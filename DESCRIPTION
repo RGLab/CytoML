@@ -10,7 +10,8 @@ License: Artistic-2.0
 LazyData: TRUE
 Imports:
   flowCore,
-  flowWorkspace,
+  flowWorkspace (>= 3.17.43),
+  openCyto (>= 1.9.9),
   XML,
   data.table,
   flowUtils (>= 1.35.7),

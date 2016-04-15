@@ -1,5 +1,5 @@
 
-# CytoML: A tool for openCyto exchange the hierarchical gated cytometry data with third-party platform
+# CytoML: A tool for openCyto to exchange the hierarchical gated cytometry data with third-party platform
 
 This package is designed import/export the hierarchical gated flow data to/from `openCyto` framework using the standard cytometry format: `gatingML2.0` and `FCS3.0`.
 

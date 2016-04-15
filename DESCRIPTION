@@ -1,0 +1,28 @@
+Package: CytoML
+Type: Package
+Title: GatingML interface for openCyto
+Version: 0.1
+Date: 2016-04-15
+Author: Mike Jiang
+Maintainer: Mike Jiang <wjiang2@fhcrc.org>
+Description: This package is designed to use GatingML2.0 as the standard format to exchange the gated data with other software platform.
+License: Artistic-2.0
+LazyData: TRUE
+Imports:
+  flowCore,
+  flowWorkspace,
+  XML,
+  data.table,
+  flowUtils (>= 1.35.7),
+  jsonlite,
+  RBGL,
+  graph,
+  base64enc
+biocViews: FlowCytometry, DataImport, DataRepresentation
+Suggests:
+  testthat,
+	flowWorkspaceData,
+	knitr,
+	ggcyto
+VignetteBuilder: knitr
+RoxygenNote: 5.0.1

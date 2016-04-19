@@ -19,8 +19,8 @@ get children nodes
 \dontrun{
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 g <- read.gatingML.cytobank(xmlfile)
-getChildren(g, "GateSet_694130")
-getParent(g, "GateSet_694130")
+getChildren(g, "GateSet_722326")
+getParent(g, "GateSet_722326")
 }
 }
 

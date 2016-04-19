@@ -25,7 +25,7 @@ xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML"
 fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = T)
 gs <- parse.gatingML(xmlfile, fcsFiles)
 ## verify the stats are correct
-statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "flowWorkspace")
+statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")
 dt_merged <- compare.counts(gs, statsfile, id.vars = "population")
 all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 }

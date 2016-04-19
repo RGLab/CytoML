@@ -4,7 +4,19 @@
 \alias{GatingSet2GatingML}
 \title{Convert a GatingSet to gatingML}
 \usage{
-GatingSet2GatingML(gs, outFile, showHidden = FALSE, ...)
+GatingSet2GatingML(gs, output, showHidden = FALSE, type = c("cytobank",
+  "flowjo"), ...)
+}
+\arguments{
+\item{output}{a file name when type is "cytobank", a folder name when type is "flowjo"}
+
+\item{showHidden}{whether to include the hidden population nodes in the output}
+
+\item{type}{either "cytobank" or "flowjo"}
+
+\item{...}{other arguments}
+
+\item{a}{GatingSet object}
 }
 \description{
 this function retrieves the gates from GatingSet

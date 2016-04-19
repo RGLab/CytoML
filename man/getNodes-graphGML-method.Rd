@@ -28,7 +28,7 @@ get nodes from {graphGML} object
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 g <- read.gatingML.cytobank(xmlfile)
 getNodes(g)
-getNodes(gt, only.names = FALSE)
+getNodes(g, only.names = FALSE)
 }
 }
 

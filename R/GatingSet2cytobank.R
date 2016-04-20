@@ -5,7 +5,7 @@ GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default
     warning("With 'cytobank.default.scale' set to 'TRUE', data and gates will be re-transformed with cytobank's default scaling settings, which may affect how gates look like.")
 
   flowEnv <- new.env(parent = emptyenv())
-  res <- export_comp_trans(gs, flowEnv, cytobank.default.scale = cytobank.default.scale)
+  res <- export_comp_trans(gs, flowEnv, cytobank.default.scale = cytobank.default.scale, type = "cytobank")
   #convert gates to GML2
   export_gates_cytobank(gs, flowEnv, res[["trans.Gm2objs"]], res[["trans"]], res[["compId"]], showHidden = showHidden)
 

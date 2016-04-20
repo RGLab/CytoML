@@ -26,7 +26,8 @@
 #'
 #' #output to flowJo
 #' outDir <- "/loc/no-backup/mike/test"#tempfile()
-#' GatingSet2GatingML(gs, outDir, type = "flowjo")
+#' Rm("CD8", gs)
+#' GatingSet2GatingML(gs, outDir, type = "flowJo")
 #'
 #' #output to cytobank
 #' outFile <- tempfile(fileext = ".xml")
@@ -34,7 +35,7 @@
 #'
 #'
 #' }
-GatingSet2GatingML <- function(gs, output, showHidden = FALSE, type = c("cytobank", "flowjo"), ...){
+GatingSet2GatingML <- function(gs, output, showHidden = FALSE, type = c("cytobank", "flowJo"), ...){
   type <- match.arg(type)
 
   if(type == "cytobank")
@@ -44,8 +45,9 @@ GatingSet2GatingML <- function(gs, output, showHidden = FALSE, type = c("cytoban
 
 }
 
-export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE)
+export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type = c("cytobank", "flowJo"))
 {
+  type <- match.arg(type)
   #parse comp and channel names
   comp <- gs@compensation
   if(is.null(comp)){
@@ -76,9 +78,21 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE)
 
   #add comp
   if(!is.null(comp)){
-    #prefix the channels since cytobank expect that
-    prefix_chnls <- paste0("Comp_", chnls)
-    rownames(comp@spillover) <- prefix_chnls #change fluorochromes and leave detector(colnames) unchanged
+
+    if(type == "cytobank"){
+      #prefix the channels since cytobank expect that
+      prefix_chnls <- paste0("Comp_", chnls)
+      rownames(comp@spillover) <- prefix_chnls #change fluorochromes and leave detector(colnames) unchanged
+    }else{
+      #prefix the channels
+      prefix_chnls <- paste0("Comp-", chnls)
+      # prefix_chnls <- chnls #flowJo use the raw channel name
+      # rownames(comp@spillover) <- prefix_chnls #change fluorochromes
+      # markers <- markernames(gs)
+      # rownames(comp@spillover) <- markers #change detector to marker names because flowJo seems to expect that
+    }
+
+
     comp <- compensation(comp@spillover)
 
     compId <- identifier(comp)

@@ -10,7 +10,7 @@ GatingSet2flowJo <- function(gs, outDir, showHidden = FALSE){
   for(sn in sampleNames(gs)){
     #convert comp and trans as GML2 compatible format and save to env
     flowEnv <- new.env(parent = emptyenv())
-    res <- export_comp_trans(gs[sn], flowEnv)
+    res <- export_comp_trans(gs[sn], flowEnv, type = "flowJo")
     #convert gates to GML2
     export_gates_flowJo(gs[[sn]], flowEnv, res[["trans.Gm2objs"]], res[["trans"]], res[["compId"]], showHidden = showHidden)
 

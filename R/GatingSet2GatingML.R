@@ -40,8 +40,11 @@ GatingSet2GatingML <- function(gs, output, showHidden = FALSE, type = c("cytoban
 
   if(type == "cytobank")
     GatingSet2cytobank(gs = gs, outFile = output, showHidden = showHidden, ...)
-  else
-    GatingSet2flowJo(gs = gs, outDir = output, showHidden = showHidden)
+  else{
+    stop("FlowJo does not support standard gatingML files yet!Please use 'GatingSet2flowJo' to export flowJo workspace file instead.")
+    GatingSet2flowJo_gatingML(gs = gs, outDir = output, showHidden = showHidden)
+  }
+
 
 }
 

@@ -1,7 +1,7 @@
 
-# CytoML: A tool for openCyto to exchange the hierarchical gated cytometry data with third-party platform
+# CytoML: A tool designed to work with openCyto to exchange gated cytometry data with third-party platforms
 
-This package is designed import/export the hierarchical gated flow data to/from `openCyto` framework using the standard cytometry format: `gatingML2.0` and `FCS3.0`.
+This package is designed to import/export the hierarchical gated flow data to/from the `openCyto` framework using the standard cytometry format: `gatingML2.0` and `FCS3.0`. This package makes use of our `GatingSet` R object and data model such that imported data can easily be manipulated and visualized in R using tools like `OpenCyto` and `ggcyto`.
 
 
 ### INSTALLATION
@@ -15,10 +15,9 @@ install.packages("devtools")
 library(devtools) #load it
 install_github("RGLab/flowWorkspace", ref="trunk")
 install_github("RGLab/openCyto", ref="trunk")
-
 ```
 
-### Import `gatingML` and `FCS` data from other platform into `openCyto`
+### Import `gatingML` and `FCS` data from other platforms into `openCyto`
 
 ```r
 library(CytoML)
@@ -28,6 +27,7 @@ gs <- parse.gatingML(xmlfile, fcsFiles)
 ```
 
 ### Then you can interact with the gated data (`GatingSet`)
+
 ```r
 #get the first sample
 gh <- gs[[1]]
@@ -39,10 +39,10 @@ getNodes(gh)
 getPopStats(gh)
 #plot the gates
 plotGate(gh) 
-
 ```
 
 ### Export the existing `GatingSet` from `openCyto` to `gatingML` 
+
 ```r
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))

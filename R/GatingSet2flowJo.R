@@ -15,8 +15,8 @@
 #' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 #'
 #' #output to flowJo
-#' outFile <- tempfile(fileext = ".xml")
-#' GatingSet2GatingML(gs, outFile)
+#' outFile <- "/loc/no-backup/mike/test/ws/temp.wsp"#tempfile(fileext = ".wsp")
+#' GatingSet2flowJo(gs, outFile)
 #'
 #'
 #' }
@@ -25,7 +25,7 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   ws <- workspaceNode(gs)
 
   ## Write out to an XML file
-  saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", localeToCharset()))
+  saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", localeToCharset()[1]))
 }
 
 workspaceNode <- function(gs, ...){
@@ -37,9 +37,10 @@ workspaceNode <- function(gs, ...){
                                  )
                     , xmlNode("SampleList"
                               , .children = lapply(gs, function(gh){
-                                                xmlNode("Sample", datasetNode(gh)
+                                                xmlNode("Sample"
+                                                        , datasetNode(gh)
                                                         , spilloverMatrixNode(gh)
-                                                        , transformationNode(gh)
+#                                                         , transformationNode(gh)
                                                         , keywordNode(gh)
                                                         , sampleNode(gh, ...)
                                                       )
@@ -69,6 +70,7 @@ spilloverMatrixNode <- function(gh){
 
           , .children = c(list(paramerterNode(colnames(mat)))
                            , spilloverNodes(mat)
+
                             )
 
         )
@@ -101,9 +103,127 @@ paramerterNode <- function(params){
 
 }
 
+keywordNode <- function(gh){
+  kw <- keyword(gh)
+  kns <- names(kw)
+  kns <- kn[!grepl("flowCore", kns)]
+  xmlNode("Keywords", .children = lapply(kns, function(kn){
+                        xmlNode("Keyword", attrs = c(name = kn, value = as.character(kw[[kn]])))
+                })
+          )
+}
+
+
 
 sampleNode <- function(gh, showHidden = FALSE){
+  sn <- pData(gh)[["name"]]
+  nodes <- getNodes(gh, showHidden = showHidden)
 
+  stat <- getTotal(gh, "root", flowJo = TRUE)
+  children <- getChildren(gh, "root")
+  param <- as.vector(parameters(getGate(gh, children[1])))
+  trans <- getTransformations(gh, only.function = FALSE)
+  xmlNode("SampleNode", attrs = c(name = sn, count = ifelse(is.na(stat)||stat == -1, "", stat))
+                      , graphNode(param[1], param[2])
+                      , subPopulationNode(gh, children, trans)
+          )
+}
+
+graphNode <- function(x, y){
+  xmlNode("Graph"
+          , attrs = c(smoothing="0", backColor="#ffffff", foreColor="#000000", type="Pseudocolor", fast="1")
+          , xmlNode("Axis", attrs = c(dimension="x", name= x, label="", auto="auto"))
+          , xmlNode("Axis", attrs = c(dimension="y", name= y, label="", auto="auto"))
+          )
+}
+
+subPopulationNode <- function(gh, pops, trans){
+  subPops <-lapply(pops, function(pop){
+                  gate <- getGate(gh, pop)
+                  eventsInside <- !flowWorkspace:::isNegated(gh, pop)
+                  children <- getChildren(gh, pop)
+                  if(length(children) == 0){
+                    gate.dim <- gate
+                    subNode <- NULL
+                  }else{
+                    gate.dim <- getGate(gh, children[1])
+                    subNode <- subPopulationNode(gh, children, trans)
+                  }
+
+                  gate <- inverseTransGate(gate, trans)
+
+                  param <- as.vector(parameters(gate.dim))
+                  xmlNode("Population"
+                          , attrs = c(name = basename(pop), count = getTotal(gh, pop, flowJo = TRUE))
+                          , graphNode(param[1], param[2])
+                          , gateNode(gate, eventsInside)
+                          , subNode
+                  )
+                })
+    xmlNode("Subpopulations", .children = subPops)
+}
+
+inverseTransGate <- function(gate, trans){
+
+  params <- as.vector(parameters(gate))
+  trans.names <- names(trans)
+
+  for(i in seq_along(params)){
+    param <- params[i]
+    ind <- grepl(param, trans.names)
+    nMatched <- sum(ind)
+    if(nMatched == 1){
+
+      trans.obj <- trans[[which(ind)]]
+      inv.fun <- trans.obj[["inverse"]]
+      #rescale
+      gate <- transform(gate, inv.fun, param)
+
+    }else if(nMatched > 1)
+      stop("multiple trans matched to :", param)
+    }
+
+    gate
 
 }
 
+gateAttr <- function(eventsInside){
+  c(eventsInside = as.character(sum(eventsInside))
+    , annoOffsetX="0"
+    , annoOffsetY="0"
+    , tint="#000000"
+    , isTinted="0"
+    , lineWeight="Normal"
+    , userDefined="1"
+    , percentX="0"
+    , percentY="0"
+  )
+}
+
+gateNode <- function(gate, ...)UseMethod("gateNode")
+
+gateNode.default <- function(gate, ...)stop("unsupported gate type: ", class(gate))
+
+gateNode.polygonGate <- function(gate, ...){
+
+  # flowUtils:::xmlRectangleGateWin(gate)
+  dims <- lapply(parameters(gate), flowUtils:::xmlDimensionNode)
+  verts <- apply(gate@boundaries, 1, flowUtils:::xmlVertexNode)
+  xmlNode("PolygonGate"
+          , namespace="gating"
+          , attrs = gateAttr(...)
+          , .children=c(dims, verts)
+          )
+}
+# gateNode.ellipsoidGate <- function(gate){
+  # flowUtils:::xmlEllipsoidGateNode(gate)
+# }
+gateNode.rectangleGate <- function(gate, ...){
+  # flowUtils:::xmlRectangleGateWin(gate)
+  dims <- lapply(parameters(gate), function(x)
+                flowUtils:::xmlDimensionNode(parameter=x, min=gate@min[x], max=gate@max[x]))
+  xmlNode("RectangleGate"
+          , namespace="gating"
+          , attrs = gateAttr(...)
+          , .children=dims)
+}

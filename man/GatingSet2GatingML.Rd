@@ -5,7 +5,7 @@
 \title{Convert a GatingSet to gatingML}
 \usage{
 GatingSet2GatingML(gs, output, showHidden = FALSE, type = c("cytobank",
-  "flowjo"), ...)
+  "flowJo"), ...)
 }
 \arguments{
 \item{output}{a file name when type is "cytobank", a folder name when type is "flowjo"}
@@ -30,11 +30,22 @@ operation:
 }
 \examples{
 \dontrun{
+library(flowWorkspace)
 library(CytoML)
+
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+
+#output to flowJo
+outDir <- "/loc/no-backup/mike/test"#tempfile()
+Rm("CD8", gs)
+GatingSet2GatingML(gs, outDir, type = "flowJo")
+
+#output to cytobank
 outFile <- tempfile(fileext = ".xml")
-GatingSet2GatingML(gs, outFile)
+GatingSet2GatingML(gs, outFile) #type by default is 'cytobank'
+
+
 }
 }
 

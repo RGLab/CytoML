@@ -29,44 +29,89 @@ GatingSet2flowJo <- function(gs, outFile, ...){
 }
 
 workspaceNode <- function(gs, ...){
-  xmlNode("Workspace", attrs = c("xmlns:xsi" = "http://www.w3.org/2001/XMLSchema-instance"
+  guids <- sampleNames(gs)
+  sampleIds <- seq_along(guids)
+  xmlNode("Workspace"
+          , attrs = c(version = "20.0"
+                                  , "xmlns:xsi" = "http://www.w3.org/2001/XMLSchema-instance"
                                   , "xmlns:gating" = "http://www.isac-net.org/std/Gating-ML/v2.0/gating"
                                   , "xmlns:transforms" = "http://www.isac-net.org/std/Gating-ML/v2.0/transformations"
                                   , "xmlns:data-type" ="http://www.isac-net.org/std/Gating-ML/v2.0/datatypes"
                                   , "xsi:schemaLocation" = "http://www.isac-net.org/std/Gating-ML/v2.0/gating http://www.isac-net.org/std/Gating-ML/v2.0/gating/Gating-ML.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/transformations http://www.isac-net.org/std/Gating-ML/v2.0/gating/Transformations.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/datatypes http://www.isac-net.org/std/Gating-ML/v2.0/gating/DataTypes.v2.0.xsd"
                                  )
-                    , xmlNode("SampleList"
-                              , .children = lapply(gs, function(gh){
-                                                xmlNode("Sample"
-                                                        , datasetNode(gh)
-                                                        , spilloverMatrixNode(gh)
-#                                                         , transformationNode(gh)
-                                                        , keywordNode(gh)
-                                                        , sampleNode(gh, ...)
-                                                      )
-                                              })
-                            )
+          , groupNode(sampleIds)
+          , SampleListNode(gs, sampleIds, ...)
+
         )
 
 }
 
-datasetNode <- function(gh){
+groupNode <- function(sampleIds){
+  xmlNode("Groups"
+          , xmlNode("GroupNode"
+                    , attrs = c(name="All Samples")
+                    , xmlNode("Group"
+                              , attrs = c(name="All Samples")
+                              , xmlNode("SampleRefs"
+                                        , .children = lapply(sampleIds
+                                                             , function(sampleId){
+                                                                xmlNode("SampleRef", attrs = c(sampleID = sampleId))
+                                                             })
+                                        )
+                              )
+                    )
+          )
+}
 
-  xmlNode("DataSet", attrs = c("uri" = pData(gh)[["name"]]))
+SampleListNode <- function(gs, sampleIds, ...){
+  xmlNode("SampleList"
+          , .children = lapply(sampleIds, function(sampleId){
+                    guid <- sampleNames(gs)[sampleId]
+                    gh <- gs[[guid]]
+                    xmlNode("Sample"
+                            , datasetNode(gh, sampleId)
+                            , spilloverMatrixNode(gh)
+                            #                                                         , transformationNode(gh)
+                            , keywordNode(gh)
+                            , sampleNode(gh, sampleId, ...)
+                    )
+                  })
+        )
+}
+
+datasetNode <- function(gh, sampleId){
+
+  xmlNode("DataSet", attrs = c("uri" = pData(gh)[["name"]]
+                               , sampleID = sampleId)
+          )
 
 }
 spilloverMatrixNode <- function(gh){
-  mat <- getCompensationMatrices(gh)
-  mat <- mat@spillover
+  compobj <- gh@compensation
+  if(is.null(compobj)){
+    mat <- getCompensationMatrices(gh)@spillover
+    comp <- flowWorkspace:::.cpp_getCompensation(gh@pointer,sampleNames(gh))
+    cid <- comp$cid
+    prefix <- comp$prefix
+    suffix <- comp$suffix
+  }else{
+    mat <- compobj@spillover
+    cid <- "1"
+    prefix <- ""
+    suffix <- ""
+  }
+
+
+
   xmlNode("transforms:spilloverMatrix"
-          , attrs = c(prefix="Comp-"
+          , attrs = c(prefix = prefix
                       , name="Acquisition-defined"
                       , editable="0"
                       , color="#c0c0c0"
                       , version="FlowJo-10.1r5"
                       , status="FINALIZED"
-                      , "transforms:id" = "" #"50174c36-d015-4f8a-aa3a-68ea4880341b"
-                      , suffix="" )
+                      , "transforms:id" = cid
+                      , suffix = suffix )
 
           , .children = c(list(paramerterNode(colnames(mat)))
                            , spilloverNodes(mat)
@@ -106,16 +151,19 @@ paramerterNode <- function(params){
 keywordNode <- function(gh){
   kw <- keyword(gh)
   kns <- names(kw)
-  kns <- kn[!grepl("flowCore", kns)]
+  kns <- kns[!grepl("flowCore", kns)]
+  #skip spillover matrix for now since it requires the special care (see flowCore:::collapseDesc)
+  kns <- kns[!grepl("SPILL", kns, ignore.case = TRUE)]
+
   xmlNode("Keywords", .children = lapply(kns, function(kn){
-                        xmlNode("Keyword", attrs = c(name = kn, value = as.character(kw[[kn]])))
+                          xmlNode("Keyword", attrs = c(name = kn, value = kw[[kn]]))
                 })
           )
 }
 
 
 
-sampleNode <- function(gh, showHidden = FALSE){
+sampleNode <- function(gh, sampleId, showHidden = FALSE){
   sn <- pData(gh)[["name"]]
   nodes <- getNodes(gh, showHidden = showHidden)
 
@@ -123,7 +171,10 @@ sampleNode <- function(gh, showHidden = FALSE){
   children <- getChildren(gh, "root")
   param <- as.vector(parameters(getGate(gh, children[1])))
   trans <- getTransformations(gh, only.function = FALSE)
-  xmlNode("SampleNode", attrs = c(name = sn, count = ifelse(is.na(stat)||stat == -1, "", stat))
+  xmlNode("SampleNode", attrs = c(name = sn
+                                  , count = ifelse(is.na(stat)||stat == -1, "", stat)
+                                  , sampleID = sampleId
+                                  )
                       , graphNode(param[1], param[2])
                       , subPopulationNode(gh, children, trans)
           )
@@ -156,7 +207,9 @@ subPopulationNode <- function(gh, pops, trans){
                   xmlNode("Population"
                           , attrs = c(name = basename(pop), count = getTotal(gh, pop, flowJo = TRUE))
                           , graphNode(param[1], param[2])
-                          , gateNode(gate, eventsInside)
+                          , xmlNode("Gate"
+                                    , gateNode(gate, eventsInside)
+                                    )
                           , subNode
                   )
                 })
@@ -199,6 +252,18 @@ gateAttr <- function(eventsInside){
     , percentY="0"
   )
 }
+#modified based on flowUtils:::xmlDimensionNode
+xmlDimensionNode <- function(parameter)
+{
+  xmlNode("dimension"
+          , namespace = "gating"
+          , xmlNode("fcs-dimension"
+                    , namespace = "data-type"
+                    , attrs = c("data-type:name" = parameter)
+                    )
+        )
+
+}
 
 gateNode <- function(gate, ...)UseMethod("gateNode")
 
@@ -207,7 +272,7 @@ gateNode.default <- function(gate, ...)stop("unsupported gate type: ", class(gat
 gateNode.polygonGate <- function(gate, ...){
 
   # flowUtils:::xmlRectangleGateWin(gate)
-  dims <- lapply(parameters(gate), flowUtils:::xmlDimensionNode)
+  dims <- lapply(parameters(gate), xmlDimensionNode)
   verts <- apply(gate@boundaries, 1, flowUtils:::xmlVertexNode)
   xmlNode("PolygonGate"
           , namespace="gating"
@@ -221,7 +286,7 @@ gateNode.polygonGate <- function(gate, ...){
 gateNode.rectangleGate <- function(gate, ...){
   # flowUtils:::xmlRectangleGateWin(gate)
   dims <- lapply(parameters(gate), function(x)
-                flowUtils:::xmlDimensionNode(parameter=x, min=gate@min[x], max=gate@max[x]))
+                xmlDimensionNode(parameter=x, min=gate@min[x], max=gate@max[x]))
   xmlNode("RectangleGate"
           , namespace="gating"
           , attrs = gateAttr(...)

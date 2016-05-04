@@ -71,7 +71,7 @@ SampleListNode <- function(gs, sampleIds, ...){
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
                             , spilloverMatrixNode(gh)
-                            #                                                         , transformationNode(gh)
+                            , transformationNode(gh)
                             , keywordNode(gh)
                             , sampleNode(gh, sampleId, ...)
                     )
@@ -136,6 +136,51 @@ spilloverNodes <- function(mat){
             )
   })
 
+}
+
+transformationNode <- function(gh){
+  trans.objs <- getTransformations(gh, only.function = FALSE)
+  chnls <- as.vector(parameters(getCompensationMatrices(gh)))
+  xmlNode("Transformations"
+          , .children = lapply(chnls, function(chnl){
+                ind <- grepl(chnl, names(trans.objs))
+                if(sum(ind) == 0)
+                  stop("no transformation for channel: ", chnl)
+                if(sum(ind) > 1)
+                  stop("multiple transformations found for channel: ", chnl)
+                paramNode <- xmlNode("data-type:parameter",  attrs = c("data-type:name" = chnl))
+                trans.obj <- trans.objs[[which(ind)]]
+                trans.type <- trans.obj[["name"]]
+                if(trans.type == "flowJo_biexp"){
+                  func <- trans.obj[["transform"]]
+                  param <-  attr(func,"parameters")
+                  transNode <- xmlNode("biex"
+                                      , namespace = "transforms"
+                                      , attrs = c("transforms:length" = param[["channelRange"]]
+                                                  , "transforms:maxRange" = param[["maxValue"]]
+                                                  , "transforms:neg" = param[["neg"]]
+                                                  , "transforms:width" = param[["widthBasis"]]
+                                                  , "transforms:pos" = param[["pos"]]
+                                                  )
+                                      )
+                }else if(trans.type == "flowJo_caltbl"){
+                  warnings("Calibration table is stored in GatingSet!We are unable to restore the original biexp parameters,thus use the default settings (length = 4096, neg = 0, width = -10, pos = 4.5), which may or may not produce the same gating results.")
+
+                  transNode <- xmlNode("biex"
+                                      , namespace = "transforms"
+                                      , attrs = c("transforms:length" = 4096
+                                                  , "transforms:maxRange" = 262144
+                                                  , "transforms:neg" = 0
+                                                  , "transforms:width" = -10
+                                                  , "transforms:pos" = 4.5
+                                              )
+                                      )
+                }else
+                  stop("unsupported transformation: ", trans.type)
+
+                addChildren(transNode, paramNode)
+              })
+          )
 }
 
 paramerterNode <- function(params){

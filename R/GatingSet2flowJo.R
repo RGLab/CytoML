@@ -150,8 +150,8 @@ transformationNode <- function(gh){
                 paramNode <- xmlNode("data-type:parameter",  attrs = c("data-type:name" = chnl))
                 trans.obj <- trans.objs[[chnl]]
                 trans.type <- trans.obj[["name"]]
+                func <- trans.obj[["transform"]]
                 if(trans.type == "flowJo_biexp"){
-                  func <- trans.obj[["transform"]]
                   param <-  attr(func,"parameters")
                   transNode <- xmlNode("biex"
                                       , namespace = "transforms"
@@ -174,6 +174,19 @@ transformationNode <- function(gh){
                                                   , "transforms:pos" = 4.5
                                               )
                                       )
+                }else if(trans.type == "flowJo_fasinh"){
+                    param <- as.list(environment(func))
+
+                    transNode <- xmlNode("fasinh"
+                                         , namespace = "transforms"
+                                         , attrs = c("transforms:length" = param[["length"]]
+                                                     , "transforms:maxRange" = param[["t"]]
+                                                     , "transforms:T" = param[["t"]]
+                                                     , "transforms:A" = param[["a"]]
+                                                     , "transforms:M" = param[["m"]]
+                                         )
+                    )
+
                 }else
                   stop("unsupported transformation: ", trans.type)
 

@@ -1,6 +1,6 @@
 context("Exporting GatingSet to flowJo workspace")
 
-path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/gatingML"
+path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
 
 test_that("GatingSet2flowJo: rectangleGate + boolgate",{
   dataDir <- "/fh/fast/gottardo_r/mike_working/wsTestSuite/curlyQuad/example1"
@@ -42,9 +42,12 @@ test_that("GatingSet2flowJo: manual gates with calibration table stored ",{
     expect_equal(stats.orig, stats.new)
       })
 
-test_that("GatingSet2flowJo: fasinh ",{
-  dataDir <- system.file("extdata",package="flowWorkspaceData")
-  gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+test_that("GatingSet2flowJo: no comp + fasinh ",{
+  thisPath <- file.path(path, "PROVIDE")
+  wsFile <- file.path(thisPath, "batch1 local and week 53.wsp")
+
+  ws <- openWorkspace(wsFile)
+  gs <- parseWorkspace(ws, name = 1, subset = 3, sampNloc = "sampleNode", additional.keys = NULL)
   stats.orig <- getPopStats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -52,7 +55,7 @@ test_that("GatingSet2flowJo: fasinh ",{
 
   #parse it back in
   ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode", additional.keys = NULL)
   stats.new <- getPopStats(gs1[[1]])
   expect_equal(stats.orig, stats.new)
 })

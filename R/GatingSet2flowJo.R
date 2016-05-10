@@ -276,11 +276,11 @@ subPopulationNode <- function(gh, pops, trans){
 inverseTransGate <- function(gate, trans){
 
   params <- as.vector(parameters(gate))
-  trans.names <- names(trans)
+  chnls <- names(trans)
 
   for(i in seq_along(params)){
     param <- params[i]
-    ind <- grepl(param, trans.names)
+    ind <- sapply(chnls, function(chnl)grepl(chnl, param, fixed = TRUE), USE.NAMES = FALSE)
     nMatched <- sum(ind)
     if(nMatched == 1){
 

@@ -293,10 +293,11 @@ gateAttr <- function(eventsInside){
   )
 }
 #modified based on flowUtils:::xmlDimensionNode
-xmlDimensionNode <- function(parameter)
+xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 {
   xmlNode("dimension"
           , namespace = "gating"
+          , attrs = c(min = min, max = max)
           , xmlNode("fcs-dimension"
                     , namespace = "data-type"
                     , attrs = c("data-type:name" = parameter)
@@ -325,8 +326,10 @@ gateNode.polygonGate <- function(gate, ...){
 # }
 gateNode.rectangleGate <- function(gate, ...){
   # flowUtils:::xmlRectangleGateWin(gate)
-  dims <- lapply(parameters(gate), function(x)
-                xmlDimensionNode(parameter=x, min=gate@min[x], max=gate@max[x]))
+  dims <- lapply(parameters(gate), function(x){
+
+              xmlDimensionNode(parameter = x, min = gate@min[[x]], max = gate@max[[x]])
+              })
   xmlNode("RectangleGate"
           , namespace="gating"
           , attrs = gateAttr(...)

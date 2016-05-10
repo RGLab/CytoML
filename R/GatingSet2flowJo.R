@@ -89,11 +89,15 @@ datasetNode <- function(gh, sampleId){
 spilloverMatrixNode <- function(gh){
   compobj <- gh@compensation
   if(is.null(compobj)){
-    mat <- getCompensationMatrices(gh)@spillover
-    comp <- flowWorkspace:::.cpp_getCompensation(gh@pointer,sampleNames(gh))
-    cid <- comp$cid
-    prefix <- comp$prefix
-    suffix <- comp$suffix
+    compobj <- getCompensationMatrices(gh)
+    if(!is.null(compobj)){
+      mat <- compobj@spillover
+      comp <- flowWorkspace:::.cpp_getCompensation(gh@pointer,sampleNames(gh))
+      cid <- comp$cid
+      prefix <- comp$prefix
+      suffix <- comp$suffix
+    }
+
   }else{
     mat <- compobj@spillover
     cid <- "1"
@@ -102,24 +106,24 @@ spilloverMatrixNode <- function(gh){
   }
 
 
+  if(!is.null(compobj)){
+    xmlNode("transforms:spilloverMatrix"
+            , attrs = c(prefix = prefix
+                        , name="Acquisition-defined"
+                        , editable="0"
+                        , color="#c0c0c0"
+                        , version="FlowJo-10.1r5"
+                        , status="FINALIZED"
+                        , "transforms:id" = cid
+                        , suffix = suffix )
 
-  xmlNode("transforms:spilloverMatrix"
-          , attrs = c(prefix = prefix
-                      , name="Acquisition-defined"
-                      , editable="0"
-                      , color="#c0c0c0"
-                      , version="FlowJo-10.1r5"
-                      , status="FINALIZED"
-                      , "transforms:id" = cid
-                      , suffix = suffix )
+            , .children = c(list(paramerterNode(colnames(mat)))
+                             , spilloverNodes(mat)
 
-          , .children = c(list(paramerterNode(colnames(mat)))
-                           , spilloverNodes(mat)
+                              )
 
-                            )
-
-        )
-
+          )
+  }
 }
 spilloverNodes <- function(mat){
   lapply(rownames(mat), function(param){

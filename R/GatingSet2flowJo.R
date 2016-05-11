@@ -220,10 +220,8 @@ keywordNode <- function(gh){
 
 
 
-sampleNode <- function(gh, sampleId, showHidden = FALSE){
+sampleNode <- function(gh, sampleId, ...){
   sn <- pData(gh)[["name"]]
-  nodes <- getNodes(gh, showHidden = showHidden)
-
   stat <- getTotal(gh, "root", flowJo = TRUE)
   children <- getChildren(gh, "root")
   param <- as.vector(parameters(getGate(gh, children[1])))
@@ -233,7 +231,7 @@ sampleNode <- function(gh, sampleId, showHidden = FALSE){
                                   , sampleID = sampleId
                                   )
                       , graphNode(param[1], param[2])
-                      , subPopulationNode(gh, children, trans)
+                      , subPopulationNode(gh, children, trans, ...)
           )
 }
 
@@ -245,30 +243,33 @@ graphNode <- function(x, y){
           )
 }
 
-subPopulationNode <- function(gh, pops, trans){
+subPopulationNode <- function(gh, pops, trans, showHidden = FALSE){
   subPops <-lapply(pops, function(pop){
-                  gate <- getGate(gh, pop)
-                  eventsInside <- !flowWorkspace:::isNegated(gh, pop)
-                  children <- getChildren(gh, pop)
-                  if(length(children) == 0){
-                    gate.dim <- gate
-                    subNode <- NULL
-                  }else{
-                    gate.dim <- getGate(gh, children[1])
-                    subNode <- subPopulationNode(gh, children, trans)
+                  if(!flowWorkspace:::isHidden(gh, pop)||showHidden){
+
+                      gate <- getGate(gh, pop)
+                      eventsInside <- !flowWorkspace:::isNegated(gh, pop)
+                      children <- getChildren(gh, pop)
+                      if(length(children) == 0){
+                        gate.dim <- gate
+                        subNode <- NULL
+                      }else{
+                        gate.dim <- getGate(gh, children[1])
+                        subNode <- subPopulationNode(gh, children, trans)
+                      }
+
+                      gate <- inverseTransGate(gate, trans)
+
+                      param <- as.vector(parameters(gate.dim))
+                      xmlNode("Population"
+                              , attrs = c(name = basename(pop), count = getTotal(gh, pop, flowJo = TRUE))
+                              , graphNode(param[1], param[2])
+                              , xmlNode("Gate"
+                                        , gateNode(gate, eventsInside)
+                                        )
+                              , subNode
+                      )
                   }
-
-                  gate <- inverseTransGate(gate, trans)
-
-                  param <- as.vector(parameters(gate.dim))
-                  xmlNode("Population"
-                          , attrs = c(name = basename(pop), count = getTotal(gh, pop, flowJo = TRUE))
-                          , graphNode(param[1], param[2])
-                          , xmlNode("Gate"
-                                    , gateNode(gate, eventsInside)
-                                    )
-                          , subNode
-                  )
                 })
     xmlNode("Subpopulations", .children = subPops)
 }
@@ -314,7 +315,7 @@ xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 {
   xmlNode("dimension"
           , namespace = "gating"
-          , attrs = c(min = min, max = max)
+          , attrs = c("gating:min" = min, "gating:max" = max)
           , xmlNode("fcs-dimension"
                     , namespace = "data-type"
                     , attrs = c("data-type:name" = parameter)
@@ -326,6 +327,13 @@ xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 gateNode <- function(gate, ...)UseMethod("gateNode")
 
 gateNode.default <- function(gate, ...)stop("unsupported gate type: ", class(gate))
+
+
+gateNode.ellipsoidGate <- function(gate, ...){
+
+  gate <- as(gate, "polygonGate")
+  gateNode(gate, ...)
+}
 
 gateNode.polygonGate <- function(gate, ...){
 

@@ -68,12 +68,15 @@ SampleListNode <- function(gs, sampleIds, ...){
           , .children = lapply(sampleIds, function(sampleId){
                     guid <- sampleNames(gs)[sampleId]
                     gh <- gs[[guid]]
+                    matInfo <- getSpilloverMat(gh)
+
+
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
-                            , spilloverMatrixNode(gh)
+                            , spilloverMatrixNode(matInfo)
                             , transformationNode(gh)
                             , keywordNode(gh)
-                            , sampleNode(gh, sampleId, ...)
+                            , sampleNode(gh, sampleId, matInfo, ...)
                     )
                   })
         )
@@ -86,7 +89,7 @@ datasetNode <- function(gh, sampleId){
           )
 
 }
-spilloverMatrixNode <- function(gh){
+getSpilloverMat <- function(gh){
   compobj <- gh@compensation
   if(is.null(compobj)){
     compobj <- getCompensationMatrices(gh)
@@ -96,7 +99,8 @@ spilloverMatrixNode <- function(gh){
       cid <- comp$cid
       prefix <- comp$prefix
       suffix <- comp$suffix
-    }
+    }else
+      mat <- NULL
 
   }else{
     mat <- compobj@spillover
@@ -106,7 +110,16 @@ spilloverMatrixNode <- function(gh){
   }
 
 
-  if(!is.null(compobj)){
+  list(mat = mat, prefix = prefix,  suffix = suffix, cid = 1)
+
+}
+spilloverMatrixNode <- function(matInfo){
+  mat <- matInfo[["mat"]]
+  prefix <- "Comp-" #hardcode the prefix for vX
+  suffix <- ""
+  cid <- matInfo[["cid"]]
+
+  if(!is.null(mat)){
     rownames(mat) <- colnames(mat) #ensure rownames has channel info
     xmlNode("transforms:spilloverMatrix"
             , attrs = c(prefix = prefix
@@ -219,20 +232,34 @@ keywordNode <- function(gh){
           )
 }
 
+fixChnlName <- function(chnl, matInfo){
 
+  isRaw <- matInfo[["prefix"]] == ""
 
-sampleNode <- function(gh, sampleId, ...){
+  if(isRaw){
+    if(chnl%in%colnames(matInfo[["mat"]]))
+      chnl <- paste0("Comp-", chnl) #hardcode prefix for vX
+  }
+  chnl
+
+}
+
+sampleNode <- function(gh, sampleId, matInfo, ...){
+
   sn <- pData(gh)[["name"]]
   stat <- getTotal(gh, "root", flowJo = TRUE)
   children <- getChildren(gh, "root")
   param <- as.vector(parameters(getGate(gh, children[1])))
+
+
+  param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
   trans <- getTransformations(gh, only.function = FALSE)
   xmlNode("SampleNode", attrs = c(name = sn
                                   , count = ifelse(is.na(stat)||stat == -1, "", stat)
                                   , sampleID = sampleId
                                   )
                       , graphNode(param[1], param[2])
-                      , subPopulationNode(gh, children, trans, ...)
+                      , subPopulationNode(gh, children, trans, matInfo = matInfo, ...)
           )
 }
 
@@ -244,7 +271,7 @@ graphNode <- function(x, y){
           )
 }
 
-subPopulationNode <- function(gh, pops, trans, showHidden = FALSE){
+subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE){
   subPops <-lapply(pops, function(pop){
                   if(!flowWorkspace:::isHidden(gh, pop)||showHidden){
 
@@ -256,12 +283,14 @@ subPopulationNode <- function(gh, pops, trans, showHidden = FALSE){
                         subNode <- NULL
                       }else{
                         gate.dim <- getGate(gh, children[1])
-                        subNode <- subPopulationNode(gh, children, trans)
+                        subNode <- subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden)
                       }
 
                       gate <- inverseTransGate(gate, trans)
 
                       param <- as.vector(parameters(gate.dim))
+
+                      param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
                       count <- getTotal(gh, pop, flowJo = TRUE)
                       if(is.na(count))
                         count <- -1
@@ -269,7 +298,7 @@ subPopulationNode <- function(gh, pops, trans, showHidden = FALSE){
                               , attrs = c(name = basename(pop), count = count)
                               , graphNode(param[1], param[2])
                               , xmlNode("Gate"
-                                        , gateNode(gate, eventsInside)
+                                        , gateNode(gate, eventsInside, matInfo = matInfo)
                                         )
                               , subNode
                       )
@@ -342,10 +371,13 @@ gateNode.ellipsoidGate <- function(gate, ...){
   gateNode(gate, ...)
 }
 
-gateNode.polygonGate <- function(gate, ...){
+gateNode.polygonGate <- function(gate, matInfo, ...){
 
-  # flowUtils:::xmlRectangleGateWin(gate)
-  dims <- lapply(parameters(gate), xmlDimensionNode)
+  param <- parameters(gate)
+
+  param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
+  dims <- lapply(param, xmlDimensionNode)
+
   verts <- apply(gate@boundaries, 1, flowUtils:::xmlVertexNode)
   xmlNode("PolygonGate"
           , namespace="gating"
@@ -356,11 +388,13 @@ gateNode.polygonGate <- function(gate, ...){
 # gateNode.ellipsoidGate <- function(gate){
   # flowUtils:::xmlEllipsoidGateNode(gate)
 # }
-gateNode.rectangleGate <- function(gate, ...){
-  # flowUtils:::xmlRectangleGateWin(gate)
-  dims <- lapply(parameters(gate), function(x){
+gateNode.rectangleGate <- function(gate, matInfo, ...){
+  param <- parameters(gate)
 
-              xmlDimensionNode(parameter = x, min = gate@min[[x]], max = gate@max[[x]])
+  dims <- lapply(param, function(x){
+
+            chnl <- fixChnlName(x, matInfo = matInfo)
+            xmlDimensionNode(parameter = chnl, min = gate@min[[x]], max = gate@max[[x]])
               })
   xmlNode("RectangleGate"
           , namespace="gating"

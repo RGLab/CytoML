@@ -107,6 +107,7 @@ spilloverMatrixNode <- function(gh){
 
 
   if(!is.null(compobj)){
+    rownames(mat) <- colnames(mat) #ensure rownames has channel info
     xmlNode("transforms:spilloverMatrix"
             , attrs = c(prefix = prefix
                         , name="Acquisition-defined"
@@ -313,9 +314,12 @@ gateAttr <- function(eventsInside){
     , percentY="0"
   )
 }
+
 #modified based on flowUtils:::xmlDimensionNode
 xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 {
+  min <- ggcyto:::.fixInf(min)
+  max <- ggcyto:::.fixInf(max)
   xmlNode("dimension"
           , namespace = "gating"
           , attrs = c("gating:min" = min, "gating:max" = max)

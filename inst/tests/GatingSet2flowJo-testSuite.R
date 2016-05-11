@@ -72,7 +72,7 @@ test_that("GatingSet2flowJo: no transformation + boolean Gate",{
 
 })
 
-test_that("GatingSet2flowJo: automated gates",{
+test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity",{
   thisPath <- file.path(path, "gatingML/ics")
   #load the original automated gating set
   gs <- load_gs(file.path(thisPath, "autogating"))
@@ -88,4 +88,45 @@ test_that("GatingSet2flowJo: automated gates",{
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode", additional.keys = NULL)
   stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
   expect_equal(stats.orig, stats.new)
+})
+
+localPath <- "~/rglab/workspace/openCyto"
+test_that("tcell", {
+  #load raw FCS
+  fs <- read.flowSet(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
+  gs <- GatingSet(fs)
+
+  #compensate
+  comp <- spillover(fs[[1]])[["SPILL"]]
+  chnls <- colnames(comp)
+  comp <- compensation(comp)
+  gs <- compensate(gs, comp)
+
+  #transform
+  trans <- flowJo_biexp_trans()
+  trans <- transformerList(chnls, trans)
+  gs <- transform(gs, trans)
+
+  #run auto gating
+  gtFile <- tempfile()
+  tbl <- data.table::fread(system.file("extdata/gating_template/tcell.csv", package = "openCyto"))
+  tbl[5, gating_args:= "gate_range = c(1e3, 3e3)"]
+  tbl[8, gating_args:= "gate_range = c(2e3, 3e3)"]
+  write.csv(tbl, file = gtFile)
+  gt <- gatingTemplate(gtFile, autostart = 1L)
+  gating(gt, gs)
+
+  flowIncubator::toggle.helperGates(gt, gs) #hide the helper gates
+  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  #output to flowJo
+  outFile <- tempfile(fileext = ".wsp")
+  GatingSet2flowJo(gs, outFile)
+
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  expect_equal(stats.orig, stats.new, tol = 5e-4)
+
+
 })

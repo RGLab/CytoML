@@ -78,7 +78,7 @@ test_that("GatingSet2flowJo: automated gates",{
   gs <- load_gs(file.path(thisPath, "autogating"))
   gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
   flowIncubator::toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- getPopStats(gs[[1]])
+  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -86,6 +86,6 @@ test_that("GatingSet2flowJo: automated gates",{
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode", additional.keys = NULL)
-  stats.new <- getPopStats(gs1[[1]])
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
   expect_equal(stats.orig, stats.new)
 })

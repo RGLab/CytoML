@@ -261,8 +261,11 @@ subPopulationNode <- function(gh, pops, trans, showHidden = FALSE){
                       gate <- inverseTransGate(gate, trans)
 
                       param <- as.vector(parameters(gate.dim))
+                      count <- getTotal(gh, pop, flowJo = TRUE)
+                      if(is.na(count))
+                        count <- -1
                       xmlNode("Population"
-                              , attrs = c(name = basename(pop), count = getTotal(gh, pop, flowJo = TRUE))
+                              , attrs = c(name = basename(pop), count = count)
                               , graphNode(param[1], param[2])
                               , xmlNode("Gate"
                                         , gateNode(gate, eventsInside)

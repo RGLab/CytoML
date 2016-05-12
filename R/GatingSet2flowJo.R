@@ -244,11 +244,13 @@ fixChnlName <- function(chnl, matInfo){
 
 }
 
-sampleNode <- function(gh, sampleId, matInfo, ...){
+sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, ...){
 
   sn <- pData(gh)[["name"]]
   stat <- getTotal(gh, "root", flowJo = TRUE)
   children <- getChildren(gh, "root")
+  if(!showHidden)
+    children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
   param <- as.vector(parameters(getGate(gh, children[1])))
 
 
@@ -259,7 +261,7 @@ sampleNode <- function(gh, sampleId, matInfo, ...){
                                   , sampleID = sampleId
                                   )
                       , graphNode(param[1], param[2])
-                      , subPopulationNode(gh, children, trans, matInfo = matInfo, ...)
+                      , subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden, ...)
           )
 }
 
@@ -278,6 +280,8 @@ subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE){
                       gate <- getGate(gh, pop)
                       eventsInside <- !flowWorkspace:::isNegated(gh, pop)
                       children <- getChildren(gh, pop)
+                      if(!showHidden)
+                        children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
                       if(length(children) == 0){
                         gate.dim <- gate
                         subNode <- NULL

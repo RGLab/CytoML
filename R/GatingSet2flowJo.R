@@ -259,7 +259,7 @@ fixChnlName <- function(chnl, matInfo){
 sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, ...){
 
   sn <- pData(gh)[["name"]]
-  stat <- getTotal(gh, "root", flowJo = TRUE)
+  stat <- getTotal(gh, "root", flowJo = FALSE)
   children <- getChildren(gh, "root")
   if(!showHidden)
     children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
@@ -269,7 +269,7 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, ...){
   param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
   trans <- getTransformations(gh, only.function = FALSE)
   xmlNode("SampleNode", attrs = c(name = sn
-                                  , count = ifelse(is.na(stat)||stat == -1, "", stat)
+                                  , count = stat
                                   , sampleID = sampleId
                                   )
                       , graphNode(param[1], param[2])
@@ -307,7 +307,7 @@ subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE){
                       param <- as.vector(parameters(gate.dim))
 
                       param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
-                      count <- getTotal(gh, pop, flowJo = TRUE)
+                      count <- getTotal(gh, pop, flowJo = FALSE)
                       if(is.na(count))
                         count <- -1
                       xmlNode("Population"

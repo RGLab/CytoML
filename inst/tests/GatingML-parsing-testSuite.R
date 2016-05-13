@@ -56,6 +56,13 @@ test_that("gatingML-cytobank parsing: cytotrol tcell",{
 
 
 })
+test_that("gatingML-cytobank exporting: cytotrol tcell",{
+
+  #export the gs_orig to xml
+  tmp <- tempfile(fileext = ".xml")
+  GatingSet2GatingML(gs, tmp)
+
+})
 
 test_that("gatingML-cytobank parsing: Merck FirstExample",{
   thisPath <- file.path(path, "Merck/firstExample")

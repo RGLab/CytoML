@@ -36,10 +36,10 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
     for(fcs_id in seq_along(fcs_names)){
       sn <- fcs_names[fcs_id]
       gate <- gates[[sn]]
-      # browser()
+
       #cytobank does not support negated gate
       #we have to create inverse gate on our end
-      if(flowWorkspace:::isNegated(gs[[sn]], nodePath)){
+      if(flowWorkspace:::isNegated(gs[sn][[1]], nodePath)){
         gate <- inverse(gate, rng)
       }
       #transform to raw scale

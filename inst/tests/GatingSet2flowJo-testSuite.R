@@ -85,13 +85,14 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity",{
 
   #parse it back in
   ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode", additional.keys = NULL)
+  gs1 <- parseWorkspace(ws, name = 1, path = thisPath)
   stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
-  expect_equal(stats.orig, stats.new)
+  expect_equal(stats.orig, stats.new, tol = 2e-4)
 })
 
 localPath <- "~/rglab/workspace/openCyto"
 test_that("tcell", {
+  dataDir <- system.file("extdata",package="flowWorkspaceData")
   #load raw FCS
   fs <- read.flowSet(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
   gs <- GatingSet(fs)
@@ -111,7 +112,7 @@ test_that("tcell", {
   gtFile <- tempfile()
   tbl <- data.table::fread(system.file("extdata/gating_template/tcell.csv", package = "openCyto"))
   tbl[5, gating_args:= "gate_range = c(1e3, 3e3)"]
-  tbl[8, gating_args:= "gate_range = c(2e3, 3e3)"]
+  tbl[c(8,11), gating_args:= "gate_range = c(2e3, 3e3)"]
   write.csv(tbl, file = gtFile)
   gt <- gatingTemplate(gtFile, autostart = 1L)
   gating(gt, gs)

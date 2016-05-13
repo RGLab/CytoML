@@ -74,7 +74,7 @@ SampleListNode <- function(gs, sampleIds, ...){
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
                             , spilloverMatrixNode(matInfo)
-                            , transformationNode(gh)
+                            , transformationNode(gh, matInfo)
                             , keywordNode(gh)
                             , sampleNode(gh, sampleId, matInfo, ...)
                     )
@@ -99,8 +99,12 @@ getSpilloverMat <- function(gh){
       cid <- comp$cid
       prefix <- comp$prefix
       suffix <- comp$suffix
-    }else
+    }else{
+      prefix <- ""
+      suffix <- ""
       mat <- NULL
+    }
+
 
   }else{
     mat <- compobj@spillover
@@ -156,12 +160,15 @@ spilloverNodes <- function(mat){
 
 }
 
-transformationNode <- function(gh){
+
+transformationNode <- function(gh, matInfo){
+
   trans.objs <- getTransformations(gh, only.function = FALSE)
   chnls <- names(trans.objs)
   xmlNode("Transformations"
           , .children = lapply(chnls, function(chnl){
-                paramNode <- xmlNode("data-type:parameter",  attrs = c("data-type:name" = chnl))
+
+                paramNode <- xmlNode("data-type:parameter",  attrs = c("data-type:name" = fixChnlName(chnl, matInfo)))
                 trans.obj <- trans.objs[[chnl]]
                 trans.type <- trans.obj[["name"]]
                 func <- trans.obj[["transform"]]
@@ -232,13 +239,18 @@ keywordNode <- function(gh){
           )
 }
 
+# replace the original perfix with "Comp-" since vX only accepts this particular one
 fixChnlName <- function(chnl, matInfo){
-
-  isRaw <- matInfo[["prefix"]] == ""
-
-  if(isRaw){
-    if(chnl%in%colnames(matInfo[["mat"]]))
-      chnl <- paste0("Comp-", chnl) #hardcode prefix for vX
+  mat <- matInfo[["mat"]]
+  if(!is.null(mat)){ #only do this when spillover matrix is present
+    #get raw chnl
+    prefix <- matInfo[["prefix"]]
+    suffix <- matInfo[["suffix"]]
+    chnl <- sub(paste0("^", prefix), "", chnl) #strip prefix
+    chnl <- sub(paste0(suffix, "$"), "", chnl) #strip suffix
+    #only do it when chnl is used in compensation matrix
+    if(chnl %in% colnames(mat))
+      chnl <- paste0("Comp-", chnl) #prepend the new one
   }
   chnl
 
@@ -318,7 +330,7 @@ inverseTransGate <- function(gate, trans){
 
   for(i in seq_along(params)){
     param <- params[i]
-    ind <- sapply(chnls, function(chnl)grepl(chnl, param, fixed = TRUE), USE.NAMES = FALSE)
+    ind <- chnls %in% param
     nMatched <- sum(ind)
     if(nMatched == 1){
 

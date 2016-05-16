@@ -208,6 +208,16 @@ transformationNode <- function(gh, matInfo){
                                          )
                     )
 
+                }else if(trans.type == "flowJo_flog"){
+                  param <- as.list(environment(func))
+
+                  transNode <- xmlNode("log"
+                                       , namespace = "transforms"
+                                       , attrs = c("transforms:offset" = param[["offset"]]
+                                                   , "transforms:decades" = param[["decade"]]
+                                                   )
+                  )
+
                 }else
                   stop("unsupported transformation: ", trans.type)
 

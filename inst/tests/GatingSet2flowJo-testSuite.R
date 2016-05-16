@@ -2,6 +2,23 @@ context("Exporting GatingSet to flowJo workspace")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
 
+test_that("EllipsoidGate defined on log-transformed channels ",{
+  thisPath <- file.path(path, "ellipsoid_log")
+  wsFile <- file.path(thisPath, "xml_spillover2.xml")
+  ws <- openWorkspace(wsFile)
+  gs <- parseWorkspace(ws, name=1, execute = T, sampNloc = "sampleNode", subset = "spillover_B2.fcs")
+
+  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  #output to flowJo
+  outFile <- tempfile(fileext = ".wsp")
+  GatingSet2flowJo(gs, outFile)
+
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  expect_equal(stats.orig, stats.new)
+})
 test_that("GatingSet2flowJo: rectangleGate + boolgate",{
   dataDir <- "/fh/fast/gottardo_r/mike_working/wsTestSuite/curlyQuad/example1"
   ws <- openWorkspace(file.path(dataDir, "20151208_TBNK_DS.xml"))

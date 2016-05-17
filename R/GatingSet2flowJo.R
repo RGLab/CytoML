@@ -164,14 +164,23 @@ spilloverNodes <- function(mat){
 transformationNode <- function(gh, matInfo){
 
   trans.objs <- getTransformations(gh, only.function = FALSE)
-  chnls <- names(trans.objs)
+  fr <- getData(gh)
+
+  chnls <- colnames(fr)
+  # chnls <- names(trans.objs)
   xmlNode("Transformations"
           , .children = lapply(chnls, function(chnl){
 
                 paramNode <- xmlNode("data-type:parameter",  attrs = c("data-type:name" = fixChnlName(chnl, matInfo)))
                 trans.obj <- trans.objs[[chnl]]
-                trans.type <- trans.obj[["name"]]
-                func <- trans.obj[["transform"]]
+                if(is.null(trans.obj)){
+                  trans.type <- "flowJo_linear"
+                }else
+                {
+                  trans.type <- trans.obj[["name"]]
+                  func <- trans.obj[["transform"]]
+                }
+
                 if(trans.type == "flowJo_biexp"){
                   param <-  attr(func,"parameters")
                   transNode <- xmlNode("biex"
@@ -210,12 +219,32 @@ transformationNode <- function(gh, matInfo){
 
                 }else if(trans.type == "flowJo_flog"){
                   param <- as.list(environment(func))
-
                   transNode <- xmlNode("log"
                                        , namespace = "transforms"
                                        , attrs = c("transforms:offset" = param[["offset"]]
                                                    , "transforms:decades" = param[["decade"]]
                                                    )
+                  )
+
+                }else if(trans.type == "flowJo_linear"){
+                  if(grepl("time", chnl, ignore.case = TRUE)){
+                    rg <- range(exprs(fr)[, chnl])
+                    gain <- flowWorkspace:::compute.timestep(keyword(fr), rg, timestep.source = "TIMESTEP")
+
+                  }else
+                  {
+                    rg <- range(fr)[, chnl]
+                    gain <- 1
+
+                  }
+                  minRange <- rg[1]
+                  maxRange <- rg[2]
+                  transNode <- xmlNode("linear"
+                                       , namespace = "transforms"
+                                       , attrs = c("transforms:minRange" = minRange
+                                                   , "transforms:maxRange" = maxRange
+                                                   , "gain" = gain
+                                       )
                   )
 
                 }else

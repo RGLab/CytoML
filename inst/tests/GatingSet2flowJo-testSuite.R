@@ -2,6 +2,39 @@ context("Exporting GatingSet to flowJo workspace")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
 
+test_that("Time gate ",{
+  thisPath <- file.path(path, "flin")
+  wsFile <- file.path(thisPath, "A01.wsp")
+  ws <- openWorkspace(wsFile)
+  gs <- parseWorkspace(ws, name = 1, subset = 1)
+  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  #output to flowJo
+  outFile <- tempfile(fileext = ".wsp")
+  GatingSet2flowJo(gs, outFile)
+
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  expect_equal(stats.orig, stats.new)
+})
+
+test_that("Time gate2--when computed timestep is very different from $TIMESTEP ",{
+  thisPath <- file.path(path, "timegate")
+  wsFile <- file.path(thisPath, "MX1 Analysis VISC.xml")
+  ws <- openWorkspace(wsFile)
+  gs <- parseWorkspace(ws,name="Group 1",subset=11)
+  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  #output to flowJo
+  outFile <- tempfile(fileext = ".wsp")
+  GatingSet2flowJo(gs, outFile)
+
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  expect_equal(stats.orig, stats.new, tol = 1.3e-5)
+})
 test_that("EllipsoidGate defined on log-transformed channels ",{
   thisPath <- file.path(path, "ellipsoid_log")
   wsFile <- file.path(thisPath, "xml_spillover2.xml")

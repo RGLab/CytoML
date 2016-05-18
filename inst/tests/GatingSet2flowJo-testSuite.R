@@ -2,6 +2,25 @@ context("Exporting GatingSet to flowJo workspace")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
 
+test_that("NotNode ",{
+  thisPath <- file.path(path, "combineNode/OrNode")
+  wsFile <- file.path(thisPath, "Test_EW.wsp")
+  ws <- openWorkspace(wsFile)
+  gs <- parseWorkspace(ws, name = 1, path = file.path(path))
+  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  #output to flowJo
+  outFile <- tempfile(fileext = ".wsp")
+  GatingSet2flowJo(gs, outFile)
+
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  expect_equal(stats.orig, stats.new)
+
+})
+
+
 test_that("Time gate ",{
   thisPath <- file.path(path, "flin")
   wsFile <- file.path(thisPath, "A01.wsp")
@@ -109,16 +128,14 @@ test_that("GatingSet2flowJo: no comp + fasinh ",{
   stats.new <- getPopStats(gs1[[1]])
   expect_equal(stats.orig, stats.new)
 })
-test_that("GatingSet2flowJo: no transformation + boolean Gate",{
+
+test_that("GatingSet2flowJo: no transformation",{
 
   gs <- load_gs("/fh/fast/gottardo_r/mike_working/lyoplate_out/gated_data/manual/gslist-bcell/cgRoygodqg")
   stats.orig <- getPopStats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  expect_error(
-    GatingSet2flowJo(gs, outFile)
-    # , "no transformation"
-    )
+  expect_error(GatingSet2flowJo(gs, outFile), "No transformation is found in GatingSet!")
 
 })
 
@@ -140,7 +157,7 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity",{
   expect_equal(stats.orig, stats.new, tol = 2e-4)
 })
 
-localPath <- "~/rglab/workspace/openCyto"
+
 test_that("tcell", {
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   #load raw FCS

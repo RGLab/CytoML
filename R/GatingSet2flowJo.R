@@ -164,6 +164,8 @@ spilloverNodes <- function(mat){
 transformationNode <- function(gh, matInfo){
 
   trans.objs <- getTransformations(gh, only.function = FALSE)
+  if(length(trans.objs) == 0)
+    stop("No transformation is found in GatingSet!")
   fr <- getData(gh)
 
   chnls <- colnames(fr)
@@ -333,35 +335,88 @@ subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE){
                       children <- getChildren(gh, pop)
                       if(!showHidden)
                         children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
-                      if(length(children) == 0){
-                        gate.dim <- gate
+
+                      isBool <- is(gate, "booleanFilter")
+
+                      if(length(children) == 0){ #leaf node
+                        if(isBool){
+                          #use parent gate's dims for boolean node
+                         gate.dim <- getGate(gh, getParent(gh, pop))
+                        }else
+                            gate.dim <- gate
                         subNode <- NULL
                       }else{
-                        gate.dim <- getGate(gh, children[1])
+                        #get dim from non-boolean children
+                        nonBool <- sapply(children, function(child){
+                                              thisGate <- getGate(gh, child)
+                                              !is(thisGate, "booleanFilter")
+                                            })
+                        if(sum(nonBool) == 0)
+                          stop("Can't find any non-boolean children node under ", pop)
+
+                        children.dim <- children[nonBool]
+                        gate.dim <- getGate(gh, children.dim[1]) #pick the first children node for dim
                         subNode <- subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden)
                       }
 
-                      gate <- inverseTransGate(gate, trans)
+                      if(!isBool){
+                        gate <- inverseTransGate(gate, trans)
+
+                      }
 
                       param <- as.vector(parameters(gate.dim))
-
                       param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
                       count <- getTotal(gh, pop, flowJo = FALSE)
+
                       if(is.na(count))
                         count <- -1
-                      xmlNode("Population"
-                              , attrs = c(name = basename(pop), count = count)
-                              , graphNode(param[1], param[2])
-                              , xmlNode("Gate"
-                                        , gateNode(gate, eventsInside, matInfo = matInfo)
-                                        )
-                              , subNode
-                      )
+                      if(isBool){
+                        booleanNode(gate, pop, count, param, subNode)
+
+                      }else{
+
+                        xmlNode("Population"
+                                , attrs = c(name = basename(pop), count = count)
+                                , graphNode(param[1], param[2])
+                                , xmlNode("Gate"
+                                          , gateNode(gate, eventsInside, matInfo = matInfo)
+                                          )
+                                , subNode
+                        )
+                    }
                   }
                 })
     xmlNode("Subpopulations", .children = subPops)
 }
 
+booleanNode <- function(gate, pop, count, param, subNode){
+
+  parsed <- filterObject(gate)
+
+  op <- parsed[["op"]][-1]
+  op <- unique(op)
+  if(length(op) > 1){
+    stop("And gate and Or gate can't not be used together!")
+  }
+  if(op == "&"){
+    nodeName <- "AndNode"
+  }else if(op == "|"){
+    nodeName <- "OrNode"
+  }else
+    stop("unsupported logical operation: ", op)
+
+  xmlNode(nodeName
+          , attrs = c(name = basename(pop), count = count)
+          , graphNode(param[1], param[2])
+          , xmlNode("Dependents", .children = lapply(parsed[["refs"]]
+                                                     , function(ref){
+                                                       xmlNode("Dependent", attrs = c(name = ref))
+                                                     })
+                      )
+          , subNode
+          )
+
+}
 inverseTransGate <- function(gate, trans){
 
   params <- as.vector(parameters(gate))

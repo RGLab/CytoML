@@ -1,6 +1,8 @@
 library(testthat)
+library(XML)
 library(flowWorkspace)
 library(openCyto)
+library(ggcyto)
 library(CytoML)
 
 

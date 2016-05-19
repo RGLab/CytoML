@@ -395,15 +395,27 @@ booleanNode <- function(gate, pop, count, param, subNode){
 
   op <- parsed[["op"]][-1]
   op <- unique(op)
-  if(length(op) > 1){
-    stop("And gate and Or gate can't not be used together!")
-  }
-  if(op == "&"){
-    nodeName <- "AndNode"
-  }else if(op == "|"){
-    nodeName <- "OrNode"
+  nLen <- length(op)
+  if(nLen == 0){
+    #NOT gate
+    isNot <- parsed[["isNot"]]
+    if(length(isNot) == 1){
+      if(isNot){
+        nodeName <- "NotNode"
+      }else
+        stop("isNot flag must be TRUE in 'Not' boolean gate!")
+    }else
+      stop("invalid number of '!' operator in boolean Gate.")
+  }else if(nLen == 1){
+
+    if(op == "&"){
+      nodeName <- "AndNode"
+    }else if(op == "|"){
+      nodeName <- "OrNode"
+    }else
+      stop("unsupported logical operation: ", op)
   }else
-    stop("unsupported logical operation: ", op)
+    stop("And gate and Or gate can't not be used together!")
 
   xmlNode(nodeName
           , attrs = c(name = basename(pop), count = count)
@@ -415,6 +427,7 @@ booleanNode <- function(gate, pop, count, param, subNode){
                       )
           , subNode
           )
+
 
 }
 inverseTransGate <- function(gate, trans){

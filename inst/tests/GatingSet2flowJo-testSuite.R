@@ -2,7 +2,7 @@ context("Exporting GatingSet to flowJo workspace")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
 
-test_that("NotNode ",{
+test_that("OrNode ",{
   thisPath <- file.path(path, "combineNode/OrNode")
   wsFile <- file.path(thisPath, "Test_EW.wsp")
   ws <- openWorkspace(wsFile)
@@ -76,14 +76,6 @@ test_that("GatingSet2flowJo: rectangleGate + boolgate",{
   ws <- openWorkspace(file.path(dataDir, "20151208_TBNK_DS.xml"))
   gs <- parseWorkspace(ws, subset = 1, name = 2)
 
-
-  #   #rename the node since these names with special characters seems to fail in reference node finding
-  #   setNode(gs, "Q2: CD16+56 PE-A+ , CD19 APC-A+",  "Q2")
-  #   setNode(gs, "Q4: CD16+56 PE-A- , CD19 APC-A-", "Q4")
-  #   #add boolgate
-  #   bf <- booleanFilter(Q2|Q4)
-  #   add(gs, bf, name = "Q2 or Q4", parent = "Non T cells")
-  #   recompute(gs)
   stats.orig <- getPopStats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -145,6 +137,26 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity",{
   gs <- load_gs(file.path(thisPath, "autogating"))
   gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
   flowIncubator::toggle.helperGates(gt, gs) #hide the helper gates
+
+  #add AND gate
+  bf <- booleanFilter(cd4/GzB&cd4/Prf)
+  add(gs, bf, name = "bool1", parent = "cd4")
+  #Or gate
+  bf <- booleanFilter(cd4/GzB|cd4/Prf)
+  add(gs, bf, name = "bool2", parent = "cd4")
+  #Not gate
+  bf <- booleanFilter(!cd4/GzB)
+  add(gs, bf, name = "bool3", parent = "cd4")
+  #mixture
+  bf <- booleanFilter(cd4/GzB|cd4/Prf&cd4/IFNg)
+  add(gs, bf, name = "bool3", parent = "cd4")
+  recompute(gs)
+  expect_error(GatingSet2flowJo(gs, outFile), "And gate and Or gate can't not be used together!")
+  Rm("bool3", gs)
+
+  autoplot(gs[[1]], getChildren(gs[[1]], "cd4"))
+  getTotal(gs[[1]], "bool3")
+  plotGate(gs, "bool2", bool = T)
   stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")

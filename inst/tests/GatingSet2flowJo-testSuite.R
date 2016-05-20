@@ -131,7 +131,7 @@ test_that("GatingSet2flowJo: no transformation",{
 
 })
 
-test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity",{
+test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean gate",{
   thisPath <- file.path(path, "gatingML/ics")
   #load the original automated gating set
   gs <- load_gs(file.path(thisPath, "autogating"))
@@ -147,16 +147,23 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity",{
   #Not gate
   bf <- booleanFilter(!cd4/GzB)
   add(gs, bf, name = "bool3", parent = "cd4")
-  #mixture
+  #combine & and !
+  bf <- booleanFilter(cd4/GzB&!cd4/Prf)
+  add(gs, bf, name = "bool4", parent = "cd4")
+  #combine & and !
+  bf <- booleanFilter(cd4/GzB|!cd4/Prf)
+  add(gs, bf, name = "bool5", parent = "cd4")
+  recompute(gs)
+  #mixture of & , |
   bf <- booleanFilter(cd4/GzB|cd4/Prf&cd4/IFNg)
-  add(gs, bf, name = "bool3", parent = "cd4")
+  add(gs, bf, name = "bool6", parent = "cd4")
   recompute(gs)
   expect_error(GatingSet2flowJo(gs, outFile), "And gate and Or gate can't not be used together!")
-  Rm("bool3", gs)
+  Rm("bool6", gs)
 
   autoplot(gs[[1]], getChildren(gs[[1]], "cd4"))
-  getTotal(gs[[1]], "bool3")
-  plotGate(gs, "bool2", bool = T)
+  getTotal(gs[[1]], "bool5")
+  plotGate(gs, "bool4", bool = T)
   stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -166,7 +173,8 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity",{
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath)
   stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
-  expect_equal(stats.orig, stats.new, tol = 2e-4)
+  expect_equal(getTotal(gs1[[1]], "Prf-"), 90423)
+  expect_equal(stats.orig, stats.new[-26,], tol = 1.6e-4)
 })
 
 

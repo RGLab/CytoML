@@ -229,7 +229,7 @@ matchPath <- function(g, leaf, nodeSet){
 #' @param flowEnv the enivornment contains the elements parsed by read.gatingML function
 #' @param gateInfo the data.frame contains the gate name, fcs filename parsed by parse.gateInfo function
 #' @return a graphNEL represent the population tree. The gate and population name are stored as nodeData in each node.
-#' @importFrom graph graphNEL nodeDataDefaults<- nodeData<- addEdge edges removeNode
+#' @importFrom graph graphNEL nodeDataDefaults<- nodeData<- addEdge edges removeNode addNode
 #' @importFrom jsonlite fromJSON
 constructTree <- function(flowEnv, gateInfo){
 
@@ -269,6 +269,7 @@ constructTree <- function(flowEnv, gateInfo){
     popName <- gateInfo[id == popId, name]
     #add pop name
     nodeData(g, popId, "popName") <- popName
+    message(popName)
 
     if(nDepth == 1){#root node
       gateID <- thisGateSet[1]
@@ -354,6 +355,9 @@ findParent <- function(gateSets,thisGateSet, parents_popIds){
 addGate <- function(gateInfo,flowEnv, g, popId, gateID){
   #add gate
   sb <- gateInfo[id == gateID, ]
+  nGates <- nrow(sb)
+  if(nGates > 1)
+    stop("multiple gates found for ", gateID)
   #try to find the tailored gate
   tg_sb <- gateInfo[gate_id == sb[, gate_id] & fcs != "", ]
 

@@ -24,10 +24,7 @@
 #' dataDir <- system.file("extdata",package="flowWorkspaceData")
 #' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 #'
-#' #output to flowJo
-#' outDir <- "/loc/no-backup/mike/test"#tempfile()
 #' Rm("CD8", gs)
-#' GatingSet2GatingML(gs, outDir, type = "flowJo")
 #'
 #' #output to cytobank
 #' outFile <- tempfile(fileext = ".xml")
@@ -135,10 +132,12 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
         #extract parameters
         env <- environment(trans.func)
         transID <- paste0("Tr_Arcsinh_", prefix_chnl)
+        env <- env[["expr"]]
+
         flowEnv[[transID]] <- asinhtGml2(parameters = param.obj
-                                     , M = env[["m"]]
-                                     , T = env[["t"]]
-                                     , A = env[["a"]]
+                                     , M = env@M
+                                     , T = env@T
+                                     , A = env@A
                                      , transformationId = transID
                                     )
       }else if(type == "logicleGml2"){
@@ -312,8 +311,9 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
     if(nMatched == 0){
 
       chnl <- gate@parameters[[i]]@parameters
+      #can't use "uncompensated" because it will cause multiple entries when paring gate back into openCyto through parse.gatingML
       gate@parameters[[i]] <- compensatedParameter(chnl
-                                                   , spillRefId = "uncompensated"#compId
+                                                   , spillRefId = compId #"uncompensated"
                                                    , searchEnv = flowEnv
                                                    , transformationId = chnl
                                                    )

@@ -1,3 +1,6 @@
+###################################
+#Discontinued due to the lack of support for standard gatingML from flowJo
+#####################################
 GatingSet2flowJo_gatingML <- function(gs, outDir, showHidden = FALSE){
   if(file.exists(outDir)){
 

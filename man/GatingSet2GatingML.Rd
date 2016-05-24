@@ -36,10 +36,7 @@ library(CytoML)
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 
-#output to flowJo
-outDir <- "/loc/no-backup/mike/test"#tempfile()
 Rm("CD8", gs)
-GatingSet2GatingML(gs, outDir, type = "flowJo")
 
 #output to cytobank
 outFile <- tempfile(fileext = ".xml")

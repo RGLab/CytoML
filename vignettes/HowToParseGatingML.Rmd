@@ -25,10 +25,10 @@ fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "f
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 ```
 
-## Use `parse.gatingML`
-The entire parsing work can be done with single convevient function `parse.gatingML`:
+## Use `cytobank2GatingSet`
+The entire parsing work can be done with single convevient function `cytobank2GatingSet`:
 ```{r, eval=FALSE}
-gs <- parse.gatingML(xmlfile, fcsFiles)
+gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 ```
 
 ## Load GatingML and FCS separately

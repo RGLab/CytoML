@@ -48,7 +48,7 @@ gs <- transform(gs, trans)
 Note that the compensation and transformation **must** be applied directly to `GatingSet` instead of `flowSet/ncdfFlowSet` so that these information will be stored in the `GatingSet` object and exported to gatingML eventually.
 
 ### Load the gating template and run auto gating
-```{r}
+```{r warning=FALSE}
 library(openCyto)
 #load the original template for tcell panel
 tbl <- data.table::fread(system.file("extdata/gating_template/tcell.csv", package = "openCyto"))
@@ -72,7 +72,7 @@ autoplot(gs[[1]])
 ## Export to Cytobank 
 ```{r}
 outFile <- tempfile(fileext = ".xml")
-GatingSet2GatingML(gs, outFile)
+GatingSet2cytobank(gs, outFile)
 ```
 Note that the resulted `xml` file is a standard `GatingML2.0` file with some additional `custom_info` added so that it can be recognized by `Cytobank`. Here is the example gate plot from `Cytobank` after the gatingML is imported.
 ![Gates in Cytobank](cytobank.png)

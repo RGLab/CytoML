@@ -18,7 +18,6 @@ showHidden whether to include the hidden population nodes in the output}
 Convert a GatingSet to flowJo workspace
 }
 \examples{
-\dontrun{
 library(flowWorkspace)
 library(CytoML)
 
@@ -26,10 +25,7 @@ dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 
 #output to flowJo
-outFile <- "/loc/no-backup/mike/test/ws/temp.wsp"#tempfile(fileext = ".wsp")
+outFile <- tempfile(fileext = ".wsp")
 GatingSet2flowJo(gs, outFile)
-
-
-}
 }
 

@@ -1,50 +1,11 @@
-#' Convert a GatingSet to gatingML
-#'
-#' this function retrieves the gates from GatingSet
-#' and writes a customed GatingML-2.0 file
-#' which can then be imported into cytobank
-#' operation:
-#' 1. Read in gate geometry, compensation and transformation from gatingSet
-#' 2. Rescale gate boundaries with flowJoTrans() so gates show up in flowJo
-#' 3. Save gates and hierarchy structure to R environment
-#' 4. Write environment out to gatingML using write.GatingML()
-#' @importFrom  flowUtils write.gatingML
-#' @importFrom XML saveXML xmlTreeParse xmlRoot
-#' @param a GatingSet object
-#' @param output a file name when type is "cytobank", a folder name when type is "flowjo"
-#' @param type either "cytobank" or "flowjo"
-#' @param showHidden whether to include the hidden population nodes in the output
-#' @param ... other arguments
-#' @export
-#' @examples
-#' \dontrun{
-#' library(flowWorkspace)
-#' library(CytoML)
-#'
-#' dataDir <- system.file("extdata",package="flowWorkspaceData")
-#' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
-#'
-#' Rm("CD8", gs)
-#'
-#' #output to cytobank
-#' outFile <- tempfile(fileext = ".xml")
-#' GatingSet2GatingML(gs, outFile) #type by default is 'cytobank'
-#'
-#'
-#' }
-GatingSet2GatingML <- function(gs, output, showHidden = FALSE, type = c("cytobank", "flowJo"), ...){
-  type <- match.arg(type)
+compact <- flowWorkspace:::compact
 
-  if(type == "cytobank")
-    GatingSet2cytobank(gs = gs, outFile = output, showHidden = showHidden, ...)
-  else{
-    stop("FlowJo does not support standard gatingML files yet!Please use 'GatingSet2flowJo' to export flowJo workspace file instead.")
-    GatingSet2flowJo_gatingML(gs = gs, outDir = output, showHidden = showHidden)
-  }
-
-
-}
-
+######################################
+#common APIs related to processing comp, trans, gates
+#to prepare the GatingML output that can be shared by both cytobank and flowJo modules
+######################################
+#' @importFrom flowWorkspace getData
+#' @importFrom flowCore compensation identifier identifier<- compensatedParameter asinhtGml2 logicletGml2
 export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type = c("cytobank", "flowJo"))
 {
   type <- match.arg(type)
@@ -311,7 +272,7 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
     if(nMatched == 0){
 
       chnl <- gate@parameters[[i]]@parameters
-      #can't use "uncompensated" because it will cause multiple entries when paring gate back into openCyto through parse.gatingML
+      #can't use "uncompensated" because it will cause multiple entries when paring gate back into openCyto through cytobank2GatingSet
       gate@parameters[[i]] <- compensatedParameter(chnl
                                                    , spillRefId = compId #"uncompensated"
                                                    , searchEnv = flowEnv

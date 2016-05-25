@@ -12,11 +12,11 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
 
       #export the gs_orig to xml
       tmp <- tempfile()
-      GatingSet2GatingML(gs_orig, tmp)
+      GatingSet2cytobank(gs_orig, tmp)
 
       #parse the exported xml
       fcs <- file.path(path, "ics/769121.fcs")
-      gs_parsed <- parse.gatingML(tmp, fcs)
+      gs_parsed <- cytobank2GatingSet(tmp, fcs)
 
       parsedStats <- getPopStats(gs_parsed)[order(Population),]
       expect_equal(stats, parsedStats, tol = 2e-4)
@@ -25,7 +25,7 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
 
       #parse the cytobank xml
       xmlfile <- file.path(path, "ics/CytExp_52926_Gates_v5.xml")
-      gs_parsed <- parse.gatingML(xmlfile, fcs)
+      gs_parsed <- cytobank2GatingSet(xmlfile, fcs)
 
       parsedStats <- getPopStats(gs_parsed)[order(Population),]
       expect_equal(stats, parsedStats, tol = 2e-4)
@@ -45,7 +45,7 @@ test_that("gatingML-cytobank parsing: Merck FirstExample",{
   thisPath <- file.path(path, "Merck/firstExample")
   xmlfile <- file.path(thisPath, "CytExp_10623_Gates_v5.xml")
   fcsFiles <- list.files(pattern = "\\.fcs", thisPath, full = T)
-  gs <- parse.gatingML(xmlfile, fcsFiles[c(1,3,6)])
+  gs <- cytobank2GatingSet(xmlfile, fcsFiles[c(1,3,6)])
 
   ### Verify the stats are correct
   statsfile <- file.path(thisPath,"population_counts.csv")
@@ -60,7 +60,7 @@ test_that("gatingML-cytobank parsing: Merck SecondExample",{
   xmlfile <- file.path(thisPath, "CytExp_10624_Gates_v3.xml")
   fcsFiles <- list.files(pattern = "\\.fcs", thisPath, full = T)
 
-  gs <- parse.gatingML(xmlfile, fcsFiles[c(1,4,6,12)])
+  gs <- cytobank2GatingSet(xmlfile, fcsFiles[c(1,4,6,12)])
 
   ### Verify the stats are correct
   statsfile <- file.path(thisPath,"secondExample.csv")

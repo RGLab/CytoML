@@ -6,6 +6,19 @@
 \usage{
 addCustomInfo(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden)
 }
+\arguments{
+\item{root}{the root node of the XML}
+
+\item{gs}{a GatingSet object}
+
+\item{flowEnv}{the environment that stores the information parsed by 'read.GatingML'.}
+
+\item{cytobank.default.scale}{logical flag indicating whether to use the default Cytobank asinhtGml2 settings.
+Currently it should be set to TRUE in order for gates to be displayed properly in Cytobank
+because cytobank currently does not parse the global scale settings from GatingML.}
+
+\item{showHidden}{whether to include the hidden population nodes in the output}
+}
 \description{
 add customInfo nodes to each gate node and add BooleanAndGates
 }

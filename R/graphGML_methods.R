@@ -12,12 +12,10 @@ NULL
 #' @importFrom graph nodeData
 #' @export
 #' @examples
-#' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xmlfile)
 #' getNodes(g)
 #' getNodes(g, only.names = FALSE)
-#' }
 setMethod("getNodes", signature = c("graphGML"),
           definition = function(x, y
                                   , order = c("default", "bfs", "dfs", "tsort")
@@ -68,12 +66,10 @@ setMethod("getNodes", signature = c("graphGML"),
 #' @param y \code{character} parent node path
 #' @export
 #' @examples
-#' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xmlfile)
 #' getChildren(g, "GateSet_722326")
 #' getParent(g, "GateSet_722326")
-#' }
 #' @importClassesFrom methods character ANY data.frame environment list logical matrix missing numeric oldClass
 #' @importFrom flowWorkspace getChildren
 setMethod("getChildren", signature = c("graphGML", "character"),
@@ -135,12 +131,10 @@ setMethod("show", signature = c("graphGML"),
 #' @importFrom graph nodeData nodes<- nodeRenderInfo<-
 #' @importFrom Rgraphviz renderGraph layoutGraph
 #' @examples
-#' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xmlfile)
 #' plot(g)
 #'
-#' }
 setMethod("plot", signature = c(x = "graphGML", y = "missing"), definition = function(x, y = "missing", label = c("popName", "gateName")){
   label <- match.arg(label, c("popName", "gateName"))
   if(label == "popName")

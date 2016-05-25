@@ -7,7 +7,6 @@
 #'        showHidden whether to include the hidden population nodes in the output
 #' @export
 #' @examples
-#' \dontrun{
 #' library(flowWorkspace)
 #' library(CytoML)
 #'
@@ -15,11 +14,10 @@
 #' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 #'
 #' #output to flowJo
-#' outFile <- "/loc/no-backup/mike/test/ws/temp.wsp"#tempfile(fileext = ".wsp")
+#' outFile <- tempfile(fileext = ".wsp")
 #' GatingSet2flowJo(gs, outFile)
 #'
 #'
-#' }
 GatingSet2flowJo <- function(gs, outFile, ...){
 
   ws <- workspaceNode(gs)
@@ -160,7 +158,7 @@ spilloverNodes <- function(mat){
 
 }
 
-
+#' @importFrom flowCore exprs
 transformationNode <- function(gh, matInfo){
 
   trans.objs <- getTransformations(gh, only.function = FALSE)
@@ -266,7 +264,7 @@ paramerterNode <- function(params){
           )
 
 }
-
+#' @importFrom flowWorkspace keyword
 keywordNode <- function(gh){
   kw <- keyword(gh)
   kns <- names(kw)
@@ -297,6 +295,7 @@ fixChnlName <- function(chnl, matInfo){
 
 }
 
+#' @importFrom flowWorkspace getTotal
 sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, ...){
 
   sn <- pData(gh)[["name"]]

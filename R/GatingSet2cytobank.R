@@ -1,3 +1,38 @@
+#' Convert a GatingSet to a Cytobank-compatible gatingML
+#'
+#' this function retrieves the gates from GatingSet and writes a customed GatingML-2.0 file
+#' that can be imported into cytobank.
+#'
+#' The process can be divided into four steps:
+#' 1. Read in gate geometry, compensation and transformation from gatingSet
+#' 2. Rescale gate boundaries with flowJoTrans() so gates can be displayed properly in Cytobank
+#' 3. Save gates and hierarchy structure to R environment
+#' 4. Write environment out to gatingML using write.GatingML()
+#'
+#' @importFrom  flowUtils write.gatingML
+#' @importFrom XML saveXML xmlTreeParse xmlRoot
+#' @importFrom utils localeToCharset packageVersion
+#' @export
+#' @param gs a GatingSet object
+#' @param outFile a file name
+#' @param showHidden whether to include the hidden population nodes in the output
+#' @param cytobank.default.scale logical flag indicating whether to use the default Cytobank asinhtGml2 settings.
+#'                              Currently it should be set to TRUE in order for gates to be displayed properly in Cytobank
+#'                              because cytobank currently does not parse the global scale settings from GatingML.
+#' @examples
+#' library(flowWorkspace)
+#' library(CytoML)
+#'
+#' dataDir <- system.file("extdata",package="flowWorkspaceData")
+#' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+#'
+#' Rm("CD8", gs)
+#'
+#' #output to cytobank
+#' outFile <- tempfile(fileext = ".xml")
+#' GatingSet2cytobank(gs, outFile) #type by default is 'cytobank'
+#'
+#'
 GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE){
 
   #convert comp and trans as GML2 compatible format and save to env
@@ -140,7 +175,11 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, nodePaths, guid_mapping
 }
 
 #' add customInfo nodes to each gate node and add BooleanAndGates
+#' @inheritParams GatingSet2cytobank
+#' @param root the root node of the XML
+#' @param flowEnv the environment that stores the information parsed by 'read.GatingML'.
 #' @importFrom  XML xmlAttrs getNodeSet addChildren xmlAttrs<-
+#' @importFrom flowWorkspace pData
 addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden){
   nodePaths <- getNodes(gs, showHidden = showHidden)[-1]
   pd <- pData(gs)

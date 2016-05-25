@@ -2,7 +2,7 @@
 test_that("gatingML-cytobank parsing: cytotrol tcell",{
   xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
   fcsFiles <<- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = T)
-  gs <<- parse.gatingML(xmlfile, fcsFiles)
+  gs <<- cytobank2GatingSet(xmlfile, fcsFiles)
 
 
   #' ## verify the stats are correct
@@ -19,9 +19,9 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
 
   #export the gs_orig to xml
   outFile <- tempfile(fileext = ".xml")
-  expect_warning(GatingSet2GatingML(gs, outFile))
+  expect_warning(GatingSet2cytobank(gs, outFile))
   #read the exported gatingML back in
-  gs1 <- parse.gatingML(outFile, fcsFiles)
+  gs1 <- cytobank2GatingSet(outFile, fcsFiles)
   stats.orig <- getPopStats(gs)
   stats.new <- getPopStats(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))

@@ -24,11 +24,9 @@ It returns the node names and population names by default. Or return the entire 
 get nodes from {graphGML} object
 }
 \examples{
-\dontrun{
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 g <- read.gatingML.cytobank(xmlfile)
 getNodes(g)
 getNodes(g, only.names = FALSE)
-}
 }
 

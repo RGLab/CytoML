@@ -19,11 +19,8 @@
 The node with dotted order represents the population that has tailored gates (sample-specific gates) defined.
 }
 \examples{
-\dontrun{
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 g <- read.gatingML.cytobank(xmlfile)
 plot(g)
-
-}
 }
 

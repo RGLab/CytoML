@@ -23,7 +23,7 @@ install_github("RGLab/openCyto", ref="trunk")
 library(CytoML)
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = T)
-gs <- parse.gatingML(xmlfile, fcsFiles)
+gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 ```
 
 ### Then you can interact with the gated data (`GatingSet`)
@@ -41,11 +41,17 @@ getPopStats(gh)
 plotGate(gh) 
 ```
 
-### Export the existing `GatingSet` from `openCyto` to `gatingML` 
+### Export the existing `GatingSet` from `openCyto` to `Cytobank` or `flowJo`
 
 ```r
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+
+#Cytobank
 outFile <- tempfile(fileext = ".xml")
-GatingSet2GatingML(gs, outFile)
+GatingSet2cytobank(gs, outFile)
+
+#flowJo
+outFile <- tempfile(fileext = ".wsp")
+GatingSet2cytobank(gs, outFile)
 ```

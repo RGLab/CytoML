@@ -15,6 +15,9 @@
 
 \item{label}{specifies what to be dispaled as node label. Can be either 'popName' (population name parsed from GateSets) or 'gateName'(the name of the actual gate associated with each node)}
 }
+\value{
+nothing
+}
 \description{
 The node with dotted order represents the population that has tailored gates (sample-specific gates) defined.
 }

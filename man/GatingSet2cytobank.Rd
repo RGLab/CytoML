@@ -18,6 +18,9 @@ GatingSet2cytobank(gs, outFile, showHidden = FALSE,
 Currently it should be set to TRUE in order for gates to be displayed properly in Cytobank
 because cytobank currently does not parse the global scale settings from GatingML.}
 }
+\value{
+nothing
+}
 \description{
 this function retrieves the gates from GatingSet and writes a customed GatingML-2.0 file
 that can be imported into cytobank.
@@ -31,7 +34,6 @@ The process can be divided into four steps:
 }
 \examples{
 library(flowWorkspace)
-library(CytoML)
 
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))

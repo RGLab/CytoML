@@ -23,6 +23,8 @@ Imports:
     Biobase,
     methods,
     graph,
+    graphics,
+    utils,
     base64enc
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:

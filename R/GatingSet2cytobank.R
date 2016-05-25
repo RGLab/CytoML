@@ -13,6 +13,7 @@
 #' @importFrom XML saveXML xmlTreeParse xmlRoot
 #' @importFrom utils localeToCharset packageVersion
 #' @export
+#' @return nothing
 #' @param gs a GatingSet object
 #' @param outFile a file name
 #' @param showHidden whether to include the hidden population nodes in the output
@@ -21,7 +22,6 @@
 #'                              because cytobank currently does not parse the global scale settings from GatingML.
 #' @examples
 #' library(flowWorkspace)
-#' library(CytoML)
 #'
 #' dataDir <- system.file("extdata",package="flowWorkspaceData")
 #' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
@@ -180,6 +180,7 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, nodePaths, guid_mapping
 #' @param flowEnv the environment that stores the information parsed by 'read.GatingML'.
 #' @importFrom  XML xmlAttrs getNodeSet addChildren xmlAttrs<-
 #' @importFrom flowWorkspace pData
+#' @return XML root node
 addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden){
   nodePaths <- getNodes(gs, showHidden = showHidden)[-1]
   pd <- pData(gs)

@@ -12,6 +12,9 @@
 
 \item{y}{\code{character} child node path}
 }
+\value{
+a graphNEL node
+}
 \description{
 get parent nodes
 }

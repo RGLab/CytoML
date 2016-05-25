@@ -24,11 +24,9 @@ setClass("graphGML", contains = "graphNEL")
 #' The gate and population name are stored in nodeData of each node.
 #' Compensation and transformations are stored in graphData.
 #' @examples
-#' \dontrun{
 #' xml <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xml) #parse the population tree
-#' plot(g) #visualize it
-#' }
+#' #plot(g) #visualize it
 read.gatingML.cytobank <- function(file, ...){
 
   #parse all the elements:gate, GateSets, comp, trans
@@ -107,7 +105,7 @@ read.gatingML.cytobank <- function(file, ...){
                               }, USE.NAMES = FALSE)
 
   trans <- compact(trans)
-  chnl <- sapply(trans, function(tran)unname(parameters(tran@parameters)), USE.NAMES = F)
+  chnl <- sapply(trans, function(tran)unname(parameters(tran@parameters)), USE.NAMES = FALSE)
 
   ind <- chnl != "any"
 
@@ -396,13 +394,17 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
   g
 }
 
-#' extend the gate to the minimum and maximum limit of both dimensions
-#' based on the bounding information.
+#' extend the gate to the minimum and maximum limit of both dimensions based on the bounding information.
+#'
 #' It is equivalent to the behavior of shifting the off-scale boundary events into the gate boundary that is describled in
 #' bounding transformation section of gatingML standard.
+#'
 #' The advantage of extending gates instead of shifting data are two folds:
 #' 1. Avoid the extra computation each time applying or plotting the gates
 #' 2. Avoid changing the data distribution caused by adding the gates
+#'
+#' Normally this function is not used directly by user but invoked when parsing GatingML file exported from Cytobank.
+#'
 #' @export
 #' @param gate a flowCore filter/gate
 #' @param bound numeric matrix representing the bouding information parsed from gatingML. Each row corresponds to a channel.
@@ -410,6 +412,15 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
 #' @param data.range numeric matrix specifying the data limits of each channel. It is used to set the extended value of vertices and must has the same structure as 'bound'.
 #'        when it is not supplied, c(-.Machine$integer.max, - .Machine$integer.max) is used.
 #' @param ... other arguments
+#' @return a flowCore filter/gate
+#' @examples
+#' sqrcut <- matrix(c(300,300,600,600,50,300,300,50),ncol=2,nrow=4)
+#' colnames(sqrcut) <- c("FSC-H","SSC-H")
+#' pg <- polygonGate(filterId="nonDebris", sqrcut)
+#' pg
+#' bound <- matrix(c(100,3e3,100,3e3), byrow = TRUE, nrow = 2, dimnames = list(c("FSC-H", "SSC-H"), c("min", "max")))
+#' bound
+#' pg.extened <- extend(pg, bound, plot = TRUE)
 extend <- function(gate, bound, data.range = NULL, plot = FALSE)UseMethod("extend")
 
 #' @export

@@ -65,6 +65,7 @@ setMethod("getNodes", signature = c("graphGML"),
 #' @param obj \code{graphGML}
 #' @param y \code{character} parent node path
 #' @export
+#' @return a graphNEL node
 #' @examples
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xmlfile)
@@ -81,7 +82,7 @@ setMethod("getChildren", signature = c("graphGML", "character"),
 #'
 #' @param obj \code{graphGML}
 #' @param y \code{character} child node path
-#'
+#' @return a graphNEL node
 #' @export
 #' @importFrom flowWorkspace getParent
 setMethod("getParent", signature = c("graphGML", "character"),
@@ -95,6 +96,7 @@ setMethod("getParent", signature = c("graphGML", "character"),
 #'
 #' @param obj \code{graphGML}
 #' @param y \code{character} node path
+#' @return the gate information associated with the node
 #' @export
 #' @importFrom flowWorkspace getGate
 setMethod("getGate", signature = c("graphGML", "character"),
@@ -109,6 +111,7 @@ setMethod("getGate", signature = c("graphGML", "character"),
 #' show method for graphGML
 #'
 #' @param object \code{graphGML}
+#' @return nothing
 #' @export
 #' @importFrom methods show
 setMethod("show", signature = c("graphGML"),
@@ -128,6 +131,7 @@ setMethod("show", signature = c("graphGML"),
 #' @param y not used
 #' @param label specifies what to be dispaled as node label. Can be either 'popName' (population name parsed from GateSets) or 'gateName'(the name of the actual gate associated with each node)
 #' @export
+#' @return nothing
 #' @importFrom graph nodeData nodes<- nodeRenderInfo<-
 #' @importFrom Rgraphviz renderGraph layoutGraph
 #' @examples
@@ -198,7 +202,7 @@ gating.graphGML <- function(gt, gs, ...) {
   for (nodeID in gt_nodes) {
 
     # get parent node to gate
-    gt_node <- getNodes(gt, nodeID, only.names = F)
+    gt_node <- getNodes(gt, nodeID, only.names = FALSE)
     popName <- gt_node[["popName"]]
 
 

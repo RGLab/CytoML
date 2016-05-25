@@ -19,6 +19,9 @@ because cytobank currently does not parse the global scale settings from GatingM
 
 \item{showHidden}{whether to include the hidden population nodes in the output}
 }
+\value{
+XML root node
+}
 \description{
 add customInfo nodes to each gate node and add BooleanAndGates
 }

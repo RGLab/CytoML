@@ -10,6 +10,9 @@
 \arguments{
 \item{object}{\code{graphGML}}
 }
+\value{
+nothing
+}
 \description{
 show method for graphGML
 }

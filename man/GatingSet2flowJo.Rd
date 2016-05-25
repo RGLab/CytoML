@@ -14,12 +14,14 @@ GatingSet2flowJo(gs, outFile, ...)
 \item{...}{other arguments
 showHidden whether to include the hidden population nodes in the output}
 }
+\value{
+nothing
+}
 \description{
 Convert a GatingSet to flowJo workspace
 }
 \examples{
 library(flowWorkspace)
-library(CytoML)
 
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))

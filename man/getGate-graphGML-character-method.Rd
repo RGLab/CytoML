@@ -12,6 +12,9 @@
 
 \item{y}{\code{character} node path}
 }
+\value{
+the gate information associated with the node
+}
 \description{
 get gate from the node
 }

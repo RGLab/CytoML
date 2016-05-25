@@ -6,9 +6,9 @@
 #' @param ... other arguments
 #'        showHidden whether to include the hidden population nodes in the output
 #' @export
+#' @return nothing
 #' @examples
 #' library(flowWorkspace)
-#' library(CytoML)
 #'
 #' dataDir <- system.file("extdata",package="flowWorkspaceData")
 #' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
@@ -395,6 +395,7 @@ subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.
     xmlNode("Subpopulations", .children = unlist(subPops, recursive = FALSE, use.names = FALSE))
 }
 
+#' @importFrom flowWorkspace filterObject
 booleanNode <- function(gate, pop, count, env.nodes, ...){
 
   parsed <- filterObject(gate)

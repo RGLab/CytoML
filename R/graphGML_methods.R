@@ -1,3 +1,6 @@
+#' @include read.gatingML.cytobank.R
+NULL
+
 #' get nodes from {graphGML} object
 #'
 #' @param x \code{graphGML}
@@ -131,7 +134,6 @@ setMethod("show", signature = c("graphGML"),
 #' @export
 #' @importFrom graph nodeData nodes<- nodeRenderInfo<-
 #' @importFrom Rgraphviz renderGraph layoutGraph
-#' @importFrom graphics plot
 #' @examples
 #' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")

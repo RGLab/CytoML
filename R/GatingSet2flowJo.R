@@ -557,7 +557,7 @@ gateNode.polygonGate <- function(gate, matInfo, ...){
   param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
   dims <- lapply(param, xmlDimensionNode)
 
-  verts <- apply(gate@boundaries, 1, flowUtils:::xmlVertexNode)
+  verts <- apply(gate@boundaries, 1, xmlVertexNode)
   xmlNode("PolygonGate"
           , namespace="gating"
           , attrs = gateAttr(...)

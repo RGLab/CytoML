@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: GatingML interface for openCyto
-Version: 0.99.0
+Version: 0.99.1
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -38,6 +38,7 @@ Collate:
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
     'cytobank2GatingSet.R'
+    'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
     'utils.R'

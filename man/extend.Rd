@@ -43,6 +43,7 @@ The advantage of extending gates instead of shifting data are two folds:
 Normally this function is not used directly by user but invoked when parsing GatingML file exported from Cytobank.
 }
 \examples{
+library(flowCore)
 sqrcut <- matrix(c(300,300,600,600,50,300,300,50),ncol=2,nrow=4)
 colnames(sqrcut) <- c("FSC-H","SSC-H")
 pg <- polygonGate(filterId="nonDebris", sqrcut)

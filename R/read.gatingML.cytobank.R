@@ -414,6 +414,7 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
 #' @param ... other arguments
 #' @return a flowCore filter/gate
 #' @examples
+#' library(flowCore)
 #' sqrcut <- matrix(c(300,300,600,600,50,300,300,50),ncol=2,nrow=4)
 #' colnames(sqrcut) <- c("FSC-H","SSC-H")
 #' pg <- polygonGate(filterId="nonDebris", sqrcut)

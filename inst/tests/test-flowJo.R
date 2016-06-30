@@ -25,7 +25,7 @@ test_that("autogating--tcell", {
   gt <- gatingTemplate(gtFile, autostart = 1L)
   expect_warning(gating(gt, gs))
 
-  flowIncubator::toggle.helperGates(gt, gs) #hide the helper gates
+  toggle.helperGates(gt, gs) #hide the helper gates
   stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")

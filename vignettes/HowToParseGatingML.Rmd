@@ -1,0 +1,92 @@
+---
+title: "How to parse gatingML into a GatingSet"
+author: "Mike Jiang"
+output: 
+  html_document: 
+    number_sections: yes
+    toc: yes
+    toc_float: true
+vignette: >    
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{How to parse gatingML into a GatingSet}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = "markup", message = FALSE, warning = FALSE)
+```
+
+This vignette demonstrates how the gatingML files exported from Cytobank can be imported into R as a GatingSet object.
+
+```{r}
+library(flowWorkspace)
+library(CytoML)
+fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full.names = TRUE)
+xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
+```
+
+## Use `cytobank2GatingSet`
+The entire parsing work can be done with single convevient function `cytobank2GatingSet`:
+```{r, eval=FALSE}
+gs <- cytobank2GatingSet(xmlfile, fcsFiles)
+```
+
+## Load GatingML and FCS separately
+Or you can divide the parsing into several steps to have more controls.
+
+### Load the gatingML file as a **graphGML** object
+```{r}
+g <- read.gatingML.cytobank(xmlfile)
+class(g)
+g
+```
+**graphGML** stores the gating hierarchy, which can be inspected by various accessors.
+```{r}
+getNodes(g)
+getParent(g, "GateSet_722318")
+getChildren(g, "GateSet_722318")
+
+```
+
+And the population tree can be plotted
+```{r fig.width=4,fig.height=4}
+plot(g)
+```
+
+The node with **dotted** border means the `tailored` gates(or sample-specific gates) are defined for that population.
+
+### Read raw FCS files and construct the **GatingSet**
+```{r}
+fs <- read.ncdfFlowSet(fcsFiles)
+gs <- GatingSet(fs)
+```
+
+### Compensate and transform the `GatingSet`
+```{r}
+gs <- compensate(gs, g)
+## Extract the transformation from graphGML
+trans <- getTransformations(g)
+trans
+## Transform the `GatingSet`
+gs <- transform(gs, trans)
+```
+
+
+### Visualize the outcome of compensation and transformation
+```{r fig.width=4,fig.height=4, fig.show='hold'}
+require(ggcyto)
+ggcyto(gs, aes(x = CD4), subset = "root") + geom_density()
+ggcyto(gs, aes(x = CD4, y = CD8), subset = "root") + geom_hex()
+```
+
+
+### Apply the gates to **GatingSet** and inspect the results
+```{r}
+gating(g, gs)
+## Plot the gates
+autoplot(gs[[1]])
+# Extract the population statistics
+getPopStats(gs, statType = "count")
+```
+
+

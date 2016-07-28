@@ -7,7 +7,7 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
       #load the original automated gating set
       gs_orig <- load_gs(file.path(thisPath, "autogating"))
       gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
-      flowIncubator::toggle.helperGates(gt, gs_orig) #hide the helper gates
+      openCyto::toggle.helperGates(gt, gs_orig) #hide the helper gates
       stats <- getPopStats(gs_orig)[order(Population),]
 
       #export the gs_orig to xml

@@ -458,6 +458,11 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE){
   verts.orig[verts.orig==Inf] <- .Machine$integer.max
   verts.orig[verts.orig==-Inf] <- -.Machine$integer.max
 
+  #this is a hack: We assume the polygon is convex
+  #if not we turn the convcave into convex
+  #to avoid the error
+  verts.orig <- verts.orig[chull(verts.orig),]
+
   verts <- data.table(verts.orig)
   pname <- as.vector(parameters(gate))
   setnames(verts, colnames(verts), pname)
@@ -610,7 +615,7 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE){
 
   if(plot){
     plot(type = "n", x = verts.orig[,1], y = verts.orig[,2])
-    polygon(verts.orig, lwd =  3)
+    polygon(verts.orig, lwd =  4, border = rgb(0, 0, 0,0.5))
     # points(verts.orig, col = "red")
     # points(t(as.data.frame(colMeans(verts.orig))), col = "red")
     abline(v = bound[1,], lty = "dashed", col = "red")

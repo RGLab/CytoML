@@ -411,6 +411,7 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
 #'        rownames should be the channel names. colnames should be c("min", "max")
 #' @param data.range numeric matrix specifying the data limits of each channel. It is used to set the extended value of vertices and must has the same structure as 'bound'.
 #'        when it is not supplied, c(-.Machine$integer.max, - .Machine$integer.max) is used.
+#' @param limits character whether to plot in "extended" or "original" gate limits. Default is "original".
 #' @param ... other arguments
 #' @return a flowCore filter/gate
 #' @examples
@@ -422,7 +423,7 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
 #' bound <- matrix(c(100,3e3,100,3e3), byrow = TRUE, nrow = 2, dimnames = list(c("FSC-H", "SSC-H"), c("min", "max")))
 #' bound
 #' pg.extened <- extend(pg, bound, plot = TRUE)
-extend <- function(gate, bound, data.range = NULL, plot = FALSE)UseMethod("extend")
+extend <- function(gate, bound, data.range = NULL, plot = FALSE, limits = c("original", "extended"))UseMethod("extend")
 
 #' @export
 #' @S3method extend polygonGate
@@ -430,8 +431,8 @@ extend <- function(gate, bound, data.range = NULL, plot = FALSE)UseMethod("exten
 #' @param plot whether to plot the extended polygon.
 #' @importFrom flowCore polygonGate
 #' @importFrom graphics abline polygon text
-extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE){
-
+extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, limits = c("original", "extended")){
+  limits <- match.arg(limits)
   #linear functions
   f.solve <- list(x = function(x, slope, x1, y1){
 
@@ -461,7 +462,7 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE){
   #this is a hack: We assume the polygon is convex
   #if not we turn the convcave into convex
   #to avoid the error
-  verts.orig <- verts.orig[chull(verts.orig),]
+  # verts.orig <- verts.orig[chull(verts.orig),]
 
   verts <- data.table(verts.orig)
   pname <- as.vector(parameters(gate))
@@ -539,7 +540,7 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE){
           }
 
 
-          c(point, id = i + 0.5)#jitter a positive ammount to break the tie with vert1
+          c(point, id = i + 0.1)#jitter a positive ammount to break the tie with vert1
 
         }
 
@@ -548,61 +549,96 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE){
 
 
 
-      this.intersect <- do.call(rbind, this.intersect)
+      this.intersect.df <- do.call(rbind, this.intersect)
+
       dim.flip <- ifelse(dim == "x", "y", "x")
 #       this.intersect <- this.intersect[order(this.intersect[[dim.flip]]),] #bottom to top/or left to right
-      nCount <- ifelse(is.null(this.intersect), 0, nrow(this.intersect))
+      nCount <- ifelse(is.null(this.intersect.df), 0, nrow(this.intersect.df))
       if(nCount > 0){
-        if(nCount!= 2)
-          stop("Unsupported number of intersected points with ", bn, " boundary on ", dim, " axis: ", nCount)
+        if(nCount %% 2 != 0)
+          stop("uneven number of intersected points with ", bn, " boundary on ", dim, " axis: ", nCount)
+      verts[, id := 1:nVerts]#record the id before insertion
+      verts[, key := paste0(x,",", y)] # generate key for the comparsion to intersected points later on
 
-        verts[, id := 1:nVerts]#record the id before insertion
-        this.intersect <- as.data.table(this.intersect)
+      #reset id for the duplicated intersects so that they won't cause chaos for the ordering later on
+      this.intersect.df <- as.data.table(this.intersect.df)
+      this.intersect.df[, key := paste0(x,",", y)]
+      this.intersect.df[, id := min(id), by = key]
+      #order by dim so that extension to pairs follows the order
+      setorderv(this.intersect.df, dim.flip)
+      inserted.ids <- NULL
+      #loop through each pair of extended points
+      for(i in seq_len(nCount/2)){
+          j <- 2 * i
+          # browser()
+          this.intersect <- this.intersect.df[(j -1):j, ]
 
-        #insert the intersect points
-        verts <- rbindlist(list(verts, this.intersect))
-        verts <- verts[order(id),]
+          # this.intersect <- as.data.table(this.intersect)
 
-        #remove off-bound points
-        if(bn == "min")
-          ind <- verts[, dim, with = FALSE] < intersect.coord
-        else
-          ind <- verts[, dim, with = FALSE] > intersect.coord
-        ind <- as.vector(ind)
-        verts <- verts[!ind, ]
-
-        #add extended points
-        this.extend <- this.intersect
-        this.extend[, dim] <- data.range[dim, bn]
-
-        #sort by the Id
-        this.extend[, is.smaller:= order(id) == 1]
-        #check if head-tail node situation
-
-        this.extend[, is.tail := id == verts[,max(id)]]
-        this.extend[, is.head := id == verts[,min(id)]]
-
-        nhead <- sum(this.extend[, is.head])
-        ntail <- sum(this.extend[, is.tail])
+          #remove the original edge points that overlap with intersect points
+          #but keep the intersected points inserted previously
+          #nchar(id) : length of significant digits
+          #== 1: original points
+          #== 2: intersected
+          #== 4: extended
+          # verts <- verts[!(key %in% this.intersect[, key] && nchar(id) == 1), ]
+          verts <- verts[!(key %in% this.intersect[, key]), ]
 
 
-        if(nhead == 0||ntail == 0){#two consecutive points
-          this.extend[is.smaller == TRUE, id := id + 0.1]
-          this.extend[is.smaller == FALSE, id := this.extend[is.smaller == TRUE, id] + 0.1]
-        }else if(nhead == 1 && ntail == 1){
-          #deal with head-tail points
-          this.extend[is.smaller == TRUE, id := id - 0.1]
-          this.extend[is.smaller == FALSE, id := this.extend[is.smaller == TRUE, id] - 0.1]
-        }else
-          stop("Incorrect number of head and tail points!")
+
+          #keep track of id that has been inserted repeatly
+          #so that the duplicated intersects can be removed later
+          #otherwise, it could mess up the already removed off-bound points
+          dup.id <- this.intersect[id %in% inserted.ids, id]
+          inserted.ids <- unique(c(inserted.ids, this.intersect[, id]))
+          #insert the intersect points
+          verts <- rbindlist(list(verts, this.intersect))
+          verts <- verts[order(id),]
+
+          #remove off-bound points between the two intersected points
+          vals.dim <- verts[, dim, with = FALSE]
+          vals.dim.flip <- verts[, dim.flip, with = FALSE]
+          rng.dim.flip  <- range(this.intersect[[dim.flip]])
+          ind.between <- vals.dim.flip <= rng.dim.flip[2] & vals.dim.flip >= rng.dim.flip[1]
+          if(bn == "min")
+            ind <- vals.dim < intersect.coord & ind.between
+          else
+            ind <- vals.dim > intersect.coord & ind.between
+          ind <- as.vector(ind)
+          verts <- verts[!ind, ]
 
 
-        this.extend[, is.smaller := NULL]
-        this.extend[, is.head := NULL]
-        this.extend[, is.tail := NULL]
 
-        verts <- rbindlist(list(verts, this.extend))
-        verts <- verts[order(id),]
+          #add extended points
+          this.extend <- this.intersect
+          this.extend[, dim] <- data.range[dim, bn]
+          this.extend[, key := paste0(x,",", y)]#update key
+
+          #sort by the Id
+          this.extend[, is.smaller:= order(id) == 1]
+          #check if head-tail node situation
+          # by cal the distance between two points
+          this.extend[, order := match(id, verts[,id])]
+          dist <- abs(diff(this.extend[, order]))
+          if(dist == 1){#two consecutive points
+            this.extend[is.smaller == TRUE, id := id + 0.01]
+            this.extend[is.smaller == FALSE, id := this.extend[is.smaller == TRUE, id] + 0.01]
+          }else{
+            #deal with head-tail points
+            this.extend[is.smaller == TRUE, id := id - 0.01]
+            this.extend[is.smaller == FALSE, id := this.extend[is.smaller == TRUE, id] - 0.01]
+          }
+          # browser()
+          this.extend[, is.smaller := NULL]
+          this.extend[, order := NULL]
+
+          #remove dup id
+          verts <- verts[!id%in%dup.id, ]
+
+          verts <- rbindlist(list(verts, this.extend))
+          verts <- verts[order(id),]
+
+        }
 
       }
 
@@ -610,16 +646,19 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE){
   }
 
 
-
+# browser()
 
 
   if(plot){
-    plot(type = "n", x = verts.orig[,1], y = verts.orig[,2])
+    if(limits == "extended")
+      plot(type = "n", x = verts[[1]], y = verts[[2]])
+    else
+      plot(type = "n", x = verts.orig[,1], y = verts.orig[,2])
     polygon(verts.orig, lwd =  4, border = rgb(0, 0, 0,0.5))
     # points(verts.orig, col = "red")
     # points(t(as.data.frame(colMeans(verts.orig))), col = "red")
-    abline(v = bound[1,], lty = "dashed", col = "red")
-    abline(h = bound[2,], lty = "dashed", col = "red")
+    # abline(v = bound[1,], lty = "dashed", col = "red")
+    # abline(h = bound[2,], lty = "dashed", col = "red")
     text(verts, labels = verts[, id], col = "red")
     # points(intersect.points[, c(axis.names)], col = "blue")
     polygon(verts, lty = "dotted", border = "green", lwd = 3)

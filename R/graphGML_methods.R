@@ -234,8 +234,7 @@ gating.graphGML <- function(gt, gs, ...) {
     gateInfo <- gt_node[["gateInfo"]]
     this_gate <- gateInfo[["gate"]]
 
-#     if(popName == "PD-1(Histo)")
-#       browser()
+
 
     # transform bounds if applicable
     bound <- gateInfo[["bound"]]
@@ -248,7 +247,8 @@ gating.graphGML <- function(gt, gs, ...) {
       }
     }
 
-
+        # if(popName == "MDSC(gran-cd15+)")
+        #   browser()
     this_gate <- extend(this_gate,bound = bound)
 
     sn <- sampleNames(gs)

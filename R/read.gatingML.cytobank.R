@@ -638,17 +638,30 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, lim
           verts <- rbindlist(list(verts, this.extend))
           verts <- verts[order(id),]
 
-        }
+        }#end loop for each pair of intersects
 
-      }
+        #also make sure to remove the off-bound points outside of any intersected points range
+        vals.dim <- verts[, dim, with = FALSE]
+        vals.dim.flip <- verts[, dim.flip, with = FALSE]
+        rng.dim.flip  <- range(this.intersect.df[[dim.flip]])
+        ind.between <- vals.dim.flip <= rng.dim.flip[2] & vals.dim.flip >= rng.dim.flip[1]
+        if(bn == "min")
+          ind <- vals.dim < intersect.coord & !ind.between
+        else
+          ind <- vals.dim > intersect.coord & !ind.between
+        ind <- as.vector(ind)
+        verts <- verts[!ind, ]
+      }#end if of ncount>0
 
-    }
-  }
+    }#end of inner for loop for boundary (from min to max)
 
 
-# browser()
+  }#end of outer for loop for dim (from x to y)
 
 
+
+# if(isTRUE(parent.frame(1)[["popName"]] == "T-helpers"))
+#   browser()
   if(plot){
     if(limits == "extended")
       plot(type = "n", x = verts[[1]], y = verts[[2]])

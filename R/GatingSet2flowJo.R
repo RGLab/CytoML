@@ -105,6 +105,8 @@ getSpilloverMat <- function(gh){
 
 
   }else{
+    sn <- sampleNames(gh)
+    compobj <- compobj[[sn]]
     mat <- compobj@spillover
     cid <- "1"
     prefix <- ""

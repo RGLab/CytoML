@@ -16,8 +16,13 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
 
       #parse the exported xml
       fcs <- file.path(path, "ics/769121.fcs")
+      #mute the error message printed to stderr() by flowUtils
+      con <- file("/dev/null", "r")      
+      sink(con, type = "message") 
       gs_parsed <- cytobank2GatingSet(tmp, fcs)
-
+      sink(NULL, type = "message")
+      close(con)
+      
       parsedStats <- getPopStats(gs_parsed)[order(Population),]
       expect_equal(stats, parsedStats, tol = 2e-4)
 

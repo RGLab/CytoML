@@ -10,32 +10,12 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
 {
   type <- match.arg(type)
   #parse comp and channel names
-  comp <- gs@compensation
+  comp <- getCompensationMatrices(gs[[1]])#assuming the comp is identical across samples
   if(is.null(comp)){
-    #(assume it is identical across samples)
-    comp.obj <- flowWorkspace:::.cpp_getCompensation(gs@pointer, sampleNames(gs)[1])
-    if(is.null(comp.obj)){
-      #no compensation and channel names in transformation are not prefixed
-      chnls <- colnames(getData(gs))
-    }else{
-      #parsed from flowJo and channel names are usually prefixed
-      #thus get the raw channel names from here
-      chnls <- comp.obj[["parameters"]]
-      comp <- compensation(matrix(comp.obj$spillOver
-                                  ,nrow=length(chnls)
-                                  ,ncol=length(chnls)
-                                  ,byrow=TRUE
-                                  ,dimnames=list(chnls,chnls)
-                                  )
-                           )
-
-    }
-  }else{
-    #compensation was added in R
-    #channel names are not prefixed
+    #no compensation and channel names in transformation are not prefixed
+    chnls <- colnames(getData(gs))
+  }else
     chnls <- as.vector(parameters(comp))
-
-  }
 
   #add comp
   if(!is.null(comp)){

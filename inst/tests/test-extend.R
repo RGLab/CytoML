@@ -88,3 +88,22 @@ test_that("extend.polygonGate: concave on left& bottom with data.range",{
   expect_equivalent(pg.extened@boundaries, expectRes)
 
 })
+
+test_that("extend.polygonGate: with off-bound vertex that is outside of bounding intersected points",{
+  sqrcut <- matrix(c(-1.17531505192556,0.0277040198781766,-0.0795288778870589,-1.10419733542672,3.13855379324755,3.5332650668046,5.79388417899497,5.79089357705492)
+                   , nrow = 4
+                   , dimnames = list(NULL, chnls))
+  pg <- polygonGate(filterId="nonDebris", sqrcut)
+  data.range <- data.frame(min = c(-2, -1), max = c(1, 7), row.names = chnls)
+  bound <- matrix(c(-1.098612,8.159161
+                    ,-1.098612,8.159161)
+                  , byrow = TRUE, nrow = 2
+                  , dimnames = list(chnls, c("min", "max")))
+  pg.extened <- extend(pg, bound, data.range = data.range)
+
+  expectRes <- matrix(c(-2,-2,-1.098612,0.0277040198781766,-0.0795288778870589,-1.098612,5.79090987843986,3.16372011024189,3.16372011024189,3.5332650668046,5.79388417899497,5.79090987843986)
+                      , nrow = 6)
+
+  expect_equivalent(pg.extened@boundaries, expectRes)
+
+})

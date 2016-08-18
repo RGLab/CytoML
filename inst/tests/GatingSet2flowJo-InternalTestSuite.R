@@ -122,7 +122,7 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean ga
   #load the original automated gating set
   gs <- load_gs(file.path(thisPath, "autogating"))
   gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
-  flowIncubator::toggle.helperGates(gt, gs) #hide the helper gates
+  toggle.helperGates(gt, gs) #hide the helper gates
 
   #add AND gate
   bf <- booleanFilter(cd4/GzB&cd4/Prf)

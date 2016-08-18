@@ -9,7 +9,7 @@ This package is designed to import/export the hierarchical gated flow data to/fr
 ```r
 # First, install it from bionconductor so that it will pull all the dependent packages automatically
 library(BiocInstalller)
-bicLite(openCyto) # may be older
+biocLite(openCyto) # may be older
 # Then, install the latest version from github using devtools package 
 install.packages("devtools") 
 library(devtools) #load it

@@ -26,6 +26,6 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   stats.new <- getPopStats(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
-  expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y], tol = 7e-3)
+  expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
 
 })

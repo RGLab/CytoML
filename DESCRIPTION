@@ -5,9 +5,8 @@ Version: 0.99.7
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
-Description: This package is designed to use GatingML2.0 as the
-        standard format to exchange the gated data with other software
-        platform.
+Description: This package is designed to use GatingML2.0 as the standard format
+    to exchange the gated data with other software platform.
 License: Artistic-2.0
 LazyData: TRUE
 Imports:
@@ -28,10 +27,18 @@ Imports:
     utils,
     base64enc
 biocViews: FlowCytometry, DataImport, DataRepresentation
-Suggests: testthat, flowWorkspaceData, knitr, ggcyto
+Suggests:
+    testthat,
+    flowWorkspaceData,
+    knitr,
+    ggcyto
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
-Collate: 'GatingSet2cytobank.R' 'GatingSet2flowJo.R'
-        'cytobank2GatingSet.R' 'flowUtils_functions.R'
-        'read.gatingML.cytobank.R' 'graphGML_methods.R' 'utils.R'
-NeedsCompilation: no
+Collate:
+    'GatingSet2cytobank.R'
+    'GatingSet2flowJo.R'
+    'cytobank2GatingSet.R'
+    'flowUtils_functions.R'
+    'read.gatingML.cytobank.R'
+    'graphGML_methods.R'
+    'utils.R'

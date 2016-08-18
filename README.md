@@ -53,5 +53,5 @@ GatingSet2cytobank(gs, outFile)
 
 #flowJo
 outFile <- tempfile(fileext = ".wsp")
-GatingSet2cytobank(gs, outFile)
+GatingSet2flowJo(gs, outFile)
 ```

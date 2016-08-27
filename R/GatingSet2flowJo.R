@@ -19,6 +19,20 @@
 #'
 #'
 GatingSet2flowJo <- function(gs, outFile, ...){
+  #validity check for slash
+  # for(chnl in colnames(gs))
+  # {
+  #
+  #   if(grepl("/", chnl))
+  #     stop("'/' is found in channel '", chnl, "'! Please update GatingSet by running 'gs <- fix_channel_slash(gs)'")
+  # }
+  chnls <- colnames(gs)
+  slash_loc <- sapply(chnls, function(thisCol)as.integer(gregexpr("/", thisCol)[[1]]), simplify = FALSE)
+  new_cnd <- flowWorkspace:::.fix_channel_slash(chnls, slash_loc)
+  if(!all(new_cnd == chnls)){
+    gs <- clone.GatingSet(gs, isNew = FALSE, isEmpty = FALSE) # ensure everything else is cloned except hdf5
+    gs <- myupdateChannels(gs, map = data.frame(old = chnls, new = new_cnd))
+  }
 
   pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
 
@@ -45,6 +59,7 @@ workspaceNode <- function(gs, ...){
         )
 
 }
+
 
 groupNode <- function(sampleIds){
   xmlNode("Groups"

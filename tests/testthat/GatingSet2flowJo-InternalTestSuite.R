@@ -2,6 +2,22 @@ context("Exporting GatingSet to flowJo workspace")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
 
+test_that("GatingSet2flowJo: forward slash ",{
+  thisPath <- file.path(path, "slash_issue_vX")
+  gs <- load_gs(file.path(thisPath, "gs"))
+
+  stats.orig <- getPopStats(gs[[1]])
+  #output to flowJo
+  outFile <- tempfile(fileext = ".wsp")
+  GatingSet2flowJo(gs, outFile)
+
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, additional.keys = NULL)
+  stats.new <- getPopStats(gs1[[1]])
+  expect_equal(stats.orig[,flowCore.freq], stats.new[,flowCore.freq])
+})
+
 test_that("OrNode ",{
   thisPath <- file.path(path, "combineNode/OrNode")
   wsFile <- file.path(thisPath, "Test_EW.wsp")

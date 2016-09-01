@@ -20,6 +20,8 @@
 #'
 GatingSet2flowJo <- function(gs, outFile, ...){
 
+  pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
+
   ws <- workspaceNode(gs)
 
   ## Write out to an XML file

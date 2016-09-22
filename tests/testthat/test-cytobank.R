@@ -21,9 +21,11 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   outFile <- tempfile(fileext = ".xml")
   expect_warning(GatingSet2cytobank(gs, outFile))
   #read the exported gatingML back in
-  con <- file("/dev/null", "r")      
+  # con <- file("/dev/null", "r")      avoid /dev/null for windows
+  tmp <- tempfile()
+  con <- file(tmp, "w")
   #mute the error message printed to stderr() by flowUtils
-  sink(con, type = "message") 
+  sink(con, type = "message")
   gs1 <- cytobank2GatingSet(outFile, fcsFiles)
   sink(NULL, type = "message")
   close(con)

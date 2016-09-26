@@ -38,9 +38,11 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
 
   ws <- workspaceNode(gs)
-
+  locale <- localeToCharset()[1]
+  if(locale == "ISO8859-1")
+    locale <- "ISO-8859-1"
   ## Write out to an XML file
-  saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", localeToCharset()[1]))
+  saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", locale))
 }
 
 workspaceNode <- function(gs, ...){

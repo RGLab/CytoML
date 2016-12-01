@@ -38,6 +38,7 @@ Collate:
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
     'cytobank2GatingSet.R'
+    'diva2GatingSet.R'
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'

@@ -233,14 +233,22 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
         sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
 
-        # get comp
-        comp <- xpathApply(sampleNode, "instrument_settings/parameter", function(paramNode){
+        # get comp & param for biexp
+        biexp_para <- new.env(parent = emptyenv())
+        comp <- xpathApply(sampleNode, "instrument_settings/parameter", function(paramNode, biexp_para){
 
           paramName <- xmlGetAttr(paramNode, "name")
 
           isComp <- as.logical(xmlValue(xmlElementsByTagName(paramNode, "is_log")[[1]]))
           if(isComp){
-#             browser()
+            # browser()
+            #get biexp para
+
+            biexp_para[[paramName]] <- c(min = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "min")[[1]]))
+                                          , max = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "max")[[1]]))
+                                          , biexp_scale = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "comp_biexp_scale")[[1]]))
+                                          )
+            #get comp
             coef <- as.numeric(xpathSApply(paramNode, "compensation/compensation_coefficient", xmlValue))
             res <- list(coef)
             names(res) <- paramName
@@ -248,7 +256,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           }else
             res <- NULL
             return(res)
-        })
+        }, biexp_para = biexp_para)
         comp <- unlist(comp, recur = F)
         comp <- data.frame(comp, check.names = F)
         comp <- t(comp)
@@ -269,9 +277,22 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
         message(paste("transforming ..."))
+        params <- names(biexp_para)
+        # browser()
+        trans <- lapply(params, function(pn){
+          this_para <- biexp_para[[pn]]
+          channelRange <- 4096
+          maxValue <- 262144
+          widthBasis <- this_para[["biexp_scale"]]
 
-        trans <- flowJoTrans()
-        translist <- transformList(parameters(comp), trans)
+          flowJoTrans(neg = this_para[["min"]]
+                      , pos = this_para[["max"]]
+                      , widthBasis = - widthBasis
+                      , channelRange = channelRange
+                      , maxValue = maxValue
+                      )
+                    })
+        translist <- transformList(params, trans)
         data <- transform(data, translist)
 
 

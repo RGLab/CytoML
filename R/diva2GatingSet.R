@@ -241,7 +241,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
           isComp <- as.logical(xmlValue(xmlElementsByTagName(paramNode, "is_log")[[1]]))
           if(isComp){
-            # browser()
+
             #get biexp para
 
             biexp_para[[paramName]] <- c(min = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "min")[[1]]))
@@ -250,6 +250,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
                                           )
             #get comp
             coef <- as.numeric(xpathSApply(paramNode, "compensation/compensation_coefficient", xmlValue))
+            # browser()
             res <- list(coef)
             names(res) <- paramName
 
@@ -257,11 +258,15 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
             res <- NULL
             return(res)
         }, biexp_para = biexp_para)
-        comp <- unlist(comp, recur = F)
-        comp <- data.frame(comp, check.names = F)
-        comp <- t(comp)
-        colnames(comp) <- rownames(comp)
-        comp <- compensation(comp)
+        #comp stored in xml seems to be incorrect
+
+        # comp <- unlist(comp, recur = F)
+        # comp <- data.frame(comp, check.names = F)
+        # comp <- t(comp)
+        # colnames(comp) <- rownames(comp)
+        # comp <- compensation(comp)
+
+
         ##################################
         #Compensating the data
         ##################################
@@ -272,6 +277,15 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         data <- read.FCS(file)[, cnd]
 
         message("Compensating");
+        #we use the spillover from FCS keyword
+        comp <- spillover(data)
+        comp <- compact(comp)
+        if(length(comp) > 1)
+          stop("More than one spillover found in FCS!")
+        else if(length(comp) == 0)
+          stop("No spillover found in FCS!")
+        else
+          comp <- comp[[1]]
         data <- compensate(data,comp)
 
 
@@ -283,11 +297,11 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           this_para <- biexp_para[[pn]]
           channelRange <- 4096
           maxValue <- 262144
-          widthBasis <- this_para[["biexp_scale"]]
+
 
           flowJoTrans(neg = this_para[["min"]]
                       , pos = this_para[["max"]]
-                      , widthBasis = - widthBasis
+                      , widthBasis = - this_para[["biexp_scale"]]
                       , channelRange = channelRange
                       , maxValue = maxValue
                       )
@@ -295,7 +309,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         translist <- transformList(params, trans)
         data <- transform(data, translist)
 
-
+        # browser()
         fs[[sampleName]] <- data
 
 

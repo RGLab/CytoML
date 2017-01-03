@@ -21,6 +21,7 @@ open Diva xml workspace
 }
 \examples{
 \dontrun{
+library(flowWorkspace)
 library(CytoML)
 ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "CytoML"))
 ws

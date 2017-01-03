@@ -326,18 +326,19 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
     sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
     #assume the gates listed in xml follows the topological order
-    oldRoot <- NULL
+    rootNode.xml <- NULL
     gateNodes <- xpathApply(sampleNode, "gates/gate")
     for(gateNode in gateNodes)
     {
       nodeName <- xmlGetAttr(gateNode, "fullname")
       nodeName <- gsub("\\\\", "/", nodeName)
       nodeName <- basename(nodeName)
+      count <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]]))
       parent <- xmlElementsByTagName(gateNode, "parent")
       if(length(parent) > 0){
         parent <- xmlValue(parent[[1]])
         parent <- gsub("\\\\", "/", parent)
-        parent <- gsub(oldRoot, "root", parent)
+        parent <- gsub(rootNode.xml, "root", parent)
 
         #TODO: to store it to gs
         ws_count <- xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]])
@@ -390,10 +391,17 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
         add(gh, gate, parent = parent, name = nodeName)
-        recompute(gh, file.path(parent, nodeName))
-
+        if(parent == "root")
+          parent <- ""
+        unique.path <- file.path(parent, nodeName)
+        recompute(gh, unique.path)
+        #save the xml counts
+        set.count.xml(gh, unique.path, count)
       }else{
-        oldRoot <- nodeName
+        rootNode.xml <- nodeName
+        if(rootNode.xml!="All Events")
+          stop("unrecognized root node: ", rootNode.xml)
+        set.count.xml(gh, "root", count)
         next
       }
 

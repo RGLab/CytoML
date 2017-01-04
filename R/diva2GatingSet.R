@@ -294,19 +294,24 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
         params <- names(biexp_para)
         # browser()
+        #transform data in default flowCore logicle scale
         trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
-          channelRange <- 4096
+          # channelRange <- 4096
           maxValue <- 262144
-
-
-          flowJoTrans(neg = this_para[["min"]]
-                      , pos = this_para[["max"]]
-                      , widthBasis = - this_para[["biexp_scale"]]
-                      , channelRange = channelRange
-                      , maxValue = maxValue
-                      )
-                    }, simplify = FALSE)
+          # pos <- this_para[["max"]]
+          # flowJoTrans(neg = this_para[["min"]]
+          #             , pos = pos
+          #             , widthBasis = - this_para[["biexp_scale"]]
+          #             , channelRange = channelRange
+          #             , maxValue = maxValue
+          #             )
+          pos <- 4.5
+          r <- abs(this_para[["biexp_scale"]])
+          w = (pos - log10(maxValue/r))/2
+          lgclObj  <- logicleTransform(w=w, t = maxValue, m = pos) #
+                    }
+          , simplify = FALSE)
         translist <- transformList(params, trans)
         data <- transform(data, translist)
 
@@ -340,8 +345,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         parent <- gsub("\\\\", "/", parent)
         parent <- gsub(rootNode.xml, "root", parent)
 
-        #TODO: to store it to gs
-        ws_count <- xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]])
+
         regionNode <- xmlElementsByTagName(gateNode, "region")[[1]]
         xParam <- xmlGetAttr(regionNode, "xparm")
         yParam <- xmlGetAttr(regionNode, "yparm")
@@ -356,19 +360,33 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
         x_biexp <- this_biexp[[xParam]]
         y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]]
-        if(!is.null(x_biexp)&&!is.x.scaled){
-          # browser()
-          biexp_param <- attr(x_biexp, "parameters")
-          inv <- flowJoTrans(channelRange = biexp_param[["pos"]]
-                             , maxValue = biexp_param[["maxValue"]]
-                             , pos = biexp_param[["pos"]]
-                             , neg = biexp_param[["neg"]]
-                             , widthBasis = biexp_param[["widthBasis"]]
-                             , inverse = TRUE
-                             )
-          #inverse to raw and then biexp to the transformed data scale
-          mat[1, ] <- x_biexp(inv(mat[1, ]))
+        #the gate may be either stored as simple log or 4096 scale
+        #we need to rescale them to the data scale (i.e. 4.5 )
+        if(!is.null(x_biexp)){#when channel is logicle scale
+          if(is.x.scaled)#if the gate is scaled to 4096
+            mat[1, ] <- mat[1, ]/4096 * 4.5
+          else #it was in log scale
+          {
+            #restore to raw scale
+            mat[1, ] <- 10 ^ mat[1, ]
+            #logicle transform it to data scale
+            mat[1, ] <- x_biexp@.Data(mat[1, ])
+          }
+
         }
+        if(!is.null(y_biexp)){#when channel is logicle scale
+          if(is.y.scaled)#if the gate is scaled to 4096
+            mat[2, ] <- mat[2, ]/4096 * 4.5
+          else #it was in log scale
+          {
+            #restore to raw scale
+            mat[2, ] <- 10 ^ mat[2, ]
+            #logicle transform it to data scale
+            mat[2, ] <- y_biexp@.Data(mat[2, ])
+          }
+
+        }
+
         if(gType == "RECTANGLE_REGION"){
           x <- unique(mat[1,])
           y <- unique(mat[2,])

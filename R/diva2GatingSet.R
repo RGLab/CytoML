@@ -173,8 +173,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 }
 
 #' @importFrom XML xpathSApply
-#' @importFrom flowCore read.FCS transformList
-#' @importFrom flowWorkspace flowJoTrans
+#' @importFrom flowCore read.FCS transformList spillover logicleTransform
 .parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName,...){
 
   if(!file.exists(xmlFileName))
@@ -298,15 +297,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         #transform data in default flowCore logicle scale
         trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
-          # channelRange <- 4096
           maxValue <- 262144
-          # pos <- this_para[["max"]]
-          # flowJoTrans(neg = this_para[["min"]]
-          #             , pos = pos
-          #             , widthBasis = - this_para[["biexp_scale"]]
-          #             , channelRange = channelRange
-          #             , maxValue = maxValue
-          #             )
           pos <- 4.5
           r <- abs(this_para[["biexp_scale"]])
           w = (pos - log10(maxValue/r))/2

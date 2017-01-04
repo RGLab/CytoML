@@ -1,5 +1,6 @@
 #' divaWorkspace class
 #' Inherited from \link{flowJoWorkspace}
+#' @importClassesFrom flowWorkspace flowJoWorkspace
 #' @exportClass divaWorkspace
 setClass("divaWorkspace", contains = "flowJoWorkspace")
 # copied from "openWorkspace" method (flowWorkspace/diva branch)

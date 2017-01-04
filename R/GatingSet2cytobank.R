@@ -55,7 +55,7 @@ GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default
   root <- addGateSets(root, gs, flowEnv[["guid_mapping"]], showHidden = showHidden)
   #add experiment info to custom node
   root <- addExperimentInfo(root)
-  saveXML(root, file = outFile)
+  suppressWarnings(saveXML(root, file = outFile))#(suppress the warning due to the usage of deprecated structure call in saveXML)
 }
 
 export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, showHidden, rescale.gate = TRUE)

@@ -41,8 +41,8 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   locale <- localeToCharset()[1]
   if(locale == "ISO8859-1")
     locale <- "ISO-8859-1"
-  ## Write out to an XML file
-  saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", locale))
+  ## Write out to an XML file (suppress the warning due to the usage of deprecated structure call in saveXML)
+  suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", locale)))
 }
 
 workspaceNode <- function(gs, ...){

@@ -222,7 +222,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
   rootDoc <- ws@doc
 
   xpathGroup <- paste0("/bdfacs/experiment/specimen[@name='", groupName, "']")
-
+  biexp_list <- new.env(parent = emptyenv())
   for(file in files)
   {
 
@@ -291,9 +291,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
         message(paste("transforming ..."))
+
         params <- names(biexp_para)
         # browser()
-        trans <- lapply(params, function(pn){
+        trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
           channelRange <- 4096
           maxValue <- 262144
@@ -305,14 +306,14 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
                       , channelRange = channelRange
                       , maxValue = maxValue
                       )
-                    })
+                    }, simplify = FALSE)
         translist <- transformList(params, trans)
         data <- transform(data, translist)
 
         # browser()
         fs[[sampleName]] <- data
 
-
+        biexp_list[[sampleName]] <- trans
 
     }
 
@@ -321,6 +322,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
   message("parsing gates ...")
   for(sn in sampleNames(gs)){
     gh <- gs[[sn]]
+    this_biexp <- biexp_list[[sn]]
     xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
     sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
     #assume the gates listed in xml follows the topological order
@@ -344,7 +346,28 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         yParam <- xmlGetAttr(regionNode, "yparm")
         gType <- xmlGetAttr(regionNode, "type")
 
+        #parse the coodinates
         mat <- xpathSApply(regionNode, "points/point", function(pointNode)as.numeric(xmlAttrs(pointNode)))
+        #rescale the gate if it is stored as unscaled value
+        is.x.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_x_parameter_scaled")[[1]]))
+        is.y.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_y_parameter_scaled")[[1]]))
+
+
+        x_biexp <- this_biexp[[xParam]]
+        y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]]
+        if(!is.null(x_biexp)&&!is.x.scaled){
+          # browser()
+          biexp_param <- attr(x_biexp, "parameters")
+          inv <- flowJoTrans(channelRange = biexp_param[["pos"]]
+                             , maxValue = biexp_param[["maxValue"]]
+                             , pos = biexp_param[["pos"]]
+                             , neg = biexp_param[["neg"]]
+                             , widthBasis = biexp_param[["widthBasis"]]
+                             , inverse = TRUE
+                             )
+          #inverse to raw and then biexp to the transformed data scale
+          mat[1, ] <- x_biexp(inv(mat[1, ]))
+        }
         if(gType == "RECTANGLE_REGION"){
           x <- unique(mat[1,])
           y <- unique(mat[2,])
@@ -363,6 +386,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           gate <- rectangleGate(coord)
         }else
           stop("unsupported gate type: ", gType)
+
+
 
         add(gh, gate, parent = parent, name = nodeName)
         recompute(gh, file.path(parent, nodeName))

@@ -17,14 +17,22 @@ install_github("RGLab/flowWorkspace", ref="trunk")
 install_github("RGLab/openCyto", ref="trunk")
 ```
 
-### Import `gatingML` and `FCS` data from other platforms into `openCyto`
+### Import `XML` and `FCS` data from other platforms into `openCyto`
 
+#### Parse `gatingML` generated from `Cytobank` 
 ```r
 library(CytoML)
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = T)
 gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 ```
+
+#### Parse `diva` workspace 
+```r
+ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
+gs <- parseWorkspace(ws, name = 2, subset = 1)
+```
+
 
 ### Then you can interact with the gated data (`GatingSet`)
 

@@ -11,7 +11,7 @@ License: Artistic-2.0
 LazyData: TRUE
 Imports:
     flowCore,
-    flowWorkspace (>= 3.19.24),
+    flowWorkspace (>= 3.21.5),
     openCyto (>= 1.11.3),
     XML,
     data.table,
@@ -29,16 +29,20 @@ Imports:
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
-    flowWorkspaceData,
+    flowWorkspaceData (>= 2.11.1),
     knitr,
     ggcyto
+LinkingTo: Rcpp, flowWorkspace
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
 Collate:
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
+    'RcppExports.R'
     'cytobank2GatingSet.R'
+    'diva2GatingSet.R'
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
+    'set.count.xml.R'
     'utils.R'

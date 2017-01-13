@@ -17,8 +17,9 @@ test_that("autogating--tcell", {
   gs <- transform(gs, trans)
 
   #run auto gating
+  gtFile.orig <- system.file("extdata/gating_template/tcell.csv", package = "openCyto")
   gtFile <- tempfile()
-  tbl <- data.table::fread(system.file("extdata/gating_template/tcell.csv", package = "openCyto"))
+  tbl <- data.table::fread(gtFile.orig)
   tbl[5, gating_args:= "gate_range = c(1e3, 3e3)"]
   tbl[c(8,11), gating_args:= "gate_range = c(2e3, 3e3)"]
   write.csv(tbl, file = gtFile)
@@ -37,6 +38,25 @@ test_that("autogating--tcell", {
   stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
+  ####################
+  #use logicle
+  ####################
+  gs <- GatingSet(fs)
+  gs <- compensate(gs, comp)
+  trans <- estimateLogicle(gs[[1]], chnls)
+  gs <- transform(gs, trans)
+  gt <- gatingTemplate(gtFile.orig, autostart = 1L)
+  expect_warning(gating(gt, gs))
+  toggle.helperGates(gt, gs) #hide the helper gates
+  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  #output to flowJo
+
+  GatingSet2flowJo(gs, outFile)
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })
 test_that("GatingSet2flowJo: manual gates with calibration table parsed and stored as biexp ",{

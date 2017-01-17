@@ -34,6 +34,7 @@ Suggests:
     ggcyto
 LinkingTo: Rcpp, flowWorkspace, BH(>= 1.62.0-1)
 VignetteBuilder: knitr
+SystemRequirements: xml2, GNU make, C++11
 RoxygenNote: 5.0.1
 Collate:
     'GatingSet2cytobank.R'

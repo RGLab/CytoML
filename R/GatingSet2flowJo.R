@@ -271,7 +271,7 @@ transformationNode <- function(gh, matInfo){
 
                 }else if(trans.type == "logicle"){
                   param <- as.list(environment(func))
-                  withBasis <- - as.vector(param[["w"]]) * 4096
+                  withBasis <- - 10 ^ (2 * as.vector(param[["w"]]))
                   transNode <- xmlNode("biex"
                                        , namespace = "transforms"
                                        , attrs = c("transforms:length" = 4096

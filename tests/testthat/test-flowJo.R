@@ -53,10 +53,10 @@ test_that("autogating--tcell", {
 
   GatingSet2flowJo(gs, outFile)
   #parse it back in
-  # ws <- openWorkspace(outFile)
-  # gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  # stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
-  # expect_equal(stats.orig, stats.new, tol = 6e-4)
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })
 test_that("GatingSet2flowJo: manual gates with calibration table parsed and stored as biexp ",{

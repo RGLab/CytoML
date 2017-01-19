@@ -5,7 +5,7 @@
 \title{Convert a GatingSet to a Cytobank-compatible gatingML}
 \usage{
 GatingSet2cytobank(gs, outFile, showHidden = FALSE,
-  cytobank.default.scale = TRUE)
+  cytobank.default.scale = TRUE, ...)
 }
 \arguments{
 \item{gs}{a GatingSet object}
@@ -17,6 +17,10 @@ GatingSet2cytobank(gs, outFile, showHidden = FALSE,
 \item{cytobank.default.scale}{logical flag indicating whether to use the default Cytobank asinhtGml2 settings.
 Currently it should be set to TRUE in order for gates to be displayed properly in Cytobank
 because cytobank currently does not parse the global scale settings from GatingML.}
+
+\item{...}{rescale.gate default is TRUE. which means the gate is rescaled to the new scale that is understandable by cytobank.
+It is recommended not to change this behavior unless user wants to export to a gatingML file used for other purpose other
+than being imported into cytobank.}
 }
 \value{
 nothing

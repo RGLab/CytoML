@@ -20,6 +20,10 @@
 #' @param cytobank.default.scale logical flag indicating whether to use the default Cytobank asinhtGml2 settings.
 #'                              Currently it should be set to TRUE in order for gates to be displayed properly in Cytobank
 #'                              because cytobank currently does not parse the global scale settings from GatingML.
+#' @param ...
+#'        rescale.gate default is TRUE. which means the gate is rescaled to the new scale that is understandable by cytobank.
+#'        It is recommended not to change this behavior unless user wants to export to a gatingML file used for other purpose other
+#'        than being imported into cytobank.
 #' @examples
 #' library(flowWorkspace)
 #'
@@ -33,7 +37,7 @@
 #' GatingSet2cytobank(gs, outFile) #type by default is 'cytobank'
 #'
 #'
-GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE){
+GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE, ...){
 
   #convert comp and trans as GML2 compatible format and save to env
   if(cytobank.default.scale)
@@ -42,7 +46,7 @@ GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default
   flowEnv <- new.env(parent = emptyenv())
   res <- export_comp_trans(gs, flowEnv, cytobank.default.scale = cytobank.default.scale, type = "cytobank")
   #convert gates to GML2
-  export_gates_cytobank(gs, flowEnv, res[["trans.Gm2objs"]], res[["trans"]], res[["compId"]], showHidden = showHidden)
+  export_gates_cytobank(gs, flowEnv, res[["trans.Gm2objs"]], res[["trans"]], res[["compId"]], showHidden = showHidden, ...)
 
   tmp <- tempfile(fileext = ".xml")#ensure correct file extension for xmlTreeParse to work
   flowUtils::write.gatingML(flowEnv, tmp)

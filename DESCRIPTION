@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: GatingML interface for openCyto
-Version: 1.1.7
+Version: 1.1.8
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -25,7 +25,8 @@ Imports:
     graph,
     graphics,
     utils,
-    base64enc
+    base64enc,
+    plyr
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,

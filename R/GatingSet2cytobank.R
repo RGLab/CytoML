@@ -228,7 +228,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
         scale <- lapply(gate@parameters@.Data, function(param){
           # browser()
           if(class(param) == "compensatedParameter"){
-            if(cytobank.default.scale){
+            if(cytobank.default.scale&&!is.cytof(gs)){
              thisRng <- c(1, 262144.0)
             }else{
                 chnl <- as.vector(parameters(param))
@@ -245,7 +245,10 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
             nMatched <- sum(ind)
             if(nMatched == 1){
               if(cytobank.default.scale){
-                thisRng <- c(-200, 262144.0)
+                if(is.cytof(gs))
+                  thisRng <- c(-5, 12000.0)
+                else
+                  thisRng <- c(-200, 262144.0)
               }else
                 thisRng <- rng[, ind]
             }else

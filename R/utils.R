@@ -1,5 +1,8 @@
 compact <- flowWorkspace:::compact
 
+is.cytof <- function(gs){
+  any(grepl("Event_length", colnames(gs)))
+}
 ######################################
 #common APIs related to processing comp, trans, gates
 #to prepare the GatingML output that can be shared by both cytobank and flowJo modules
@@ -41,8 +44,11 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
     identifier(comp) <- compId
 
     flowEnv[[compId]] <- comp
-  }else
+  }else{
+    compId <- "FCS"
     prefix_chnls <- chnls
+  }
+
 
 
 
@@ -109,7 +115,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
         #use asinhtGml2 with cytobank default setting
         flowEnv[[transID]] <- asinhtGml2(parameters = param.obj
                                          , M = 0.43429448190325176
-                                         , T = 176.2801790465702
+                                         , T = ifelse(is.cytof(gs), 5.8760059682190064, 176.2801790465702)
                                          , A = 0.0
                                          , transformationId = transID
                                         )
@@ -127,7 +133,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
       #overwrite the customed scale with default one
       flowEnv[[transID]] <- asinhtGml2(parameters = param.obj
                                        , M = 0.43429448190325176
-                                       , T = 176.2801790465702
+                                       , T = ifelse(is.cytof(gs), 5.8760059682190064, 176.2801790465702)
                                        , A = 0.0
                                        , transformationId = transID)
     }

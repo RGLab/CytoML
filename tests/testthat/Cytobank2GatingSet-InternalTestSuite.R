@@ -1,6 +1,41 @@
-context("parse gatingMLs exported from Cytobank ")
+context("GatingSet2cytobank and GatingSet2Cytobank ")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/gatingML"
+
+test_that("GatingSet2Cytobank--cytof ",{
+
+  thisPath <- file.path(path, "cytof")
+  #load the original automated gating set
+  gs_orig <- load_gs(file.path(thisPath, "gs"))
+  stats <- getPopStats(gs_orig)[order(Population),]
+
+  #export the gs_orig to xml
+  outFile <- tempfile(fileext = ".xml")
+  expect_warning(GatingSet2cytobank(gs_orig, outFile))
+
+  #parse the exported xml
+  fcs <- file.path(path, "cytof/186089_Env_1-concat_normalized.fcs")
+  #mute the error message printed to stderr() by flowUtils
+  con <- file("/dev/null", "r")
+  sink(con, type = "message")
+  gs_parsed <- cytobank2GatingSet(outFile, fcs)
+  sink(NULL, type = "message")
+  close(con)
+
+  parsedStats <- getPopStats(gs_parsed)[order(Population),]
+  expect_equal(stats, parsedStats, tol = 1e-3)
+
+  #upload xml to cytobank and download the cytobank version of xml
+
+  # #parse the cytobank xml
+  # xmlfile <- file.path(path, "ics/CytExp_52926_Gates_v5.xml")
+  # gs_parsed <- cytobank2GatingSet(xmlfile, fcs)
+  #
+  # parsedStats <- getPopStats(gs_parsed)[order(Population),]
+  # expect_equal(stats, parsedStats, tol = 2e-4)
+
+})
+
 
 test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channels ",{
       thisPath <- file.path(path, "ics")
@@ -17,12 +52,12 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
       #parse the exported xml
       fcs <- file.path(path, "ics/769121.fcs")
       #mute the error message printed to stderr() by flowUtils
-      con <- file("/dev/null", "r")      
-      sink(con, type = "message") 
+      con <- file("/dev/null", "r")
+      sink(con, type = "message")
       gs_parsed <- cytobank2GatingSet(tmp, fcs)
       sink(NULL, type = "message")
       close(con)
-      
+
       parsedStats <- getPopStats(gs_parsed)[order(Population),]
       expect_equal(stats, parsedStats, tol = 2e-4)
 

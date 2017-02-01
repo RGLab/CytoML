@@ -2,9 +2,9 @@ context("parse winlist protocal ..")
 
 test_that("tcell", {
   dataDir <- system.file("extdata",package="flowWorkspaceData")
-  xmlfile <- system.file('extdata/winlist.wlx', package = "CytoML")
+  xmlfile <- system.file('extdata/NewProtocol.wlx', package = "CytoML")
 
-  gs <<- winlist2GatingSet(xmlfile, dataDir)
+  gs <- winlist2GatingSet(xmlfile, dataDir)
 
 
   #' ## verify the stats are correct

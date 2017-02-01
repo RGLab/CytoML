@@ -48,3 +48,4 @@ Collate:
     'graphGML_methods.R'
     'set.count.xml.R'
     'utils.R'
+    'winlist2GatingSet.R'

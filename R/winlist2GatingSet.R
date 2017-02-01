@@ -80,6 +80,15 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     xpathSample <- paste0("DataSources/DataSource/File[text()='", sampleName, "']/..")
     sampleNode <- xpathApply(root, xpathSample)[[1]]
 
+    #parse parameterID vs paramName from DataSource/Properties
+    paramEnv <- new.env(parent = emptyenv())
+    paramNodes <- xpathApply(sampleNode, "Properties/*[starts-with(name(), 'ParamBaseName')]")
+    for(pn in paramNodes)
+    {
+      paramID <- xmlName(pn)
+      paramName <- getContent(pn)
+      paramEnv[[paramID]] <- paramName
+    }
     # #TODO: parse comp
     # biexp_para <- new.env(parent = emptyenv())
     # comp <- xpathApply(sampleNode, "instrument_settings/parameter", function(paramNode, biexp_para){
@@ -128,134 +137,131 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
 
     message(paste("transforming ..."))
 
-    params <- names(biexp_para)
+    # params <- names(biexp_para)
+    params <- colnames(comp)
+
     # browser()
     #transform data in default flowCore logicle scale
+    # trans <- sapply(params, function(pn){
+    #   this_para <- biexp_para[[pn]]
+    #   maxValue <- 262144
+    #   pos <- 4.5
+    #   r <- abs(this_para[["biexp_scale"]])
+    #   w = (pos - log10(maxValue/r))/2
+    #   lgclObj  <- logicleTransform(w=w, t = maxValue, m = pos) #
+    # }
+    # , simplify = FALSE)
+
+    #transform with default hyperlog
     trans <- sapply(params, function(pn){
-      this_para <- biexp_para[[pn]]
-      maxValue <- 262144
-      pos <- 4.5
-      r <- abs(this_para[["biexp_scale"]])
-      w = (pos - log10(maxValue/r))/2
-      lgclObj  <- logicleTransform(w=w, t = maxValue, m = pos) #
-    }
-    , simplify = FALSE)
+        function(x){
+          #TODO: change hyperlogGml2 eval method to avoid directly call this
+          flowCore:::hyperlog_transform(x, T = 262144, W = 0.5, M = 4.5, A=0, FALSE)
+        }
+      }, simplify = FALSE)
+
     translist <- transformList(params, trans)
     data <- transform(data, translist)
 
     # browser()
     fs[[sampleName]] <- data
 
-    biexp_list[[sampleName]] <- trans
+    # biexp_list[[sampleName]] <- trans
+
+    #parse population objects from Gate nodes
+    popEnv <- new.env(parent = emptyenv());
+    popNodes <- xpathApply(sampleNode, "Gates/GateDefinition")
+    for(popNode in popNodes)
+    {
+      if(getContent(popNode, "Active") == "1")
+      {
+        popId <- getContent(popNode, "GateID")
+        parentId <- getContent(popNode, "ParentGateID")
+        if(parentId != popId)#skip root
+        {
+          popEnv[[popId]] <- list(parentId = parentId
+                                  , NumEvents = getContent(popNode, "NumEvents")
+                                  , Equation = getContent(popNode, "Equation")
+                                  )
+        }
+      }
+
+    }
+
+    #parse gates (with abstract dims) from region node
+    gateEnv <- new.env(parent = emptyenv());
+    gateNodes <- xpathApply(sampleNode, "Regions/RegionDefinition/DragRegion/Properties")
+    for(gateNode in gateNodes)
+    {
+        gateID <- getContent(gateNode, "RegionID")
+
+        #special logic for parsing quadgate
+        NStatColumns <- gateNode[["NStatColumns"]]
+        NStatRows <- gateNode[["NStatRows"]]
+        if(!is.null(NStatRows)&&!is.null(NStatColumns))
+        {
+          #get name from SubRegionAlias
+          sub_name <- paste0("SubRegionAlias", gateID)
+          gateName <- getContent(gateNode, sub_name)
+        }else
+          gateName <- getContent(gateNode, "RegionAlias")
+
+        vertNodes <- xpathApply(gateNode, "*[starts-with(name(), 'LinVertex')]")
+
+        mat <- sapply(vertNodes, function(vn){
+                    as.numeric(getContent(vn))
+                 })
+
+        gType = getContent(gateNode, "Description")
+        if(gType == "2 parameter polygon region"){
+          rownames(mat) <- c("x", "y")
+          gate <- polygonGate(.gate = t(mat))
+        }else if(gType == "1 parameter region"){
+          # browser()
+          coord <- list(unique(mat[1,]))
+          names(coord) <- "x"
+          gate <- rectangleGate(coord)
+        }else
+          stop("unsupported gate type: ", gType)
+
+        gateEnv[[gateID]] <- list(gateName = gateName, gate = gate)
+
+    }
+
+
+    #parse histograms
+
+    #parse equations/bool expresions from pop to link to the actual gate object
+
+    #link pop to histogram using GateID to get dimID
+
+
+
+
 
   }
 
 
   gs <- GatingSet(fs)
-  message("parsing gates ...")
-  for(sn in sampleNames(gs)){
-    gh <- gs[[sn]]
-    this_biexp <- biexp_list[[sn]]
-    xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
-    sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
-    #assume the gates listed in xml follows the topological order
-    rootNode.xml <- NULL
-    gateNodes <- xpathApply(sampleNode, "gates/gate")
-    for(gateNode in gateNodes)
-    {
-      nodeName <- xmlGetAttr(gateNode, "fullname")
-      nodeName <- gsub("\\\\", "/", nodeName)
-      nodeName <- basename(nodeName)
-      count <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]]))
-      parent <- xmlElementsByTagName(gateNode, "parent")
-      if(length(parent) > 0){
-        parent <- xmlValue(parent[[1]])
-        parent <- gsub("\\\\", "/", parent)
-        parent <- gsub(rootNode.xml, "root", parent)
 
 
-        regionNode <- xmlElementsByTagName(gateNode, "region")[[1]]
-        xParam <- xmlGetAttr(regionNode, "xparm")
-        yParam <- xmlGetAttr(regionNode, "yparm")
-        gType <- xmlGetAttr(regionNode, "type")
-
-        #parse the coodinates
-        mat <- xpathSApply(regionNode, "points/point", function(pointNode)as.numeric(xmlAttrs(pointNode)))
-        #rescale the gate if it is stored as unscaled value
-        is.x.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_x_parameter_scaled")[[1]]))
-        is.y.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_y_parameter_scaled")[[1]]))
-
-
-        x_biexp <- this_biexp[[xParam]]
-        y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]]
-        #the gate may be either stored as simple log or 4096 scale
-        #we need to rescale them to the data scale (i.e. 4.5 )
-        if(!is.null(x_biexp)){#when channel is logicle scale
-          if(is.x.scaled)#if the gate is scaled to 4096
-            mat[1, ] <- mat[1, ]/4096 * 4.5
-          else #it was in log scale
-          {
-            #restore to raw scale
-            mat[1, ] <- 10 ^ mat[1, ]
-            #logicle transform it to data scale
-            mat[1, ] <- x_biexp@.Data(mat[1, ])
-          }
-
-        }
-        if(!is.null(y_biexp)){#when channel is logicle scale
-          if(is.y.scaled)#if the gate is scaled to 4096
-            mat[2, ] <- mat[2, ]/4096 * 4.5
-          else #it was in log scale
-          {
-            #restore to raw scale
-            mat[2, ] <- 10 ^ mat[2, ]
-            #logicle transform it to data scale
-            mat[2, ] <- y_biexp@.Data(mat[2, ])
-          }
-
-        }
-
-        if(gType == "RECTANGLE_REGION"){
-          x <- unique(mat[1,])
-          y <- unique(mat[2,])
-          if(length(x)!=2||length(y)!=2)
-            stop("invalid RECTANGLE_REGION from ", nodeName)
-          coord <- list(x,y)
-          names(coord) <- c(xParam, yParam)
-          gate <- rectangleGate(.gate = coord)
-        }else if(gType == "POLYGON_REGION"){
-          rownames(mat) <- c(xParam, yParam)
-          gate <- polygonGate(.gate = t(mat))
-        }else if(gType == "INTERVAL_REGION"){
-          # browser()
-          coord <- list(mat[1,])
-          names(coord) <- xParam
-          gate <- rectangleGate(coord)
-        }else
-          stop("unsupported gate type: ", gType)
+  #   add(gh, gate, parent = parent, name = nodeName)
+  #   if(parent == "root")
+  #     parent <- ""
+  #   unique.path <- file.path(parent, nodeName)
+  #   recompute(gh, unique.path)
+  #   #save the xml counts
+  #   set.count.xml(gh, unique.path, count)
+  # }else{
+  #   rootNode.xml <- nodeName
+  #   if(rootNode.xml!="All Events")
+  #     stop("unrecognized root node: ", rootNode.xml)
+  #   set.count.xml(gh, "root", count)
+  #   next
+  # }
 
 
 
-        add(gh, gate, parent = parent, name = nodeName)
-        if(parent == "root")
-          parent <- ""
-        unique.path <- file.path(parent, nodeName)
-        recompute(gh, unique.path)
-        #save the xml counts
-        set.count.xml(gh, unique.path, count)
-      }else{
-        rootNode.xml <- nodeName
-        if(rootNode.xml!="All Events")
-          stop("unrecognized root node: ", rootNode.xml)
-        set.count.xml(gh, "root", count)
-        next
-      }
-
-
-    }
-
-
-  }
 
 
 
@@ -281,4 +287,12 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     }
   gs
 
+}
+
+#' parse the actual content from json text
+getContent <- function(xmlnode, name = NULL){
+  if(!is.null(name))
+    xmlnode <- xmlnode[[name]]
+  x <- xmlValue(xmlnode)
+  strsplit(x, ",")[[1]][-1]
 }

@@ -87,7 +87,7 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     {
       paramID <- xmlName(pn)
       paramName <- getContent(pn)
-      paramEnv[[paramID]] <- paramName
+      paramEnv[[paramID]] <- getChannelMarker(data, paramName)[["name"]]
     }
     # #TODO: parse comp
     # biexp_para <- new.env(parent = emptyenv())
@@ -210,10 +210,10 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     {
 
         HistogramID <- getContent(gateNode[["Properties"]], "HistogramID")
+        gateID <- getContent(gateNode[["Properties"]], "RegionID")
         gateNode <- gateNode[["DragRegion"]][["Properties"]]
         if(is.null(gateNode))
           next
-        gateID <- getContent(gateNode, "RegionID")
 
         #special logic for parsing quadgate
         NStatColumns <- gateNode[["NStatColumns"]]
@@ -264,36 +264,25 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
 
     #parse equations/bool expresions from pop to link to the actual gate object
     dt <- rbindlist(as.list(popEnv), idcol = "id")
-    dt[, gateID:=-1]
+
     res <- new.env(parent = emptyenv())
-    traverseTree(dt, 0, gateEnv)#start from root
-    # pid <- 0
+    traverseTree(dt, pid= 0, pEquation = "", gateEnv, res)#start from root
+    # merge back to dt
+    dt <- merge(dt, rbindlist(as.list(res), idcol = "id"))
 
-
-
-
-
-    sampleEnv[[sampelName]] <- list()
+    sampleEnv[[sampleName]] <- list(pops = dt, gateEnv = gateEnv, trans = trans)
   }
 
   #add gates to gs
   gs <- GatingSet(fs)
 
+  for(sn in sampleNames(gs))
+  {
 
-  #   add(gh, gate, parent = parent, name = nodeName)
-  #   if(parent == "root")
-  #     parent <- ""
-  #   unique.path <- file.path(parent, nodeName)
-  #   recompute(gh, unique.path)
-  #   #save the xml counts
-  #   set.count.xml(gh, unique.path, count)
-  # }else{
-  #   rootNode.xml <- nodeName
-  #   if(rootNode.xml!="All Events")
-  #     stop("unrecognized root node: ", rootNode.xml)
-  #   set.count.xml(gh, "root", count)
-  #   next
-  # }
+    .addPop(gs[[sn]], pid = 0, parentPath = "root", sampleEnv[[sn]])
+  }
+
+
 
 
   message("done!")
@@ -305,51 +294,97 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
   gslist <- suppressMessages(flowWorkspace:::.groupByTree(gs))
   if(length(gslist) > 1)
     warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
-  #    if(length(gslist) == 1){
-  #      return (gslist[[1]])
-  #    }else
-  {
-    #      warning("Due to the different gating tree structures, a list of GatingSets is returned instead!")
-    #      return (gslist)
-    }
   gs
 
 }
 
-traverseTree <- function(dt, pid, gateEnv){
-  sub <- dt[parentId == pid, ]
-  if(nrow(sub) >0)
+.addPop <- function(gh, pid, parentPath, popInfo){
+  trans <- popInfo[["trans"]]
+  dt <- popInfo[["pops"]]
+  gateEnv <- popInfo[["gateEnv"]]
+  children <- dt[parentId == pid, ]
+  for(i in seq_len(nrow(children)))
   {
-    for(i in 1:nrow(sub))
+    gateID <- children[i, gateID]
+    cid <-  children[i, id]
+    NumEvents <- children[i, NumEvents]
+    gate <- gateEnv[[gateID]]
+    gateName <- gate[["gateName"]]
+    gate <- gate[["gate"]]
+    gate <- .transformGate(gate, trans)
+    negated <- children[i, negated]
+    add(gh, gate, parent = parentPath, name = gateName, negated = negated)
+
+    if(parentPath == "root")
+      parentPath <- ""
+
+    unique.path <- file.path(parentPath, gateName)
+    recompute(gh, unique.path)
+    #save the xml counts
+    set.count.xml(gh, unique.path, as.integer(NumEvents))
+    #recursively gate descendants
+    .addPop(gh, cid, unique.path, popInfo)
+  }
+}
+
+.transformGate <- function(gate, trans){
+
+  params <- as.vector(parameters(gate))
+  chnls <- names(trans)
+
+  for(i in seq_along(params)){
+    param <- params[i]
+    ind <- sapply(chnls, function(chnl)grepl(chnl, param), USE.NAMES = FALSE)
+    nMatched <- sum(ind)
+    if(nMatched == 1){
+      chnl <- chnls[ind]
+      trans.fun <- trans[[chnl]]
+      gate <- transform(gate, trans.fun, param)
+
+    }else if(nMatched > 1)
+      stop("multiple trans matched to :", param)
+  }
+
+  # round
+  gate
+
+}
+
+#' resursively parse gateID from equations
+#' @param dt a data.table that stores hierarchical structure of gate defintions
+#' @param pid the parent gate ID that restrains the subsets to process
+#' @param pEquation the gate definiton of the parent gate
+#' @param gateEnv the environment that stores the actual gate objects to be used to validate the parsing
+#' @param res the working environment to hold the parsing results
+traverseTree <- function(dt, pid, pEquation, gateEnv, res){
+  children <- dt[parentId == pid, ]#extract the children gates to be processed
+  nChildren <- nrow(children)
+  for(i in seq_len(nChildren))
+  {
+    cid <- children[i, id]
+    Equation <- children[i, Equation]
+    #strip the leading string that represents the parent gate defintion
+    def <- sub(paste0("^", pEquation,"&"), "", Equation)
+    if(grepl("\\&", def))
+      stop("The gate should not have '&' operators!", def)
+    #deal with ! symbol
+    negated <- FALSE
+    if(grepl("\\!", def))
     {
-      cid <- sub[, id]
-      Equation <- sub[, Equation]
-      if(pid == 0)#first gate no need to split
-      {
-        if(grepl("\\&", Equation))
-          stop("The gate at the top level should not have '&' operators!", Equation)
-        negated <- FALSE
-        if(grepl("\\!", Equation))
-        {
-          negated <- TRUE
-          Equation <- sub("\\!", "", Equation)
-        }
-      }else
-      {
-        browser()
-        #strip the previous cascaded gates
-
-      }
-      gateID <- sub("R", "", Equation)
-
-      if(!exists(gateID, gateEnv))
-        stop("Can't find gate for R",gateID, "pared from ", Equation)
-      dt[id == cid, gateID := gateID]
-      traverseTree(dt, pid = cid, gateEnv)
-
+      negated <- TRUE
+      def <- sub("\\!", "", def)
     }
+    #extract id
+    gateID <- sub("R", "", def)
+
+    if(!exists(gateID, gateEnv))
+      stop("Can't find gate for R",gateID, " parsed from ", Equation)
+    res[[cid]] <- list(gateID = gateID, negated = negated)
+    #recursively to process its children
+    traverseTree(dt, pid = cid, Equation, gateEnv, res)
 
   }
+
 }
 #' parse the actual content from json text
 getContent <- function(xmlnode, name = NULL){

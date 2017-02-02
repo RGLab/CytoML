@@ -65,7 +65,7 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
   #load the raw data from FCS
   fs <- read.ncdfFlowSet(dataPaths,isWriteSlice=FALSE,...)
 
-  # biexp_list <- new.env(parent = emptyenv())
+  sampleEnv <- new.env(parent = emptyenv())
   for(file in dataPaths)
   {
 
@@ -188,21 +188,43 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
 
     }
 
+    #parse histograms
+    histEnv <- new.env(parent = emptyenv());
+    histNodes <- xpathApply(sampleNode, "Histograms/Histogram")
+    for(histNode in histNodes)
+    {
+      HistID <- getContent(histNode, "HistID")
+      xParamID <- getContent(histNode, "XParam")
+      xParam <- paramEnv[[paste0("ParamBaseName", xParamID)]]
+      yParamID <- getContent(histNode, "YParam")
+      yParam <- paramEnv[[paste0("ParamBaseName", yParamID)]]
+
+      histEnv[[HistID]] <- list(x = xParam, y = yParam)
+
+    }
+
     #parse gates (with abstract dims) from region node
     gateEnv <- new.env(parent = emptyenv());
-    gateNodes <- xpathApply(sampleNode, "Regions/RegionDefinition/DragRegion/Properties")
+    gateNodes <- xpathApply(sampleNode, "Regions/RegionDefinition")
     for(gateNode in gateNodes)
     {
+
+        HistogramID <- getContent(gateNode[["Properties"]], "HistogramID")
+        gateNode <- gateNode[["DragRegion"]][["Properties"]]
+        if(is.null(gateNode))
+          next
         gateID <- getContent(gateNode, "RegionID")
 
         #special logic for parsing quadgate
         NStatColumns <- gateNode[["NStatColumns"]]
         NStatRows <- gateNode[["NStatRows"]]
+        isQadGate <- FALSE
         if(!is.null(NStatRows)&&!is.null(NStatColumns))
         {
           #get name from SubRegionAlias
           sub_name <- paste0("SubRegionAlias", gateID)
           gateName <- getContent(gateNode, sub_name)
+          isQadGate <- TRUE
         }else
           gateName <- getContent(gateNode, "RegionAlias")
 
@@ -213,35 +235,48 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
                  })
 
         gType = getContent(gateNode, "Description")
-        if(gType == "2 parameter polygon region"){
-          rownames(mat) <- c("x", "y")
+
+        #link gate to histogram using fill dims
+        params <- histEnv[[HistogramID]]
+        if(is.null(params))
+          stop("unable to find the histogram related to this gate:", gateName)
+
+        if(gType == "2 parameter polygon region" || (isQadGate && gType == "Collection of regions")){
+
+          rownames(mat) <- params
           gate <- polygonGate(.gate = t(mat))
         }else if(gType == "1 parameter region"){
           # browser()
           coord <- list(unique(mat[1,]))
-          names(coord) <- "x"
+          names(coord) <- params[["x"]]
           gate <- rectangleGate(coord)
-        }else
+        }else{
           stop("unsupported gate type: ", gType)
+        }
 
+        gateID <- as.character(as.integer(gateID)+1)#increment id for it is referenced from pop differently
         gateEnv[[gateID]] <- list(gateName = gateName, gate = gate)
 
     }
 
 
-    #parse histograms
+
 
     #parse equations/bool expresions from pop to link to the actual gate object
+    dt <- rbindlist(as.list(popEnv), idcol = "id")
+    dt[, gateID:=-1]
+    res <- new.env(parent = emptyenv())
+    traverseTree(dt, 0, gateEnv)#start from root
+    # pid <- 0
 
-    #link pop to histogram using GateID to get dimID
 
 
 
 
-
+    sampleEnv[[sampelName]] <- list()
   }
 
-
+  #add gates to gs
   gs <- GatingSet(fs)
 
 
@@ -261,15 +296,7 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
   # }
 
 
-
-
-
-
-
-
   message("done!")
-
-
 
   #we don't want to return the splitted gs since they share the same cdf and externalptr
   #thus should be handled differently(more efficiently) from the regular gslist
@@ -289,6 +316,41 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
 
 }
 
+traverseTree <- function(dt, pid, gateEnv){
+  sub <- dt[parentId == pid, ]
+  if(nrow(sub) >0)
+  {
+    for(i in 1:nrow(sub))
+    {
+      cid <- sub[, id]
+      Equation <- sub[, Equation]
+      if(pid == 0)#first gate no need to split
+      {
+        if(grepl("\\&", Equation))
+          stop("The gate at the top level should not have '&' operators!", Equation)
+        negated <- FALSE
+        if(grepl("\\!", Equation))
+        {
+          negated <- TRUE
+          Equation <- sub("\\!", "", Equation)
+        }
+      }else
+      {
+        browser()
+        #strip the previous cascaded gates
+
+      }
+      gateID <- sub("R", "", Equation)
+
+      if(!exists(gateID, gateEnv))
+        stop("Can't find gate for R",gateID, "pared from ", Equation)
+      dt[id == cid, gateID := gateID]
+      traverseTree(dt, pid = cid, gateEnv)
+
+    }
+
+  }
+}
 #' parse the actual content from json text
 getContent <- function(xmlnode, name = NULL){
   if(!is.null(name))

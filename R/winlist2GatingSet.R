@@ -230,9 +230,10 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
 
         vertNodes <- xpathApply(gateNode, "*[starts-with(name(), 'LinVertex')]")
 
-        mat <- sapply(vertNodes, function(vn){
-                    as.numeric(getContent(vn))
-                 })
+        mat <- sapply(vertNodes, function(vn)as.numeric(getContent(vn)))
+        vertID <- sapply(vertNodes, function(vn)as.numeric(sub("LinVertex", "", xmlName(vn))))
+        mat <- mat[, order(vertID)]#sort by ID order
+
 
         gType = getContent(gateNode, "Description")
 

@@ -177,13 +177,13 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
       {
         popId <- getContent(popNode, "GateID")
         parentId <- getContent(popNode, "ParentGateID")
-        if(parentId != popId)#skip root
-        {
+        # if(parentId != popId)#skip root
+        # {
           popEnv[[popId]] <- list(parentId = parentId
                                   , NumEvents = getContent(popNode, "NumEvents")
                                   , Equation = getContent(popNode, "Equation")
                                   )
-        }
+        # }
       }
 
     }
@@ -267,9 +267,9 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     dt <- rbindlist(as.list(popEnv), idcol = "id")
 
     res <- new.env(parent = emptyenv())
-    traverseTree(dt, pid= 0, pEquation = "", gateEnv, res)#start from root
+    traverseTree(dt[id>0,], pid= 0, pEquation = "", gateEnv, res)#start from root
     # merge back to dt
-    dt <- merge(dt, rbindlist(as.list(res), idcol = "id"))
+    dt <- merge(dt, rbindlist(as.list(res), idcol = "id"), all.x = TRUE)
 
     sampleEnv[[sampleName]] <- list(pops = dt, gateEnv = gateEnv, trans = trans)
   }
@@ -309,22 +309,27 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     gateID <- children[i, gateID]
     cid <-  children[i, id]
     NumEvents <- children[i, NumEvents]
-    gate <- gateEnv[[gateID]]
-    gateName <- gate[["gateName"]]
-    gate <- gate[["gate"]]
-    gate <- .transformGate(gate, trans)
-    negated <- children[i, negated]
-    add(gh, gate, parent = parentPath, name = gateName, negated = negated)
+    if(cid > 0)#skip root node
+    {
+      gate <- gateEnv[[gateID]]
+      gateName <- gate[["gateName"]]
+      gate <- gate[["gate"]]
+      gate <- .transformGate(gate, trans)
+      negated <- children[i, negated]
+      add(gh, gate, parent = parentPath, name = gateName, negated = negated)
+      if(parentPath == "root")
+        parentPath <- ""
 
-    if(parentPath == "root")
-      parentPath <- ""
+      unique.path <- file.path(parentPath, gateName)
+      recompute(gh, unique.path)
+    }else
+      unique.path <- "root"
 
-    unique.path <- file.path(parentPath, gateName)
-    recompute(gh, unique.path)
     #save the xml counts
     set.count.xml(gh, unique.path, as.integer(NumEvents))
-    #recursively gate descendants
-    .addPop(gh, cid, unique.path, popInfo)
+    if(cid > 0)
+      .addPop(gh, cid, unique.path, popInfo)#recursively gate descendants
+
   }
 }
 

@@ -5,7 +5,7 @@ test_that("PE_2", {
   gs <- parseWorkspace(ws, name = 2, subset = 1)
   stats <- getPopStats(gs[[1]])
 
-  expect_equal(stats[, flowJo.count], stats[, flowCore.count], tolerance = 0.0018)
+  expect_equal(stats[, xml.count], stats[, openCyto.count], tolerance = 0.0018)
 
   sg <- getSampleGroups(ws)
   expect_is(sg, "data.frame")

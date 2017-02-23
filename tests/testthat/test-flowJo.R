@@ -27,7 +27,7 @@ test_that("autogating--tcell", {
   expect_warning(gating(gt, gs))
 
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -35,7 +35,7 @@ test_that("autogating--tcell", {
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
   ####################
@@ -48,14 +48,14 @@ test_that("autogating--tcell", {
   gt <- gatingTemplate(gtFile.orig, autostart = 1L)
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
 
   GatingSet2flowJo(gs, outFile)
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })

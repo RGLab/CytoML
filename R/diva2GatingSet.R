@@ -1,5 +1,5 @@
 #' divaWorkspace class
-#' Inherited from \link{flowJoWorkspace}
+#' Inherited from \link{flowJoWorkspace-class}
 #' @importClassesFrom flowWorkspace flowJoWorkspace
 #' @exportClass divaWorkspace
 setClass("divaWorkspace", contains = "flowJoWorkspace")
@@ -54,17 +54,20 @@ openDiva <- function(file,options = 0,...){
   return(x);
 }
 
+#' @rdname divaWorkspace-class
 #' @importFrom flowWorkspace getSamples
 #' @export
 setMethod("getSamples","divaWorkspace",function(x){
       selectMethod("getSampleGroups","divaWorkspace")(x)
     })
 
+#' @rdname divaWorkspace-class
 #' @importFrom flowWorkspace getSampleGroups
 #' @export
 setMethod("getSampleGroups","divaWorkspace",function(x){
       .getSampleGroupsDiva(x)
     })
+
 #' @importFrom plyr ldply
 .getSampleGroupsDiva<-function(x){
     ldply(
@@ -83,6 +86,7 @@ setMethod("getSampleGroups","divaWorkspace",function(x){
 
 }
 
+#' @rdname divaWorkspace-class
 #' @importFrom flowWorkspace show
 #' @export
 setMethod("show",c("divaWorkspace"),function(object){
@@ -103,6 +107,7 @@ setMethod("show",c("divaWorkspace"),function(object){
       }
     })
 
+#' @rdname divaWorkspace-class
 #' @importFrom flowWorkspace parseWorkspace
 #' @export
 setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){

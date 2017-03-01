@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="US-ASCII" standalone="yes" ?>
-<!-- Created by WinList 3D 9.0.1   (build 27-Dec-2016), on 30Jan2017 @ 12:13:26 -->
+<!-- Created by WinList 3D 9.0.1   (build 27-Dec-2016), on 1Mar2017 @ 10:23:38 -->
 <WinListXMLProtocol>
  <Name>NewProtocol</Name>
  <ObjectVersion>2</ObjectVersion>
- <Date>30Jan2017</Date>
- <Time>12:13:26</Time>
+ <Date>1Mar2017</Date>
+ <Time>10:23:38</Time>
  <InitialRegions>32</InitialRegions>
  <InitialGates>32</InitialGates>
  <PacketSize>100000</PacketSize>
@@ -290,6 +290,18 @@
     <Parameter9Resolution>4,262144.000000</Parameter9Resolution>
     <Parameter9Slope>4,1.000000</Parameter9Slope>
     <Parameter9SlopeType>2,0</Parameter9SlopeType>
+    <ParamNameLock0>2,0</ParamNameLock0>
+    <ParamNameLock1>2,0</ParamNameLock1>
+    <ParamNameLock10>2,0</ParamNameLock10>
+    <ParamNameLock11>2,0</ParamNameLock11>
+    <ParamNameLock2>2,0</ParamNameLock2>
+    <ParamNameLock3>2,0</ParamNameLock3>
+    <ParamNameLock4>2,0</ParamNameLock4>
+    <ParamNameLock5>2,0</ParamNameLock5>
+    <ParamNameLock6>2,0</ParamNameLock6>
+    <ParamNameLock7>2,0</ParamNameLock7>
+    <ParamNameLock8>2,0</ParamNameLock8>
+    <ParamNameLock9>2,0</ParamNameLock9>
     <ProtectHistograms>2,0</ProtectHistograms>
     <SetAutoZoomFixedUpperBoundary_CCR7_PE>4,0.000000</SetAutoZoomFixedUpperBoundary_CCR7_PE>
     <SetAutoZoomFixedUpperBoundary_CD38_APC>4,0.000000</SetAutoZoomFixedUpperBoundary_CD38_APC>
@@ -833,13 +845,13 @@
      <CreatingScreenBitmap>2,0</CreatingScreenBitmap>
      <DataSourcePage>2,0</DataSourcePage>
      <DesiredDotNumber>2,10000</DesiredDotNumber>
-     <DotNumber>2,1271</DotNumber>
+     <DotNumber>2,1520</DotNumber>
      <DotSize>2,2</DotSize>
      <Draw2pContours>2,0</Draw2pContours>
      <Draw2pDensity>2,1</Draw2pDensity>
      <Draw2pDots>2,0</Draw2pDots>
      <dZoomHighLinearX>4,262144.000000</dZoomHighLinearX>
-     <dZoomHighLinearY>4,1271.000000</dZoomHighLinearY>
+     <dZoomHighLinearY>4,10.000000</dZoomHighLinearY>
      <dZoomHighLinearZ>4,0.000000</dZoomHighLinearZ>
      <dZoomLowLinearX>4,-20.000000</dZoomLowLinearX>
      <dZoomLowLinearY>4,0.000000</dZoomLowLinearY>
@@ -847,7 +859,7 @@
      <GateID>2,8</GateID>
      <HideButton>2,0</HideButton>
      <HighX>2,63</HighX>
-     <HighY>2,1271</HighY>
+     <HighY>2,1520</HighY>
      <HighZ>2,31</HighZ>
      <HistID>2,6</HistID>
      <HistogramName><![CDATA[1,CD45RA PECy7]]></HistogramName>
@@ -923,7 +935,7 @@
        <AutoPositionXPercentile>4,10.000000</AutoPositionXPercentile>
        <AutoPositionYOffset>4,0.000000</AutoPositionYOffset>
        <AutoPositionYPercentile>4,10.000000</AutoPositionYPercentile>
-       <BoundingRect>5,594,50,1771,2835</BoundingRect>
+       <BoundingRect>5,595,50,1771,2835</BoundingRect>
        <CenterMode>2,1</CenterMode>
        <ClassID>2,58613</ClassID>
        <ClickLocation>6,906,94</ClickLocation>
@@ -933,7 +945,7 @@
        <EditEnable>2,0</EditEnable>
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
-       <GatedEvents>3,100000</GatedEvents>
+       <GatedEvents>3,119531</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -959,13 +971,13 @@
        <RegionAlias><![CDATA[1,debris]]></RegionAlias>
        <RegionCenter>6,868,1490</RegionCenter>
        <RegionCenterRect>5,805,1427,931,1553</RegionCenterRect>
-       <RegionEvents>3,22468</RegionEvents>
+       <RegionEvents>3,26870</RegionEvents>
        <RegionID>2,0</RegionID>
        <RegionStyle>2,0</RegionStyle>
        <RegionType>2,1</RegionType>
        <RoamingRect>5,0,0,3437,3354</RoamingRect>
-       <RotateDistance>4,136.000000</RotateDistance>
-       <RotateHotSpot>5,954,1440,1054,1540</RotateHotSpot>
+       <RotateDistance>4,137.000000</RotateDistance>
+       <RotateHotSpot>5,955,1440,1055,1540</RotateHotSpot>
        <Shape>2,2</Shape>
        <ShowAlias>2,1</ShowAlias>
        <ShowName>2,0</ShowName>
@@ -974,7 +986,7 @@
        <Size>2,8</Size>
        <SizeEnable>2,0</SizeEnable>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -994,7 +1006,7 @@
         <CenterMode>2,1</CenterMode>
         <ClassID>2,7424</ClassID>
         <Color>3,16777215</Color>
-        <Description><![CDATA[1,debris: 22.47%]]></Description>
+        <Description><![CDATA[1,debris: 22.48%]]></Description>
         <EditEnable>2,0</EditEnable>
         <EditProperties>2,1</EditProperties>
         <EditPropertyTree>2,1</EditPropertyTree>
@@ -1082,7 +1094,7 @@
        <EditEnable>2,0</EditEnable>
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
-       <GatedEvents>3,77532</GatedEvents>
+       <GatedEvents>3,92661</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -1104,7 +1116,7 @@
        <RegionAlias><![CDATA[1,singlets]]></RegionAlias>
        <RegionCenter>6,2126,1481</RegionCenter>
        <RegionCenterRect>5,2063,1418,2189,1544</RegionCenterRect>
-       <RegionEvents>3,67202</RegionEvents>
+       <RegionEvents>3,80274</RegionEvents>
        <RegionID>2,2</RegionID>
        <RegionStyle>2,0</RegionStyle>
        <RegionType>2,1</RegionType>
@@ -1120,7 +1132,7 @@
        <SizeEnable>2,0</SizeEnable>
        <StartMoving2p>2,0</StartMoving2p>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -1136,7 +1148,7 @@
         <CenterMode>2,1</CenterMode>
         <ClassID>2,7424</ClassID>
         <Color>3,16777215</Color>
-        <Description><![CDATA[1,singlets: 86.68%]]></Description>
+        <Description><![CDATA[1,singlets: 86.63%]]></Description>
         <EditEnable>2,0</EditEnable>
         <EditProperties>2,1</EditProperties>
         <EditPropertyTree>2,1</EditPropertyTree>
@@ -1197,7 +1209,7 @@
        <AutoPositionXPercentile>4,10.000000</AutoPositionXPercentile>
        <AutoPositionYOffset>4,0.000000</AutoPositionYOffset>
        <AutoPositionYPercentile>4,10.000000</AutoPositionYPercentile>
-       <BoundingRect>5,2289,530,3205,2658</BoundingRect>
+       <BoundingRect>5,2289,530,3205,2659</BoundingRect>
        <CenterMode>2,1</CenterMode>
        <ClassID>2,58613</ClassID>
        <ClickLocation>6,187,105</ClickLocation>
@@ -1207,7 +1219,7 @@
        <EditEnable>2,0</EditEnable>
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
-       <GatedEvents>3,67202</GatedEvents>
+       <GatedEvents>3,80274</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -1241,13 +1253,13 @@
        <RegionAlias><![CDATA[1,CD3]]></RegionAlias>
        <RegionCenter>6,2685,2091</RegionCenter>
        <RegionCenterRect>5,2622,2028,2748,2154</RegionCenterRect>
-       <RegionEvents>3,42645</RegionEvents>
+       <RegionEvents>3,50961</RegionEvents>
        <RegionID>2,3</RegionID>
        <RegionStyle>2,0</RegionStyle>
        <RegionType>2,1</RegionType>
        <RoamingRect>5,0,0,3437,3354</RoamingRect>
-       <RotateDistance>4,151.000000</RotateDistance>
-       <RotateHotSpot>5,2786,2041,2886,2141</RotateHotSpot>
+       <RotateDistance>4,152.000000</RotateDistance>
+       <RotateHotSpot>5,2787,2041,2887,2141</RotateHotSpot>
        <Shape>2,2</Shape>
        <ShowAlias>2,1</ShowAlias>
        <ShowName>2,0</ShowName>
@@ -1257,7 +1269,7 @@
        <SizeEnable>2,0</SizeEnable>
        <StartMoving2p>2,0</StartMoving2p>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -1285,7 +1297,7 @@
         <CenterMode>2,1</CenterMode>
         <ClassID>2,7424</ClassID>
         <Color>3,16777215</Color>
-        <Description><![CDATA[1,CD3: 63.46%]]></Description>
+        <Description><![CDATA[1,CD3: 63.48%]]></Description>
         <EditEnable>2,0</EditEnable>
         <EditProperties>2,1</EditProperties>
         <EditPropertyTree>2,1</EditPropertyTree>
@@ -1346,7 +1358,7 @@
        <AutoPositionXPercentile>4,10.000000</AutoPositionXPercentile>
        <AutoPositionYOffset>4,0.000000</AutoPositionYOffset>
        <AutoPositionYPercentile>4,10.000000</AutoPositionYPercentile>
-       <BoundingRect>5,488,48,3388,2866</BoundingRect>
+       <BoundingRect>5,488,48,3388,2865</BoundingRect>
        <ClassID>2,22970</ClassID>
        <ClickLocation>6,270,94</ClickLocation>
        <Color>3,0</Color>
@@ -1355,7 +1367,7 @@
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
        <EnableNStatGates>2,1</EnableNStatGates>
-       <GatedEvents>3,42645</GatedEvents>
+       <GatedEvents>3,50961</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -1381,7 +1393,7 @@
        <RegionAlias><![CDATA[1,R5]]></RegionAlias>
        <RegionCenter>6,2139,1405</RegionCenter>
        <RegionCenterRect>5,2076,1342,2202,1468</RegionCenterRect>
-       <RegionEvents>3,12446</RegionEvents>
+       <RegionEvents>3,14866</RegionEvents>
        <RegionID>2,4</RegionID>
        <RegionType>2,2</RegionType>
        <RoamingRect>5,0,0,3437,3354</RoamingRect>
@@ -1395,12 +1407,12 @@
        <SubRegionAlias6><![CDATA[1,DN]]></SubRegionAlias6>
        <SubRegionAlias7><![CDATA[1,CD4]]></SubRegionAlias7>
        <SubRegionDisplayOption>2,2</SubRegionDisplayOption>
-       <SubRegionLabel4><![CDATA[1,CD8: 29.19%]]></SubRegionLabel4>
+       <SubRegionLabel4><![CDATA[1,CD8: 29.17%]]></SubRegionLabel4>
        <SubRegionLabel5><![CDATA[1,DPT: 1.03%]]></SubRegionLabel5>
-       <SubRegionLabel6><![CDATA[1,DN: 4.09%]]></SubRegionLabel6>
-       <SubRegionLabel7><![CDATA[1,CD4: 65.70%]]></SubRegionLabel7>
+       <SubRegionLabel6><![CDATA[1,DN: 4.06%]]></SubRegionLabel6>
+       <SubRegionLabel7><![CDATA[1,CD4: 65.73%]]></SubRegionLabel7>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -1431,11 +1443,11 @@
         <Path><![CDATA[1,R5/Label]]></Path>
         <PenColor>3,16777215</PenColor>
         <Picked>2,1</Picked>
-        <RoamingRect>5,488,48,3388,2866</RoamingRect>
+        <RoamingRect>5,488,48,3388,2865</RoamingRect>
         <ScaledX>4,66.748237</ScaledX>
         <ScaledY>4,75.141830</ScaledY>
         <SizeEnable>2,0</SizeEnable>
-        <SuperRoamingRect>5,488,48,3388,2866</SuperRoamingRect>
+        <SuperRoamingRect>5,488,48,3388,2865</SuperRoamingRect>
         <TextAlignment>2,0</TextAlignment>
         <TextColor>3,0</TextColor>
         <TextFontName><![CDATA[1,Arial]]></TextFontName>
@@ -1479,7 +1491,7 @@
        <AutoPositionXPercentile>4,10.000000</AutoPositionXPercentile>
        <AutoPositionYOffset>4,0.000000</AutoPositionYOffset>
        <AutoPositionYPercentile>4,10.000000</AutoPositionYPercentile>
-       <BoundingRect>5,488,48,3388,2866</BoundingRect>
+       <BoundingRect>5,488,48,3388,2865</BoundingRect>
        <ClassID>2,22970</ClassID>
        <ClickLocation>6,270,94</ClickLocation>
        <Color>3,0</Color>
@@ -1488,7 +1500,7 @@
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
        <EnableNStatGates>2,1</EnableNStatGates>
-       <GatedEvents>3,42645</GatedEvents>
+       <GatedEvents>3,50961</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -1514,7 +1526,7 @@
        <RegionAlias><![CDATA[1,R5]]></RegionAlias>
        <RegionCenter>6,2139,1405</RegionCenter>
        <RegionCenterRect>5,2076,1342,2202,1468</RegionCenterRect>
-       <RegionEvents>3,440</RegionEvents>
+       <RegionEvents>3,526</RegionEvents>
        <RegionID>2,4</RegionID>
        <RegionType>2,2</RegionType>
        <RoamingRect>5,0,0,3437,3354</RoamingRect>
@@ -1528,12 +1540,12 @@
        <SubRegionAlias6><![CDATA[1,DN]]></SubRegionAlias6>
        <SubRegionAlias7><![CDATA[1,CD4]]></SubRegionAlias7>
        <SubRegionDisplayOption>2,2</SubRegionDisplayOption>
-       <SubRegionLabel4><![CDATA[1,CD8: 29.19%]]></SubRegionLabel4>
+       <SubRegionLabel4><![CDATA[1,CD8: 29.17%]]></SubRegionLabel4>
        <SubRegionLabel5><![CDATA[1,DPT: 1.03%]]></SubRegionLabel5>
-       <SubRegionLabel6><![CDATA[1,DN: 4.09%]]></SubRegionLabel6>
-       <SubRegionLabel7><![CDATA[1,CD4: 65.70%]]></SubRegionLabel7>
+       <SubRegionLabel6><![CDATA[1,DN: 4.06%]]></SubRegionLabel6>
+       <SubRegionLabel7><![CDATA[1,CD4: 65.73%]]></SubRegionLabel7>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -1564,11 +1576,11 @@
         <Path><![CDATA[1,R5/Label]]></Path>
         <PenColor>3,16777215</PenColor>
         <Picked>2,1</Picked>
-        <RoamingRect>5,488,48,3388,2866</RoamingRect>
+        <RoamingRect>5,488,48,3388,2865</RoamingRect>
         <ScaledX>4,66.748237</ScaledX>
         <ScaledY>4,75.141830</ScaledY>
         <SizeEnable>2,0</SizeEnable>
-        <SuperRoamingRect>5,488,48,3388,2866</SuperRoamingRect>
+        <SuperRoamingRect>5,488,48,3388,2865</SuperRoamingRect>
         <TextAlignment>2,0</TextAlignment>
         <TextColor>3,0</TextColor>
         <TextFontName><![CDATA[1,Arial]]></TextFontName>
@@ -1612,7 +1624,7 @@
        <AutoPositionXPercentile>4,10.000000</AutoPositionXPercentile>
        <AutoPositionYOffset>4,0.000000</AutoPositionYOffset>
        <AutoPositionYPercentile>4,10.000000</AutoPositionYPercentile>
-       <BoundingRect>5,488,48,3388,2866</BoundingRect>
+       <BoundingRect>5,488,48,3388,2865</BoundingRect>
        <ClassID>2,22970</ClassID>
        <ClickLocation>6,270,94</ClickLocation>
        <Color>3,0</Color>
@@ -1621,7 +1633,7 @@
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
        <EnableNStatGates>2,1</EnableNStatGates>
-       <GatedEvents>3,42645</GatedEvents>
+       <GatedEvents>3,50961</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -1647,7 +1659,7 @@
        <RegionAlias><![CDATA[1,R5]]></RegionAlias>
        <RegionCenter>6,2139,1405</RegionCenter>
        <RegionCenterRect>5,2076,1342,2202,1468</RegionCenterRect>
-       <RegionEvents>3,1743</RegionEvents>
+       <RegionEvents>3,2070</RegionEvents>
        <RegionID>2,4</RegionID>
        <RegionType>2,2</RegionType>
        <RoamingRect>5,0,0,3437,3354</RoamingRect>
@@ -1661,12 +1673,12 @@
        <SubRegionAlias6><![CDATA[1,DN]]></SubRegionAlias6>
        <SubRegionAlias7><![CDATA[1,CD4]]></SubRegionAlias7>
        <SubRegionDisplayOption>2,2</SubRegionDisplayOption>
-       <SubRegionLabel4><![CDATA[1,CD8: 29.19%]]></SubRegionLabel4>
+       <SubRegionLabel4><![CDATA[1,CD8: 29.17%]]></SubRegionLabel4>
        <SubRegionLabel5><![CDATA[1,DPT: 1.03%]]></SubRegionLabel5>
-       <SubRegionLabel6><![CDATA[1,DN: 4.09%]]></SubRegionLabel6>
-       <SubRegionLabel7><![CDATA[1,CD4: 65.70%]]></SubRegionLabel7>
+       <SubRegionLabel6><![CDATA[1,DN: 4.06%]]></SubRegionLabel6>
+       <SubRegionLabel7><![CDATA[1,CD4: 65.73%]]></SubRegionLabel7>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -1697,11 +1709,11 @@
         <Path><![CDATA[1,R5/Label]]></Path>
         <PenColor>3,16777215</PenColor>
         <Picked>2,1</Picked>
-        <RoamingRect>5,488,48,3388,2866</RoamingRect>
+        <RoamingRect>5,488,48,3388,2865</RoamingRect>
         <ScaledX>4,66.748237</ScaledX>
         <ScaledY>4,75.141830</ScaledY>
         <SizeEnable>2,0</SizeEnable>
-        <SuperRoamingRect>5,488,48,3388,2866</SuperRoamingRect>
+        <SuperRoamingRect>5,488,48,3388,2865</SuperRoamingRect>
         <TextAlignment>2,0</TextAlignment>
         <TextColor>3,0</TextColor>
         <TextFontName><![CDATA[1,Arial]]></TextFontName>
@@ -1745,7 +1757,7 @@
        <AutoPositionXPercentile>4,10.000000</AutoPositionXPercentile>
        <AutoPositionYOffset>4,0.000000</AutoPositionYOffset>
        <AutoPositionYPercentile>4,10.000000</AutoPositionYPercentile>
-       <BoundingRect>5,488,48,3388,2866</BoundingRect>
+       <BoundingRect>5,488,48,3388,2865</BoundingRect>
        <ClassID>2,22970</ClassID>
        <ClickLocation>6,270,94</ClickLocation>
        <Color>3,0</Color>
@@ -1754,7 +1766,7 @@
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
        <EnableNStatGates>2,1</EnableNStatGates>
-       <GatedEvents>3,42645</GatedEvents>
+       <GatedEvents>3,50961</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -1780,7 +1792,7 @@
        <RegionAlias><![CDATA[1,R5]]></RegionAlias>
        <RegionCenter>6,2139,1405</RegionCenter>
        <RegionCenterRect>5,2076,1342,2202,1468</RegionCenterRect>
-       <RegionEvents>3,28016</RegionEvents>
+       <RegionEvents>3,33499</RegionEvents>
        <RegionID>2,4</RegionID>
        <RegionType>2,2</RegionType>
        <RoamingRect>5,0,0,3437,3354</RoamingRect>
@@ -1794,12 +1806,12 @@
        <SubRegionAlias6><![CDATA[1,DN]]></SubRegionAlias6>
        <SubRegionAlias7><![CDATA[1,CD4]]></SubRegionAlias7>
        <SubRegionDisplayOption>2,2</SubRegionDisplayOption>
-       <SubRegionLabel4><![CDATA[1,CD8: 29.19%]]></SubRegionLabel4>
+       <SubRegionLabel4><![CDATA[1,CD8: 29.17%]]></SubRegionLabel4>
        <SubRegionLabel5><![CDATA[1,DPT: 1.03%]]></SubRegionLabel5>
-       <SubRegionLabel6><![CDATA[1,DN: 4.09%]]></SubRegionLabel6>
-       <SubRegionLabel7><![CDATA[1,CD4: 65.70%]]></SubRegionLabel7>
+       <SubRegionLabel6><![CDATA[1,DN: 4.06%]]></SubRegionLabel6>
+       <SubRegionLabel7><![CDATA[1,CD4: 65.73%]]></SubRegionLabel7>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -1830,11 +1842,11 @@
         <Path><![CDATA[1,R5/Label]]></Path>
         <PenColor>3,16777215</PenColor>
         <Picked>2,1</Picked>
-        <RoamingRect>5,488,48,3388,2866</RoamingRect>
+        <RoamingRect>5,488,48,3388,2865</RoamingRect>
         <ScaledX>4,66.748237</ScaledX>
         <ScaledY>4,75.141830</ScaledY>
         <SizeEnable>2,0</SizeEnable>
-        <SuperRoamingRect>5,488,48,3388,2866</SuperRoamingRect>
+        <SuperRoamingRect>5,488,48,3388,2865</SuperRoamingRect>
         <TextAlignment>2,0</TextAlignment>
         <TextColor>3,0</TextColor>
         <TextFontName><![CDATA[1,Arial]]></TextFontName>
@@ -1878,7 +1890,7 @@
        <AutoPositionXPercentile>4,10.000000</AutoPositionXPercentile>
        <AutoPositionYOffset>4,0.000000</AutoPositionYOffset>
        <AutoPositionYPercentile>4,10.000000</AutoPositionYPercentile>
-       <BoundingRect>5,1728,394,3123,1221</BoundingRect>
+       <BoundingRect>5,1728,394,3124,1222</BoundingRect>
        <CenterMode>2,1</CenterMode>
        <ClassID>2,58613</ClassID>
        <ClickLocation>6,2042,354</ClickLocation>
@@ -1888,7 +1900,7 @@
        <EditEnable>2,0</EditEnable>
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
-       <GatedEvents>3,28016</GatedEvents>
+       <GatedEvents>3,33499</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -1913,13 +1925,13 @@
        <RegionAlias><![CDATA[1,activated CD4]]></RegionAlias>
        <RegionCenter>6,2654,913</RegionCenter>
        <RegionCenterRect>5,2591,850,2717,976</RegionCenterRect>
-       <RegionEvents>3,1363</RegionEvents>
+       <RegionEvents>3,1632</RegionEvents>
        <RegionID>2,8</RegionID>
        <RegionStyle>2,0</RegionStyle>
        <RegionType>2,1</RegionType>
        <RoamingRect>5,0,0,3437,3354</RoamingRect>
-       <RotateDistance>4,234.000000</RotateDistance>
-       <RotateHotSpot>5,2838,863,2938,963</RotateHotSpot>
+       <RotateDistance>4,235.000000</RotateDistance>
+       <RotateHotSpot>5,2839,863,2939,963</RotateHotSpot>
        <Shape>2,2</Shape>
        <ShowAlias>2,1</ShowAlias>
        <ShowName>2,0</ShowName>
@@ -1928,7 +1940,7 @@
        <Size>2,8</Size>
        <SizeEnable>2,0</SizeEnable>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -2018,7 +2030,7 @@
        <EditEnable>2,0</EditEnable>
        <EditProperties>2,1</EditProperties>
        <EditPropertyTree>2,1</EditPropertyTree>
-       <GatedEvents>3,28016</GatedEvents>
+       <GatedEvents>3,33499</GatedEvents>
        <ImageIndex>2,12</ImageIndex>
        <ImageSize>2,1</ImageSize>
        <LabelInitialized>2,1</LabelInitialized>
@@ -2037,7 +2049,7 @@
        <RegionAlias><![CDATA[1,45+]]></RegionAlias>
        <RegionCenter>6,2811,1459</RegionCenter>
        <RegionCenterRect>5,2748,1396,2874,1522</RegionCenterRect>
-       <RegionEvents>3,10392</RegionEvents>
+       <RegionEvents>3,12359</RegionEvents>
        <RegionID>2,9</RegionID>
        <RegionStyle>2,0</RegionStyle>
        <RegionType>2,0</RegionType>
@@ -2048,7 +2060,7 @@
        <Size>2,7</Size>
        <SizeEnable>2,0</SizeEnable>
        <SuperRoamingRect>5,-250,-250,3687,3604</SuperRoamingRect>
-       <TotalEvents>3,100000</TotalEvents>
+       <TotalEvents>3,119531</TotalEvents>
        <Type>2,1</Type>
        <Update>2,1</Update>
        <UpdateFromScaledUnits>2,0</UpdateFromScaledUnits>
@@ -2064,7 +2076,7 @@
         <CenterMode>2,1</CenterMode>
         <ClassID>2,7424</ClassID>
         <Color>3,16777215</Color>
-        <Description><![CDATA[1,45+: 37.09%]]></Description>
+        <Description><![CDATA[1,45+: 36.89%]]></Description>
         <EditEnable>2,0</EditEnable>
         <EditProperties>2,1</EditProperties>
         <EditPropertyTree>2,1</EditPropertyTree>
@@ -2476,7 +2488,7 @@
      <EditPropertyTree>2,0</EditPropertyTree>
      <Equation><![CDATA[1, ]]></Equation>
      <EventsInMultipleChildren>3,0</EventsInMultipleChildren>
-     <EventsInNoChildren>3,22468</EventsInNoChildren>
+     <EventsInNoChildren>3,26870</EventsInNoChildren>
      <GateID>2,0</GateID>
      <HierarchyColoring>2,1</HierarchyColoring>
      <HierarchyGate0>2,1</HierarchyGate0>
@@ -2495,15 +2507,7 @@
      <HierarchyGate20>2,29</HierarchyGate20>
      <HierarchyGate21>2,30</HierarchyGate21>
      <HierarchyGate22>2,31</HierarchyGate22>
-     <HierarchyGate23>2,31</HierarchyGate23>
-     <HierarchyGate24>2,31</HierarchyGate24>
-     <HierarchyGate25>2,28</HierarchyGate25>
-     <HierarchyGate26>2,29</HierarchyGate26>
-     <HierarchyGate27>2,30</HierarchyGate27>
-     <HierarchyGate28>2,31</HierarchyGate28>
-     <HierarchyGate29>2,30</HierarchyGate29>
      <HierarchyGate3>2,12</HierarchyGate3>
-     <HierarchyGate30>2,31</HierarchyGate30>
      <HierarchyGate4>2,13</HierarchyGate4>
      <HierarchyGate5>2,14</HierarchyGate5>
      <HierarchyGate6>2,15</HierarchyGate6>
@@ -2513,23 +2517,23 @@
      <HierarchyLevel>2,0</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,Ungated ]]></Name>
-     <NumEvents>3,100000</NumEvents>
+     <NumEvents>3,119531</NumEvents>
      <NumHierarchyGates>2,23</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,0</ParentGateID>
      <Path><![CDATA[1,/Ungated ]]></Path>
      <PcntEventsInMultipleChildren>4,0.000000</PcntEventsInMultipleChildren>
-     <PcntEventsInNoChildren>4,22.468000</PcntEventsInNoChildren>
+     <PcntEventsInNoChildren>4,22.479524</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
-     <PcntGndPntEventsInNoChildren>4,22.468000</PcntGndPntEventsInNoChildren>
+     <PcntGndPntEventsInNoChildren>4,22.479524</PcntGndPntEventsInNoChildren>
      <PcntGrandParent>4,100.000000</PcntGrandParent>
      <PcntParent>4,100.000000</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
-     <PcntParentEventsInNoChildren>4,22.468000</PcntParentEventsInNoChildren>
+     <PcntParentEventsInNoChildren>4,22.479524</PcntParentEventsInNoChildren>
      <PcntTotal>4,100.000000</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2542,30 +2546,30 @@
      <EditPropertyTree>2,0</EditPropertyTree>
      <Equation><![CDATA[1,!R1]]></Equation>
      <EventsInMultipleChildren>3,0</EventsInMultipleChildren>
-     <EventsInNoChildren>3,10330</EventsInNoChildren>
+     <EventsInNoChildren>3,12387</EventsInNoChildren>
      <GateID>2,1</GateID>
      <HierarchyColoring>2,1</HierarchyColoring>
      <HierarchyGate0>2,3</HierarchyGate0>
      <HierarchyLevel>2,1</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G1 ]]></Name>
-     <NumEvents>3,77532</NumEvents>
+     <NumEvents>3,92661</NumEvents>
      <NumHierarchyGates>2,1</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,0</ParentGateID>
      <Path><![CDATA[1,/G1 ]]></Path>
      <PcntEventsInMultipleChildren>4,0.000000</PcntEventsInMultipleChildren>
-     <PcntEventsInNoChildren>4,10.330000</PcntEventsInNoChildren>
+     <PcntEventsInNoChildren>4,10.363002</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
-     <PcntGndPntEventsInNoChildren>4,10.330000</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,77.532000</PcntGrandParent>
-     <PcntParent>4,77.532000</PcntParent>
+     <PcntGndPntEventsInNoChildren>4,10.363002</PcntGndPntEventsInNoChildren>
+     <PcntGrandParent>4,77.520476</PcntGrandParent>
+     <PcntParent>4,77.520476</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
-     <PcntParentEventsInNoChildren>4,13.323531</PcntParentEventsInNoChildren>
-     <PcntTotal>4,77.532000</PcntTotal>
+     <PcntParentEventsInNoChildren>4,13.368084</PcntParentEventsInNoChildren>
+     <PcntTotal>4,77.520476</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2613,30 +2617,30 @@
      <EditPropertyTree>2,0</EditPropertyTree>
      <Equation><![CDATA[1,!R1&R3]]></Equation>
      <EventsInMultipleChildren>3,0</EventsInMultipleChildren>
-     <EventsInNoChildren>3,24557</EventsInNoChildren>
+     <EventsInNoChildren>3,29313</EventsInNoChildren>
      <GateID>2,3</GateID>
      <HierarchyColoring>2,1</HierarchyColoring>
      <HierarchyGate0>2,4</HierarchyGate0>
      <HierarchyLevel>2,2</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G3 ]]></Name>
-     <NumEvents>3,67202</NumEvents>
+     <NumEvents>3,80274</NumEvents>
      <NumHierarchyGates>2,1</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,1</ParentGateID>
      <Path><![CDATA[1,/G3 ]]></Path>
      <PcntEventsInMultipleChildren>4,0.000000</PcntEventsInMultipleChildren>
-     <PcntEventsInNoChildren>4,24.557000</PcntEventsInNoChildren>
+     <PcntEventsInNoChildren>4,24.523345</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
-     <PcntGndPntEventsInNoChildren>4,31.673374</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,67.202000</PcntGrandParent>
-     <PcntParent>4,86.676469</PcntParent>
+     <PcntGndPntEventsInNoChildren>4,31.634668</PcntGndPntEventsInNoChildren>
+     <PcntGrandParent>4,67.157474</PcntGrandParent>
+     <PcntParent>4,86.631916</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
-     <PcntParentEventsInNoChildren>4,36.542067</PcntParentEventsInNoChildren>
-     <PcntTotal>4,67.202000</PcntTotal>
+     <PcntParentEventsInNoChildren>4,36.516182</PcntParentEventsInNoChildren>
+     <PcntTotal>4,67.157474</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2659,7 +2663,7 @@
      <HierarchyLevel>2,3</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G4 ]]></Name>
-     <NumEvents>3,42645</NumEvents>
+     <NumEvents>3,50961</NumEvents>
      <NumHierarchyGates>2,4</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,3</ParentGateID>
@@ -2668,14 +2672,14 @@
      <PcntEventsInNoChildren>4,0.000000</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
      <PcntGndPntEventsInNoChildren>4,0.000000</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,55.003095</PcntGrandParent>
-     <PcntParent>4,63.457933</PcntParent>
+     <PcntGrandParent>4,54.997248</PcntGrandParent>
+     <PcntParent>4,63.483818</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
      <PcntParentEventsInNoChildren>4,0.000000</PcntParentEventsInNoChildren>
-     <PcntTotal>4,42.645000</PcntTotal>
+     <PcntTotal>4,42.634128</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2694,7 +2698,7 @@
      <HierarchyLevel>2,4</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G5 ]]></Name>
-     <NumEvents>3,12446</NumEvents>
+     <NumEvents>3,14866</NumEvents>
      <NumHierarchyGates>2,0</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,4</ParentGateID>
@@ -2703,14 +2707,14 @@
      <PcntEventsInNoChildren>4,0.000000</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
      <PcntGndPntEventsInNoChildren>4,0.000000</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,18.520282</PcntGrandParent>
-     <PcntParent>4,29.185133</PcntParent>
+     <PcntGrandParent>4,18.519072</PcntGrandParent>
+     <PcntParent>4,29.171327</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
      <PcntParentEventsInNoChildren>4,0.000000</PcntParentEventsInNoChildren>
-     <PcntTotal>4,12.446000</PcntTotal>
+     <PcntTotal>4,12.436941</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2729,7 +2733,7 @@
      <HierarchyLevel>2,4</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G6 ]]></Name>
-     <NumEvents>3,440</NumEvents>
+     <NumEvents>3,526</NumEvents>
      <NumHierarchyGates>2,0</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,4</ParentGateID>
@@ -2738,14 +2742,14 @@
      <PcntEventsInNoChildren>4,0.000000</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
      <PcntGndPntEventsInNoChildren>4,0.000000</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,0.654742</PcntGrandParent>
-     <PcntParent>4,1.031774</PcntParent>
+     <PcntGrandParent>4,0.655256</PcntGrandParent>
+     <PcntParent>4,1.032162</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
      <PcntParentEventsInNoChildren>4,0.000000</PcntParentEventsInNoChildren>
-     <PcntTotal>4,0.440000</PcntTotal>
+     <PcntTotal>4,0.440053</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2764,7 +2768,7 @@
      <HierarchyLevel>2,4</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G7 ]]></Name>
-     <NumEvents>3,1743</NumEvents>
+     <NumEvents>3,2070</NumEvents>
      <NumHierarchyGates>2,0</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,4</ParentGateID>
@@ -2773,14 +2777,14 @@
      <PcntEventsInNoChildren>4,0.000000</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
      <PcntGndPntEventsInNoChildren>4,0.000000</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,2.593673</PcntGrandParent>
-     <PcntParent>4,4.087232</PcntParent>
+     <PcntGrandParent>4,2.578668</PcntGrandParent>
+     <PcntParent>4,4.061930</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
      <PcntParentEventsInNoChildren>4,0.000000</PcntParentEventsInNoChildren>
-     <PcntTotal>4,1.743000</PcntTotal>
+     <PcntTotal>4,1.731768</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2792,8 +2796,8 @@
      <EditProperties>2,0</EditProperties>
      <EditPropertyTree>2,0</EditPropertyTree>
      <Equation><![CDATA[1,!R1&R3&R4&R8]]></Equation>
-     <EventsInMultipleChildren>3,752</EventsInMultipleChildren>
-     <EventsInNoChildren>3,17013</EventsInNoChildren>
+     <EventsInMultipleChildren>3,901</EventsInMultipleChildren>
+     <EventsInNoChildren>3,20409</EventsInNoChildren>
      <GateID>2,8</GateID>
      <HierarchyColoring>2,1</HierarchyColoring>
      <HierarchyGate0>2,9</HierarchyGate0>
@@ -2801,23 +2805,23 @@
      <HierarchyLevel>2,4</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G8 ]]></Name>
-     <NumEvents>3,28016</NumEvents>
+     <NumEvents>3,33499</NumEvents>
      <NumHierarchyGates>2,2</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,4</ParentGateID>
      <Path><![CDATA[1,/G8 ]]></Path>
-     <PcntEventsInMultipleChildren>4,0.752000</PcntEventsInMultipleChildren>
-     <PcntEventsInNoChildren>4,17.013000</PcntEventsInNoChildren>
-     <PcntGndPntEventsInMultipleChildren>4,1.763395</PcntGndPntEventsInMultipleChildren>
-     <PcntGndPntEventsInNoChildren>4,39.894478</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,41.689235</PcntGrandParent>
-     <PcntParent>4,65.695861</PcntParent>
-     <PcntParentEventsInMultipleChildren>4,2.684180</PcntParentEventsInMultipleChildren>
-     <PcntParentEventsInNoChildren>4,60.726014</PcntParentEventsInNoChildren>
-     <PcntTotal>4,28.016000</PcntTotal>
+     <PcntEventsInMultipleChildren>4,0.753779</PcntEventsInMultipleChildren>
+     <PcntEventsInNoChildren>4,17.074232</PcntEventsInNoChildren>
+     <PcntGndPntEventsInMultipleChildren>4,1.768019</PcntGndPntEventsInMultipleChildren>
+     <PcntGndPntEventsInNoChildren>4,40.048272</PcntGndPntEventsInNoChildren>
+     <PcntGrandParent>4,41.730822</PcntGrandParent>
+     <PcntParent>4,65.734581</PcntParent>
+     <PcntParentEventsInMultipleChildren>4,2.689633</PcntParentEventsInMultipleChildren>
+     <PcntParentEventsInNoChildren>4,60.924207</PcntParentEventsInNoChildren>
+     <PcntTotal>4,28.025366</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2836,7 +2840,7 @@
      <HierarchyLevel>2,5</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G9 ]]></Name>
-     <NumEvents>3,1363</NumEvents>
+     <NumEvents>3,1632</NumEvents>
      <NumHierarchyGates>2,0</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,8</ParentGateID>
@@ -2845,14 +2849,14 @@
      <PcntEventsInNoChildren>4,0.000000</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
      <PcntGndPntEventsInNoChildren>4,0.000000</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,3.196154</PcntGrandParent>
-     <PcntParent>4,4.865077</PcntParent>
+     <PcntGrandParent>4,3.202449</PcntGrandParent>
+     <PcntParent>4,4.871787</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
      <PcntParentEventsInNoChildren>4,0.000000</PcntParentEventsInNoChildren>
-     <PcntTotal>4,1.363000</PcntTotal>
+     <PcntTotal>4,1.365336</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -2871,7 +2875,7 @@
      <HierarchyLevel>2,5</HierarchyLevel>
      <ImageIndex>2,1</ImageIndex>
      <Name><![CDATA[1,G10]]></Name>
-     <NumEvents>3,10392</NumEvents>
+     <NumEvents>3,12359</NumEvents>
      <NumHierarchyGates>2,0</NumHierarchyGates>
      <ObjectVersion>2,1</ObjectVersion>
      <ParentGateID>2,8</ParentGateID>
@@ -2880,14 +2884,14 @@
      <PcntEventsInNoChildren>4,0.000000</PcntEventsInNoChildren>
      <PcntGndPntEventsInMultipleChildren>4,0.000000</PcntGndPntEventsInMultipleChildren>
      <PcntGndPntEventsInNoChildren>4,0.000000</PcntGndPntEventsInNoChildren>
-     <PcntGrandParent>4,24.368625</PcntGrandParent>
-     <PcntParent>4,37.093090</PcntParent>
+     <PcntGrandParent>4,24.251879</PcntGrandParent>
+     <PcntParent>4,36.893639</PcntParent>
      <PcntParentEventsInMultipleChildren>4,0.000000</PcntParentEventsInMultipleChildren>
      <PcntParentEventsInNoChildren>4,0.000000</PcntParentEventsInNoChildren>
-     <PcntTotal>4,10.392000</PcntTotal>
+     <PcntTotal>4,10.339577</PcntTotal>
      <Type>2,0</Type>
      <Update>2,0</Update>
-     <UpdateStats>2,1</UpdateStats>
+     <UpdateStats>2,0</UpdateStats>
     </GateDefinition>
     <GateDefinition>
      <ActivationOption>2,0</ActivationOption>
@@ -3506,16 +3510,16 @@
     <Compensation_10_10>4,1.000000</Compensation_10_10>
     <Compensation_10_4>4,-0.009455</Compensation_10_4>
     <Compensation_10_5>4,0.001627</Compensation_10_5>
-    <Compensation_10_6>4,-0.173760</Compensation_10_6>
+    <Compensation_10_6>4,-0.173759</Compensation_10_6>
     <Compensation_10_7>4,-0.000061</Compensation_10_7>
     <Compensation_10_8>4,0.000047</Compensation_10_8>
     <Compensation_10_9>4,-0.041258</Compensation_10_9>
-    <Compensation_4_10>4,-0.065174</Compensation_4_10>
+    <Compensation_4_10>4,-0.065175</Compensation_4_10>
     <Compensation_4_4>4,1.000000</Compensation_4_4>
     <Compensation_4_5>4,-0.029665</Compensation_4_5>
     <Compensation_4_6>4,-0.172982</Compensation_4_6>
     <Compensation_4_7>4,-0.002977</Compensation_4_7>
-    <Compensation_4_8>4,-0.000671</Compensation_4_8>
+    <Compensation_4_8>4,-0.000670</Compensation_4_8>
     <Compensation_4_9>4,0.002345</Compensation_4_9>
     <Compensation_5_10>4,-0.000000</Compensation_5_10>
     <Compensation_5_4>4,-0.005527</Compensation_5_4>
@@ -3525,8 +3529,8 @@
     <Compensation_5_8>4,0.000004</Compensation_5_8>
     <Compensation_5_9>4,0.000002</Compensation_5_9>
     <Compensation_6_10>4,-0.035393</Compensation_6_10>
-    <Compensation_6_4>4,0.000290</Compensation_6_4>
-    <Compensation_6_5>4,-0.009902</Compensation_6_5>
+    <Compensation_6_4>4,0.000289</Compensation_6_4>
+    <Compensation_6_5>4,-0.009903</Compensation_6_5>
     <Compensation_6_6>4,1.000000</Compensation_6_6>
     <Compensation_6_7>4,0.000002</Compensation_6_7>
     <Compensation_6_8>4,-0.000002</Compensation_6_8>
@@ -3542,14 +3546,14 @@
     <Compensation_8_4>4,-0.002510</Compensation_8_4>
     <Compensation_8_5>4,-0.000455</Compensation_8_5>
     <Compensation_8_6>4,0.000527</Compensation_8_6>
-    <Compensation_8_7>4,-0.037954</Compensation_8_7>
+    <Compensation_8_7>4,-0.037955</Compensation_8_7>
     <Compensation_8_8>4,1.000000</Compensation_8_8>
-    <Compensation_8_9>4,-0.000066</Compensation_8_9>
-    <Compensation_9_10>4,-0.001568</Compensation_9_10>
-    <Compensation_9_4>4,-0.117127</Compensation_9_4>
+    <Compensation_8_9>4,-0.000067</Compensation_8_9>
+    <Compensation_9_10>4,-0.001567</Compensation_9_10>
+    <Compensation_9_4>4,-0.117128</Compensation_9_4>
     <Compensation_9_5>4,0.001823</Compensation_9_5>
-    <Compensation_9_6>4,0.021834</Compensation_9_6>
-    <Compensation_9_7>4,0.000349</Compensation_9_7>
+    <Compensation_9_6>4,0.021835</Compensation_9_6>
+    <Compensation_9_7>4,0.000350</Compensation_9_7>
     <Compensation_9_8>4,0.000078</Compensation_9_8>
     <Compensation_9_9>4,1.000000</Compensation_9_9>
     <CompOn>2,1</CompOn>
@@ -3742,7 +3746,7 @@
     <ObjectVersion>2,1</ObjectVersion>
     <ScrollLine>2,0</ScrollLine>
     <Type>2,0</Type>
-    <Window>5,0,0,0,0</Window>
+    <Window>5,1487,563,1831,931</Window>
     <WindowState>2,0</WindowState>
    </GateStatWindow>
   </DataSource>

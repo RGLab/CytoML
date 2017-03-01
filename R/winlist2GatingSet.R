@@ -81,14 +81,31 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     sampleNode <- xpathApply(root, xpathSample)[[1]]
 
     #parse parameterID vs paramName from DataSource/Properties
-    paramEnv <- new.env(parent = emptyenv())
+
     paramNodes <- xpathApply(sampleNode, "Properties/*[starts-with(name(), 'ParamBaseName')]")
+    nParam <- length(paramNodes)
+    paramVec <- vector("character", length = nParam)
     for(pn in paramNodes)
     {
       paramID <- xmlName(pn)
+      paramID <- as.integer(sub("ParamBaseName", "", paramID)) + 1
       paramName <- getContent(pn)
-      paramEnv[[paramID]] <- getChannelMarker(data, paramName)[["name"]]
+      paramVec[[paramID]] <- getChannelMarker(data, paramName)[["name"]]
     }
+    #parse BCoefficient and MaxLogNegativeValue for hyperlog
+    transEnv <- new.env(parent = emptyenv())
+    for(paramID in seq_along(paramVec))
+    {
+      paramID <- paramID - 1
+      bn <- paste0("BCoefficient", paramID)
+      bn <- sampleNode[["Properties"]][[bn]]
+      nn <- paste0("MaxLogNegativeValue", paramID)
+      nn <- sampleNode[["Properties"]][[nn]]
+
+      transEnv[[paramVec[[paramID+1]]]] <- c(BCoefficient = as.numeric(getContent(bn))
+                               , MaxLogNegativeValue = as.numeric(getContent(nn)))
+    }
+
     # #TODO: parse comp
     # biexp_para <- new.env(parent = emptyenv())
     # comp <- xpathApply(sampleNode, "instrument_settings/parameter", function(paramNode, biexp_para){
@@ -155,8 +172,15 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     #transform with default hyperlog
     trans <- sapply(params, function(pn){
         function(x){
+          thisTrans <-  transEnv[[pn]]
           #TODO: change hyperlogGml2 eval method to avoid directly call this
-          flowCore:::hyperlog_transform(x, T = 262144, W = 0.5, M = 4.5, A=0, FALSE)
+          maxValue <- 262144
+          pos <- 4.5
+          r <- thisTrans[["BCoefficient"]]
+          w = (pos - log10(maxValue/r))/2
+          neg <- 20#-thisTrans[["MaxLogNegativeValue"]]
+          a <- log10(neg)
+          flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, FALSE)
         }
       }, simplify = FALSE)
 
@@ -194,10 +218,10 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     for(histNode in histNodes)
     {
       HistID <- getContent(histNode, "HistID")
-      xParamID <- getContent(histNode, "XParam")
-      xParam <- paramEnv[[paste0("ParamBaseName", xParamID)]]
-      yParamID <- getContent(histNode, "YParam")
-      yParam <- paramEnv[[paste0("ParamBaseName", yParamID)]]
+      xParamID <- as.integer(getContent(histNode, "XParam")) + 1
+      xParam <- paramVec[[xParamID]]
+      yParamID <- as.integer(getContent(histNode, "YParam")) + 1
+      yParam <- paramVec[[yParamID]]
 
       histEnv[[HistID]] <- list(x = xParam, y = yParam)
 

@@ -99,11 +99,17 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
       paramID <- paramID - 1
       bn <- paste0("BCoefficient", paramID)
       bn <- sampleNode[["Properties"]][[bn]]
-      nn <- paste0("MaxLogNegativeValue", paramID)
+
+      nn <- paste0("MaxNegativeValue", paramID)
       nn <- sampleNode[["Properties"]][[nn]]
 
+      rn <- paste0("Parameter", paramID, "Resolution")
+      rn <- sampleNode[["Properties"]][[rn]]
+
       transEnv[[paramVec[[paramID+1]]]] <- c(BCoefficient = as.numeric(getContent(bn))
-                               , MaxLogNegativeValue = as.numeric(getContent(nn)))
+                               , MaxNegativeValue = as.numeric(getContent(nn))
+                               , Resolution = as.numeric(getContent(rn))
+                               )
     }
 
     # #TODO: parse comp
@@ -171,17 +177,19 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
 
     #transform with default hyperlog
     trans <- sapply(params, function(pn){
-        function(x){
-          thisTrans <-  transEnv[[pn]]
-          #TODO: change hyperlogGml2 eval method to avoid directly call this
-          maxValue <- 262144
-          pos <- 4.5
-          r <- thisTrans[["BCoefficient"]]
-          w = (pos - log10(maxValue/r))/2
-          neg <- 20#-thisTrans[["MaxLogNegativeValue"]]
-          a <- log10(neg)
-          flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, FALSE)
+      thisTrans <-  transEnv[[pn]]
+      #TODO: change hyperlogGml2 eval method to avoid directly call this
+      maxValue <- 262144
+      pos <- 4.5
+      r <- thisTrans[["BCoefficient"]]
+      w <- log10(r) #(pos - log10(maxValue/r))/2
+      neg <- thisTrans[["MaxNegativeValue"]]
+      a <- log10(-neg)
+
+      function(x){
+           flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, FALSE)
         }
+      # flowJoTrans(neg = -20, widthBasis = -10)
       }, simplify = FALSE)
 
     translist <- transformList(params, trans)
@@ -304,7 +312,7 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
   for(sn in sampleNames(gs))
   {
 
-    .addPop(gs[[sn]], pid = 0, parentPath = "root", sampleEnv[[sn]])
+    .addPop(gs[[sn]], pid = 0, parentPath = "root", sampleEnv[[sn]], transEnv)
   }
 
 
@@ -323,7 +331,7 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
 
 }
 
-.addPop <- function(gh, pid, parentPath, popInfo){
+.addPop <- function(gh, pid, parentPath, popInfo, transEnv){
   trans <- popInfo[["trans"]]
   dt <- popInfo[["pops"]]
   gateEnv <- popInfo[["gateEnv"]]
@@ -338,23 +346,48 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
       gate <- gateEnv[[gateID]]
       gateName <- gate[["gateName"]]
       gate <- gate[["gate"]]
+      gate <- .extendGate(gate, transEnv)
       gate <- .transformGate(gate, trans)
       negated <- children[i, negated]
+
       add(gh, gate, parent = parentPath, name = gateName, negated = negated)
       if(parentPath == "root")
-        parentPath <- ""
-
-      unique.path <- file.path(parentPath, gateName)
-      recompute(gh, unique.path)
+        unique.path <- gateName
+      else
+        unique.path <- file.path(parentPath, gateName)
+      suppressMessages(recompute(gh, unique.path))
     }else
       unique.path <- "root"
-
+    message(unique.path)
     #save the xml counts
     set.count.xml(gh, unique.path, as.integer(NumEvents))
     if(cid > 0)
-      .addPop(gh, cid, unique.path, popInfo)#recursively gate descendants
+      .addPop(gh, cid, unique.path, popInfo, transEnv)#recursively gate descendants
 
   }
+}
+
+#' try to extend gate where it falls on the edge of low value of data
+.extendGate <- function(gate, transEnv){
+  params <- as.vector(parameters(gate))
+  if(length(params) > 1) #skip 1d gate since we don't have API for 1d gate yet
+  {
+    lowVal1 <- transEnv[[params[1]]][["MaxNegativeValue"]]
+    lowVal2 <- transEnv[[params[2]]][["MaxNegativeValue"]]
+    highVal1 <- transEnv[[params[1]]][["Resolution"]]
+    highVal2 <- transEnv[[params[2]]][["Resolution"]]
+
+    bound <- matrix(c(lowVal1,highVal1
+                      ,lowVal2,highVal2)
+                    , byrow = TRUE
+                    , nrow = 2
+                    , dimnames = list(params
+                                      , c("min", "max")))
+
+
+    gate <- extend(gate, bound)
+  }
+gate
 }
 
 .transformGate <- function(gate, trans){
@@ -370,8 +403,7 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
       chnl <- chnls[ind]
       trans.fun <- trans[[chnl]]
       gate <- transform(gate, trans.fun, param)
-
-    }else if(nMatched > 1)
+   }else if(nMatched > 1)
       stop("multiple trans matched to :", param)
   }
 

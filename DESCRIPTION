@@ -40,6 +40,7 @@ RoxygenNote: 5.0.1
 Collate:
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
+    'GatingSet2winlist.R'
     'RcppExports.R'
     'cytobank2GatingSet.R'
     'diva2GatingSet.R'

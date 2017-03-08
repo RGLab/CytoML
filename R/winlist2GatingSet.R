@@ -1,4 +1,4 @@
-openWinlist <- function(file,options = 0,...){
+openWinlist <- function(file,useInternalNodes=TRUE,options = 0,...){
   #message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
   tmp<-tempfile(fileext=".xml")
   if(!file.exists(file))
@@ -7,17 +7,17 @@ openWinlist <- function(file,options = 0,...){
     stop("Can't copy ", file, " to ", tmp)
 
   if(inherits(file,"character")){
-    x<-xmlTreeParse(tmp,useInternalNodes=TRUE,options = options, ...);
+    x<-xmlTreeParse(tmp,useInternalNodes=useInternalNodes,options = options, ...);
   }else{
     stop("Require a filename of a workspace, but received ",class(x)[1]);
   }
   #    browser()
-  rootNode <- names(xmlChildren(x))[2]
-
-  if(rootNode == "WinListXMLProtocol"){
-    return(xmlRoot(x));
+  rootNode <- xmlRoot(x)
+  docType <- xmlName(rootNode)
+  if(docType == "WinListXMLProtocol"){
+    return(rootNode);
   }else
-    stop("Unrecognized xml root node: ", rootNode)
+    stop("Unrecognized xml root node: ", docType)
 
 
 }

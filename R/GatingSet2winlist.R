@@ -15,7 +15,7 @@
 #' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 #'
 #' #output to winlist
-#' outFile <- tempfile(fileext = ".wlx")
+#' outFile <- "/loc/no-backup/mike/shared/tcell/test.wlx"#tempfile(fileext = ".wlx")
 #' GatingSet2winlist(gs, outFile)
 #'
 #'
@@ -70,16 +70,94 @@ dsNode <- function(ds, gh, ...){
   sn <- sampleNames(gh)
   xmlValue(ds[["File"]][[1]]) <- sn
   #update ds property node
-  dsPropNode(ds[["Properties"]], gh, ...)
+  ds[["Properties"]] <- dsPropNode(ds[["Properties"]], gh, ...)
   #histogram node
   histEnv =  new.env(parent = emptyenv())
-  dsHistNode(ds[["Histograms"]], gh, histEnv, ...)
+  ds[["Histograms"]] <- histNode(ds[["Histograms"]], gh, histEnv, ...)
   #Regions node
-  dsRegionNode(ds[["Regions"]], gh, histEnv, ...)
+  ds[["Regions"]] <- regionsNode(ds[["Regions"]], gh, histEnv, ...)
+  #Gates node
+  ds[["Gates"]] <- gatesNode(ds[["Gates"]], gh, histEnv, ...)
+  #TODO: comp node
   ds
 }
 
-dsRegionNode <- function(dsRegion, gh, histEnv, ...){
+gatesNode <- function(dsGates, gh, ...){
+  nodes <- getNodes(gh)
+  prop <- dsGates[["Properties"]]
+  xmlValue(prop[["NumGates"]]) <- paste0("2,", length(nodes))
+  tmpNode <- dsGates[["GateDefinition"]]
+  gateList <- lapply(nodes, function(node){
+        regionDefNode(tmpNode, gh, node)
+    })
+  xmlNode("Gates", .children = c(list(prop), gateList))
+}
+
+regionDefNode <- function(region, gh, node){
+  gateID <- getNodeID(gh, node)
+  xmlValue(region[["GateID"]]) <- paste0("2,", gateID)
+
+  gateName <- ifelse(gateID==0, "Ungated", paste0("G", gateID))
+  region[["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,", gateName)))
+  region[["Path"]] <- xmlNode("Path", xmlCDataNode(paste0("1,/", gateName)))
+
+  if(gateID == 0)
+    pID <- 0
+  else
+    pID <- getNodeID(gh, getParent(gh, node))
+  xmlValue(region[["ParentGateID"]]) <- paste0("2,", pID)
+
+  xmlValue(region[["NumEvents"]]) <- paste0("3,", getTotal(gh, node))
+
+  #trace back to root to get gateID for each ancestor
+  nodeIDs <- getNodeIDs(node, gh)
+  if(gateID == 0)
+  {
+    equation <- ""
+  }else
+  {
+    equation <- paste0(paste0("R", nodeIDs), collapse = "&")
+  }
+
+  region[["Equation"]] <- xmlNode("Equation", xmlCDataNode(paste0("1,", equation)))
+
+  #children gates
+  xmlValue(region[["HierarchyLevel"]]) <- paste0("2,", length(nodeIDs) - 1)
+  children <- getChildren(gh, node)
+  nChildren <- length(children)
+  xmlValue(region[["NumHierarchyGates"]]) <- paste0("2,", nChildren)
+  removeChildren(region, kids = lapply(0:22, function(i)paste0("HierarchyGate", i)))
+  HierarchyGatelist <- lapply(seq_len(nChildren) - 1, function(i){
+      cid <- getNodeID(gh, children[i+1])
+      xmlNode(paste0("HierarchyGate", i)
+              , paste0("2,", cid))
+      })
+  region <- addChildren(region, kids = HierarchyGatelist)
+  region
+}
+getNodeID <- function(gh, node){
+  flowWorkspace:::.getNodeInd(gh, node) -1
+}
+getNodeIDs <- function(node, gh, eq = integer())
+{
+
+  if(node %in% c("/", ".", "root"))#base case
+    return(0)
+  else
+  {
+    #append the current id
+    id <- getNodeID(gh, node)
+    eq <- c(id, eq)
+    #and recursively call on its parent
+    parent <- dirname(node)
+    getNodeIDs(parent, gh, eq)
+  }
+
+
+
+}
+
+regionsNode <- function(dsRegion, gh, histEnv, ...){
   nodes <- getNodes(gh)[-1]
   prop <- dsRegion[["Properties"]]
   xmlValue(prop[["NumRegions"]]) <- paste0("2,", length(nodes))
@@ -89,7 +167,7 @@ dsRegionNode <- function(dsRegion, gh, histEnv, ...){
     #update Properties node
     histID <- histEnv[[node]]
     xmlValue(tmpNode[["Properties"]][["HistogramID"]]) <- paste0("2,", histID)
-    gateID <- flowWorkspace:::.getNodeInd(gh, node) - 1
+    gateID <- getNodeID(gh, node)
     xmlValue(tmpNode[["Properties"]][["RegionID"]]) <- paste0("2,", gateID)
     tmpNode[["Properties"]][["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,R", gateID+1)))
     tmpNode[["Properties"]][["Path"]] <- xmlNode("Path", xmlCDataNode(paste0("1,/R", gateID+1)))
@@ -105,7 +183,7 @@ dsRegionNode <- function(dsRegion, gh, histEnv, ...){
 }
 
 dragRegionNode<- function(dRegion, gh, node, ...){
-  gateID <- flowWorkspace:::.getNodeInd(gh, node) - 1
+  gateID <- getNodeID(gh, node)
   dProp <- dRegion[["Properties"]]
   xmlValue(dProp[["RegionID"]]) <- paste0("2,", gateID)
   dProp[["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,R", gateID+1)))
@@ -181,7 +259,7 @@ gate2winlist.polygonGate <- function(gate, type = "LinVertex", ...){
   })
 }
 
-dsHistNode <- function(dsHist, gh, histEnv, ...){
+histNode <- function(dsHist, gh, histEnv, ...){
   nodes <- getNodes(gh)[-1]
   fr <- getData(gh, use.exprs = FALSE)
   pd <- pData(parameters(fr))
@@ -201,7 +279,7 @@ dsHistNode <- function(dsHist, gh, histEnv, ...){
     for(child in children)
       histEnv[[child]] <- i
     parent <- getParent(gh, child)
-    pid <- flowWorkspace:::.getNodeInd(gh, parent) - 1
+    pid <- getNodeID(gh, parent)
     xmlValue(tmpNode[["GateID"]]) <- paste0("2,", pid)
     params <- as.vector(parameters(getGate(gh,child)))
     paramId <- sapply(params, function(param){

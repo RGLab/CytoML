@@ -32,13 +32,13 @@ GatingSet2winlist <- function(gs, outFile, ...){
   pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
   # load template
   #avoid internal XML doc since its manipulation is not stable and leads to segfault
-  template <- openWinlist("/loc/no-backup/mike/shared/tcell/template.wlx", useInternalNodes = FALSE)
-  ws <- wlxNode(template, gs)
+  ws <- openWinlist("/loc/no-backup/mike/shared/tcell/template.wlx", useInternalNodes = FALSE)
+  ws <- wlxNode(ws, gs)
   locale <- localeToCharset()[1]
   if(locale == "ISO8859-1")
     locale <- "ISO-8859-1"
   ## Write out to an XML file (suppress the warning due to the usage of deprecated structure call in saveXML)
-  suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", locale)))
+  suppressWarnings(saveXML.link.ex(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", locale)))
 }
 
 wlxNode <- function(ws, ...){
@@ -76,7 +76,7 @@ dsNode <- function(ds, gh, ...){
   ds[["Histograms"]] <- histNode(ds[["Histograms"]], gh, histEnv, ...)
   #Regions node
   ds[["Regions"]] <- regionsNode(ds[["Regions"]], gh, histEnv, ...)
-  #Gates node
+  # #Gates node
   ds[["Gates"]] <- gatesNode(ds[["Gates"]], gh, histEnv, ...)
   #TODO: comp node
   ds

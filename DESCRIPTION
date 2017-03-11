@@ -47,6 +47,7 @@ Collate:
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
+    'print.xmlNode.R'
     'set.count.xml.R'
     'utils.R'
     'winlist2GatingSet.R'

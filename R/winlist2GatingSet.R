@@ -438,6 +438,8 @@ traverseTree <- function(dt, pid, pEquation, gateEnv, res){
     }
     #extract id
     gateID <- sub("R", "", def)
+    #strip whitespaces
+    gateID <- as.character(as.integer(gateID))
 
     if(!exists(gateID, gateEnv))
       stop("Can't find gate for R",gateID, " parsed from ", Equation)

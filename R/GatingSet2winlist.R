@@ -157,7 +157,15 @@ regionsNode <- function(dsRegion, gh, histEnv, ...){
   nodes <- getNodes(gh)[-1]
   prop <- dsRegion[["Properties"]]
   xmlValue(prop[["NumRegions"]]) <- paste0("2,", length(nodes))
-  tmpNode <- dsRegion[["RegionDefinition"]]
+  #pick a valid region that has dragRegion
+  tmps <- xmlChildren(dsRegion)
+  for(tmpNode in tmps)
+  {
+    if(xmlName(tmpNode) == "RegionDefinition")
+      if(xmlValue(tmpNode[["Properties"]][["HasDragRegion"]]) == "2,1")
+        break
+  }
+
   regionList <- lapply(nodes, function(node){
 
     #update Properties node
@@ -291,9 +299,9 @@ histNode <- function(dsHist, gh, histEnv, ...){
     xmlValue(tmpNode[["GateID"]]) <- paste0("2,", pid)
     params <- as.vector(parameters(getGate(gh,child)))
     paramId <- sapply(params, function(param){
-      sub("\\$P", "", rownames(subset(pd, name == param)))
+      as.integer(sub("\\$P", "", rownames(subset(pd, name == param)))) - 1
     })
-    if(length(params==1))
+    if(length(params)==1)
     {
 
       title <- paste0("1,", pid)

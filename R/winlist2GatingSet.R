@@ -299,9 +299,10 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
     dt <- rbindlist(as.list(popEnv), idcol = "id")
 
     res <- new.env(parent = emptyenv())
-    traverseTree(dt[id>0,], pid= 0, pEquation = "", gateEnv, res)#start from root
+    traverseTree(dt, pid= 0, pEquation = "", gateEnv, res)#start from root
+
     # merge back to dt
-    dt <- merge(dt, rbindlist(as.list(res), idcol = "id"), all.x = TRUE)
+    dt <- merge(dt, rbindlist(as.list(res), idcol = "id"))
 
     sampleEnv[[sampleName]] <- list(pops = dt, gateEnv = gateEnv, trans = trans)
   }
@@ -424,6 +425,11 @@ traverseTree <- function(dt, pid, pEquation, gateEnv, res){
   for(i in seq_len(nChildren))
   {
     cid <- children[i, id]
+    if(cid == 0)#root node
+    {
+      res[[cid]] <- list(gateID = NA, negated = NA)
+      next
+    }
     Equation <- children[i, Equation]
     #strip the leading string that represents the parent gate defintion
     def <- sub(paste0("^", pEquation,"&"), "", Equation)
@@ -441,11 +447,16 @@ traverseTree <- function(dt, pid, pEquation, gateEnv, res){
     #strip whitespaces
     gateID <- as.character(as.integer(gateID))
 
-    if(!exists(gateID, gateEnv))
-      stop("Can't find gate for R",gateID, " parsed from ", Equation)
-    res[[cid]] <- list(gateID = gateID, negated = negated)
-    #recursively to process its children
-    traverseTree(dt, pid = cid, Equation, gateEnv, res)
+    if(!exists(gateID, gateEnv)) #skip orphan pop that does not have gate obj stored in xml
+    {
+      # warning("Can't find gate for R",gateID, " parsed from ", Equation)
+      next
+    }else
+    {
+      res[[cid]] <- list(gateID = gateID, negated = negated)
+      #recursively to process its children
+      traverseTree(dt, pid = cid, Equation, gateEnv, res)
+    }
 
   }
 

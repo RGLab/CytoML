@@ -196,6 +196,8 @@ dragRegionNode<- function(dRegion, gh, node, ...){
   xmlValue(dProp[["GatedEvents"]]) <- paste0("3,", getTotal(gh, node))
 
   gate <- getGate(gh, node)
+  xmlValue(dProp[["NumPoints"]]) <- paste0("2,", getNumPoints(gate))
+
   #winlist does not support negated gate
   #we have to create inverse gate on our end
   if(flowWorkspace:::isNegated(gh, node)){
@@ -225,9 +227,11 @@ dragRegionNode<- function(dRegion, gh, node, ...){
   gate <- .scaleGate(gate, trans)
 
   #scale gate to (0, 100) space
-  chnls <- colnames(gh)
-  trans <- sapply(chnls, function(pn){
+  all.chnls <- colnames(gh)
+  trans <- sapply(all.chnls, function(pn){
     maxValue <- 262144
+    if(pn%in% chnls)
+      maxValue <- trans[[pn]](maxValue)
       function(x){
       100 * x / maxValue
     }
@@ -237,9 +241,9 @@ dragRegionNode<- function(dRegion, gh, node, ...){
   gate <- .scaleGate(gate, trans)
   vertexList <- gate2winlist(gate, type = "Vertex")
 
-  dProp <- removeChildren(dProp, kids = lapply(0:7, function(i)paste0("LinVertex", i)))
+  suppressWarnings(dProp <- removeChildren(dProp, kids = lapply(0:100, function(i)paste0("LinVertex", i))))
   dProp <- addChildren(dProp, kids = linVertexList)
-  dProp <- removeChildren(dProp, kids = lapply(0:7, function(i)paste0("Vertex", i)))
+  suppressWarnings(dProp <- removeChildren(dProp, kids = lapply(0:100, function(i)paste0("Vertex", i))))
   dProp <- addChildren(dProp, kids = vertexList)
   dRegion[["Properties"]] <- dProp
   dRegion
@@ -265,6 +269,11 @@ dragRegionNode<- function(dRegion, gh, node, ...){
     stop("multiple trans matched to :", param)
   }
   gate
+}
+
+getNumPoints <- function(gate)UseMethod("getNumPoints")
+getNumPoints.polygonGate <- function(gate){
+  return (nrow(gate@boundaries))
 }
 
 gate2winlist <- function(gate, type, ...)UseMethod("gate2winlist")
@@ -369,8 +378,8 @@ dsPropNode <- function(dsProp, gh, ds_id, ...){
   dsProp <- removeChildren(dsProp, kids = lapply(0:11, function(i)paste0("ConvertParam", i, "ToLog")))
   dsProp <- addChildren(dsProp, kids = lapply(ids, function(id){
     chnl <- as.vector(pd[id+1,"name"])
-    val <- ifelse(grepl(chnl, logChnls), 2, 0)
-    xmlNode(name = paste0("ConvertParam", id, "ToLog"), xmlCDataNode(paste0("2,", val)))
+    val <- ifelse(chnl %in% logChnls, 2, 0)
+    xmlNode(name = paste0("ConvertParam", id, "ToLog"), paste0("2,", val))
   })
   )
 

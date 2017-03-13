@@ -185,14 +185,15 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
       w <- log10(r) #(pos - log10(maxValue/r))/2
       neg <- thisTrans[["MaxNegativeValue"]]
       a <- log10(-neg)
+      flow_trans("hyperlog"
+                 , trans.fun = function(x)flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, FALSE)
+                 , inverse.fun = function(x)flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, TRUE)
+                )
 
-      function(x){
-           flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, FALSE)
-        }
-      # flowJoTrans(neg = -20, widthBasis = -10)
       }, simplify = FALSE)
 
-    translist <- transformList(params, trans)
+    trans <- transformerList(params, trans)
+    translist <- transformList(params, lapply(trans, "[[", "transform"))
     data <- transform(data, translist)
 
     # browser()
@@ -310,6 +311,9 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
   #add gates to gs
   gs <- GatingSet(fs)
 
+  #TODO: store the sample-specific trans at c++ level
+  #currently assuming trans are identical across samples
+  gs@transformation <- sampleEnv[[sampleNames(gs)[1]]][["trans"]]
   for(sn in sampleNames(gs))
   {
 
@@ -402,7 +406,7 @@ gate
     nMatched <- sum(ind)
     if(nMatched == 1){
       chnl <- chnls[ind]
-      trans.fun <- trans[[chnl]]
+      trans.fun <- trans[[chnl]][["transform"]]
       gate <- transform(gate, trans.fun, param)
    }else if(nMatched > 1)
       stop("multiple trans matched to :", param)

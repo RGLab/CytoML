@@ -45,11 +45,11 @@ wlxNode <- function(ws, ...){
   xmlValue(ws[["ObjectVersion"]]) <- 1
   xmlValue(ws[["Date"]]) <- format(Sys.Date(), "%d%b%Y")
   xmlValue(ws[["Time"]]) <- format(Sys.time(), "%H:%M:%S")
-  ws[["DataSources"]] <- datasourceNode(ws[["DataSources"]], ...)
+  ws[["DataSources"]] <- dataSourcesNode(ws[["DataSources"]], ...)
   ws
 }
 
-datasourceNode <- function(ds, gs, ...){
+dataSourcesNode <- function(ds, gs, ...){
   guid <- sampleNames(gs)
   nSample <- length(guid)
   # pData(gs)[["name"]]
@@ -141,19 +141,15 @@ getNodeID <- function(gh, node){
 getNodeIDs <- function(node, gh, eq = integer())
 {
 
-  if(node %in% c("/", ".", "root"))#base case
-    return(0)
-  else
-  {
     #append the current id
     id <- getNodeID(gh, node)
     eq <- c(id, eq)
     #and recursively call on its parent
     parent <- dirname(node)
-    getNodeIDs(parent, gh, eq)
-  }
-
-
+    if(parent %in% c("/", ".", "root"))#base case
+      return(eq)
+    else
+      return(getNodeIDs(parent, gh, eq))
 
 }
 
@@ -168,11 +164,11 @@ regionsNode <- function(dsRegion, gh, histEnv, ...){
     histID <- histEnv[[node]]
     xmlValue(tmpNode[["Properties"]][["HistogramID"]]) <- paste0("2,", histID)
     gateID <- getNodeID(gh, node)
-    xmlValue(tmpNode[["Properties"]][["RegionID"]]) <- paste0("2,", gateID)
-    tmpNode[["Properties"]][["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,R", gateID+1)))
-    tmpNode[["Properties"]][["Path"]] <- xmlNode("Path", xmlCDataNode(paste0("1,/R", gateID+1)))
-    #update DragRegion node
-    tmpNode[["RegionDefinition"]] <- dragRegionNode(tmpNode[["DragRegion"]], gh, node)
+    xmlValue(tmpNode[["Properties"]][["RegionID"]]) <- paste0("2,", gateID-1)
+    tmpNode[["Properties"]][["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,R", gateID)))
+    tmpNode[["Properties"]][["Path"]] <- xmlNode("Path", xmlCDataNode(paste0("1,/R", gateID)))
+    # #update DragRegion node
+    tmpNode[["DragRegion"]] <- dragRegionNode(tmpNode[["DragRegion"]], gh, node)
     tmpNode
   })
   xmlNode("Regions"
@@ -185,13 +181,12 @@ regionsNode <- function(dsRegion, gh, histEnv, ...){
 dragRegionNode<- function(dRegion, gh, node, ...){
   gateID <- getNodeID(gh, node)
   dProp <- dRegion[["Properties"]]
-  xmlValue(dProp[["RegionID"]]) <- paste0("2,", gateID)
-  dProp[["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,R", gateID+1)))
-  dProp[["Path"]] <- xmlNode("Path", xmlCDataNode(paste0("1,//R", gateID+1)))
+  xmlValue(dProp[["RegionID"]]) <- paste0("2,", gateID-1)
+  dProp[["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,R", gateID)))
+  dProp[["Path"]] <- xmlNode("Path", xmlCDataNode(paste0("1,//R", gateID)))
   dProp[["RegionAlias"]] <- xmlNode("RegionAlias", xmlCDataNode(paste0("1,", basename(node))))
   xmlValue(dProp[["GatedEvents"]]) <- paste0("3,", getTotal(gh, node))
-  dProp <- removeChildren(dProp, kids = lapply(0:7, function(i)paste0("LinVertex", i)))
-  dProp <- removeChildren(dProp, kids = lapply(0:7, function(i)paste0("Vertex", i)))
+
   gate <- getGate(gh, node)
   #winlist does not support negated gate
   #we have to create inverse gate on our end
@@ -214,16 +209,29 @@ dragRegionNode<- function(dRegion, gh, node, ...){
     a <- log10(-neg)
 
     function(x){
-      flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, FALSE)
+       flowCore:::hyperlog_transform(x, T = maxValue, W = w, M = pos, A = a, FALSE)
+      }
+
+  }, simplify = FALSE)
+
+  gate <- .scaleGate(gate, trans)
+
+  #scale gate to (0, 100) space
+  chnls <- colnames(gh)
+  trans <- sapply(chnls, function(pn){
+    maxValue <- 262144
+      function(x){
+      100 * x / maxValue
     }
 
   }, simplify = FALSE)
 
-
   gate <- .scaleGate(gate, trans)
   vertexList <- gate2winlist(gate, type = "Vertex")
 
+  dProp <- removeChildren(dProp, kids = lapply(0:7, function(i)paste0("LinVertex", i)))
   dProp <- addChildren(dProp, kids = linVertexList)
+  dProp <- removeChildren(dProp, kids = lapply(0:7, function(i)paste0("Vertex", i)))
   dProp <- addChildren(dProp, kids = vertexList)
   dRegion[["Properties"]] <- dProp
   dRegion
@@ -255,7 +263,7 @@ gate2winlist <- function(gate, type, ...)UseMethod("gate2winlist")
 gate2winlist.polygonGate <- function(gate, type = "LinVertex", ...){
   lapply(seq_len(nrow(gate@boundaries)), function(i){
     coord <- gate@boundaries[i,]
-    xmlNode(paste0(type, i), paste0("8,", paste(coord, collapse = ",")))
+    xmlNode(paste0(type, i-1), paste0("8,", paste(coord, collapse = ",")))
   })
 }
 

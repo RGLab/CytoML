@@ -435,6 +435,8 @@ traverseTree <- function(dt, pid, pEquation, gateEnv, res){
       next
     }
     Equation <- children[i, Equation]
+    #strip whitespaces
+    Equation <- gsub(" $", "", Equation)
     #strip the leading string that represents the parent gate defintion
     def <- sub(paste0("^", pEquation,"&"), "", Equation)
     if(grepl("\\&", def))
@@ -448,8 +450,8 @@ traverseTree <- function(dt, pid, pEquation, gateEnv, res){
     }
     #extract id
     gateID <- sub("R", "", def)
-    #strip whitespaces
-    gateID <- as.character(as.integer(gateID))
+    # #strip whitespaces
+    # gateID <- as.character(as.integer(gateID))
 
     if(!exists(gateID, gateEnv)) #skip orphan pop that does not have gate obj stored in xml
     {

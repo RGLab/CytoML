@@ -210,13 +210,13 @@ winlist2GatingSet <- function(xmlFileName, path, ...){
       {
         popId <- getContent(popNode, "GateID")
         parentId <- getContent(popNode, "ParentGateID")
-        # if(parentId != popId)#skip root
-        # {
-          popEnv[[popId]] <- list(parentId = parentId
+        eq <- getContent(popNode, "Equation")
+        eq <- ifelse(length(eq) == 0, " ", eq)
+        popEnv[[popId]] <- list(parentId = parentId
                                   , NumEvents = getContent(popNode, "NumEvents")
-                                  , Equation = getContent(popNode, "Equation")
+                                  , Equation = eq
                                   )
-        # }
+
       }
 
     }

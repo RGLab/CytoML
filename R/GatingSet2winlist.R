@@ -82,6 +82,7 @@ dsNode <- function(ds, gh, ...){
   ds
 }
 
+
 gatesNode <- function(dsGates, gh, ...){
   nodes <- getNodes(gh)
   prop <- dsGates[["Properties"]]
@@ -107,22 +108,27 @@ regionDefNode <- function(region, gh, node){
     pID <- getNodeID(gh, getParent(gh, node))
   xmlValue(region[["ParentGateID"]]) <- paste0("2,", pID)
 
-  xmlValue(region[["NumEvents"]]) <- paste0("3,", getTotal(gh, node))
+  nEvents <- getTotal(gh, node)
+  if(gateID > 0&&flowWorkspace:::isNegated(gh, node)){
+    nEvents <- getTotal(gh, getParent(gh, node)) - nEvents
+  }
+
+  xmlValue(region[["NumEvents"]]) <- paste0("3,", nEvents)
 
   #trace back to root to get gateID for each ancestor
-  nodeIDs <- getNodeIDs(node, gh)
+  equationVec <- getEquations(node, gh)
   if(gateID == 0)
   {
     equation <- ""
   }else
   {
-    equation <- paste0(paste0("R", nodeIDs), collapse = "&")
+    equation <- paste(equationVec, collapse = "&")
   }
 
   region[["Equation"]] <- xmlNode("Equation", xmlCDataNode(paste0("1,", equation)))
 
   #children gates
-  xmlValue(region[["HierarchyLevel"]]) <- paste0("2,", length(nodeIDs) - 1)
+  xmlValue(region[["HierarchyLevel"]]) <- paste0("2,", length(equationVec) - 1)
   children <- getChildren(gh, node)
   nChildren <- length(children)
   xmlValue(region[["NumHierarchyGates"]]) <- paste0("2,", nChildren)
@@ -135,21 +141,26 @@ regionDefNode <- function(region, gh, node){
   region <- addChildren(region, kids = HierarchyGatelist)
   region
 }
+
 getNodeID <- function(gh, node){
   flowWorkspace:::.getNodeInd(gh, node) -1
 }
-getNodeIDs <- function(node, gh, eq = integer())
-{
 
+getEquations <- function(node, gh, eq = character())
+{
+  if(node %in% c("/", ".", "root"))#base case
+    return(eq)
     #append the current id
     id <- getNodeID(gh, node)
-    eq <- c(id, eq)
+    rid <- paste0("R", id)
+    if(flowWorkspace:::isNegated(gh, node))
+      rid <- paste0("!", rid)
+
+    eq <-  c(rid, eq)
+
     #and recursively call on its parent
     parent <- dirname(node)
-    if(parent %in% c("/", ".", "root"))#base case
-      return(eq)
-    else
-      return(getNodeIDs(parent, gh, eq))
+    return(getEquations(parent, gh, eq))
 
 }
 
@@ -193,17 +204,18 @@ dragRegionNode<- function(dRegion, gh, node, ...){
   dProp[["Name"]] <- xmlNode("Name", xmlCDataNode(paste0("1,R", gateID)))
   dProp[["Path"]] <- xmlNode("Path", xmlCDataNode(paste0("1,//R", gateID)))
   dProp[["RegionAlias"]] <- xmlNode("RegionAlias", xmlCDataNode(paste0("1,", basename(node))))
-  xmlValue(dProp[["GatedEvents"]]) <- paste0("3,", getTotal(gh, node))
 
   gate <- getGate(gh, node)
   xmlValue(dProp[["NumPoints"]]) <- paste0("2,", getNumPoints(gate))
 
-  #winlist does not support negated gate
-  #we have to create inverse gate on our end
+  #winlist does not support negated gate and inversed geometric gate
+  #so we store the gate as it is without negatation
+  #but we will add negated flag ! in its children's equation
+  nEvents <- getTotal(gh, node)
   if(flowWorkspace:::isNegated(gh, node)){
-    rng <- range(getData(gh, use.exprs = FALSE))
-    gate <- inverse(gate, rng)
+    nEvents <- getTotal(gh, getParent(gh, node)) - nEvents
   }
+  xmlValue(dProp[["GatedEvents"]]) <- paste0("3,", nEvents)
   #transform gate to raw
   orig.trans <- getTransformations(gh, inverse = TRUE)
   gate <- .scaleGate(gate, orig.trans)

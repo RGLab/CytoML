@@ -193,6 +193,10 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   translist <- getTransformations(gs[[1]], only.function = FALSE)
   transNames <- names(translist)
   rng <- range(getData(gs[[1]], use.exprs = FALSE))
+  #retrieve the prefix for latter trans matching
+  cmp <- flowWorkspace:::.cpp_getCompensation(gs@pointer, sampleNames(gs)[[1]])
+  prefix <- cmp$prefix
+  suffix <- cmp$suffix
   for(id in 1:length(root)){
 
     curNode <- root[[id]]
@@ -240,7 +244,8 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
           }else if(is(param, "singleParameterTransform")){
 
             chnl <- as.vector(parameters(param@parameters))
-            chnl <- sub("(^Comp_)(.*)", "\\2", chnl) #strip the prefix before matching
+            chnl <- sub("(^Comp_)(.*)", "\\2", chnl) #strip the new prefix and add the original one before matching
+            chnl <- paste0(prefix, chnl, suffix)
             ind <- grepl(chnl, names(rng))
             nMatched <- sum(ind)
             if(nMatched == 1){
@@ -251,8 +256,10 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
                   thisRng <- c(-200, 262144.0)
               }else
                 thisRng <- rng[, ind]
-            }else
+            }else if(nMatched == 0)
               stop(chnl , " not found in range info")
+            else
+              stop(chnl , " has multiple matches in range info")
             if(is(param, "asinhtGml2")){
               flag <- 4
               argument <- as.character(round(param@T/sinh(1)))

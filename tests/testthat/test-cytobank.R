@@ -28,11 +28,23 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   sink(con, type = "message")
   gs1 <- cytobank2GatingSet(outFile, fcsFiles)
   sink(NULL, type = "message")
-  close(con)
+
   stats.orig <- getPopStats(gs)
   stats.new <- getPopStats(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
 
+  #enable custom scale
+  GatingSet2cytobank(gs, outFile, cytobank.default.scale =F)
+
+  sink(con, type = "message")
+  gs1 <- cytobank2GatingSet(outFile, fcsFiles)
+  sink(NULL, type = "message")
+  stats.new <- getPopStats(gs1)
+  stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
+
+  expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
+
+  close(con)
 })

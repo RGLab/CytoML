@@ -30,4 +30,3 @@ dt_merged <- compare.counts(gs, statsfile, id.vars = "population")
 all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 
 }
-

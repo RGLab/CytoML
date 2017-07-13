@@ -17,4 +17,3 @@ a graphNEL represent the population tree. The gate and population name are store
 \description{
 Reconstruct the population tree from the GateSets
 }
-

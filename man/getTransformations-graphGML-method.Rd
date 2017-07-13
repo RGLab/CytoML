@@ -16,4 +16,3 @@ transformerList object
 \description{
 Extract transformations from graphGML object.
 }
-

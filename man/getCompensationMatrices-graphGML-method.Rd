@@ -16,4 +16,3 @@ compensation object or "FCS" when compensation comes from FCS keywords
 \description{
 Extract compensation from graphGML object.
 }
-

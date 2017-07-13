@@ -2,9 +2,9 @@
 % Please edit documentation in R/read.gatingML.cytobank.R
 \name{extend}
 \alias{extend}
-\alias{extend.ellipsoidGate}
 \alias{extend.polygonGate}
 \alias{extend.rectangleGate}
+\alias{extend.ellipsoidGate}
 \title{extend the gate to the minimum and maximum limit of both dimensions based on the bounding information.}
 \usage{
 extend(gate, bound, data.range = NULL, plot = FALSE,
@@ -56,4 +56,3 @@ bound <- matrix(c(100,3e3,100,3e3), byrow = TRUE, nrow = 2, dimnames = list(c("F
 bound
 pg.extened <- extend(pg, bound, plot = TRUE)
 }
-

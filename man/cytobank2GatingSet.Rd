@@ -25,4 +25,3 @@ gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 #plotGate(gs[[1]])
 
 }
-

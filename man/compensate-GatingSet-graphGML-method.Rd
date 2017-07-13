@@ -20,4 +20,3 @@ compensated GatingSet
 \description{
 compensate a GatingSet based on the compensation information stored in graphGML object
 }
-

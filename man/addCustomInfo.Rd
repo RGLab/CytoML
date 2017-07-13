@@ -25,4 +25,3 @@ XML root node
 \description{
 add customInfo nodes to each gate node and add BooleanAndGates
 }
-

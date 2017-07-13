@@ -19,4 +19,3 @@ TRUE if path is found, FALSE if not path is matched.
 \description{
 Given the leaf node, try to find out if a collection of nodes can be matched to a path in a graph(tree) by the bottom-up searching
 }
-

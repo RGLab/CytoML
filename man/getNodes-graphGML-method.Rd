@@ -29,4 +29,3 @@ g <- read.gatingML.cytobank(xmlfile)
 getNodes(g)
 getNodes(g, only.names = FALSE)
 }
-

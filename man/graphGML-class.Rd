@@ -11,4 +11,3 @@ associated with each node as nodeData. Compensation and transformations are stor
 \details{
 The class simply extends the graphNEL class and exists for the purpose of method dispatching.
 }
-

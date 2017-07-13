@@ -18,4 +18,3 @@ a data.frame that contains three columns: id (gateId), name (gate name), fcs (fc
 Fcs filename and gate name stored in 'custom_info' element are beyong the scope of
 the gatingML standard and thus not covered by the default 'read.gatingML'.
 }
-

@@ -33,4 +33,3 @@ getNodes(gs)
 plotGate(gs[[1]])
 }
 }
-

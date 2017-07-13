@@ -18,4 +18,3 @@ a graphNEL node
 \description{
 get parent nodes
 }
-

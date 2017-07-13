@@ -27,4 +27,3 @@ g <- read.gatingML.cytobank(xmlfile)
 plot(g)
 
 }
-

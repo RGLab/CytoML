@@ -50,4 +50,3 @@ GatingSet2cytobank(gs, outFile) #type by default is 'cytobank'
 
 
 }
-

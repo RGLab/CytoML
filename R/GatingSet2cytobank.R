@@ -269,8 +269,10 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
                 trans.obj <- translist[[which(ind)]]
                 trans.fun <- trans.obj[["inverse"]]
                 thisRng <- round(trans.fun(thisRng))#cytobank experiment scale expect 0 digits after decimal
-              }else
+              }else if(nMatched == 0)
                 stop("can't find the transformation function in GatingSet to inverse the range for :", chnl)
+              else
+                stop("found multiple the transformation functions in GatingSet for inversing the range for :", chnl)
             }
 
           }else

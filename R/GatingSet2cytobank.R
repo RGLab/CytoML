@@ -192,7 +192,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   fcs_guids <- rownames(pd)
   translist <- getTransformations(gs[[1]], only.function = FALSE)
   transNames <- names(translist)
-  rng <- range(getData(gs[[1]], use.exprs = FALSE))
+  rng <- range(gs[[1]], raw.scale = TRUE)
   #retrieve the prefix for latter trans matching
   cmp <- flowWorkspace:::.cpp_getCompensation(gs@pointer, sampleNames(gs)[[1]])
   prefix <- cmp$prefix
@@ -260,6 +260,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
               stop(chnl , " not found in range info")
             else
               stop(chnl , " has multiple matches in range info")
+
             if(is(param, "asinhtGml2")){
               flag <- 4
               argument <- as.character(round(param@T/sinh(1)))
@@ -268,19 +269,6 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
              argument <- as.character(round(param@T/sinh(1)))
             }else
               stop("unsupported transform: ", class(param))
-            if(!cytobank.default.scale){
-              #inverse range into raw scale
-              ind <- sapply(transNames, function(transName)grepl(chnl, transName), USE.NAMES = FALSE)
-              nMatched <- sum(ind)
-              if(nMatched == 1){
-                trans.obj <- translist[[which(ind)]]
-                trans.fun <- trans.obj[["inverse"]]
-                thisRng <- round(trans.fun(thisRng))#cytobank experiment scale expect 0 digits after decimal
-              }else if(nMatched == 0)
-                stop("can't find the transformation function in GatingSet to inverse the range for :", chnl)
-              else
-                stop("found multiple the transformation functions in GatingSet for inversing the range for :", chnl)
-            }
 
           }else
             stop("unsupported transform: ", class(param))

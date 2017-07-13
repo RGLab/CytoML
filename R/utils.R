@@ -1,5 +1,39 @@
 compact <- flowWorkspace:::compact
 
+#' the parameter range from the flow data associated with GatingHierarchy
+#' @param ... GatingHierarchy object
+#' @param na.rm not used
+#' @param type character of "instrument" or "data" indicating whether to retrieve the instrument or the actual data range
+#' @param raw.scale logical whether convert the range from transformed scale to raw scale
+#' @param return matrix
+#' @examples
+#' \dontrun{
+#'  range(gh, type = "data")#return data range
+#'  range(gh) #return instrument range
+#'  range(gh, raw.scale = TRUE) #inverse transform the range to the raw scale
+#' }
+range.GatingHierarchy <- function(..., na.rm = FALSE, type = c("instrument", "data"), raw.scale = FALSE){
+  type <- match.arg(type)
+  gh <- list(...)[[1]]
+  fr <- getData(gh, use.exprs = type == "data")
+  rng <- range(fr, type = type)
+  if(raw.scale)
+  {
+    chnls <- names(rng)
+    translist <- getTransformations(gh, only.function = FALSE)
+    for(chnl in chnls)
+    {
+      trans <- translist[[chnl]]
+      if(!is.null(trans))
+      {
+        rng[, chnl] <- trans$inverse(rng[, chnl])
+      }
+    }
+  }
+  rng
+
+}
+
 is.cytof <- function(gs){
   any(grepl("Event_length", colnames(gs)))
 }

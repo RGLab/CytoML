@@ -365,68 +365,103 @@ graphNode <- function(x, y){
           )
 }
 
+constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.nodes, quad.gate = NULL){
+  if(!flowWorkspace:::isHidden(gh, pop)||showHidden){
+    if(is.null(quad.gate))
+      gate <- getGate(gh, pop)
+    else
+      gate <- quad.gate
+    eventsInside <- !flowWorkspace:::isNegated(gh, pop)
+    children <- getChildren(gh, pop)
+    if(!showHidden)
+      children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
+
+    isBool <- is(gate, "booleanFilter")
+
+    if(length(children) == 0){ #leaf node
+      if(isBool){
+        #use parent gate's dims for boolean node
+        gate.dim <- getGate(gh, getParent(gh, pop))
+      }else
+        gate.dim <- gate
+      subNode <- NULL
+    }else{
+      #get dim from non-boolean children
+      nonBool <- sapply(children, function(child){
+        thisGate <- getGate(gh, child)
+        !is(thisGate, "booleanFilter")
+      })
+      if(sum(nonBool) == 0)
+        stop("Can't find any non-boolean children node under ", pop)
+
+      children.dim <- children[nonBool]
+      gate.dim <- getGate(gh, children.dim[1]) #pick the first children node for dim
+      subNode <- subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden, env.nodes = env.nodes)
+    }
+
+    if(!isBool){
+      gate <- inverseTransGate(gate, trans)
+
+    }
+
+    param <- as.vector(parameters(gate.dim))
+    param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
+    count <- getTotal(gh, pop, xml = FALSE)
+
+    if(is.na(count))
+      count <- -1
+    if(isBool){
+      booleanNode(gate, pop, count, env.nodes = env.nodes, param = param, subNode = subNode)
+
+    }else{
+
+      list(xmlNode("Population"
+                   , attrs = c(name = basename(pop), count = count)
+                   , graphNode(param[1], param[2])
+                   , xmlNode("Gate"
+                             , gateNode(gate, eventsInside, matInfo = matInfo)
+                   )
+                   , subNode
+      )
+      )
+    }
+  }
+}
 subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.nodes){
+  #reconstruct quadgate when needed
+  groups <- ggcyto:::merge.quad.gates(gh, pops)
 
-  subPops <-lapply(pops, function(pop){
-                  if(!flowWorkspace:::isHidden(gh, pop)||showHidden){
+  subPops <- list()
+  i <- 1
+  for(pops in groups)
+  {
+    if(is.list(pops)){#check if multi pops
+      pops <- pops[["popIds"]]
 
-                      gate <- getGate(gh, pop)
-                      eventsInside <- !flowWorkspace:::isNegated(gh, pop)
-                      children <- getChildren(gh, pop)
-                      if(!showHidden)
-                        children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
+      if(is.list(pops)){#check if multi pops have been merged to quad gate
+        quad.gate <- pops[["quad.gate"]]
+        quad.patterns <- pops[["quad.pattern"]]
+        pops <- pops[["pop.name"]]
+        for(j in seq_along(pops))
+        {
+          pop <- pops[j]
+          attr(quad.gate, "quad.pattern") <- quad.patterns[j]
+          subPops[[i]] <- constructPopNode(gh, pop, trans, matInfo, showHidden, env.nodes, quad.gate = quad.gate)
+          i <- i+1
+        }
+      }else
+        for(pop in pops)
+        {
+          subPops[[i]] <- constructPopNode(gh, pop, trans, matInfo, showHidden, env.nodes)
+          i <- i+1
+        }
+    }else
+    {
+      subPops[[i]] <- constructPopNode(gh, pops, trans, matInfo, showHidden, env.nodes)
+      i <- i+1
+    }
 
-                      isBool <- is(gate, "booleanFilter")
-
-                      if(length(children) == 0){ #leaf node
-                        if(isBool){
-                          #use parent gate's dims for boolean node
-                         gate.dim <- getGate(gh, getParent(gh, pop))
-                        }else
-                            gate.dim <- gate
-                        subNode <- NULL
-                      }else{
-                        #get dim from non-boolean children
-                        nonBool <- sapply(children, function(child){
-                                              thisGate <- getGate(gh, child)
-                                              !is(thisGate, "booleanFilter")
-                                            })
-                        if(sum(nonBool) == 0)
-                          stop("Can't find any non-boolean children node under ", pop)
-
-                        children.dim <- children[nonBool]
-                        gate.dim <- getGate(gh, children.dim[1]) #pick the first children node for dim
-                        subNode <- subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden, env.nodes = env.nodes)
-                      }
-
-                      if(!isBool){
-                        gate <- inverseTransGate(gate, trans)
-
-                      }
-
-                      param <- as.vector(parameters(gate.dim))
-                      param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
-                      count <- getTotal(gh, pop, xml = FALSE)
-
-                      if(is.na(count))
-                        count <- -1
-                      if(isBool){
-                        booleanNode(gate, pop, count, env.nodes = env.nodes, param = param, subNode = subNode)
-
-                      }else{
-
-                        list(xmlNode("Population"
-                                , attrs = c(name = basename(pop), count = count)
-                                , graphNode(param[1], param[2])
-                                , xmlNode("Gate"
-                                          , gateNode(gate, eventsInside, matInfo = matInfo)
-                                          )
-                                , subNode
-                              )
-                            )
-                    }
-                  }
-                })
+  }
 
     xmlNode("Subpopulations", .children = unlist(subPops, recursive = FALSE, use.names = FALSE))
 }
@@ -611,6 +646,26 @@ gateNode.rectangleGate <- function(gate, matInfo, ...){
             chnl <- fixChnlName(x, matInfo = matInfo)
             xmlDimensionNode(parameter = chnl, min = gate@min[[x]], max = gate@max[[x]])
               })
+  xmlNode("RectangleGate"
+          , namespace="gating"
+          , attrs = gateAttr(...)
+          , .children=dims)
+}
+
+#' @param quad a character of size 2, indicating the quadrant pattern .e.g. '+-')
+gateNode.quadGate <- function(gate, matInfo, ...){
+  quad <- attr(gate, "quad.pattern")
+  stopifnot(grepl("^[\\+-]{2}$", quad))
+  quad <- strsplit(quad, split = "")[[1]]
+  param <- parameters(gate)
+
+  dims <- lapply(1:2, function(i){
+      chnl <- fixChnlName(param[i], matInfo = matInfo)
+      if(quad[i] == "+")
+        xmlDimensionNode(parameter = chnl, min = gate@boundary[[param[i]]])
+      else
+        xmlDimensionNode(parameter = chnl, max = gate@boundary[[param[i]]])
+                  })
   xmlNode("RectangleGate"
           , namespace="gating"
           , attrs = gateAttr(...)

@@ -279,6 +279,18 @@ setMethod("transform", signature = c("rectangleGate"), function(`_data`, ...){
   gate
 
 }
+setMethod("transform", signature = c("quadGate"), function(`_data`, ...){
+  .transform.quadGate(`_data`, ...)
+})
+.transform.quadGate <- function(gate, trans.fun, param){
+
+  boundary <- gate@boundary[[param]]
+  if(!is.infinite(boundary))
+    gate@boundary[[param]] <- trans.fun(boundary)
+
+  gate
+
+}
 #' @importFrom flowCore eval
 processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE, orig.trans){
 

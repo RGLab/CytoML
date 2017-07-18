@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: GatingML interface for openCyto
-Version: 1.3.1
+Version: 1.3.2
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -26,18 +26,18 @@ Imports:
     graphics,
     utils,
     base64enc,
-    plyr
+    plyr,
+    ggcyto (>= 1.5.4)
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),
-    knitr,
-    ggcyto
+    knitr
 LinkingTo: Rcpp, flowWorkspace, BH(>= 1.62.0-1), RProtoBufLib
 VignetteBuilder: knitr
 SystemRequirements: xml2, GNU make, C++11
 RoxygenNote: 6.0.1
-Collate:
+Collate: 
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
     'RcppExports.R'

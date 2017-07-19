@@ -66,35 +66,87 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
 {
   #add gates and pops(as GateSets)
   nodePaths <- getNodes(gs, showHidden = showHidden)[-1]
+  gh <- gs[[1]]
+
   fcs_guids <- sampleNames(gs)
-  rng <- range(getData(gs[[1]], use.exprs = FALSE))
-  for(gate_id in seq_along(nodePaths)){
-    nodePath <- nodePaths[gate_id]
-    gates <- getGate(gs, nodePath)
-    popName <- basename(nodePath)
+  rng <- range(getData(gh, use.exprs = FALSE))
+  grp.list <- sapply(fcs_guids, function(sn){
+    grps <- ggcyto:::merge.quad.gates(gs[[sn]], nodePaths)
+    #unlist the grp so that the gates that can't be merged to quadgates
+    #will still be treated by cytobank independently but the quad.gates will be specially treated  as the one QuadrantGate node
+    grps <- lapply(grps, function(grp){
+      if(is.list(grp))
+      {
+        if(is.list(grp[["popIds"]]))
+          grp <- list(c(grp[["popIds"]], grp["parentId"]))
+        else
+          grp <- grp[["popIds"]]
+      }
+      grp
+    })
+    unlist(grps, recursive = FALSE)
+  }, simplify = FALSE)
+
+  gate_id <- 0
+  for(i in seq_along(grp.list[[1]])){
+    gate.obj <- grp.list[[1]][[i]]
+    if(is.list(gate.obj))
+    {
+      isQuad <- TRUE
+      #quad gates
+      #  <-  #get parent as the dummy node path for there is no such path for quadGate in gs
+      nodePath <- paste0(gate.obj[["parentId"]], " sub")
+      gates <- sapply(grp.list, function(grp){
+        grp[[i]][["quad.gate"]]
+        })
+      gate_id <- gate_id + 5 #preserve 4 ids for quadrants
+
+    }else
+    {
+      isQuad <- FALSE
+      nodePath <- gate.obj
+      # gate_id <- nodePath
+      gates <- getGate(gs, nodePath)
+      gate_id <- gate_id + 1#increment gate id
+
+    }
+
+
+
     for(fcs_id in seq_along(fcs_guids)){
       fcs_guid <- fcs_guids[fcs_id]
       gate <- gates[[fcs_guid]]
 
       #cytobank does not support negated gate
       #we have to create inverse gate on our end
-      if(flowWorkspace:::isNegated(gs[fcs_guid][[1]], nodePath)){
-        gate <- inverse(gate, rng)
+      if(!isQuad)
+      {
+        if(flowWorkspace:::isNegated(gs[fcs_guid][[1]], nodePath))
+          gate <- inverse(gate, rng)
       }
       #transform to raw scale
       #and attach comp and trans reference to parameters
       gate <- processGate(gate, trans.Gm2objs, compId, flowEnv, rescale.gate, trans)
 
-      parent <- getParent(gs, nodePath)
-      if(parent == "root")
-        parent_id <- 0
-      else
-        parent_id <- match(parent, nodePaths)
+      # parent <- getParent(gs, nodePath)
+      # if(parent == "root")
+      #   parent_id <- 0
+      # else
+      #   parent_id <- match(parent, nodePaths)
 
-      guid <- paste("gate", gate_id, fcs_id, sep = "_")
+      guid <- paste("gate", gate_id, fcs_id, sep = "_")#can't save path into xml attr use idx i here
       identifier(gate) <- guid
+      #save quadrant info to gate
+      if(isQuad)
+      {
+        attr(gate, "quad.pop.name") <- gate.obj[["pop.name"]]
+        attr(gate, "quad.pattern") <- gate.obj[["quad.pattern"]]
+
+      }
+      attr(gate, "nodePath") <- nodePath
       #add gate
       flowEnv[[guid]] <- gate
+
 
     }
   }
@@ -118,16 +170,19 @@ base64decode_cytobank <- function(x){
 
 
 #' @importFrom XML xmlTree
-addGateSets <- function(root, gs, showHidden, ...)
+addGateSets <- function(root, gs, showHidden, guid_mapping)
 {
 
-  nodePaths <- getNodes(gs, showHidden = showHidden)[-1]
+  nodePaths <- names(guid_mapping)
   # browser()
-  newNodes <- lapply(seq_along(nodePaths), function(gate_id){
-                      nodePath <- nodePaths[gate_id]
+  newNodes <- lapply(nodePaths, function(nodePath){
+
+                      guid <- guid_mapping[[nodePath]]
+                      gate_id <- strsplit(guid, split = "_")[[1]][[2]]
                       curNode <- nodePath
                       pop_name <- basename(nodePath)
                       gate_id_path <- gate_id
+                      names(gate_id_path) <- curNode
                       # browser()
                       repeat{
                         curNode <- getParent(gs, curNode)
@@ -135,11 +190,12 @@ addGateSets <- function(root, gs, showHidden, ...)
                           break
                         else{
                           cur_parent_id <- match(curNode, nodePaths)
+                          names(cur_parent_id) <- curNode
                           gate_id_path <- c(cur_parent_id, gate_id_path)
                         }
 
                       }
-                      GateSetNode(gate_id, pop_name, gate_id_path, nodePaths, ...)
+                      GateSetNode(gate_id, pop_name, gate_id_path, guid_mapping)
                     })
 
   addChildren(root, kids = newNodes)
@@ -147,16 +203,16 @@ addGateSets <- function(root, gs, showHidden, ...)
 
 #' @importFrom jsonlite toJSON
 #' @importFrom XML xmlNode
-GateSetNode <- function(gate_id, pop_name, gate_id_path, nodePaths, guid_mapping){
+GateSetNode <- function(gate_id, pop_name, gate_id_path, guid_mapping){
 
   attrs = c("gating:id" = paste("GateSet", gate_id, sep = "_"))
 
-  definition <- toJSON(list(gates = gate_id_path, negGates = vector()))
+  definition <- toJSON(list(gates = as.vector(gate_id_path), negGates = vector()))
 
   #duplicate the refs if it is the root
-  ref_gate_id_path <- gate_id_path
-  if(length(ref_gate_id_path) == 1)
-    ref_gate_id_path <- c(ref_gate_id_path, ref_gate_id_path)
+  ref_gate_path <- names(gate_id_path)
+  if(length(ref_gate_path) == 1)
+    ref_gate_path <- c(ref_gate_path, ref_gate_path)
   xmlNode("gating:BooleanGate", attrs = attrs
           , xmlNode("data-type:custom_info"
                     , xmlNode("cytobank"
@@ -168,9 +224,9 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, nodePaths, guid_mapping
 
          ,  xmlNode("gating:and"
                   #create two dummy reference
-                  , .children = lapply(ref_gate_id_path, function(gate_id){
+                  , .children = lapply(ref_gate_path, function(gate_path){
 
-                    guid <- guid_mapping[[gate_id]]
+                    guid <- guid_mapping[[gate_path]]
                     attrs = c("gating:ref" = guid)
                     xmlNode("gating:gateReference", attrs = attrs)
                   })
@@ -186,7 +242,7 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, nodePaths, guid_mapping
 #' @importFrom flowWorkspace pData
 #' @return XML root node
 addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden){
-  nodePaths <- getNodes(gs, showHidden = showHidden)[-1]
+  quad.pattern.cytobank <- c("++", "-+", "--","+-")
   pd <- pData(gs)
   fcs_names <- pd[["name"]]
   fcs_guids <- rownames(pd)
@@ -200,20 +256,21 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   for(id in 1:length(root)){
 
     curNode <- root[[id]]
-    guid <- as.vector(xmlAttrs(curNode, "gating:id"))
+    guid <- as.vector(xmlAttrs(curNode)[["id"]])
     if(!is.null(guid)&&grepl("gate_", guid)){
         #parse pop and fcs info from guid
         fields <- strsplit(guid, "_")[[1]]
         gate_id <- as.integer(fields[[2]])
         fcs_id <- as.integer(fields[[3]])
 
-        nodePath <- nodePaths[gate_id]
-        pop_name<- basename(nodePath)
+
         fcs_name <- fcs_names[fcs_id]
         fcs_guid <- fcs_guids[fcs_id]
         # browser()
 
         gate <- flowEnv[[guid]]
+        nodePath <- attr(gate, "nodePath")
+        pop_name<- basename(nodePath)
         gate_type <- class(gate)
         if(gate_type == "rectangleGate"){
           if(length(parameters(gate)) == 1)
@@ -224,6 +281,8 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
           gate_type <- "PolygonGate"
         else if(gate_type == "ellipsoidGate")
           gate_type <- "EllipseGate"
+        else if(gate_type == "quadGate")
+          gate_type <- "QuadrantGate"
         else
           stop("unsupported gate: ", gate_type)
         # browser()
@@ -282,19 +341,73 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
           names(scale) <- c("x", "y")
         }
         definition <- list(scale = scale)
+        #quadgate requires the json definition
+        if(gate_type == "QuadrantGate")
+        {
+          definition[["labels"]] <- matrix(c(7.015343642234706,7.620918572637606
+                                             ,0.33115968153503017,7.620918572637606
+                                             ,0.33115968153503017,-0.3809554276552931
+                                             ,7.015343642234706,-0.3809554276552931)
+                                           , nrow = 4, byrow = TRUE)
+          definition[["quadrant"]] <- list(x = gate@boundary[1], y = gate@boundary[2]
+                                           , UR = 1, UL = 2, LL = 3, LR = 4)
+        }
         definition <- toJSON(definition, auto_unbox = TRUE)
         #insert custom info
-        customNode <- customInfoNodeForGate(id, gate_id, pop_name, fcs_id, fcs_name, gate_type, definition)
+        customNode <- customInfoNodeForGate(gate_id, pop_name, fcs_id, fcs_name, gate_type, definition)
         newNode <- addChildren(curNode, kids = list(customNode), at = 0)
-        #modify id
-        guid.new <- paste("Gate", id, base64encode_cytobank(pop_name), sep = "_")
-        xmlAttrs(newNode, suppressNamespaceWarning = TRUE, append = FALSE) <- c("gating:id" = guid.new)
+        #modify gate id so that cytobank can parse it
+        guid.new <- paste("Gate", gate_id, base64encode_cytobank(pop_name), sep = "_")
+        xmlAttrs(newNode)[["id"]] = guid.new
+
+
+
+        #special treatment for quadGate
+        #modify the id of each divider and quadrant
+        if(gate_type == "QuadrantGate")
+        {
+          quad_gate_id <- gate_id - 5
+          quad.pattern <- attr(gate, "quad.pattern")
+          for(j in seq_len(length(newNode)))
+          {
+            subNode <- newNode[[j]]
+            nodeName <- xmlName(subNode)
+            if(nodeName == "divider"){
+              old.id <- xmlAttrs(subNode)[["id"]]
+              div.id <- substr(old.id, nchar(old.id), nchar(old.id))
+              div.guid.new <- paste0(guid.new, "divider_", div.id)
+              xmlAttrs(subNode)[["id"]] = div.guid.new
+            }else if(nodeName == "Quadrant")
+            {
+              #update id
+              #extract and convert flowUtils quad pattern to +-
+              old.id <- xmlAttrs(subNode)[["id"]]
+              this.pattern <- substr(old.id, nchar(old.id)-1, nchar(old.id))
+              this.pattern <- gsub("N", "-", gsub("P", "+", this.pattern))
+              pat.ind <- match(this.pattern, quad.pattern)
+              # quad.ord <- match(this.pattern, quad.pattern.cytobank)
+              quad_gate_id <- quad_gate_id + 1
+              nodePath <- attr(gate, "quad.pop.name")[pat.ind]
+              pop_name <- basename(nodePath)
+              quad.guid.new <- paste("Gate", quad_gate_id, base64encode_cytobank(pop_name), sep = "_")
+              xmlAttrs(subNode)[["id"]] <- quad.guid.new
+              #update divider ref id
+              xmlAttrs(subNode[[2]])[["divider_ref"]] <- paste0(guid.new, "divider_1")
+              xmlAttrs(subNode[[4]])[["divider_ref"]] <- paste0(guid.new, "divider_2")
+              if(fcs_id == 1)#record the mapping between gate_id and guid.new for the refs of GateSets
+                flowEnv[["guid_mapping"]][[nodePath]] <- quad.guid.new
+            }
+            newNode[[j]] <- subNode
+          }
+
+        }else
+        {
+          if(fcs_id == 1)#record the mapping between gate_id and guid.new for the refs of GateSets
+            flowEnv[["guid_mapping"]][[nodePath]] <- guid.new
+        }
         #update the tree
         root[[id]] <- newNode
 
-        #record the mapping between gate_id and guid.new for the refs of GateSets
-        if(fcs_id == 1)
-          flowEnv[["guid_mapping"]][[gate_id]] <- guid.new
     }
   }
   root
@@ -302,7 +415,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
 }
 
 #' @importFrom  XML newXMLNode
-customInfoNodeForGate <- function(id, gate_id, pop_name, fcs_id, fcs_name, type, definition)
+customInfoNodeForGate <- function(gate_id, pop_name, fcs_id, fcs_name, type, definition)
 {
     if(fcs_id == 1){
       fcs_id <- fcs_name <- ""
@@ -312,7 +425,7 @@ customInfoNodeForGate <- function(id, gate_id, pop_name, fcs_id, fcs_name, type,
   xmlNode("data-type:custom_info"
       , xmlNode("cytobank"
           , xmlNode("name", pop_name)
-          , xmlNode("id", id)
+          , xmlNode("id", gate_id)
           , xmlNode("gate_id", gate_id)
           , xmlNode("type", type)
           , xmlNode("version", 1)

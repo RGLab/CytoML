@@ -14,7 +14,7 @@ setClass("divaWorkspace", contains = "flowJoWorkspace")
 #' \dontrun{
 #' library(flowWorkspace)
 #' library(CytoML)
-#' ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "CytoML"))
+#' ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
 #' ws
 #' getSampleGroups(ws)
 #' getSamples(ws)
@@ -302,10 +302,15 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         #transform data in default flowCore logicle scale
         trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
-          maxValue <- 262144
+          maxValue <- 262144#TODO:this_para[["max"]]^10
           pos <- 4.5
           r <- abs(this_para[["biexp_scale"]])
-          w = (pos - log10(maxValue/r))/2
+          if(r == 0)
+            r <- 262144/10^4.5
+
+          w <- (pos - log10(maxValue/r))/2
+          if(w < 0)
+            w <- 0
           lgclObj  <- logicleTransform(w=w, t = maxValue, m = pos) #
                     }
           , simplify = FALSE)

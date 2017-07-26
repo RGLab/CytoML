@@ -145,14 +145,17 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                                         )
         rescale.gate <- TRUE
       }else if(type %in% c("flowJo_biexp", "flowJo_fasinh")){
-        transID <- paste0("Tr_Arcsinh_", prefix_chnl)
-        #use asinhtGml2 with cytobank default setting
-        flowEnv[[transID]] <- asinhtGml2(parameters = param.obj
-                                         , M = 0.43429448190325176
-                                         , T = ifelse(is.cytof(gs), 5.8760059682190064, 176.2801790465702)
-                                         , A = 0.0
-                                         , transformationId = transID
-                                        )
+        transID <- paste0("Tr_logicle_", prefix_chnl)
+        param <-  attr(trans.func,"parameters")
+
+        flowEnv[[transID]] <- logicletGml2(parameters = param.obj
+                                           , M = param[["pos"]]
+                                           , T = param[["maxValue"]]
+                                           , A = param[["neg"]]
+                                           , W = log10(-param[["widthBasis"]]) / 2
+                                           , transformationId = transID
+        )
+
         rescale.gate <- TRUE
       }else{
         # browser()

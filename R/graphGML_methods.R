@@ -286,26 +286,28 @@ setMethod("getCompensationMatrices", signature = "graphGML", definition = functi
 #' @param x graphGML
 #' @return transformerList object
 #' @importFrom flowCore eval parameters colnames
-#' @importFrom flowWorkspace transformerList asinh_Gml2 flow_trans
+#' @importFrom flowWorkspace transformerList asinh_Gml2 flow_trans asinhtGml2_trans logicleGml2_trans
 #' @export
 setMethod("getTransformations", signature = c(x = "graphGML"), function(x){
   trans <- x@graphData[["transformations"]]
   if(!is.null(trans)){
     chnls <- names(trans)
     trans <- sapply(trans, function(thisTrans){
-
+      trans
       #convert from transform object to function since transform has empty function in .Data slot
       #which is not suitable for transformList constructor
-      trans.fun <- eval(thisTrans)
+      # trans.fun <- eval(thisTrans)
       trans.type <- class(thisTrans)
       if(extends(trans.type, "asinhtGml2")){
-        inv.func <- asinh_Gml2(thisTrans@T, thisTrans@M, thisTrans@A, inverse = TRUE)
-
+        # inv.func <- asinh_Gml2(thisTrans@T, thisTrans@M, thisTrans@A, inverse = TRUE)
+        trans.obj <- asinhtGml2_trans(thisTrans@T, thisTrans@M, thisTrans@A)
+      }else if(extends(trans.type, "logicletGml2")){
+        trans.obj <- logicleGml2_trans(thisTrans@T, thisTrans@M, thisTrans@W, thisTrans@A)
       }else
         stop("Don't know how to inverse transformation: ", trans.type)
 
-      trans.obj <- flow_trans(trans.type, trans.fun, inv.func)
-
+      # trans.obj <- flow_trans(trans.type, trans.fun, inv.func)
+      trans.obj
     }
     , USE.NAMES = FALSE, simplify = FALSE)
 

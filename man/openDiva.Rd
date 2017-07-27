@@ -23,7 +23,7 @@ open Diva xml workspace
 \dontrun{
 library(flowWorkspace)
 library(CytoML)
-ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "CytoML"))
+ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
 ws
 getSampleGroups(ws)
 getSamples(ws)

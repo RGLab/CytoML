@@ -48,3 +48,41 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
 
   close(con)
 })
+
+test_that("autogating to cytobank--tcell", {
+  dataDir <- system.file("extdata",package="flowWorkspaceData")
+  #load raw FCS
+  fs <- read.flowSet(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
+
+
+  #compensate
+  comp <- spillover(fs[[1]])[["SPILL"]]
+  chnls <- colnames(comp)
+  comp <- compensation(comp)
+
+
+  #run auto gating
+  gtFile.orig <- system.file("extdata/gating_template/tcell.csv", package = "openCyto")
+
+
+  ####################
+  #use logicle
+  ####################
+  gs <- GatingSet(fs)
+  gs <- compensate(gs, comp)
+  trans <- estimateLogicle(gs[[1]], chnls)
+  gs <- transform(gs, trans)
+  gt <- gatingTemplate(gtFile.orig, autostart = 1L)
+
+  expect_warning(gating(gt, gs))
+  toggle.helperGates(gt, gs) #hide the helper gates
+  stats.orig <- getPopStats(gs[[1]])[order(node), list(openCyto.count, node)]
+  #output to cytobank
+
+  GatingSet2cytobank(gs, outFile, cytobank.default.scale = F)
+  #parse it back in
+  gs1 <- cytobank2GatingSet(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs"))
+  stats.new <- getPopStats(gs1[[1]])[order(node), list(openCyto.count, node)]
+  expect_equal(stats.orig, stats.new, tol = 4e-4)
+
+})

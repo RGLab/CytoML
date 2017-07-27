@@ -140,7 +140,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                                         , M = env[["m"]]
                                         , T = env[["t"]]
                                         , A = env[["a"]]
-                                        , W = env[["w"]]
+                                        , W = as.vector(env[["w"]])
                                         , transformationId = transID
                                         )
         rescale.gate <- TRUE

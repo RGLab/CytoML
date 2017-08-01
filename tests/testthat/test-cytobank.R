@@ -83,6 +83,6 @@ test_that("autogating to cytobank--tcell", {
   #parse it back in
   gs1 <- cytobank2GatingSet(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs"))
   stats.new <- getPopStats(gs1[[1]])[order(node), list(openCyto.count, node)]
-  expect_equal(stats.orig, stats.new, tol = 4e-4)
+  expect_equal(stats.orig, stats.new, tol = 5e-4)
 
 })

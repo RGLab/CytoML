@@ -113,12 +113,12 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
         #extract parameters
         env <- environment(trans.func)
         transID <- paste0("Tr_Arcsinh_", prefix_chnl)
-        env <- env[["expr"]]
+
 
         flowEnv[[transID]] <- asinhtGml2(parameters = param.obj
-                                     , M = env@M
-                                     , T = env@T
-                                     , A = env@A
+                                     , M = env[["m"]]
+                                     , T = env[["t"]]
+                                     , A = env[["a"]]
                                      , transformationId = transID
                                     )
       }else if(type == "logicleGml2"){

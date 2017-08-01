@@ -163,7 +163,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
       }
 
 
-    }
+
 
     if(cytobank.default.scale){
       rescale.gate <- TRUE
@@ -173,10 +173,11 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                                        , T = ifelse(is.cytof(gs), 5.8760059682190064, 176.2801790465702)
                                        , A = 0.0
                                        , transformationId = transID)
-    }
+      }
 
     #save another copy of trans.obj in the list
     trans.Gm2objs[[chnl]] <- flowEnv[[transID]]
+    }
   }
   return(list(trans.Gm2objs = trans.Gm2objs, trans = trans, compId = compId))
 }

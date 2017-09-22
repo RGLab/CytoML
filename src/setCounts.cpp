@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-#include <flowWorkspace/GatingSet.hpp>
+#include <cytolib/GatingSet.hpp>
 
 using namespace Rcpp;
 

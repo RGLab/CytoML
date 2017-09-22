@@ -33,7 +33,7 @@ Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),
     knitr
-LinkingTo: Rcpp, flowWorkspace, BH(>= 1.62.0-1), RProtoBufLib
+LinkingTo: Rcpp, cytolib, BH(>= 1.62.0-1), RProtoBufLib
 VignetteBuilder: knitr
 SystemRequirements: xml2, GNU make, C++11
 RoxygenNote: 6.0.1

@@ -9,5 +9,5 @@ endif
 
 CXX_STD = CXX11
 PKG_CPPFLAGS =-DROUT @PKG_CPPFLAGS@
-PKG_LIBS = `${R_HOME}/bin/Rscript -e "flowWorkspace:::LdFlags();cat(' ');RProtoBufLib:::LdFlags();cat(' ');flowCore:::LdFlags()"` @PKG_LIBS@
+PKG_LIBS = `${R_HOME}/bin/Rscript -e "cytolib:::LdFlags();cat(' ');RProtoBufLib:::LdFlags();cat(' ');flowCore:::LdFlags()"` @PKG_LIBS@
 

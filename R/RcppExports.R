@@ -9,6 +9,6 @@
 #' @param node node name
 #' @param count the event count to be stored
 .set.count.xml <- function(gsPtr, sampleName, node, count) {
-    invisible(.Call('CytoML_setCounts', PACKAGE = 'CytoML', gsPtr, sampleName, node, count))
+    invisible(.Call('_CytoML_setCounts', PACKAGE = 'CytoML', gsPtr, sampleName, node, count))
 }
 

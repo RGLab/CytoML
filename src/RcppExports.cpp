@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // setCounts
 void setCounts(Rcpp::XPtr<GatingSet> gsPtr, string sampleName, string node, int count);
-RcppExport SEXP CytoML_setCounts(SEXP gsPtrSEXP, SEXP sampleNameSEXP, SEXP nodeSEXP, SEXP countSEXP) {
+RcppExport SEXP _CytoML_setCounts(SEXP gsPtrSEXP, SEXP sampleNameSEXP, SEXP nodeSEXP, SEXP countSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<GatingSet> >::type gsPtr(gsPtrSEXP);
@@ -18,4 +18,14 @@ BEGIN_RCPP
     setCounts(gsPtr, sampleName, node, count);
     return R_NilValue;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_CytoML_setCounts", (DL_FUNC) &_CytoML_setCounts, 4},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_CytoML(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

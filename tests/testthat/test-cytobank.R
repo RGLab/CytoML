@@ -53,6 +53,7 @@ test_that("autogating to cytobank--tcell", {
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   #load raw FCS
   fs <- read.flowSet(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
+  outFile <- tempfile(fileext = ".xml")
 
 
   #compensate

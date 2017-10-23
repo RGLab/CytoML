@@ -5,7 +5,7 @@ compact <- flowWorkspace:::compact
 #' @param na.rm not used
 #' @param type character of "instrument" or "data" indicating whether to retrieve the instrument or the actual data range
 #' @param raw.scale logical whether convert the range from transformed scale to raw scale
-#' @param return matrix
+#' @return matrix
 #' @examples
 #' \dontrun{
 #'  range(gh, type = "data")#return data range

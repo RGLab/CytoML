@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: GatingML interface for openCyto
-Version: 1.3.4
+Version: 1.3.5
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -11,7 +11,7 @@ License: Artistic-2.0
 LazyData: TRUE
 Imports:
     flowCore,
-    flowWorkspace (>= 3.25.7),
+    flowWorkspace (>= 3.25.16),
     openCyto (>= 1.11.3),
     XML,
     data.table,
@@ -33,18 +33,14 @@ Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),
     knitr
-LinkingTo: Rcpp, cytolib, BH(>= 1.62.0-1), RProtoBufLib
 VignetteBuilder: knitr
-SystemRequirements: xml2, GNU make, C++11
 RoxygenNote: 6.0.1
 Collate: 
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
-    'RcppExports.R'
     'cytobank2GatingSet.R'
     'diva2GatingSet.R'
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
-    'set.count.xml.R'
     'utils.R'

@@ -15,8 +15,9 @@
 \item{type}{character of "instrument" or "data" indicating whether to retrieve the instrument or the actual data range}
 
 \item{raw.scale}{logical whether convert the range from transformed scale to raw scale}
-
-\item{return}{matrix}
+}
+\value{
+matrix
 }
 \description{
 the parameter range from the flow data associated with GatingHierarchy

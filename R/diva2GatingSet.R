@@ -55,6 +55,7 @@ openDiva <- function(file,options = 0,...){
 }
 
 #' @rdname divaWorkspace-class
+#' @param x divaWorkspace
 #' @importFrom flowWorkspace getSamples
 #' @export
 setMethod("getSamples","divaWorkspace",function(x){
@@ -87,6 +88,7 @@ setMethod("getSampleGroups","divaWorkspace",function(x){
 }
 
 #' @rdname divaWorkspace-class
+#' @param object divaWorkspace
 #' @importFrom flowWorkspace show
 #' @export
 setMethod("show",c("divaWorkspace"),function(object){
@@ -108,6 +110,8 @@ setMethod("show",c("divaWorkspace"),function(object){
     })
 
 #' @rdname divaWorkspace-class
+#' @param obj divaWorkspace
+#' @param ... other arguments
 #' @importFrom flowWorkspace parseWorkspace
 #' @export
 setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
@@ -179,6 +183,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
+#' @importFrom flowWorkspace set.count.xml
 .parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName,...){
 
   if(!file.exists(xmlFileName))

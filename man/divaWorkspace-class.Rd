@@ -18,6 +18,15 @@ Inherited from \link{flowJoWorkspace-class}}
 
 \S4method{parseWorkspace}{divaWorkspace}(obj, ...)
 }
+\arguments{
+\item{x}{divaWorkspace}
+
+\item{object}{divaWorkspace}
+
+\item{obj}{divaWorkspace}
+
+\item{...}{other arguments}
+}
 \description{
 divaWorkspace class
 Inherited from \link{flowJoWorkspace-class}

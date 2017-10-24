@@ -244,7 +244,7 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, guid_mapping){
 addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden){
   quad.pattern.cytobank <- c("++", "-+", "--","+-")
   pd <- pData(gs)
-  fcs_names <- pd[["name"]]
+  # fcs_names <- pd[["name"]]
   fcs_guids <- rownames(pd)
   translist <- getTransformations(gs[[1]], only.function = FALSE)
   transNames <- names(translist)
@@ -265,8 +265,9 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
         fcs_id <- as.integer(fields[[3]])
 
 
-        fcs_name <- fcs_names[fcs_id]
+        # fcs_name <- fcs_names[fcs_id]
         fcs_guid <- fcs_guids[fcs_id]
+        fcs_name <- basename(keyword(gs[[fcs_guid]], "FILENAME"))#cytobank uses the actual filename instead of keyword to match tailor gates
         # browser()
 
         gate <- flowEnv[[guid]]

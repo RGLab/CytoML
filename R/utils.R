@@ -96,7 +96,8 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
   for(transName in names(trans)){
     trans.obj <- trans[[transName]]
     type <- trans.obj[["name"]]
-    ind <- sapply(chnls, grepl, x = transName, USE.NAMES = FALSE)
+    # ind <- sapply(chnls, grepl, x = transName, USE.NAMES = FALSE)
+    ind <- chnls == transName#do strict match due to the possible mismatch for cases like CD3 vs CD33
     nMatched <- sum(ind)
     if(nMatched > 1)
       stop("More than one channels matched to transformation: ", transName)
@@ -104,7 +105,10 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
       trans.func <- trans.obj[["transform"]]
       chnl <- chnls[ind]
       prefix_chnl <- prefix_chnls[ind]
-      param.obj <- compensatedParameter(prefix_chnl
+      # if(is.null(comp))
+      #   param.obj <- prefix_chnl
+      # else
+        param.obj <- compensatedParameter(prefix_chnl
                            , spillRefId = compId
                            , searchEnv = flowEnv
                            , transformationId = prefix_chnl)
@@ -156,6 +160,15 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                                            , transformationId = transID
         )
 
+        rescale.gate <- TRUE
+      }else if(type == "flowJo_flog"){
+        env <- environment(trans.func)
+        transID <- paste0("Tr_flog_", prefix_chnl)
+        flowEnv[[transID]] <- logtGml2(parameters = param.obj
+                                           , M = 1
+                                           , T = 1
+                                           , transformationId = transID
+                                      )
         rescale.gate <- TRUE
       }else{
         # browser()
@@ -303,7 +316,8 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
 
   for(i in seq_along(params)){
     param <- params[i]
-    ind <- sapply(chnls, function(chnl)grepl(chnl, param), USE.NAMES = FALSE)
+    # ind <- sapply(chnls, function(chnl)grepl(chnl, param), USE.NAMES = FALSE)
+    ind <- chnls == param
     nMatched <- sum(ind)
     if(nMatched == 0){
 

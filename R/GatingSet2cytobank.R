@@ -306,7 +306,8 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
             chnl <- as.vector(parameters(param@parameters))
             chnl <- sub("(^Comp_)(.*)", "\\2", chnl) #strip the new prefix and add the original one before matching
             chnl <- paste0(prefix, chnl, suffix)
-            ind <- grepl(chnl, names(rng))
+            # ind <- grepl(chnl, names(rng))
+            ind <- names(rng) == chnl
             nMatched <- sum(ind)
             if(nMatched == 1){
               if(cytobank.default.scale){
@@ -327,6 +328,9 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
             }else if(is(param, "logicletGml2")){
              flag <- 4
              argument <- as.character(round(param@T/sinh(1)))
+            }else if(is(param, "logtGml2")){
+              flag <- 2
+              argument <- as.character(1)
             }else
               stop("unsupported transform: ", class(param))
 

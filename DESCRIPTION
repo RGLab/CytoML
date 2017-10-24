@@ -10,7 +10,7 @@ Description: This package is designed to use GatingML2.0 as the standard format
 License: Artistic-2.0
 LazyData: TRUE
 Imports:
-    flowCore,
+    flowCore (>= 1.43.10),
     flowWorkspace (>= 3.25.16),
     openCyto (>= 1.11.3),
     XML,

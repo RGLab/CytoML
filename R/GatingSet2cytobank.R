@@ -449,7 +449,7 @@ addExperimentInfo <- function(root, experiment_number = ""){
 
    customNode <- root[["custom_info"]]
    customNode <- addChildren(customNode, xmlNode("flowWorkspace-version", packageVersion("flowWorkspace")))
-
+   customNode <- addChildren(customNode, xmlNode("CytoML-version", packageVersion("CytoML")))
    newNode <- xmlNode("cytobank"
                       , xmlNode("experiment_number", experiment_number)
    )

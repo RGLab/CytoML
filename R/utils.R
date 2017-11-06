@@ -51,8 +51,17 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
   if(is.null(comp)){
     #no compensation and channel names in transformation are not prefixed
     chnls <- colnames(getData(gs))
-  }else
+    prefix_chnls_orig <- chnls
+  }else{
     chnls <- as.vector(parameters(comp))
+    #retrieve the prefix for latter trans matching
+    cmp <- flowWorkspace:::.cpp_getCompensation(gs@pointer, sampleNames(gs)[[1]])
+    prefix <- cmp$prefix
+    suffix <- cmp$suffix
+    prefix_chnls_orig <- paste0(prefix, chnls, suffix)
+
+  }
+
 
   #add comp
   if(!is.null(comp)){
@@ -97,7 +106,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
     trans.obj <- trans[[transName]]
     type <- trans.obj[["name"]]
     # ind <- sapply(chnls, grepl, x = transName, USE.NAMES = FALSE)
-    ind <- chnls == transName#do strict match due to the possible mismatch for cases like CD3 vs CD33
+    ind <- prefix_chnls_orig == transName#do strict match due to the possible mismatch for cases like CD3 vs CD33
     nMatched <- sum(ind)
     if(nMatched > 1)
       stop("More than one channels matched to transformation: ", transName)
@@ -105,6 +114,8 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
       trans.func <- trans.obj[["transform"]]
       chnl <- chnls[ind]
       prefix_chnl <- prefix_chnls[ind]
+      prefix_chnl_orig <- prefix_chnls_orig[ind]
+
       # if(is.null(comp))
       #   param.obj <- prefix_chnl
       # else
@@ -189,7 +200,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
       }
 
     #save another copy of trans.obj in the list
-    trans.Gm2objs[[chnl]] <- flowEnv[[transID]]
+    trans.Gm2objs[[prefix_chnl_orig]] <- flowEnv[[transID]]
     }
   }
   return(list(trans.Gm2objs = trans.Gm2objs, trans = trans, compId = compId))
@@ -312,12 +323,12 @@ setMethod("transform", signature = c("quadGate"), function(`_data`, ...){
 processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE, orig.trans){
 
   params <- as.vector(parameters(gate))
-  chnls <- names(gml2.trans)
+  prefixed_chnls_orig <- names(gml2.trans)
 
   for(i in seq_along(params)){
     param <- params[i]
     # ind <- sapply(chnls, function(chnl)grepl(chnl, param), USE.NAMES = FALSE)
-    ind <- chnls == param
+    ind <- prefixed_chnls_orig == param
     nMatched <- sum(ind)
     if(nMatched == 0){
 
@@ -329,9 +340,9 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
                                                    , transformationId = chnl
                                                    )
     }else if(nMatched == 1){
-      chnl <- chnls[ind]
+      prefixed_chnl_orig <- prefixed_chnls_orig[ind]
       orig.trans.obj <- orig.trans[[which(ind)]]
-      gml2.trans.obj <- gml2.trans[[chnl]]
+      gml2.trans.obj <- gml2.trans[[prefixed_chnl_orig]]
       if(rescale.gate){
         inv.fun <- orig.trans.obj[["inverse"]]
         trans.fun <- eval(gml2.trans.obj)

@@ -1,7 +1,33 @@
+test_that("flowJo to cytobank",{
+  dataDir <- system.file("extdata",package="flowWorkspaceData")
+  gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+  #rm negated gate since we have some issue when load the inversed cytobank gate back in
+  moveNode(gs, "singlets", "root")
+  Rm("not debris", gs)
+
+  outFile <- tempfile(fileext = ".xml")
+  expect_warning(GatingSet2cytobank(gs, outFile))
+
+  fcsFiles <<- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = T)
+  tmp <- tempfile()
+  con <- file(tmp, "w")
+  sink(con, type = "message")
+  gs1 <- cytobank2GatingSet(outFile, fcsFiles)
+  sink(NULL, type = "message")
+
+
+  stats.orig <- getPopStats(gs)
+  stats.new <- getPopStats(gs1)
+  stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
+
+  expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y], tol = 2e-3)
+
+})
+
 
 test_that("gatingML-cytobank parsing: cytotrol tcell",{
   xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-  fcsFiles <<- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = T)
+
   gs <<- cytobank2GatingSet(xmlfile, fcsFiles)
 
 

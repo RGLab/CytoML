@@ -94,11 +94,13 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
     {
       isQuad <- TRUE
       #quad gates
-      #  <-  #get parent as the dummy node path for there is no such path for quadGate in gs
-      nodePath <- paste0(gate.obj[["parentId"]], " sub")
+
       gates <- sapply(grp.list, function(grp){
         grp[[i]][["quad.gate"]]
         })
+      nodePath <- paste0(gate.obj[["parentId"]], " sub")
+      #append quad dims to make it unqiue
+      nodePath <- paste(c(nodePath,parameters(gates[[1]])), collapse = " ")
       # gate_id <- gate_id + 5 #preserve 4 spaces for quadrants#TODO:no longer needed, since quadrants use id instead of gate_id
 
     }else
@@ -253,7 +255,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   cmp <- flowWorkspace:::.cpp_getCompensation(gs@pointer, sampleNames(gs)[[1]])
   prefix <- cmp$prefix
   suffix <- cmp$suffix
-  id <- 0
+  id <- 0 # id for each local gate instances (i.e. one gate_id vs multiple ids representing tailored gates)
   for(i in 1:length(root)){
 
     curNode <- root[[i]]
@@ -261,7 +263,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
     if(!is.null(guid)&&grepl("gate_", guid)){
         #parse pop and fcs info from guid
         fields <- strsplit(guid, "_")[[1]]
-        gate_id <- as.integer(fields[[2]])
+        gate_id <- as.integer(fields[[2]])#global id for gate (i.e. all tailored gates share the common gate_id and will be referred by GateSets)
         fcs_id <- as.integer(fields[[3]])
 
 
@@ -351,6 +353,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
         if(gate_type == "QuadrantGate")
         {
           id <- id + 5 #reserve 4 ids for quadrants
+          gate_id <- gate_id + 5 #do the same for gate_id even though individual quadrants do not explicitly use it , they are referred by GateSets later
           definition[["labels"]] <- matrix(c(7.015343642234706,7.620918572637606
                                              ,0.33115968153503017,7.620918572637606
                                              ,0.33115968153503017,-0.3809554276552931

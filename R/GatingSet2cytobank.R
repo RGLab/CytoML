@@ -101,7 +101,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       nodePath <- paste0(gate.obj[["parentId"]], " sub")
       #append quad dims to make it unqiue
       nodePath <- paste(c(nodePath,parameters(gates[[1]])), collapse = " ")
-      # gate_id <- gate_id + 5 #preserve 4 spaces for quadrants#TODO:no longer needed, since quadrants use id instead of gate_id
+      gate_id <- gate_id + 5 #preserve 4 spaces for quadrants
 
     }else
     {
@@ -353,7 +353,6 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
         if(gate_type == "QuadrantGate")
         {
           id <- id + 5 #reserve 4 ids for quadrants
-          gate_id <- gate_id + 5 #do the same for gate_id even though individual quadrants do not explicitly use it , they are referred by GateSets later
           definition[["labels"]] <- matrix(c(7.015343642234706,7.620918572637606
                                              ,0.33115968153503017,7.620918572637606
                                              ,0.33115968153503017,-0.3809554276552931

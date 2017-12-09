@@ -15,7 +15,7 @@ test_that("GatingSet2flowJo: forward slash ",{
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, additional.keys = NULL)
   stats.new <- getPopStats(gs1[[1]])
-  expect_equal(stats.orig[,flowCore.freq], stats.new[,flowCore.freq])
+  expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq])
 })
 
 test_that("OrNode ",{
@@ -23,7 +23,7 @@ test_that("OrNode ",{
   wsFile <- file.path(thisPath, "Test_EW.wsp")
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name = 1, path = file.path(path))
-  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -31,7 +31,7 @@ test_that("OrNode ",{
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
-  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
 
 })
@@ -42,7 +42,7 @@ test_that("Time gate ",{
   wsFile <- file.path(thisPath, "A01.wsp")
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name = 1, subset = 1)
-  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -50,7 +50,7 @@ test_that("Time gate ",{
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
-  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
 })
 
@@ -59,7 +59,7 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
   wsFile <- file.path(thisPath, "MX1 Analysis VISC.xml")
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws,name="Group 1",subset=11)
-  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -67,7 +67,7 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
-  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 1.3e-5)
 })
 test_that("EllipsoidGate defined on log-transformed channels ",{
@@ -76,7 +76,7 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name=1, execute = T, sampNloc = "sampleNode", subset = "spillover_B2.fcs")
 
-  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -84,7 +84,7 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
-  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
 })
 test_that("GatingSet2flowJo: rectangleGate + boolgate",{
@@ -166,7 +166,7 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean ga
   autoplot(gs[[1]], getChildren(gs[[1]], "cd4"))
   getTotal(gs[[1]], "bool5")
   plotGate(gs, "bool4", bool = T)
-  stats.orig <- getPopStats(gs[[1]])[, list(flowCore.count, node)]
+  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -174,7 +174,7 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean ga
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath)
-  stats.new <- getPopStats(gs1[[1]])[, list(flowCore.count, node)]
+  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(getTotal(gs1[[1]], "Prf-"), 90423)
   expect_equal(stats.orig, stats.new[-26,], tol = 1.6e-4)
 })

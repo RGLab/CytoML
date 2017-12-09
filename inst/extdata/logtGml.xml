@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gating:Gating-ML xmlns:gating="http://www.isac-net.org/std/Gating-ML/v2.0/gating" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:transforms="http://www.isac-net.org/std/Gating-ML/v2.0/transformations" xmlns:data-type="http://www.isac-net.org/std/Gating-ML/v2.0/datatypes" xsi:schemaLocation="http://www.isac-net.org/std/Gating-ML/v2.0/gating http://flowcyt.sourceforge.net/gating/2.0/xsd/Gating-ML.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/transformations http://flowcyt.sourceforge.net/gating/2.0/xsd/Transformations.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/datatypes http://flowcyt.sourceforge.net/gating/2.0/xsd/DataTypes.v2.0.xsd">
+  <data-type:custom_info>
+    <cytobank>
+      <about>Gating-ML 2.0 export of Cytobank experiment number 3637.</about>
+      <cytobank_gating_version>2.0</cytobank_gating_version>
+      <experiment_number>3637</experiment_number>
+      <experiment_title>tcell</experiment_title>
+      <experiment_url>https://demo.cytobank.org/cytobank/experiments/3637</experiment_url>
+      <export_timestamp>2017-12-08T13:22:49.066-08:00</export_timestamp>
+    </cytobank>
+  </data-type:custom_info>
+  <transforms:spectrumMatrix transforms:id="Spill_404">
+    <data-type:custom_info>
+      <cytobank>
+        <cytobank_compensation_id>404</cytobank_compensation_id>
+        <cytobank_compensation_name>Spill_defaultCompensation</cytobank_compensation_name>
+        <cytobank_compensation_files>
+          <file>CytoTrol_CytoTrol_1.fcs</file>
+        </cytobank_compensation_files>
+      </cytobank>
+    </data-type:custom_info>
+    <transforms:fluorochromes>
+      <data-type:fcs-dimension data-type:name="Comp_B710-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G560-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R660-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V450-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V545-A" />
+    </transforms:fluorochromes>
+    <transforms:detectors>
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <data-type:fcs-dimension data-type:name="G560-A" />
+      <data-type:fcs-dimension data-type:name="G780-A" />
+      <data-type:fcs-dimension data-type:name="R660-A" />
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <data-type:fcs-dimension data-type:name="V450-A" />
+      <data-type:fcs-dimension data-type:name="V545-A" />
+    </transforms:detectors>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="9.47599997743964E-4" />
+      <transforms:coefficient transforms:value="0.0711700022220612" />
+      <transforms:coefficient transforms:value="0.0362400002777576" />
+      <transforms:coefficient transforms:value="0.180000007152557" />
+      <transforms:coefficient transforms:value="0.00710400007665157" />
+      <transforms:coefficient transforms:value="0.00760800018906593" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.11540000140667" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.00909700058400631" />
+      <transforms:coefficient transforms:value="0.00183600001037121" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0142799997702241" />
+      <transforms:coefficient transforms:value="0.0379999987781048" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="6.48099987301975E-4" />
+      <transforms:coefficient transforms:value="0.150000005960464" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00562100019305944" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.00660399999469519" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.178599998354912" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0353399999439716" />
+      <transforms:coefficient transforms:value="0.0102099999785423" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="-0.0599999986588955" />
+      <transforms:coefficient transforms:value="-0.0399999991059303" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.409999996423721" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00274899997748435" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="6.9630000507459E-4" />
+      <transforms:coefficient transforms:value="0.0350000001490116" />
+      <transforms:coefficient transforms:value="1.0" />
+    </transforms:spectrum>
+  </transforms:spectrumMatrix>
+  <transforms:spectrumMatrix transforms:id="Spill_405">
+    <data-type:custom_info>
+      <cytobank>
+        <cytobank_compensation_id>405</cytobank_compensation_id>
+        <cytobank_compensation_name>Spill_defaultCompensation</cytobank_compensation_name>
+        <cytobank_compensation_files>
+          <file>CytoTrol_CytoTrol_1.fcs</file>
+        </cytobank_compensation_files>
+      </cytobank>
+    </data-type:custom_info>
+    <transforms:fluorochromes>
+      <data-type:fcs-dimension data-type:name="Comp_B710-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G560-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R660-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V450-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V545-A" />
+    </transforms:fluorochromes>
+    <transforms:detectors>
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <data-type:fcs-dimension data-type:name="G560-A" />
+      <data-type:fcs-dimension data-type:name="G780-A" />
+      <data-type:fcs-dimension data-type:name="R660-A" />
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <data-type:fcs-dimension data-type:name="V450-A" />
+      <data-type:fcs-dimension data-type:name="V545-A" />
+    </transforms:detectors>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="9.47599997743964E-4" />
+      <transforms:coefficient transforms:value="0.0711700022220612" />
+      <transforms:coefficient transforms:value="0.0362400002777576" />
+      <transforms:coefficient transforms:value="0.180000007152557" />
+      <transforms:coefficient transforms:value="0.00710400007665157" />
+      <transforms:coefficient transforms:value="0.00760800018906593" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.11540000140667" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.00909700058400631" />
+      <transforms:coefficient transforms:value="0.00183600001037121" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0142799997702241" />
+      <transforms:coefficient transforms:value="0.0379999987781048" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="6.48099987301975E-4" />
+      <transforms:coefficient transforms:value="0.150000005960464" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00562100019305944" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.00660399999469519" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.178599998354912" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0353399999439716" />
+      <transforms:coefficient transforms:value="0.0102099999785423" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="-0.0599999986588955" />
+      <transforms:coefficient transforms:value="-0.0399999991059303" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.409999996423721" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00274899997748435" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="6.9630000507459E-4" />
+      <transforms:coefficient transforms:value="0.0350000001490116" />
+      <transforms:coefficient transforms:value="1.0" />
+    </transforms:spectrum>
+  </transforms:spectrumMatrix>
+  <transforms:spectrumMatrix transforms:id="Spill_406">
+    <data-type:custom_info>
+      <cytobank>
+        <cytobank_compensation_id>406</cytobank_compensation_id>
+        <cytobank_compensation_name>Spill_defaultCompensation</cytobank_compensation_name>
+        <cytobank_compensation_files>
+          <file>CytoTrol_CytoTrol_1.fcs</file>
+        </cytobank_compensation_files>
+      </cytobank>
+    </data-type:custom_info>
+    <transforms:fluorochromes>
+      <data-type:fcs-dimension data-type:name="Comp_B710-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G560-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R660-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V450-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V545-A" />
+    </transforms:fluorochromes>
+    <transforms:detectors>
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <data-type:fcs-dimension data-type:name="G560-A" />
+      <data-type:fcs-dimension data-type:name="G780-A" />
+      <data-type:fcs-dimension data-type:name="R660-A" />
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <data-type:fcs-dimension data-type:name="V450-A" />
+      <data-type:fcs-dimension data-type:name="V545-A" />
+    </transforms:detectors>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="9.47599997743964E-4" />
+      <transforms:coefficient transforms:value="0.0711700022220612" />
+      <transforms:coefficient transforms:value="0.0362400002777576" />
+      <transforms:coefficient transforms:value="0.180000007152557" />
+      <transforms:coefficient transforms:value="0.00710400007665157" />
+      <transforms:coefficient transforms:value="0.00760800018906593" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.11540000140667" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.00909700058400631" />
+      <transforms:coefficient transforms:value="0.00183600001037121" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0142799997702241" />
+      <transforms:coefficient transforms:value="0.0379999987781048" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="6.48099987301975E-4" />
+      <transforms:coefficient transforms:value="0.150000005960464" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00562100019305944" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.00660399999469519" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.178599998354912" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0353399999439716" />
+      <transforms:coefficient transforms:value="0.0102099999785423" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="-0.0599999986588955" />
+      <transforms:coefficient transforms:value="-0.0399999991059303" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.409999996423721" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00274899997748435" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="6.9630000507459E-4" />
+      <transforms:coefficient transforms:value="0.0350000001490116" />
+      <transforms:coefficient transforms:value="1.0" />
+    </transforms:spectrum>
+  </transforms:spectrumMatrix>
+  <transforms:spectrumMatrix transforms:id="Spill_407">
+    <data-type:custom_info>
+      <cytobank>
+        <cytobank_compensation_id>407</cytobank_compensation_id>
+        <cytobank_compensation_name>Spill_defaultCompensation</cytobank_compensation_name>
+        <cytobank_compensation_files>
+          <file>CytoTrol_CytoTrol_1.fcs</file>
+        </cytobank_compensation_files>
+      </cytobank>
+    </data-type:custom_info>
+    <transforms:fluorochromes>
+      <data-type:fcs-dimension data-type:name="Comp_B710-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G560-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R660-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V450-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V545-A" />
+    </transforms:fluorochromes>
+    <transforms:detectors>
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <data-type:fcs-dimension data-type:name="G560-A" />
+      <data-type:fcs-dimension data-type:name="G780-A" />
+      <data-type:fcs-dimension data-type:name="R660-A" />
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <data-type:fcs-dimension data-type:name="V450-A" />
+      <data-type:fcs-dimension data-type:name="V545-A" />
+    </transforms:detectors>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="9.47599997743964E-4" />
+      <transforms:coefficient transforms:value="0.0711700022220612" />
+      <transforms:coefficient transforms:value="0.0362400002777576" />
+      <transforms:coefficient transforms:value="0.180000007152557" />
+      <transforms:coefficient transforms:value="0.00710400007665157" />
+      <transforms:coefficient transforms:value="0.00760800018906593" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.11540000140667" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.00909700058400631" />
+      <transforms:coefficient transforms:value="0.00183600001037121" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0142799997702241" />
+      <transforms:coefficient transforms:value="0.0379999987781048" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="6.48099987301975E-4" />
+      <transforms:coefficient transforms:value="0.150000005960464" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00562100019305944" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.00660399999469519" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.178599998354912" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0353399999439716" />
+      <transforms:coefficient transforms:value="0.0102099999785423" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="-0.0599999986588955" />
+      <transforms:coefficient transforms:value="-0.0399999991059303" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.409999996423721" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00274899997748435" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="6.9630000507459E-4" />
+      <transforms:coefficient transforms:value="0.0350000001490116" />
+      <transforms:coefficient transforms:value="1.0" />
+    </transforms:spectrum>
+  </transforms:spectrumMatrix>
+  <transforms:spectrumMatrix transforms:id="Spill_408">
+    <data-type:custom_info>
+      <cytobank>
+        <cytobank_compensation_id>408</cytobank_compensation_id>
+        <cytobank_compensation_name>Spill_defaultCompensation</cytobank_compensation_name>
+        <cytobank_compensation_files>
+          <file>CytoTrol_CytoTrol_1.fcs</file>
+        </cytobank_compensation_files>
+      </cytobank>
+    </data-type:custom_info>
+    <transforms:fluorochromes>
+      <data-type:fcs-dimension data-type:name="Comp_B710-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G560-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R660-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V450-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V545-A" />
+    </transforms:fluorochromes>
+    <transforms:detectors>
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <data-type:fcs-dimension data-type:name="G560-A" />
+      <data-type:fcs-dimension data-type:name="G780-A" />
+      <data-type:fcs-dimension data-type:name="R660-A" />
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <data-type:fcs-dimension data-type:name="V450-A" />
+      <data-type:fcs-dimension data-type:name="V545-A" />
+    </transforms:detectors>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="9.47599997743964E-4" />
+      <transforms:coefficient transforms:value="0.0711700022220612" />
+      <transforms:coefficient transforms:value="0.0362400002777576" />
+      <transforms:coefficient transforms:value="0.180000007152557" />
+      <transforms:coefficient transforms:value="0.00710400007665157" />
+      <transforms:coefficient transforms:value="0.00760800018906593" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.11540000140667" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.00909700058400631" />
+      <transforms:coefficient transforms:value="0.00183600001037121" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0142799997702241" />
+      <transforms:coefficient transforms:value="0.0379999987781048" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="6.48099987301975E-4" />
+      <transforms:coefficient transforms:value="0.150000005960464" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00562100019305944" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.00660399999469519" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.178599998354912" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0353399999439716" />
+      <transforms:coefficient transforms:value="0.0102099999785423" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="-0.0599999986588955" />
+      <transforms:coefficient transforms:value="-0.0399999991059303" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.409999996423721" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00274899997748435" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="6.9630000507459E-4" />
+      <transforms:coefficient transforms:value="0.0350000001490116" />
+      <transforms:coefficient transforms:value="1.0" />
+    </transforms:spectrum>
+  </transforms:spectrumMatrix>
+  <transforms:spectrumMatrix transforms:id="Spill_409">
+    <data-type:custom_info>
+      <cytobank>
+        <cytobank_compensation_id>409</cytobank_compensation_id>
+        <cytobank_compensation_name>Spill_defaultCompensation</cytobank_compensation_name>
+        <cytobank_compensation_files>
+          <file>CytoTrol_CytoTrol_1.fcs</file>
+        </cytobank_compensation_files>
+      </cytobank>
+    </data-type:custom_info>
+    <transforms:fluorochromes>
+      <data-type:fcs-dimension data-type:name="Comp_B710-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G560-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R660-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V450-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V545-A" />
+    </transforms:fluorochromes>
+    <transforms:detectors>
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <data-type:fcs-dimension data-type:name="G560-A" />
+      <data-type:fcs-dimension data-type:name="G780-A" />
+      <data-type:fcs-dimension data-type:name="R660-A" />
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <data-type:fcs-dimension data-type:name="V450-A" />
+      <data-type:fcs-dimension data-type:name="V545-A" />
+    </transforms:detectors>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="9.47599997743964E-4" />
+      <transforms:coefficient transforms:value="0.0711700022220612" />
+      <transforms:coefficient transforms:value="0.0362400002777576" />
+      <transforms:coefficient transforms:value="0.180000007152557" />
+      <transforms:coefficient transforms:value="0.00710400007665157" />
+      <transforms:coefficient transforms:value="0.00760800018906593" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.11540000140667" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.00909700058400631" />
+      <transforms:coefficient transforms:value="0.00183600001037121" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0142799997702241" />
+      <transforms:coefficient transforms:value="0.0379999987781048" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="6.48099987301975E-4" />
+      <transforms:coefficient transforms:value="0.150000005960464" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00562100019305944" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.00660399999469519" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.178599998354912" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0353399999439716" />
+      <transforms:coefficient transforms:value="0.0102099999785423" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="-0.0599999986588955" />
+      <transforms:coefficient transforms:value="-0.0399999991059303" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.409999996423721" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00274899997748435" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="6.9630000507459E-4" />
+      <transforms:coefficient transforms:value="0.0350000001490116" />
+      <transforms:coefficient transforms:value="1.0" />
+    </transforms:spectrum>
+  </transforms:spectrumMatrix>
+  <transforms:spectrumMatrix transforms:id="Spill_410">
+    <data-type:custom_info>
+      <cytobank>
+        <cytobank_compensation_id>410</cytobank_compensation_id>
+        <cytobank_compensation_name>Spill_defaultCompensation</cytobank_compensation_name>
+        <cytobank_compensation_files>
+          <file>CytoTrol_CytoTrol_1.fcs</file>
+        </cytobank_compensation_files>
+      </cytobank>
+    </data-type:custom_info>
+    <transforms:fluorochromes>
+      <data-type:fcs-dimension data-type:name="Comp_B710-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G560-A" />
+      <data-type:fcs-dimension data-type:name="Comp_G780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R660-A" />
+      <data-type:fcs-dimension data-type:name="Comp_R780-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V450-A" />
+      <data-type:fcs-dimension data-type:name="Comp_V545-A" />
+    </transforms:fluorochromes>
+    <transforms:detectors>
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <data-type:fcs-dimension data-type:name="G560-A" />
+      <data-type:fcs-dimension data-type:name="G780-A" />
+      <data-type:fcs-dimension data-type:name="R660-A" />
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <data-type:fcs-dimension data-type:name="V450-A" />
+      <data-type:fcs-dimension data-type:name="V545-A" />
+    </transforms:detectors>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="9.47599997743964E-4" />
+      <transforms:coefficient transforms:value="0.0711700022220612" />
+      <transforms:coefficient transforms:value="0.0362400002777576" />
+      <transforms:coefficient transforms:value="0.180000007152557" />
+      <transforms:coefficient transforms:value="0.00710400007665157" />
+      <transforms:coefficient transforms:value="0.00760800018906593" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.11540000140667" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.00909700058400631" />
+      <transforms:coefficient transforms:value="0.00183600001037121" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0142799997702241" />
+      <transforms:coefficient transforms:value="0.0379999987781048" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="6.48099987301975E-4" />
+      <transforms:coefficient transforms:value="0.150000005960464" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00562100019305944" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.00660399999469519" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.178599998354912" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0353399999439716" />
+      <transforms:coefficient transforms:value="0.0102099999785423" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="-0.0599999986588955" />
+      <transforms:coefficient transforms:value="-0.0399999991059303" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="1.0" />
+      <transforms:coefficient transforms:value="0.409999996423721" />
+    </transforms:spectrum>
+    <transforms:spectrum>
+      <transforms:coefficient transforms:value="0.00274899997748435" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="0.0" />
+      <transforms:coefficient transforms:value="6.9630000507459E-4" />
+      <transforms:coefficient transforms:value="0.0350000001490116" />
+      <transforms:coefficient transforms:value="1.0" />
+    </transforms:spectrum>
+  </transforms:spectrumMatrix>
+  <transforms:transformation transforms:id="Tr_Log_150">
+    <transforms:flog transforms:T="1.0" transforms:M="1.0" />
+  </transforms:transformation>
+  <gating:EllipsoidGate gating:id="Gate_59484_Y2Qz">
+    <data-type:custom_info>
+      <cytobank>
+        <name>cd3</name>
+        <id>59484</id>
+        <gate_id>1</gate_id>
+        <type>EllipseGate</type>
+        <version>37</version>
+        <compensation_id>-2</compensation_id>
+        <fcs_file_id />
+        <tailored>false</tailored>
+        <tailored_per_population>false</tailored_per_population>
+        <tailored_per_population_gateset_id />
+        <fcs_file_filename />
+        <definition>{"scale":{"x":{"flag":2,"argument":"150","min":1.0,"max":262144.0,"bins":256,"size":256},"y":{"flag":1,"argument":"1","min":1.0,"max":262144.0,"bins":256,"size":256}},"positive":false,"negative":false,"label":[4.120667720469942,67894.30689807271],"ellipse":{"center":[3.7319879991914764,102772.11167791954],"major":122809.22489246068,"minor":1.8996394869445326,"angle":1.5707946260027965}}</definition>
+      </cytobank>
+    </data-type:custom_info>
+    <gating:dimension gating:compensation-ref="FCS" gating:transformation-ref="Tr_Log_150">
+      <data-type:fcs-dimension data-type:name="V450-A" />
+    </gating:dimension>
+    <gating:dimension gating:compensation-ref="FCS">
+      <data-type:fcs-dimension data-type:name="FSC-A" />
+    </gating:dimension>
+    <gating:mean>
+      <gating:coordinate data-type:value="4.731987999191476" />
+      <gating:coordinate data-type:value="102772.11167791954" />
+    </gating:mean>
+    <gating:covarianceMatrix>
+      <gating:row>
+        <gating:entry data-type:value="0.9130645233914847" />
+        <gating:entry data-type:value="6412.881563282937" />
+      </gating:row>
+      <gating:row>
+        <gating:entry data-type:value="6412.881563282937" />
+        <gating:entry data-type:value="3.7705264296608396E9" />
+      </gating:row>
+    </gating:covarianceMatrix>
+    <gating:distanceSquare data-type:value="1.0" />
+  </gating:EllipsoidGate>
+  <gating:QuadrantGate gating:id="Gate_59489_dHN1Yg..">
+    <data-type:custom_info>
+      <cytobank>
+        <name>tsub</name>
+        <id>59489</id>
+        <gate_id>6</gate_id>
+        <type>QuadrantGate</type>
+        <version>37</version>
+        <compensation_id>-2</compensation_id>
+        <fcs_file_id />
+        <tailored>false</tailored>
+        <tailored_per_population>false</tailored_per_population>
+        <tailored_per_population_gateset_id />
+        <fcs_file_filename />
+        <definition>{"scale":{"x":{"flag":2,"argument":"150","min":1.0,"max":262144.0,"bins":256,"size":256},"y":{"flag":2,"argument":"150","min":1.0,"max":262144.0,"bins":256,"size":256}},"positive":false,"negative":false,"labels":[[4.749067808042575,5.103508531140518],[0.8368401423863568,5.103508531140518],[0.8368401423863568,0.4200418544148574],[4.749067808042575,0.4200418544148574]],"quadrant":{"x":3.2555042882913,"y":3.9063892460581737,"angles":[0.0,1.5707963267948966,3.141592653589793,4.71238898038469],"UR":2,"UL":3,"LL":4,"LR":5}}</definition>
+      </cytobank>
+    </data-type:custom_info>
+    <gating:divider gating:id="Gate_59489_dHN1Yg..divider_1" gating:compensation-ref="FCS" gating:transformation-ref="Tr_Log_150">
+      <data-type:fcs-dimension data-type:name="B710-A" />
+      <gating:value>4.2555042882913</gating:value>
+    </gating:divider>
+    <gating:divider gating:id="Gate_59489_dHN1Yg..divider_2" gating:compensation-ref="FCS" gating:transformation-ref="Tr_Log_150">
+      <data-type:fcs-dimension data-type:name="R780-A" />
+      <gating:value>4.906389246058174</gating:value>
+    </gating:divider>
+    <gating:Quadrant gating:id="Gate_59485_dHN1YiBVUg..">
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_1" gating:location="5.2555042882913" />
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_2" gating:location="5.906389246058174" />
+    </gating:Quadrant>
+    <gating:Quadrant gating:id="Gate_59486_dHN1YiBVTA..">
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_1" gating:location="3.2555042882913003" />
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_2" gating:location="5.906389246058174" />
+    </gating:Quadrant>
+    <gating:Quadrant gating:id="Gate_59487_dHN1YiBMTA..">
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_1" gating:location="3.2555042882913003" />
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_2" gating:location="3.9063892460581737" />
+    </gating:Quadrant>
+    <gating:Quadrant gating:id="Gate_59488_dHN1YiBMUg..">
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_1" gating:location="5.2555042882913" />
+      <gating:position gating:divider_ref="Gate_59489_dHN1Yg..divider_2" gating:location="3.9063892460581737" />
+    </gating:Quadrant>
+  </gating:QuadrantGate>
+  <gating:BooleanGate gating:id="GateSet_28056">
+    <data-type:custom_info>
+      <cytobank>
+        <name>cd3</name>
+        <id>28056</id>
+        <gate_set_id>9</gate_set_id>
+        <version>37</version>
+        <tailored_per_population>false</tailored_per_population>
+        <definition>{"gates":[1],"negGates":[],"tailoredPerPopulation":{}}</definition>
+      </cytobank>
+    </data-type:custom_info>
+    <gating:and>
+      <gating:gateReference gating:ref="Gate_59484_Y2Qz" />
+      <!-- Boolean "and" gates are used to describe Cytobank's populations (gate sets). Here, we only have one gate defining the population, but Gating-ML requires at least two arguments for the "and" gate. Therefore, we are referencing the same gate twice. -->
+      <gating:gateReference gating:ref="Gate_59484_Y2Qz" />
+    </gating:and>
+  </gating:BooleanGate>
+  <gating:BooleanGate gating:id="GateSet_28057">
+    <data-type:custom_info>
+      <cytobank>
+        <name>tsub UR</name>
+        <id>28057</id>
+        <gate_set_id>10</gate_set_id>
+        <version>37</version>
+        <tailored_per_population>false</tailored_per_population>
+        <definition>{"gates":[1,2],"negGates":[],"tailoredPerPopulation":{}}</definition>
+      </cytobank>
+    </data-type:custom_info>
+    <gating:and>
+      <gating:gateReference gating:ref="Gate_59484_Y2Qz" />
+      <gating:gateReference gating:ref="Gate_59485_dHN1YiBVUg.." />
+    </gating:and>
+  </gating:BooleanGate>
+  <gating:BooleanGate gating:id="GateSet_28058">
+    <data-type:custom_info>
+      <cytobank>
+        <name>tsub UL</name>
+        <id>28058</id>
+        <gate_set_id>11</gate_set_id>
+        <version>37</version>
+        <tailored_per_population>false</tailored_per_population>
+        <definition>{"gates":[1,3],"negGates":[],"tailoredPerPopulation":{}}</definition>
+      </cytobank>
+    </data-type:custom_info>
+    <gating:and>
+      <gating:gateReference gating:ref="Gate_59484_Y2Qz" />
+      <gating:gateReference gating:ref="Gate_59486_dHN1YiBVTA.." />
+    </gating:and>
+  </gating:BooleanGate>
+  <gating:BooleanGate gating:id="GateSet_28059">
+    <data-type:custom_info>
+      <cytobank>
+        <name>tsub LL</name>
+        <id>28059</id>
+        <gate_set_id>12</gate_set_id>
+        <version>37</version>
+        <tailored_per_population>false</tailored_per_population>
+        <definition>{"gates":[1,4],"negGates":[],"tailoredPerPopulation":{}}</definition>
+      </cytobank>
+    </data-type:custom_info>
+    <gating:and>
+      <gating:gateReference gating:ref="Gate_59484_Y2Qz" />
+      <gating:gateReference gating:ref="Gate_59487_dHN1YiBMTA.." />
+    </gating:and>
+  </gating:BooleanGate>
+  <gating:BooleanGate gating:id="GateSet_28060">
+    <data-type:custom_info>
+      <cytobank>
+        <name>tsub LR</name>
+        <id>28060</id>
+        <gate_set_id>13</gate_set_id>
+        <version>37</version>
+        <tailored_per_population>false</tailored_per_population>
+        <definition>{"gates":[1,5],"negGates":[],"tailoredPerPopulation":{}}</definition>
+      </cytobank>
+    </data-type:custom_info>
+    <gating:and>
+      <gating:gateReference gating:ref="Gate_59484_Y2Qz" />
+      <gating:gateReference gating:ref="Gate_59488_dHN1YiBMUg.." />
+    </gating:and>
+  </gating:BooleanGate>
+</gating:Gating-ML>
+

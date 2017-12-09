@@ -53,7 +53,7 @@ compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population")){
   #load stats from cytobank
   id.vars <- match.arg(id.vars)
   variable.name <- ifelse(id.vars == "population", "FCS Filename", "population")
-  cytobank_counts <- fread(file, stringsAsFactors = FALSE)
+  cytobank_counts <- fread(file, stringsAsFactors = FALSE, blank.lines.skip = TRUE)
 
   if(id.vars == "population"){
     #modify column name because cytobank always put FCS filename

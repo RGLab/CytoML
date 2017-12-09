@@ -41,6 +41,23 @@ test_that("gatingML-cytobank parsing: cytotrol tcell",{
 
 
 })
+
+test_that("gatingML-cytobank parsing: cytotrol tcell--logtGml",{
+  xmlfile <- system.file("extdata/logtGml.xml", package = "CytoML")
+
+  gs1 <- cytobank2GatingSet(xmlfile, fcsFiles)
+
+  #' ## verify the stats are correct
+  statsfile <- system.file("extdata/cytotrol_tcell_cytobank_logt_counts.csv", package = "CytoML")
+  dt_merged <- compare.counts(gs1, statsfile, id.vars = "population")
+
+  expect_equal(nrow(dt_merged), 5)
+  expect_equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
+
+
+
+})
+
 test_that("gatingML-cytobank exporting: cytotrol tcell",{
 
   #export the gs_orig to xml

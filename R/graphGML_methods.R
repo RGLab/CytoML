@@ -303,6 +303,8 @@ setMethod("getTransformations", signature = c(x = "graphGML"), function(x){
         trans.obj <- asinhtGml2_trans(thisTrans@T, thisTrans@M, thisTrans@A)
       }else if(extends(trans.type, "logicletGml2")){
         trans.obj <- logicleGml2_trans(thisTrans@T, thisTrans@M, thisTrans@W, thisTrans@A)
+      }else if(extends(trans.type, "logtGml2")){
+        trans.obj <- logtGml2_trans(thisTrans@T, thisTrans@M)
       }else
         stop("Don't know how to inverse transformation: ", trans.type)
 

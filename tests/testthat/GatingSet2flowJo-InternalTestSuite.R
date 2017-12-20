@@ -33,7 +33,6 @@ test_that("OrNode ",{
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
   stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
-
 })
 
 
@@ -111,7 +110,8 @@ test_that("GatingSet2flowJo: no comp + fasinh ",{
 
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name = 1, subset = 3, sampNloc = "sampleNode", additional.keys = NULL)
-  stats.orig <- getPopStats(gs[[1]])
+  stats.orig <- getPopStats(gs[[1]])[order(node), list(node, openCyto.count)]
+
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -119,8 +119,8 @@ test_that("GatingSet2flowJo: no comp + fasinh ",{
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode", additional.keys = NULL)
-  stats.new <- getPopStats(gs1[[1]])
-  expect_equal(stats.orig, stats.new, tol = 2e-2)
+  stats.new <- getPopStats(gs1[[1]])[order(node), list(node, openCyto.count)]
+  expect_equal(stats.orig, stats.new)
 })
 
 test_that("GatingSet2flowJo: no transformation",{

@@ -75,7 +75,7 @@ setMethod("getSampleGroups","divaWorkspace",function(x){
         xpathApply(x@doc, "/bdfacs/experiment/specimen",function(specimen){
               samples <- xpathApply(specimen, "tube",function(tube){
                                             c(tube = xmlGetAttr(tube,"name")
-                                                , sampleName = xmlValue(xmlElementsByTagName(tube,"data_filename")[[1]])
+                                                , name = xmlValue(xmlElementsByTagName(tube,"data_filename")[[1]])
                                             )
                                   })
 
@@ -157,7 +157,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     sg <- sg[subset, ]
 
   #check if there are samples to parse
-  sn <- sg[["sampleName"]]
+  sn <- sg[["name"]]
   nSample <- length(sn)
   if(nSample == 0)
     stop("No samples in this workspace to parse!")
@@ -419,7 +419,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         if(parent == "root")
           parent <- ""
         unique.path <- file.path(parent, nodeName)
-        recompute(gh, unique.path)
+        suppressMessages(recompute(gh, unique.path))
         #save the xml counts
         set.count.xml(gh, unique.path, count)
       }else{

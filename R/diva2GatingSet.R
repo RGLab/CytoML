@@ -227,12 +227,14 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     stop("not sample to be added to GatingSet!")
 
   #load the raw data from FCS
-  fs <- read.ncdfFlowSet(files,isWriteSlice=FALSE,...)
+  fs <- read.ncdfFlowSet(files,isWriteSlice=TRUE,...)
+  cnd <- colnames(fs)
 
   rootDoc <- ws@doc
 
   xpathGroup <- paste0("/bdfacs/experiment/specimen[@name='", groupName, "']")
-  biexp_list <- new.env(parent = emptyenv())
+  # parse compp & trans
+  translist <- complist <- list()
   for(file in files)
   {
 
@@ -270,23 +272,14 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         }, biexp_para = biexp_para)
         #comp stored in xml seems to be incorrect
 
-        # comp <- unlist(comp, recur = F)
-        # comp <- data.frame(comp, check.names = F)
-        # comp <- t(comp)
-        # colnames(comp) <- rownames(comp)
-        # comp <- compensation(comp)
-
-
         ##################################
-        #Compensating the data
+        #parse comp
         ##################################
 
-        cnd <- colnames(fs)
-
-        message("loading data: ",file);
-        data <- read.FCS(file)[, cnd]
-
-        message("Compensating");
+        data <- fs[[sampleName]]
+        # message("loading data: ",file);
+        # data <- read.FCS(file)[, cnd]
+        #
         #we use the spillover from FCS keyword
         comp <- spillover(data)
         comp <- compact(comp)
@@ -295,13 +288,9 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         else if(length(comp) == 0)
           stop("No spillover found in FCS!")
         else
-          comp <- comp[[1]]
-        data <- compensate(data,comp)
+          complist[[sampleName]] <- comp[[1]]
 
-
-
-        message(paste("transforming ..."))
-
+        #parse trans
         params <- names(biexp_para)
         # browser()
         #transform data in default flowCore logicle scale
@@ -316,25 +305,27 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           w <- (pos - log10(maxValue/r))/2
           if(w < 0)
             w <- 0
-          lgclObj  <- logicleTransform(w=w, t = maxValue, m = pos) #
+          logicle_trans(w=w, t = maxValue, m = pos) #
+
                     }
           , simplify = FALSE)
-        translist <- transformList(params, trans)
-        data <- transform(data, translist)
 
-        # browser()
-        fs[[sampleName]] <- data
-
-        biexp_list[[sampleName]] <- trans
+        translist[[sampleName]] <- transformerList(params, trans)
 
     }
 
 
   gs <- GatingSet(fs)
-  message("parsing gates ...")
+  message("Compensating");
+  gs <- compensate(gs, complist)
+
+  message(paste("transforming ..."))
+  gs <- transform(gs, translist)
+
+    message("parsing gates ...")
   for(sn in sampleNames(gs)){
     gh <- gs[[sn]]
-    this_biexp <- biexp_list[[sn]]
+    this_biexp <- translist[[sn]]
     xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
     sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
     #assume the gates listed in xml follows the topological order
@@ -365,8 +356,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         is.y.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_y_parameter_scaled")[[1]]))
 
 
-        x_biexp <- this_biexp[[xParam]]
-        y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]]
+        x_biexp <- this_biexp[[xParam]][["transform"]]
+        y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]][["transform"]]
         #the gate may be either stored as simple log or 4096 scale
         #we need to rescale them to the data scale (i.e. 4.5 )
         if(!is.null(x_biexp)){#when channel is logicle scale

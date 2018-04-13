@@ -10,7 +10,7 @@ test_that("PE_2", {
   sg <- getSampleGroups(ws)
   expect_is(sg, "data.frame")
   expect_equal(sg[["tube"]], c('Unstained Control','FITC Stained Control','PE Stained Control','PerCP-Cy5-5 Stained Control','PE-Cy7 Stained Control','APC Stained Control','APC-Cy7 Stained Control','Bd Horizon V450 Stained Control','Pacific Orange Stained Control','_001','_002','_003','_004'))
-  expect_equal(sg[["sampleName"]], c('124480.fcs','124483.fcs','124485.fcs','124487.fcs','124489.fcs','124491.fcs','124493.fcs','124495.fcs','124497.fcs','124500.fcs','124502.fcs','124504.fcs','124506.fcs'))
+  expect_equal(sg[["name"]], c('124480.fcs','124483.fcs','124485.fcs','124487.fcs','124489.fcs','124491.fcs','124493.fcs','124495.fcs','124497.fcs','124500.fcs','124502.fcs','124504.fcs','124506.fcs'))
   expect_equal(unique(sg[["specimen"]]), c("Compensation Controls", "PE"))
   paste(sg[["sampleName"]], collapse = "','")
   # getSamples(ws)

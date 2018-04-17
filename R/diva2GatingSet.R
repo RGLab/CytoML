@@ -233,7 +233,15 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
   rootDoc <- ws@doc
 
   xpathGroup <- paste0("/bdfacs/experiment/specimen[@name='", groupName, "']")
-  # parse compp & trans
+  #determine the magic number to replace neg value for log10 trans
+  log_decade <- xmlValue(rootDoc[["/bdfacs/experiment/log_decades"]])
+  if(log_decade == "4")
+    min_val <- 26
+  else if(log_decade == "5")
+    min_val <- 2.6
+  else
+    stop("unsupported decade: ", log_decade)
+   # parse compp & trans
   translist <- complist <- list()
   for(file in files)
   {
@@ -293,7 +301,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         #parse trans
         params <- names(biexp_para)
         # browser()
-        #transform data in default flowCore logicle scale
+        #transform data in default flowCore logicle or log10 scale
         trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
           maxValue <- 262144#TODO:this_para[["max"]]^10
@@ -316,8 +324,11 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
   gs <- GatingSet(fs)
-  message("Compensating");
+  message("Compensating")
   gs <- compensate(gs, complist)
+
+  message("computing data range")
+  data.ranges <- sapply(sampleNames(gs), function(sn)range(getData(gs[[sn]]), "data"), simplify = FALSE)
 
   message(paste("transforming ..."))
   gs <- transform(gs, translist)
@@ -325,6 +336,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     message("parsing gates ...")
   for(sn in sampleNames(gs)){
     gh <- gs[[sn]]
+
     this_biexp <- translist[[sn]]
     xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
     sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
@@ -360,6 +372,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]][["transform"]]
         #the gate may be either stored as simple log or 4096 scale
         #we need to rescale them to the data scale (i.e. 4.5 )
+        bound <- matrix(c(-Inf,Inf,-Inf,Inf), byrow = TRUE, nrow = 2, dimnames = list(c(xParam, yParam), c("min", "max")))
+        x.extend <- y.extend <- FALSE
         if(!is.null(x_biexp)){#when channel is logicle scale
           if(is.x.scaled)#if the gate is scaled to 4096
             mat[1, ] <- mat[1, ]/4096 * 4.5
@@ -367,8 +381,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           {
             #restore to raw scale
             mat[1, ] <- 10 ^ mat[1, ]
-            #logicle transform it to data scale
-            mat[1, ] <- x_biexp@.Data(mat[1, ])
+            #set flag to trigger gate extension later
+            x.extend <- TRUE
           }
 
         }
@@ -379,8 +393,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           {
             #restore to raw scale
             mat[2, ] <- 10 ^ mat[2, ]
-            #logicle transform it to data scale
-            mat[2, ] <- y_biexp@.Data(mat[2, ])
+            y.extend <- TRUE
+
+            # #logicle transform it to data scale
+            # mat[2, ] <- y_biexp@.Data(mat[2, ])
           }
 
         }
@@ -403,6 +419,23 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           gate <- rectangleGate(coord)
         }else
           stop("unsupported gate type: ", gType)
+
+        #deal with the off threshold data truncation in log10 scale scenario
+        #we do gate extention instead to keep transformation consistent across gates(i.e always use biexp)
+        if(x.extend||y.extend)
+        {
+          if(x.extend)
+            bound[xParam, ] <- c(min_val, 262143)
+          if(y.extend)
+            bound[yParam, ] <- c(min_val, 262143)
+          gate <- extend(gate, bound, t(data.ranges[[sn]]))
+          #need transform since extention was performed on the raw-scale gate
+          if(x.extend)
+            gate <- transform(gate, x_biexp@.Data, xParam)
+          if(y.extend)
+            gate <- transform(gate, y_biexp@.Data, yParam)
+        }
+
 
 
 

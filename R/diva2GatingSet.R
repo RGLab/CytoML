@@ -255,6 +255,9 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
         # get comp & param for biexp
         biexp_para <- new.env(parent = emptyenv())
+        use_auto_biexp_scale <- as.logical(xmlValue(sampleNode[["instrument_settings"]][["use_auto_biexp_scale"]]))
+        biexp_scale_node <- ifelse(use_auto_biexp_scale, "comp_biexp_scale", "manual_biexp_scale")
+
         comp <- xpathApply(sampleNode, "instrument_settings/parameter", function(paramNode, biexp_para){
 
           paramName <- xmlGetAttr(paramNode, "name")
@@ -266,7 +269,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
             biexp_para[[paramName]] <- c(min = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "min")[[1]]))
                                           , max = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "max")[[1]]))
-                                          , biexp_scale = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "comp_biexp_scale")[[1]]))
+                                          , biexp_scale = as.numeric(xmlValue(xmlElementsByTagName(paramNode, biexp_scale_node)[[1]]))
                                           )
             #get comp
             coef <- as.numeric(xpathSApply(paramNode, "compensation/compensation_coefficient", xmlValue))
@@ -374,32 +377,48 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         #we need to rescale them to the data scale (i.e. 4.5 )
         bound <- matrix(c(-Inf,Inf,-Inf,Inf), byrow = TRUE, nrow = 2, dimnames = list(c(xParam, yParam), c("min", "max")))
         x.extend <- y.extend <- FALSE
-        if(!is.null(x_biexp)){#when channel is logicle scale
-          if(is.x.scaled)#if the gate is scaled to 4096
-            mat[1, ] <- mat[1, ]/4096 * 4.5
-          else #it was in log scale
+        if(is.x.scaled)#if the gate is scaled to 4096
+        {
+          mat[1, ] <- mat[1, ]/4096
+          if(!is.null(x_biexp))
+          {
+            #when channel is logicle scale
+            mat[1, ] <- mat[1, ] * 4.5
+          }
+          else
+            mat[1, ] <- mat[1, ] * 262144
+        }else
+        {
+          if(!is.null(x_biexp))#it was in log scale
           {
             #restore to raw scale
             mat[1, ] <- 10 ^ mat[1, ]
             #set flag to trigger gate extension later
             x.extend <- TRUE
           }
-
         }
-        if(!is.null(y_biexp)){#when channel is logicle scale
-          if(is.y.scaled)#if the gate is scaled to 4096
-            mat[2, ] <- mat[2, ]/4096 * 4.5
-          else #it was in log scale
+
+        if(is.y.scaled)#if the gate is scaled to 4096
+        {
+          mat[2, ] <- mat[2, ]/4096
+          if(!is.null(y_biexp))
+          {
+            #when channel is logicle scale
+            mat[2, ] <- mat[2, ] * 4.5
+          }
+          else
+            mat[2, ] <- mat[2, ] * 262144
+        }else
+        {
+          if(!is.null(y_biexp))#it was in log scale
           {
             #restore to raw scale
             mat[2, ] <- 10 ^ mat[2, ]
+            #set flag to trigger gate extension later
             y.extend <- TRUE
-
-            # #logicle transform it to data scale
-            # mat[2, ] <- y_biexp@.Data(mat[2, ])
           }
-
         }
+
 
         if(gType == "RECTANGLE_REGION"){
           x <- unique(mat[1,])

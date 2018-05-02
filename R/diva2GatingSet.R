@@ -184,8 +184,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
 #' @importFrom flowWorkspace set.count.xml
-.parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName,...){
+#' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
+.parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, ...){
 
+  scale_level <- match.arg(scale_level, c("gate", "tube"))
   if(!file.exists(xmlFileName))
     stop(xmlFileName," not found!")
 #  gs <- new("GatingSet", guid = .uuid_gen(), flag = FALSE)
@@ -310,14 +312,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           maxValue <- 262144#TODO:this_para[["max"]]^10
           pos <- 4.5
           r <- abs(this_para[["biexp_scale"]])
-          if(r == 0)
-            r <- 262144/10^4.5
-
-          w <- (pos - log10(maxValue/r))/2
-          if(w < 0)
-            w <- 0
-          logicle_trans(w=w, t = maxValue, m = pos) #
-
+          trans <- generate_trans(maxValue, pos, r)
                     }
           , simplify = FALSE)
 
@@ -351,6 +346,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
       nodeName <- xmlGetAttr(gateNode, "fullname")
       nodeName <- gsub("\\\\", "/", nodeName)
       nodeName <- basename(nodeName)
+      if(verbose)
+        message(nodeName)
       count <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]]))
       parent <- xmlElementsByTagName(gateNode, "parent")
       if(length(parent) > 0){
@@ -370,6 +367,9 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         is.x.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_x_parameter_scaled")[[1]]))
         is.y.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_y_parameter_scaled")[[1]]))
 
+        x_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "x_parameter_scale_value")[[1]]))
+        y_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "y_parameter_scale_value")[[1]]))
+
 
         x_biexp <- this_biexp[[xParam]][["transform"]]
         y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]][["transform"]]
@@ -383,7 +383,14 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           if(!is.null(x_biexp))
           {
             #when channel is logicle scale
-            mat[1, ] <- mat[1, ] * 4.5
+            mat[1, ] <- mat[1, ] * 4.5 # restore it to te logicle scale
+            #rescale gate to data scale
+            if(scale_level=="gate")
+            {
+              trans.gate <- generate_trans(r = x_parameter_scale_value)
+              mat[1, ] <- trans.gate$inverse(mat[1, ])
+              mat[1, ] <- x_biexp(mat[1, ])
+            }
           }
           else
             mat[1, ] <- mat[1, ] * 262144
@@ -405,6 +412,13 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           {
             #when channel is logicle scale
             mat[2, ] <- mat[2, ] * 4.5
+            #rescale gate to data scale
+            if(scale_level=="gate")
+            {
+              trans.gate <- generate_trans(r = y_parameter_scale_value)
+              mat[2, ] <- trans.gate$inverse(mat[2, ])
+              mat[2, ] <- y_biexp(mat[2, ])
+            }
           }
           else
             mat[2, ] <- mat[2, ] * 262144
@@ -505,3 +519,13 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 }
 
+#use the equation suggested by BD engineer last year
+generate_trans <- function(maxValue = 262144, pos = 4.5, r)
+{
+  if(r == 0)
+    r <- maxValue/10^pos
+  w <- (pos - log10(maxValue/r))/2
+  if(w < 0)
+    w <- 0
+  logicle_trans(w=w, t = maxValue, m = pos) #
+}

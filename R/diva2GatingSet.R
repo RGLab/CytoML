@@ -375,7 +375,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]][["transform"]]
         #the gate may be either stored as simple log or 4096 scale
         #we need to rescale them to the data scale (i.e. 4.5 )
-        bound <- matrix(c(-Inf,Inf,-Inf,Inf), byrow = TRUE, nrow = 2, dimnames = list(c(xParam, yParam), c("min", "max")))
+        if(is.null(yParam))
+          bound <- matrix(c(-Inf,Inf), byrow = TRUE, nrow = 1, dimnames = list(c(xParam), c("min", "max")))
+        else
+          bound <- matrix(c(-Inf,Inf,-Inf,Inf), byrow = TRUE, nrow = 2, dimnames = list(c(xParam, yParam), c("min", "max")))
         x.extend <- y.extend <- FALSE
         if(is.x.scaled)#if the gate is scaled to 4096
         {

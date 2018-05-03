@@ -23,7 +23,7 @@ test_that("autogating--tcell", {
   tbl[5, gating_args:= "gate_range = c(1e3, 3e3)"]
   tbl[c(8,11), gating_args:= "gate_range = c(2e3, 3e3)"]
   write.csv(tbl, file = gtFile)
-  gt <- gatingTemplate(gtFile, autostart = 1L)
+  gt <- gatingTemplate(gtFile)
   expect_warning(gating(gt, gs))
 
   toggle.helperGates(gt, gs) #hide the helper gates
@@ -45,7 +45,7 @@ test_that("autogating--tcell", {
   gs <- compensate(gs, comp)
   trans <- estimateLogicle(gs[[1]], chnls)
   gs <- transform(gs, trans)
-  gt <- gatingTemplate(gtFile.orig, autostart = 1L)
+  gt <- gatingTemplate(gtFile.orig)
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates
   stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]

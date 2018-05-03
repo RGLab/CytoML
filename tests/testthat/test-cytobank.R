@@ -116,7 +116,7 @@ test_that("autogating to cytobank--tcell", {
   gs <- compensate(gs, comp)
   trans <- estimateLogicle(gs[[1]], chnls)
   gs <- transform(gs, trans)
-  gt <- gatingTemplate(gtFile.orig, autostart = 1L)
+  gt <- gatingTemplate(gtFile.orig)
 
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates

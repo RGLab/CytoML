@@ -45,7 +45,7 @@ cytobank2GatingSet <- function(xml, FCS){
 #' gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 #' ## verify the stats are correct
 #' statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")
-#' dt_merged <- compare.counts(gs, statsfile, id.vars = "population")
+#' dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 #' all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 #'
 #' @importFrom flowWorkspace getPopStats

@@ -31,7 +31,7 @@ read.gatingML.cytobank <- function(file, ...){
 
   #parse all the elements:gate, GateSets, comp, trans
   flowEnv <- new.env()
-  read.gatingML(file, flowEnv)
+  suppressWarnings(read.gatingML(file, flowEnv))#suppress the deprecated warnings from XML
 
   #parse gate info (id vs fcs and pop name)
   gateInfo <- parse.gateInfo(file)

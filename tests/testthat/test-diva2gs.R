@@ -18,3 +18,4 @@ test_that("PE_2", {
   expect_equal(getNodes(gs), c('root','/P1','/P1/P2','/P1/P2/P3','/P1/P2/P3/P4','/P1/P2/P3/P4/P5'))
 
 })
+

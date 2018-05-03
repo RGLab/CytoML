@@ -4,7 +4,8 @@
 \alias{compare.counts}
 \title{compare the counts to cytobank's exported csv so that the parsing result can be verified.}
 \usage{
-\method{compare}{counts}(gs, file, id.vars = c("FCS Filename", "population"))
+\method{compare}{counts}(gs, file, id.vars = c("FCS Filename", "population"),
+  ...)
 }
 \arguments{
 \item{gs}{parsed GatingSet}
@@ -12,6 +13,8 @@
 \item{file}{the stats file (contains the populatio counts) exported from cytobank.}
 
 \item{id.vars}{either "population" or "FCS filename" that tells whether the stats file format is one population per row or FCS file per row.}
+
+\item{...}{arguments passed to data.table::fread function}
 }
 \value{
 a data.table (in long format) that contains the counts from openCyto and Cytobank side by side.
@@ -26,7 +29,7 @@ fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "f
 gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 ## verify the stats are correct
 statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")
-dt_merged <- compare.counts(gs, statsfile, id.vars = "population")
+dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 
 }

@@ -1,3 +1,4 @@
+xmlElementsByTagName <- function(...)suppressWarnings(XML::xmlElementsByTagName(...))
 compact <- flowWorkspace:::compact
 
 #' the parameter range from the flow data associated with GatingHierarchy

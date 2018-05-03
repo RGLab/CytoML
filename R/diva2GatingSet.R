@@ -184,8 +184,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
 #' @importFrom flowWorkspace set.count.xml
-.parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName,...){
+#' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
+.parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, ...){
 
+  scale_level <- match.arg(scale_level, c("gate", "tube"))
   if(!file.exists(xmlFileName))
     stop(xmlFileName," not found!")
 #  gs <- new("GatingSet", guid = .uuid_gen(), flag = FALSE)
@@ -233,7 +235,15 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
   rootDoc <- ws@doc
 
   xpathGroup <- paste0("/bdfacs/experiment/specimen[@name='", groupName, "']")
-  # parse compp & trans
+  #determine the magic number to replace neg value for log10 trans
+  log_decade <- xmlValue(rootDoc[["/bdfacs/experiment/log_decades"]])
+  if(log_decade == "4")
+    min_val <- 26
+  else if(log_decade == "5")
+    min_val <- 2.6
+  else
+    stop("unsupported decade: ", log_decade)
+   # parse compp & trans
   translist <- complist <- list()
   for(file in files)
   {
@@ -247,6 +257,9 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
         # get comp & param for biexp
         biexp_para <- new.env(parent = emptyenv())
+        use_auto_biexp_scale <- as.logical(xmlValue(sampleNode[["instrument_settings"]][["use_auto_biexp_scale"]]))
+        biexp_scale_node <- ifelse(use_auto_biexp_scale, "comp_biexp_scale", "manual_biexp_scale")
+
         comp <- xpathApply(sampleNode, "instrument_settings/parameter", function(paramNode, biexp_para){
 
           paramName <- xmlGetAttr(paramNode, "name")
@@ -258,7 +271,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
             biexp_para[[paramName]] <- c(min = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "min")[[1]]))
                                           , max = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "max")[[1]]))
-                                          , biexp_scale = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "comp_biexp_scale")[[1]]))
+                                          , biexp_scale = as.numeric(xmlValue(xmlElementsByTagName(paramNode, biexp_scale_node)[[1]]))
                                           )
             #get comp
             coef <- as.numeric(xpathSApply(paramNode, "compensation/compensation_coefficient", xmlValue))
@@ -293,20 +306,13 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         #parse trans
         params <- names(biexp_para)
         # browser()
-        #transform data in default flowCore logicle scale
+        #transform data in default flowCore logicle or log10 scale
         trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
           maxValue <- 262144#TODO:this_para[["max"]]^10
           pos <- 4.5
           r <- abs(this_para[["biexp_scale"]])
-          if(r == 0)
-            r <- 262144/10^4.5
-
-          w <- (pos - log10(maxValue/r))/2
-          if(w < 0)
-            w <- 0
-          logicle_trans(w=w, t = maxValue, m = pos) #
-
+          trans <- generate_trans(maxValue, pos, r)
                     }
           , simplify = FALSE)
 
@@ -316,8 +322,11 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
   gs <- GatingSet(fs)
-  message("Compensating");
+  message("Compensating")
   gs <- compensate(gs, complist)
+
+  message("computing data range")
+  data.ranges <- sapply(sampleNames(gs), function(sn)range(getData(gs[[sn]]), "data"), simplify = FALSE)
 
   message(paste("transforming ..."))
   gs <- transform(gs, translist)
@@ -325,6 +334,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     message("parsing gates ...")
   for(sn in sampleNames(gs)){
     gh <- gs[[sn]]
+
     this_biexp <- translist[[sn]]
     xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
     sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
@@ -336,6 +346,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
       nodeName <- xmlGetAttr(gateNode, "fullname")
       nodeName <- gsub("\\\\", "/", nodeName)
       nodeName <- basename(nodeName)
+      if(verbose)
+        message(nodeName)
       count <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]]))
       parent <- xmlElementsByTagName(gateNode, "parent")
       if(length(parent) > 0){
@@ -355,35 +367,75 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         is.x.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_x_parameter_scaled")[[1]]))
         is.y.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_y_parameter_scaled")[[1]]))
 
+        x_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "x_parameter_scale_value")[[1]]))
+        y_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "y_parameter_scale_value")[[1]]))
+
 
         x_biexp <- this_biexp[[xParam]][["transform"]]
         y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]][["transform"]]
         #the gate may be either stored as simple log or 4096 scale
         #we need to rescale them to the data scale (i.e. 4.5 )
-        if(!is.null(x_biexp)){#when channel is logicle scale
-          if(is.x.scaled)#if the gate is scaled to 4096
-            mat[1, ] <- mat[1, ]/4096 * 4.5
-          else #it was in log scale
+        if(is.null(yParam))
+          bound <- matrix(c(-Inf,Inf), byrow = TRUE, nrow = 1, dimnames = list(c(xParam), c("min", "max")))
+        else
+          bound <- matrix(c(-Inf,Inf,-Inf,Inf), byrow = TRUE, nrow = 2, dimnames = list(c(xParam, yParam), c("min", "max")))
+        x.extend <- y.extend <- FALSE
+        if(is.x.scaled)#if the gate is scaled to 4096
+        {
+          mat[1, ] <- mat[1, ]/4096
+          if(!is.null(x_biexp))
+          {
+            #when channel is logicle scale
+            mat[1, ] <- mat[1, ] * 4.5 # restore it to te logicle scale
+            #rescale gate to data scale
+            if(scale_level=="gate")
+            {
+              trans.gate <- generate_trans(r = x_parameter_scale_value)
+              mat[1, ] <- trans.gate$inverse(mat[1, ])
+              mat[1, ] <- x_biexp(mat[1, ])
+            }
+          }
+          else
+            mat[1, ] <- mat[1, ] * 262144
+        }else
+        {
+          if(!is.null(x_biexp))#it was in log scale
           {
             #restore to raw scale
             mat[1, ] <- 10 ^ mat[1, ]
-            #logicle transform it to data scale
-            mat[1, ] <- x_biexp@.Data(mat[1, ])
+            #set flag to trigger gate extension later
+            x.extend <- TRUE
           }
-
         }
-        if(!is.null(y_biexp)){#when channel is logicle scale
-          if(is.y.scaled)#if the gate is scaled to 4096
-            mat[2, ] <- mat[2, ]/4096 * 4.5
-          else #it was in log scale
+
+        if(is.y.scaled)#if the gate is scaled to 4096
+        {
+          mat[2, ] <- mat[2, ]/4096
+          if(!is.null(y_biexp))
+          {
+            #when channel is logicle scale
+            mat[2, ] <- mat[2, ] * 4.5
+            #rescale gate to data scale
+            if(scale_level=="gate")
+            {
+              trans.gate <- generate_trans(r = y_parameter_scale_value)
+              mat[2, ] <- trans.gate$inverse(mat[2, ])
+              mat[2, ] <- y_biexp(mat[2, ])
+            }
+          }
+          else
+            mat[2, ] <- mat[2, ] * 262144
+        }else
+        {
+          if(!is.null(y_biexp))#it was in log scale
           {
             #restore to raw scale
             mat[2, ] <- 10 ^ mat[2, ]
-            #logicle transform it to data scale
-            mat[2, ] <- y_biexp@.Data(mat[2, ])
+            #set flag to trigger gate extension later
+            y.extend <- TRUE
           }
-
         }
+
 
         if(gType == "RECTANGLE_REGION"){
           x <- unique(mat[1,])
@@ -403,6 +455,23 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           gate <- rectangleGate(coord)
         }else
           stop("unsupported gate type: ", gType)
+
+        #deal with the off threshold data truncation in log10 scale scenario
+        #we do gate extention instead to keep transformation consistent across gates(i.e always use biexp)
+        if(x.extend||y.extend)
+        {
+          if(x.extend)
+            bound[xParam, ] <- c(min_val, 262143)
+          if(y.extend)
+            bound[yParam, ] <- c(min_val, 262143)
+          gate <- extend(gate, bound, t(data.ranges[[sn]]))
+          #need transform since extention was performed on the raw-scale gate
+          if(x.extend)
+            gate <- transform(gate, x_biexp@.Data, xParam)
+          if(y.extend)
+            gate <- transform(gate, y_biexp@.Data, yParam)
+        }
+
 
 
 
@@ -453,3 +522,13 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 }
 
+#use the equation suggested by BD engineer last year
+generate_trans <- function(maxValue = 262144, pos = 4.5, r)
+{
+  if(r == 0)
+    r <- maxValue/10^pos
+  w <- (pos - log10(maxValue/r))/2
+  if(w < 0)
+    w <- 0
+  logicle_trans(w=w, t = maxValue, m = pos) #
+}

@@ -33,7 +33,7 @@ test_that("gatingML-cytobank parsing: cytotrol tcell",{
 
   #' ## verify the stats are correct
   statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")
-  dt_merged <- compare.counts(gs, statsfile, id.vars = "population")
+  dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 
 
   expect_equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
@@ -49,7 +49,7 @@ test_that("gatingML-cytobank parsing: cytotrol tcell--logtGml",{
 
   #' ## verify the stats are correct
   statsfile <- system.file("extdata/cytotrol_tcell_cytobank_logt_counts.csv", package = "CytoML")
-  dt_merged <- compare.counts(gs1, statsfile, id.vars = "population")
+  dt_merged <- compare.counts(gs1, statsfile, id.vars = "population", skip = "FCS Filename")
 
   expect_equal(nrow(dt_merged), 5)
   expect_equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
@@ -116,7 +116,7 @@ test_that("autogating to cytobank--tcell", {
   gs <- compensate(gs, comp)
   trans <- estimateLogicle(gs[[1]], chnls)
   gs <- transform(gs, trans)
-  gt <- gatingTemplate(gtFile.orig, autostart = 1L)
+  gt <- gatingTemplate(gtFile.orig)
 
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates

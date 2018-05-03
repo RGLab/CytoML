@@ -89,7 +89,7 @@ test_that("gatingML-cytobank parsing: Merck FirstExample",{
 
   ### Verify the stats are correct
   statsfile <- file.path(thisPath,"population_counts.csv")
-  dt_merged <- compare.counts(gs, statsfile)
+  dt_merged <- compare.counts(gs, statsfile, skip = "FCS Filename")
 
   unequaled <- dt_merged[count.x != count.y]
   expect_equal(nrow(unequaled), 0)
@@ -104,7 +104,7 @@ test_that("gatingML-cytobank parsing: Merck SecondExample",{
 
   ### Verify the stats are correct
   statsfile <- file.path(thisPath,"secondExample.csv")
-  dt_merged <- compare.counts(gs, statsfile, id.vars = "population") #subset the files to speed up testing
+  dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename") #subset the files to speed up testing
 
 
   unequaled <- dt_merged[count.x != count.y]

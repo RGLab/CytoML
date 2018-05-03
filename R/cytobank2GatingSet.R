@@ -34,8 +34,8 @@ cytobank2GatingSet <- function(xml, FCS){
 #' compare the counts to cytobank's exported csv so that the parsing result can be verified.
 #' @param gs parsed GatingSet
 #' @param file the stats file (contains the populatio counts) exported from cytobank.
-#'
 #' @param id.vars either "population" or "FCS filename" that tells whether the stats file format is one population per row or FCS file per row.
+#' @param ... arguments passed to data.table::fread function
 #' @return a data.table (in long format) that contains the counts from openCyto and Cytobank side by side.
 #' @export compare.counts
 #' @examples
@@ -49,11 +49,11 @@ cytobank2GatingSet <- function(xml, FCS){
 #' all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 #'
 #' @importFrom flowWorkspace getPopStats
-compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population")){
+compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population"), ...){
   #load stats from cytobank
   id.vars <- match.arg(id.vars)
   variable.name <- ifelse(id.vars == "population", "FCS Filename", "population")
-  cytobank_counts <- fread(file, stringsAsFactors = FALSE, blank.lines.skip = TRUE)
+  cytobank_counts <- fread(file, stringsAsFactors = FALSE, blank.lines.skip = TRUE, ...)
 
   if(id.vars == "population"){
     #modify column name because cytobank always put FCS filename

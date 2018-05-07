@@ -523,6 +523,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 }
 
 #use the equation suggested by BD engineer last year
+#' @importFrom flowWorkspace logicle_trans
 generate_trans <- function(maxValue = 262144, pos = 4.5, r)
 {
   if(r == 0)

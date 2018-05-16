@@ -19,7 +19,7 @@
 #' GatingSet2flowJo(gs, outFile)
 #'
 #'
-GatingSet2flowJo <- function(gs, outFile, ...){
+GatingSet2flowJo <- function(gs, outFile, Scaling=NULL, ...){
   #validity check for slash
   # for(chnl in colnames(gs))
   # {
@@ -37,7 +37,7 @@ GatingSet2flowJo <- function(gs, outFile, ...){
 
   pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
 
-  ws <- workspaceNode(gs)
+  ws <- workspaceNode(gs, Scaling)
   locale <- localeToCharset()[1]
   if(locale == "ISO8859-1")
     locale <- "ISO-8859-1"
@@ -45,7 +45,7 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", locale)))
 }
 
-workspaceNode <- function(gs, ...){
+workspaceNode <- function(gs, Scaling=NULL, ...){
   guids <- sampleNames(gs)
   sampleIds <- seq_along(guids)
   xmlNode("Workspace"
@@ -57,7 +57,7 @@ workspaceNode <- function(gs, ...){
                                   , "xsi:schemaLocation" = "http://www.isac-net.org/std/Gating-ML/v2.0/gating http://www.isac-net.org/std/Gating-ML/v2.0/gating/Gating-ML.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/transformations http://www.isac-net.org/std/Gating-ML/v2.0/gating/Transformations.v2.0.xsd http://www.isac-net.org/std/Gating-ML/v2.0/datatypes http://www.isac-net.org/std/Gating-ML/v2.0/gating/DataTypes.v2.0.xsd"
                                  )
           , groupNode(sampleIds)
-          , SampleListNode(gs, sampleIds, ...)
+          , SampleListNode(gs, sampleIds, Scaling, ...)
 
         )
 
@@ -81,7 +81,7 @@ groupNode <- function(sampleIds){
           )
 }
 
-SampleListNode <- function(gs, sampleIds, ...){
+SampleListNode <- function(gs, sampleIds, Scaling=NULL, ...){
   xmlNode("SampleList"
           , .children = lapply(sampleIds, function(sampleId){
                     guid <- sampleNames(gs)[sampleId]
@@ -92,7 +92,7 @@ SampleListNode <- function(gs, sampleIds, ...){
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
                             , spilloverMatrixNode(matInfo)
-                            , transformationNode(gh, matInfo)
+                            , transformationNode(gh, matInfo, Scaling)
                             , keywordNode(gh)
                             , sampleNode(gh, sampleId, matInfo, ...)
                     )
@@ -181,7 +181,7 @@ spilloverNodes <- function(mat){
 }
 
 #' @importFrom flowCore exprs
-transformationNode <- function(gh, matInfo){
+transformationNode <- function(gh, matInfo, Scaling=NULL){
 
   trans.objs <- getTransformations(gh, only.function = FALSE)
   if(length(trans.objs) == 0)
@@ -204,16 +204,39 @@ transformationNode <- function(gh, matInfo){
                 }
 
                 if(trans.type == "flowJo_biexp"){
-                  param <-  attr(func,"parameters")
-                  transNode <- xmlNode("biex"
-                                      , namespace = "transforms"
-                                      , attrs = c("transforms:length" = param[["channelRange"]]
-                                                  , "transforms:maxRange" = param[["maxValue"]]
-                                                  , "transforms:neg" = param[["neg"]]
-                                                  , "transforms:width" = param[["widthBasis"]]
-                                                  , "transforms:pos" = param[["pos"]]
-                                                  )
-                                      )
+
+                  if(!is.null(Scaling)){
+                  # Added scaling adjustment
+                    maxRange <- param[["maxValue"]]
+                    pos.decades <- param[["pos"]]
+
+                    param.loc <- which(gsub("Comp-", "", chnl) == names(Scaling))
+                    if (length(param.loc) == 1){
+                      maxRange <- Scaling[[param.loc]][2]
+                     pos.decades <- 6.5
+                    }
+                    transNode <- xmlNode("biex"
+                                         , namespace = "transforms"
+                                         , attrs = c("transforms:length" = param[["channelRange"]]
+                                                     , "transforms:maxRange" = maxRange
+                                                     , "transforms:neg" = param[["neg"]]
+                                                     , "transforms:width" = param[["widthBasis"]]
+                                                     , "transforms:pos" = pos.decades
+                                                     )
+                                        )
+                  } else {
+
+                    param <-  attr(func,"parameters")
+                    transNode <- xmlNode("biex"
+                                        , namespace = "transforms"
+                                        , attrs = c("transforms:length" = param[["channelRange"]]
+                                                    , "transforms:maxRange" = param[["maxValue"]]
+                                                    , "transforms:neg" = param[["neg"]]
+                                                    , "transforms:width" = param[["widthBasis"]]
+                                                    , "transforms:pos" = param[["pos"]]
+                                                    )
+                                        )
+                  }
                 }else if(trans.type == "flowJo_caltbl"){
                   warning("Calibration table is stored in GatingSet!We are unable to restore the original biexp parameters,thus use the default settings (length = 4096, neg = 0, width = -10, pos = 4.5), which may or may not produce the same gating results.")
 
@@ -261,6 +284,17 @@ transformationNode <- function(gh, matInfo){
                   }
                   minRange <- rg[1]
                   maxRange <- rg[2]
+
+                  # Added scaling adjustment
+                  if(!is.null(Scaling)){
+                    param.loc <- which(gsub("Comp-", "", chnl) == names(Scaling))
+                    # param.loc <- grep(chnl, names(Scaling))
+                    if (length(param.loc) == 1){
+                        minRange <- Scaling[[param.loc]][1]
+                        maxRange <- Scaling[[param.loc]][2]
+                    }
+                  }
+
                   transNode <- xmlNode("linear"
                                        , namespace = "transforms"
                                        , attrs = c("transforms:minRange" = minRange
@@ -270,17 +304,39 @@ transformationNode <- function(gh, matInfo){
                   )
 
                 }else if(trans.type == "logicle"){
-                  param <- as.list(environment(func))
-                  withBasis <- - 10 ^ (2 * as.vector(param[["w"]]))
-                  transNode <- xmlNode("biex"
-                                       , namespace = "transforms"
-                                       , attrs = c("transforms:length" = 4096
-                                                   , "transforms:maxRange" = param[["t"]]
-                                                   , "transforms:neg" = param[["a"]]
-                                                   , "transforms:width" = withBasis
-                                                   , "transforms:pos" = param[["m"]]
-                                       )
-                  )
+
+                  if(!is.null(Scaling)){
+                  # Added scaling adjustment
+                    offset <- 316
+                    decades <- 3162277.7
+
+                    param.loc <- which(gsub("Comp-", "", chnl) == names(Scaling))
+                    # param.loc <- grep(chnl, names(Scaling))
+                    if (length(param.loc) == 1){
+                        offset <- Scaling[[param.loc]][1]
+                        decades <- log10(Scaling[[param.loc]][2])-log10(offset)
+                    }
+                                      # decades <- log10(3162277.7/2)-2
+                    transNode <- xmlNode("log"
+                                         , namespace = "transforms"
+                                         , attrs = c("transforms:offset" = offset
+                                                     , "transforms:decades" = decades
+                                                    )
+                    )
+                  } else {
+
+                    param <- as.list(environment(func))
+                    withBasis <- - 10 ^ (2 * as.vector(param[["w"]]))
+                    transNode <- xmlNode("biex"
+                                         , namespace = "transforms"
+                                         , attrs = c("transforms:length" = 4096
+                                                     , "transforms:maxRange" = param[["t"]]
+                                                     , "transforms:neg" = param[["a"]]
+                                                     , "transforms:width" = withBasis
+                                                     , "transforms:pos" = param[["m"]]
+                                         )
+                    )
+                  }
 
                 }
                 else

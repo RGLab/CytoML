@@ -184,6 +184,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
 #' @importFrom flowWorkspace set.count.xml
+#' @importFrom ggcyto transform_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 .parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, ...){
 
@@ -467,9 +468,9 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           gate <- extend(gate, bound, t(data.ranges[[sn]]))
           #need transform since extention was performed on the raw-scale gate
           if(x.extend)
-            gate <- transform(gate, x_biexp@.Data, xParam)
+            gate <- transform_gate(gate, x_biexp@.Data, xParam)
           if(y.extend)
-            gate <- transform(gate, y_biexp@.Data, yParam)
+            gate <- transform_gate(gate, y_biexp@.Data, yParam)
         }
 
 

@@ -571,7 +571,7 @@ inverseTransGate <- function(gate, trans){
       trans.obj <- trans[[which(ind)]]
       inv.fun <- trans.obj[["inverse"]]
       #rescale
-      gate <- transform(gate, inv.fun, param)
+      gate <- transform_gate(gate, inv.fun, param)
 
     }else if(nMatched > 1)
       stop("multiple trans matched to :", param)

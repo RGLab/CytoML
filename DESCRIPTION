@@ -27,7 +27,7 @@ Imports:
     utils,
     base64enc,
     plyr,
-    ggcyto (>= 1.7.1)
+    ggcyto (>= 1.9.3)
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,

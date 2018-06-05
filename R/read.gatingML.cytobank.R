@@ -51,7 +51,7 @@ read.gatingML.cytobank <- function(file, ...){
         orig_params <- sb[, params]
         orig_params <- strsplit(split = ":", orig_params)[[1]]
         params <- parameters(obj)
-        ind <- unlist(sapply(orig_params, function(orig_param)grep(paste0(orig_param, "$"), params)))
+        ind <- unlist(sapply(orig_params, function(orig_param)grep(paste0("\\Q", orig_param, "\\E$"), params)))
         if(length(ind)==0)
           stop("orig_param : '", paste(orig_params, collapse = ","), "'\n not matched to the prefixed params of the gate: \n'", paste(params, collapse = ","), "'")
         orig_param <- orig_params[ind]

@@ -77,7 +77,9 @@ read.gatingML.cytobank <- function(file, ...){
   comp_refs <- gateInfo[, comp_ref]
   comp_refs <- unique(comp_refs[comp_refs!=""])
   comp_refs <- comp_refs[comp_refs != "uncompensated"]
-  if(length(comp_refs) > 1)
+  if(length(comp_refs) == 0)
+    comps <- "NONE"
+  else if(length(comp_refs) > 1)
     stop("More than one compensation referred in gates!")
   else{
     if(comp_refs == "FCS")

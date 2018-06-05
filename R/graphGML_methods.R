@@ -349,7 +349,8 @@ setMethod("compensate", signature = c("GatingSet", "graphGML"), function(x, spil
       mat <- mat[[1]]
       comp <- compensation(mat)
     }
-  }
+  }else if(comp == "NONE")
+    skip <- TRUE
   if(skip)
     return(x)
   else{

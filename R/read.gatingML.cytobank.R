@@ -51,8 +51,9 @@ read.gatingML.cytobank <- function(file, ...){
         orig_params <- sb[, params]
         orig_params <- strsplit(split = ":", orig_params)[[1]]
         params <- parameters(obj)
-        ind <- sapply(orig_params, function(orig_param)grep(paste0(orig_param, "$"), params))
-
+        ind <- unlist(sapply(orig_params, function(orig_param)grep(paste0("\\Q", orig_param, "\\E$"), params)))
+        if(length(ind)==0)
+          stop("orig_param : '", paste(orig_params, collapse = ","), "'\n not matched to the prefixed params of the gate: \n'", paste(params, collapse = ","), "'")
         orig_param <- orig_params[ind]
 
         #cytobank add Comp_ prefix when the custom compensation is specified and referred by gates
@@ -76,7 +77,9 @@ read.gatingML.cytobank <- function(file, ...){
   comp_refs <- gateInfo[, comp_ref]
   comp_refs <- unique(comp_refs[comp_refs!=""])
   comp_refs <- comp_refs[comp_refs != "uncompensated"]
-  if(length(comp_refs) > 1)
+  if(length(comp_refs) == 0)
+    comps <- "NONE"
+  else if(length(comp_refs) > 1)
     stop("More than one compensation referred in gates!")
   else{
     if(comp_refs == "FCS")

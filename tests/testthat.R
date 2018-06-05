@@ -4,7 +4,7 @@ library(CytoML)
 
 test_check("CytoML")
 
-#devtools::test("~/rglab/workspace/CytoML")
+#devtools::test()
 
 
 #test_file("~/rglab/workspace/CytoML/tests/testthat/Cytobank2GatingSet-InternalTestSuite.R")

@@ -2,6 +2,16 @@ context("GatingSet2cytobank and GatingSet2Cytobank ")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/gatingML"
 
+test_that("cytobank2gs--cytof: special character in channels and no comp ",{
+
+  thisPath <- file.path(path, "43281")
+  gating_ml_cytobank_file = list.files(path = thisPath, pattern="gate.*xml", recursive=TRUE,full=TRUE)
+  fcs_files = list.files(path = file.path(thisPath,"fcs_files"), recursive=TRUE,full=TRUE)
+  gs <- cytobank2GatingSet(xml = gating_ml_cytobank_file, FCS = fcs_files[1])
+  expect_is(gs, "GatingSet")
+  expect_equal(getNodes(gs, path = "auto")[-1], c('H+R+','MEFSK4+','CD54+','Nanog+','Lin28+'))
+})
+
 test_that("GatingSet2Cytobank--cytof ",{
 
   thisPath <- file.path(path, "cytof")

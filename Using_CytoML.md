@@ -317,12 +317,9 @@ gating_ml_cytobank_file = list.files(
   plots = list()
   for (j in 1:length(gs)) {
     p = autoplot(gs[[j]], bins = 128) + theme_classic() 
-    # for (i in names(p)) {
-    #   p[[i]] = p[[i]] + theme_classic() + theme_cowplot()
-    # }
     plots[[j]] = ggcyto_arrange(p, nrow = 1)
   }
-  plot(do.call(gridExtra::gtable_rbind,plots))
+  plot(do.call(gridExtra::gtable_rbind,plots[1:3]))
 ```
 
 ![**Figure 5**: Sample 1 of 6 from Cytobank experiment 43281](Using_CytoML_files/figure-html/acs_load-1.png)
@@ -331,6 +328,39 @@ gating_ml_cytobank_file = list.files(
 cap = c("**Figure 5**: Sample 1 of 6 from Cytobank experiment 43281")
 ```
 
+# Importing Diva XML
+
+While not shown in the publication, this prcess is analogous to importing FlowJo XML.
+We will import a gated FCS file found in the flowWorkspaceData package.
+
+
+```r
+files = list.files(system.file("extdata", "diva", package = "flowWorkspaceData"),
+                   full.names = TRUE)
+ws = openDiva(files[2]) #diva xml
+ws
+```
+
+```
+## Diva Workspace Version  Version 6.1.3 
+## File location:  /Library/Frameworks/R.framework/Versions/3.5/Resources/library/flowWorkspaceData/extdata/diva 
+## File name:  PE_2.xml 
+## Workspace is open. 
+## 
+## Groups in Workspace
+##                specimen samples
+## 1 Compensation Controls       9
+## 2                    PE       4
+```
+
+```r
+#read in the one FCS file that's present. Suppress warnings that we can't find 3 others.
+#PE is the name of the sample group.
+gs = suppressWarnings(parseWorkspace(ws, name = "PE",path = dirname(files[1])))
+autoplot(gs[[1]]) + theme_classic()
+```
+
+![Visualization of the gating hierarchi for a DIVA XML file in the flowWorkspaceData package.](Using_CytoML_files/figure-html/diva-1.png)
 
 
 # References

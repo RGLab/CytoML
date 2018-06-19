@@ -316,10 +316,10 @@ gating_ml_cytobank_file = list.files(
   #Arrange the plots of the 6 samples using the ggcyto package.
   plots = list()
   for (j in 1:length(gs)) {
-    for (i in names(p)) {
-    p = autoplot(gs[[1]], bins = 128)
-      p[[i]] = p[[i]] + theme_classic() + theme_cowplot()
-    }
+    p = autoplot(gs[[j]], bins = 128) + theme_classic() 
+    # for (i in names(p)) {
+    #   p[[i]] = p[[i]] + theme_classic() + theme_cowplot()
+    # }
     plots[[j]] = ggcyto_arrange(p, nrow = 1)
   }
   plot(do.call(gridExtra::gtable_rbind,plots))

@@ -322,10 +322,10 @@ gating_ml_cytobank_file = list.files(
   plot(do.call(gridExtra::gtable_rbind,plots[1:3]))
 ```
 
-![**Figure 5**: Sample 1 of 6 from Cytobank experiment 43281](Using_CytoML_files/figure-html/acs_load-1.png)
+![**Figure 5**: Samples 1 through 3 from Cytobank experiment 43281](Using_CytoML_files/figure-html/acs_load-1.png)
 
 ```r
-cap = c("**Figure 5**: Sample 1 of 6 from Cytobank experiment 43281")
+cap = c("**Figure 5**: Samples 1 through 3 from Cytobank experiment 43281")
 ```
 
 # Importing Diva XML

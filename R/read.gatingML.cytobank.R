@@ -493,6 +493,15 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, lim
   for(dim in axis.names){ #loop from x to y
 
     for(bn in colnames(bound)){# loop from min to max
+
+      #extend data.range with gate range in case the later is larger (which will break the assumption of extension logic)
+      # if(bn=="min")
+      #   data.range[dim, bn] <- min(data.range[dim, bn], min(verts[, ..dim]))
+      # else
+      #   data.range[dim, bn] <- max(data.range[dim, bn], max(verts[, ..dim]))
+
+
+
       intersect.coord <- bound[dim, bn][[1]]
       names(intersect.coord) <- dim
       nVerts <- nrow(verts)
@@ -598,15 +607,23 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, lim
           verts <- rbindlist(list(verts, this.intersect))
           verts <- verts[order(id),]
 
-          #remove off-bound points between the two intersected points
+          #remove off-bound points
+          #(no longer do it:between the two intersected points
+          #because sometime the points fall outside of the range of dim.flip of intersected points
+          #breaks the ordering assumption of two extended points)
           vals.dim <- verts[, dim, with = FALSE]
           vals.dim.flip <- verts[, dim.flip, with = FALSE]
           rng.dim.flip  <- range(this.intersect[[dim.flip]])
-          ind.between <- vals.dim.flip <= rng.dim.flip[2] & vals.dim.flip >= rng.dim.flip[1]
+          # ind.between <- vals.dim.flip <= rng.dim.flip[2] & vals.dim.flip >= rng.dim.flip[1]
           if(bn == "min")
-            ind <- vals.dim < intersect.coord & ind.between
-          else
-            ind <- vals.dim > intersect.coord & ind.between
+          {
+            ind <- vals.dim < intersect.coord #& ind.between
+          }else
+          {
+            ind <- vals.dim > intersect.coord #& ind.between
+          }
+
+
           ind <- as.vector(ind)
           verts <- verts[!ind, ]
 
@@ -616,7 +633,6 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, lim
           this.extend <- this.intersect
           this.extend[, dim] <- data.range[dim, bn]
           this.extend[, key := paste0(x,",", y)]#update key
-
           #sort by the Id
           this.extend[, is.smaller:= order(id) == 1]
           #check if head-tail node situation

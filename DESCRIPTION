@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: GatingML interface for openCyto
-Version: 1.7.5
+Version: 1.7.6
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>

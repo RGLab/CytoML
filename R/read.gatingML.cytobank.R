@@ -494,11 +494,11 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, lim
 
     for(bn in colnames(bound)){# loop from min to max
 
-      #extend data.range with gate range in case the later is larger (which will break the assumption of extension logic)
-      # if(bn=="min")
-      #   data.range[dim, bn] <- min(data.range[dim, bn], min(verts[, ..dim]))
-      # else
-      #   data.range[dim, bn] <- max(data.range[dim, bn], max(verts[, ..dim]))
+      #extend data.range with gate range in case the later is larger
+      if(bn=="min")
+        data.range[dim, bn] <- min(data.range[dim, bn], min(verts[, ..dim]))
+      else
+        data.range[dim, bn] <- max(data.range[dim, bn], max(verts[, ..dim]))
 
 
 

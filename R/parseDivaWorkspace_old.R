@@ -149,7 +149,7 @@
     gh <- gs[[sn]]
 
     this_biexp <- translist[[sn]]
-    xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
+    xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sn, "']")
     sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
     #assume the gates listed in xml follows the topological order
     rootNode.xml <- NULL

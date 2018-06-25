@@ -552,13 +552,16 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
       stop("he parsed GatingSets are cached in: ", tmp.dir, "\n Please use load_gs to load and clean/merge them!")
     res
   }else
-    suppressMessages(load_gs(gsfiles))
+  {
 
-#    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
-  # gslist <- suppressMessages(flowWorkspace:::.groupByTree(gs))
-  # if(length(gslist) > 1)
-  #   warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
-  # gs
+    gs <- suppressMessages(load_gs(gsfiles))
+
+       # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
+    gslist <- suppressMessages(flowWorkspace:::.groupByTree(gs))
+    if(length(gslist) > 1)
+      warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
+    gs
+  }
 
 }
 

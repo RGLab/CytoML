@@ -527,6 +527,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         fs[[sampleName]] <- data
 
       }
+      flowData(gs) <- fs
+
       gs@compensation <- complist
 
       gs@transformation <- translist

@@ -193,7 +193,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml
+#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs
 #' @importFrom ggcyto transform_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 .parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, num_threads = 1,  ...){
@@ -254,7 +254,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
   num_threads <- min(num_threads, length(files))
   if(num_threads >1)
+  {
+    require(parallel)
     file.group <- split(files, cut(seq_along(files),num_threads))
+  }
   else
     file.group <- list(files)
   names(file.group) <- as.character(seq_along(file.group))

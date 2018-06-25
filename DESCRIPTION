@@ -32,7 +32,8 @@ biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),
-    knitr
+    knitr,
+    parallel
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 

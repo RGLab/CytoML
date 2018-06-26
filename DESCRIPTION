@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: GatingML interface for openCyto
-Version: 1.7.5
+Version: 1.7.7
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -32,7 +32,8 @@ biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),
-    knitr
+    knitr,
+    parallel
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
@@ -43,4 +44,5 @@ Collate:
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
+    'parseDivaWorkspace_old.R'
     'utils.R'

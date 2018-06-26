@@ -60,7 +60,7 @@ test_that("extend.polygonGate: concave on left with data.range",{
   expectRes <- matrix(c(-1,-1,400,450,400,-1,-1,400,600,600,400,50,116.666666666667,116.666666666667,150,200,200,300,300,300,50,50)
                       , nrow = 11)
 
-  expect_equivalent(pg.extened@boundaries, expectRes)
+  expect_equivalent(pg.extened@boundaries, expectRes[-(1:2),])
 
 })
 
@@ -85,7 +85,7 @@ test_that("extend.polygonGate: concave on left& bottom with data.range",{
   expectRes <- matrix(c(-1,-1,-1,400,450,400,-1,-1,400,600,600,600,550,-1,100,116.666666666667,116.666666666667,150,200,200,300,300,300,100,-1,-1)
                       , nrow = 13)
 
-  expect_equivalent(pg.extened@boundaries, expectRes)
+  expect_equivalent(pg.extened@boundaries, rbind(expectRes[-(1:3),],c(400, 100)))
 
 })
 

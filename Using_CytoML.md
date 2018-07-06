@@ -73,7 +73,7 @@ Users can, for example, import manually gated data and perform computational gat
 
 ## Examples
 
-These examples require the *flowWorkspaceData* package as well as the *CytoML* package and its dependencies. All figures (except the plots from FlowJo and Cytobank) are generated using the *ggcyto* package (@Van2018-zj). Automated gating is performed using the openCyto package (@F).
+These examples require the *flowWorkspaceData* package as well as the *CytoML* package and its dependencies. All figures (except the plots from FlowJo and Cytobank) are generated using the *ggcyto* package (@Van2018-zj). Automated gating is performed using the openCyto package (@Finak2014-mr).
 
 These can be installed using Bioconductor as follows:
 
@@ -182,7 +182,7 @@ Two of the files are available in the data package. We can plot the gating tree 
 plot(gs_tcell)
 ```
 
-![Figure 1: Gating tree of the Cytotrol T-cell data imported from a FlowJo workspace using CytoML and flowWorkspace.](Using_CytoML_files/figure-html/plot_tree-1.png)
+![Figure 1: Gating tree of the Cytotrol T-cell data imported from a FlowJo workspace using CytoML and flowWorkspace.](Using_CytoML_files/figure-html/plot_tree-1.tiff)
 
 The gating tree shows gating of different memory and activated CD4 and CD8 T cell populations. 
 
@@ -191,18 +191,18 @@ The gating tree shows gating of different memory and activated CD4 and CD8 T cel
 p = autoplot(gs_tcell[[1]], bin = 128)
 ```
 
-![Figure 2:  The gating hierarchy for a Cytotrol T cell sample imported from a FlowJo gating hierarchy.](Using_CytoML_files/figure-html/cd4_memory-1.png)
+![Figure 2:  The gating hierarchy for a Cytotrol T cell sample imported from a FlowJo gating hierarchy.](Using_CytoML_files/figure-html/cd4_memory-1.tiff)
 
 ### Adding a lymphocyte gate using openCyto.
 
 We'll use openCyto (@Finak2014-mr) to add a lymphocyte gate on the FSC-A, SSC-A channels beneath the singlet gate.
 
-![Figure 3: The ungated lymphocyte population shown in FSC-A and SSC-A.](Using_CytoML_files/figure-html/opencyto_gating_fj-1.png)
+![Figure 3: The ungated lymphocyte population shown in FSC-A and SSC-A.](Using_CytoML_files/figure-html/opencyto_gating_fj-1.tiff)
 
 
 ```r
 # Add a gate using opencyto
-add_pop(gs=gs_tcell,alias = "lymphocytes",pop = "+",parent = "singlets",dims = "FSC-A,SSC-A", gating_method = "flowClust",gating_args = "K=3")
+add_pop(gs = gs_tcell,alias = "lymphocytes",pop = "+",parent = "singlets",dims = "FSC-A,SSC-A", gating_method = "flowClust", gating_args = "K=3")
 
 #move the CD3+ subtree beneath the lymphocyte gate
 for(i in sampleNames(gs_tcell))
@@ -260,7 +260,7 @@ upViewport()
 grid.text("B",0 ,0.55)
 ```
 
-![**Figure 4**: Lymphocyte gates visualized in openCyto (A) and in FlowJo (B). A workspace of manually gated data was imported into R, modified using openCyto to add the lymphocyte gate, and exported to a new FlowJo workspace using the CytoML package.](Using_CytoML_files/figure-html/combined_plot-1.png)
+![**Figure 4**: Lymphocyte gates visualized in openCyto (A) and in FlowJo (B). A workspace of manually gated data was imported into R, modified using openCyto to add the lymphocyte gate, and exported to a new FlowJo workspace using the CytoML package.](Using_CytoML_files/figure-html/combined_plot-1.tiff)
 
 The plots from openCyto (Figure 4A) and the exported FlowJo workpsace (Figure 4B) show the same information (and have the same population statistics), with some minor style differences.
 
@@ -282,7 +282,8 @@ This gating-ml file is imported into a cytobank experiment along with the FCS fi
 
 
 
-![**Figure 5**: Cytobank display of the gating hierarchy for a manually gated Cytotrol T cell sample, with an added openCyto lymphoctye gate. ](GatingHierarchyPlotsForCytoMLExample.png)
+![**Figure 5**: Cytobank display of the gating hierarchy for a manually gated Cytotrol T cell sample, with an added openCyto lymphoctye gate. ](GatingHierarchyPlotsForCytoMLExample.tiff)
+
 
 
 ### Importing from Cytobank.
@@ -322,7 +323,7 @@ gating_ml_cytobank_file = list.files(
   plot(do.call(gridExtra::gtable_rbind,plots[1:3]))
 ```
 
-![**Figure 5**: Samples 1 through 3 from Cytobank experiment 43281](Using_CytoML_files/figure-html/acs_load-1.png)
+![**Figure 5**: Samples 1 through 3 from Cytobank experiment 43281](Using_CytoML_files/figure-html/acs_load-1.tiff)
 
 ```r
 cap = c("**Figure 5**: Samples 1 through 3 from Cytobank experiment 43281")
@@ -360,7 +361,7 @@ gs = suppressWarnings(parseWorkspace(ws, name = "PE",path = dirname(files[1])))
 autoplot(gs[[1]]) + theme_classic()
 ```
 
-![Visualization of the gating hierarchi for a DIVA XML file in the flowWorkspaceData package.](Using_CytoML_files/figure-html/diva-1.png)
+![Visualization of the gating hierarchi for a DIVA XML file in the flowWorkspaceData package.](Using_CytoML_files/figure-html/diva-1.tiff)
 
 
 # References

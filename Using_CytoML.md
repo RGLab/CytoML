@@ -3,6 +3,9 @@ title: "Using CytoML to Import and Export Gated Cytometry Data"
 author: "Greg Finak"
 date: "6/4/2018"
 output: 
+  # pdf_document:
+  #   fig_caption: yes
+  #   toc: yes
   html_document:
     fig_caption: yes
     keep_md: yes
@@ -24,7 +27,7 @@ Beckton Dickinson's (BD's) DIVA software is used as the acquisition software for
 It is often used to define gates for sorting cell poplations and also for data analysis.
 DIVA's analyses are stored as XML files. No special conversion needs to be done to read these using CytoML. 
 
-DIVA XML organizes the different gating groups into different 'specimen' nodes under an 'experiment' node. Each 'specimen' group contains multiple 'tube' nodes, which represent FCS samples. All gate definitions are directly stored under 'tube' node. The gating hierarchy can be derived from the 'parent' attribute of each gate and each gate is uniquely labeled with the full gating path (i.e. 'A\B\C').
+DIVA XML organizes the different gating groups into different 'specimen' nodes under an 'experiment' node. Each 'specimen' group contains multiple 'tube' nodes, which represent FCS samples. All gate definitions are directly stored under 'tube' node. The gating hierarchy can be derived from the 'parent' attribute of each gate and each gate is uniquely labeled with the full gating path (i.e. 'A\\B\\C').
 
 Gate definitions are not GatingML-complied. Currently CytoML supports RECTANGLE_REGION, POLYGON_REGION, INTERVAL_REGION gates.
 DIVA supports log or biexp transformations. The transformation is determined by the attributes under the 'tube/instrument_settings' node. The global transformation parameters can be overridden by gate-level attributes.
@@ -124,7 +127,10 @@ We find the path to the manual gating XML FlowJo file that's distributed with th
 
 
 ```r
-manual_gating_xml = system.file("extdata",package="flowWorkspaceData","manual.xml")
+manual_gating_xml = 
+  system.file("extdata", 
+              package = "flowWorkspaceData", 
+              "manual.xml")
 ```
 
 We need to do two things to import the data. 
@@ -202,11 +208,19 @@ We'll use openCyto (@Finak2014-mr) to add a lymphocyte gate on the FSC-A, SSC-A 
 
 ```r
 # Add a gate using opencyto
-add_pop(gs = gs_tcell,alias = "lymphocytes",pop = "+",parent = "singlets",dims = "FSC-A,SSC-A", gating_method = "flowClust", gating_args = "K=3")
+add_pop(gs = gs_tcell,
+        alias = "lymphocytes",
+        pop = "+",
+        parent = "singlets",
+        dims = "FSC-A,SSC-A",
+        gating_method = "flowClust",
+        gating_args = "K=3")
 
 #move the CD3+ subtree beneath the lymphocyte gate
 for(i in sampleNames(gs_tcell))
-  flowWorkspace::moveNode(gh = gs_tcell[[i]], node = "CD3+", to = "lymphocytes")
+  flowWorkspace::moveNode(gh = gs_tcell[[i]],
+                          node = "CD3+",
+                          to = "lymphocytes")
 recompute(gs_tcell)
 ```
 
@@ -216,7 +230,8 @@ Finally we'll export the new modified gating set to a FlowJo XML workspace.
 
 
 ```r
-CytoML::GatingSet2flowJo(gs_tcell,outFile = "new_flowjo_xml.xml")
+CytoML::GatingSet2flowJo(gs_tcell,
+                         outFile = "new_flowjo_xml.xml")
 ```
 
 ```
@@ -236,8 +251,11 @@ img = png::readPNG("new_flowjo_xml-Layout.png")
 g <- rasterGrob(img, interpolate=TRUE)
 p1 = ggcyto(gs_tcell,
             subset = "singlets",
-            mapping = aes(x = "FSC-A", y = "SSC-A")) + geom_hex(bins = 128) + geom_gate("lymphocytes") + geom_stats() + theme(axis.text.x =
-            element_text(angle = 45, hjust = 1)) + theme_classic(base_size = 10)
+            mapping = aes(x = "FSC-A", y = "SSC-A")) + 
+  geom_hex(bins = 128) + geom_gate("lymphocytes") + 
+  geom_stats() + theme(axis.text.x =
+            element_text(angle = 45, hjust = 1)) + 
+  theme_classic(base_size = 10)
             p1 = as.ggplot(p1)
 p1 = ggplotGrob(p1)
 g = rasterGrob(img,interpolate = TRUE)
@@ -245,15 +263,18 @@ g = rasterGrob(img,interpolate = TRUE)
 grid.newpage()
 ## main viewports, I divide the scene in 10 rows ans 5 columns(5 pictures)
 pushViewport(plotViewport(margins = c(1,1,1,1),
-             layout=grid.layout(nrow=10, ncol=100),xscale =c(1,5)))
+             layout=grid.layout(nrow=10, ncol=100),
+             xscale =c(1,5)))
 ## I put in the 1:7 rows the plot without axis
 ## I define my nested viewport then I plot it as a grob.
-pushViewport(plotViewport(layout.pos.col=5:95, layout.pos.row=1:4,
+pushViewport(plotViewport(layout.pos.col=5:95,
+                          layout.pos.row=1:4,
              margins = c(1,1,1,1)))
 grid.draw(p1)
 upViewport()
 grid.text("A",0,1)
-pushViewport(plotViewport(layout.pos.col=1:100, layout.pos.row=5:10,
+pushViewport(plotViewport(layout.pos.col=1:100,
+                          layout.pos.row=5:10,
              margins = c(1,1,1,1)))
 grid.draw(g)
 upViewport()
@@ -270,7 +291,9 @@ We can take the same gating set we just worked on and export it to Cytobank form
 
 
 ```r
-GatingSet2cytobank(gs_tcell,outFile = "new_cytobank_xml_cytobank_scale.xml",cytobank.default.scale = TRUE)
+GatingSet2cytobank(gs_tcell,
+                   outFile = "new_cytobank_xml_cytobank_scale.xml",
+                   cytobank.default.scale = TRUE)
 ```
 
 ```
@@ -336,7 +359,9 @@ We will import a gated FCS file found in the flowWorkspaceData package.
 
 
 ```r
-files = list.files(system.file("extdata", "diva", package = "flowWorkspaceData"),
+files = list.files(system.file("extdata", 
+                               "diva", 
+                               package = "flowWorkspaceData"),
                    full.names = TRUE)
 ws = openDiva(files[2]) #diva xml
 ws
@@ -357,8 +382,12 @@ ws
 ```r
 #read in the one FCS file that's present. Suppress warnings that we can't find 3 others.
 #PE is the name of the sample group.
-gs = suppressWarnings(parseWorkspace(ws, name = "PE",path = dirname(files[1])))
-autoplot(gs[[1]]) + theme_classic()
+gs = suppressWarnings(
+  parseWorkspace(ws, 
+                 name = "PE",
+                 path = dirname(files[1])))
+autoplot(gs[[1]]) + 
+  theme_classic()
 ```
 
 ![Visualization of the gating hierarchi for a DIVA XML file in the flowWorkspaceData package.](Using_CytoML_files/figure-html/diva-1.png)

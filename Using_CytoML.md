@@ -282,7 +282,7 @@ This gating-ml file is imported into a cytobank experiment along with the FCS fi
 
 
 
-![**Figure 5**: Cytobank display of the gating hierarchy for a manually gated Cytotrol T cell sample, with an added openCyto lymphoctye gate. ](GatingHierarchyPlotsForCytoMLExample.tiff)
+![**Figure 5**: Cytobank display of the gating hierarchy for a manually gated Cytotrol T cell sample, with an added openCyto lymphoctye gate. ](GatingHierarchyPlotsForCytoMLExample.png)
 
 
 

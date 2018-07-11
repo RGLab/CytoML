@@ -46,6 +46,7 @@ setMethod("getNodes", signature = c("graphGML"),
 #' get full path of the parent
 #' @param x \code{graphGML}
 #' @param y \code{character} node index. When \code{missing}, return all the nodes
+#' @noRd
 .getPath <- function(x, y){
   #get full path
   nodeIds <- y
@@ -287,6 +288,7 @@ setMethod("getCompensationMatrices", signature = "graphGML", definition = functi
 #' @return transformerList object
 #' @importFrom flowCore eval parameters colnames
 #' @importFrom flowWorkspace transformerList asinh_Gml2 flow_trans asinhtGml2_trans logicleGml2_trans
+#' @importFrom methods extends
 #' @export
 setMethod("getTransformations", signature = c(x = "graphGML"), function(x){
   trans <- x@graphData[["transformations"]]
@@ -298,12 +300,12 @@ setMethod("getTransformations", signature = c(x = "graphGML"), function(x){
       #which is not suitable for transformList constructor
       # trans.fun <- eval(thisTrans)
       trans.type <- class(thisTrans)
-      if(extends(trans.type, "asinhtGml2")){
+      if(methods::extends(trans.type, "asinhtGml2")){
         # inv.func <- asinh_Gml2(thisTrans@T, thisTrans@M, thisTrans@A, inverse = TRUE)
         trans.obj <- asinhtGml2_trans(thisTrans@T, thisTrans@M, thisTrans@A)
-      }else if(extends(trans.type, "logicletGml2")){
+      }else if(methods::extends(trans.type, "logicletGml2")){
         trans.obj <- logicleGml2_trans(thisTrans@T, thisTrans@M, thisTrans@W, thisTrans@A)
-      }else if(extends(trans.type, "logtGml2")){
+      }else if(methods::extends(trans.type, "logtGml2")){
         trans.obj <- logtGml2_trans(thisTrans@T, thisTrans@M)
       }else
         stop("Don't know how to inverse transformation: ", trans.type)

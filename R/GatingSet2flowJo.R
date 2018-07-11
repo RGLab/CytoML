@@ -27,6 +27,8 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   #   if(grepl("/", chnl))
   #     stop("'/' is found in channel '", chnl, "'! Please update GatingSet by running 'gs <- fix_channel_slash(gs)'")
   # }
+  #NOTE we call a lot of flowWorkspace accessors, they need to be imported explicitly. Otherwise the user needs to load flowWorkspace explicitly before using CytoML.
+  # see all the NOTES in R CMD check that have to do with "no visible global function / binding / variable". 
   chnls <- colnames(gs)
   slash_loc <- sapply(chnls, function(thisCol)as.integer(gregexpr("/", thisCol)[[1]]), simplify = FALSE)
   new_cnd <- flowWorkspace:::.fix_channel_slash(chnls, slash_loc)
@@ -617,7 +619,7 @@ gateNode.default <- function(gate, ...)stop("unsupported gate type: ", class(gat
 
 gateNode.ellipsoidGate <- function(gate, ...){
 
-  gate <- as(gate, "polygonGate")
+  gate <- methods::as(gate, "polygonGate")
   gateNode(gate, ...)
 }
 
@@ -653,6 +655,7 @@ gateNode.rectangleGate <- function(gate, matInfo, ...){
 }
 
 #' @param quad a character of size 2, indicating the quadrant pattern .e.g. '+-')
+#' @noRd
 gateNode.quadGate <- function(gate, matInfo, ...){
   quad <- attr(gate, "quad.pattern")
   stopifnot(grepl("^[\\+-]{2}$", quad))

@@ -6,7 +6,8 @@
 #' @examples
 #'
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-#' fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
+#' fcsFiles <- list.files(pattern = "CytoTrol", 
+#'       system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
 #' gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 #' #plotGate(gs[[1]])
 #'
@@ -41,7 +42,8 @@ cytobank2GatingSet <- function(xml, FCS){
 #' @examples
 #'
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-#' fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
+#' fcsFiles <- list.files(pattern = "CytoTrol", 
+#'         system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
 #' gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 #' ## verify the stats are correct
 #' statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")

@@ -20,6 +20,7 @@ setClass("graphGML", contains = "graphNEL")
 #' @export
 #' @importFrom flowUtils read.gatingML
 #' @importFrom flowCore parameters parameters<-
+#' @importFrom methods is
 #' @return a graphGML that represents the population tree.
 #' The gate and population name are stored in nodeData of each node.
 #' Compensation and transformations are stored in graphData.
@@ -42,7 +43,7 @@ read.gatingML.cytobank <- function(file, ...){
   #because flowUtils add comp and tran names as prefix which is really not neccessary (even problematic) here.
   for(objID in ls(flowEnv)){
     obj <- flowEnv[[objID]]
-    if(is(obj, "parameterFilter")){
+    if(methods::is(obj, "parameterFilter")){
 
       # message(class(obj))
 
@@ -103,7 +104,7 @@ read.gatingML.cytobank <- function(file, ...){
 
                                 obj <- flowEnv[[i]]
                                 #exclude the compensatedParameter since it also inherits transformation class
-                                if(is(obj, "transformation")&&!is(obj, "compensatedParameter"))
+                                if(methods::is(obj, "transformation")&&!methods::is(obj, "compensatedParameter"))
                                   obj
                               }, USE.NAMES = FALSE)
 
@@ -118,7 +119,7 @@ read.gatingML.cytobank <- function(file, ...){
   if(length(trans) > 0)
     g@graphData[["transformations"]] <- trans
 
-  as(g, "graphGML")
+  methods::as(g, "graphGML")
 
 }
 
@@ -232,6 +233,7 @@ matchPath <- function(g, leaf, nodeSet){
 #' @return a graphNEL represent the population tree. The gate and population name are stored as nodeData in each node.
 #' @importFrom graph graphNEL nodeDataDefaults<- nodeData<- addEdge edges removeNode addNode
 #' @importFrom jsonlite fromJSON
+#' @importFrom methods slot
 constructTree <- function(flowEnv, gateInfo){
 
   #parse the references from boolean gates
@@ -242,7 +244,7 @@ constructTree <- function(flowEnv, gateInfo){
     obj <- flowEnv[[i]]
     if(class(obj) == "intersectFilter"){
       refs <- obj@filters
-      refs <- sapply(refs, slot, "name")
+      refs <- sapply(refs, methods::slot, "name")
       unique(refs) #make root node depth of 1
     }
   })
@@ -423,17 +425,20 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
 #' colnames(sqrcut) <- c("FSC-H","SSC-H")
 #' pg <- polygonGate(filterId="nonDebris", sqrcut)
 #' pg
-#' bound <- matrix(c(100,3e3,100,3e3), byrow = TRUE, nrow = 2, dimnames = list(c("FSC-H", "SSC-H"), c("min", "max")))
+#' bound <- matrix(c(100,3e3,100,3e3), 
+#'     byrow = TRUE, nrow = 2, 
+#'    dimnames = list(c("FSC-H", "SSC-H"), 
+#'      c("min", "max")))
 #' bound
 #' pg.extened <- extend(pg, bound, plot = TRUE)
 extend <- function(gate, bound, data.range = NULL, plot = FALSE, limits = c("original", "extended"))UseMethod("extend")
 
 #' @export
-#' @S3method extend polygonGate
 #' @rdname extend
 #' @param plot whether to plot the extended polygon.
 #' @importFrom flowCore polygonGate
 #' @importFrom graphics abline polygon text
+#' @importFrom grDevices rgb
 extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, limits = c("original", "extended")){
   limits <- match.arg(limits)
   #linear functions
@@ -686,7 +691,7 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, lim
       plot(type = "n", x = verts[[1]], y = verts[[2]])
     else
       plot(type = "n", x = verts.orig[,1], y = verts.orig[,2])
-    polygon(verts.orig, lwd =  4, border = rgb(0, 0, 0,0.5))
+    polygon(verts.orig, lwd =  4, border = grDevices::rgb(0, 0, 0,0.5))
     # points(verts.orig, col = "red")
     # points(t(as.data.frame(colMeans(verts.orig))), col = "red")
     # abline(v = bound[1,], lty = "dashed", col = "red")
@@ -706,7 +711,6 @@ extend.polygonGate <- function(gate, bound, data.range = NULL, plot = FALSE, lim
 }
 
 #' @export
-#' @S3method extend rectangleGate
 #' @rdname extend
 #' @importFrom flowCore rectangleGate
 extend.rectangleGate <- function(gate, ...){
@@ -716,7 +720,7 @@ extend.rectangleGate <- function(gate, ...){
   if(nParam == 2){
     gate <- fix.rectangleGate(gate)
 
-    extend(as(gate, "polygonGate"), ...)
+    extend(methods::as(gate, "polygonGate"), ...)
   }else{
     extend.rectangleGate1d(gate, ...)
   }
@@ -742,13 +746,13 @@ extend.rectangleGate1d <- function(gate, bound, data.range = NULL)
 
 }
 #' @export
-#' @S3method extend ellipsoidGate
 #' @rdname extend
 #' @importFrom flowCore ellipsoidGate
+#' @importFrom methods as
 extend.ellipsoidGate <- function(gate, ...){
   #fix the ellipsoidGate parsed from gatingML
   gate <- fix.ellipsoidGate(gate)
-  extend(as(gate, "polygonGate"), ...)
+  extend(methods::as(gate, "polygonGate"), ...)
 }
 
 fix.ellipsoidGate <- function(gate){

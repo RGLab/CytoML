@@ -75,7 +75,7 @@ smartTreeParse <- function (file, ...)
 }
 
 # internals copied from flowUtils to avoid :::
-#' @importMethodsFrom  XML xmlSApply
+#' @importFrom  XML xmlSApply
 .fuEnv <-  new.env(parent=emptyenv())
 .onLoad <- function(...)
 {	

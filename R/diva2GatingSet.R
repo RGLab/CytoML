@@ -197,7 +197,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs
+#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated
 #' @importFrom ggcyto transform_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -567,7 +567,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     gs <- suppressMessages(load_gs(gsfiles))
 
        # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
-    gslist <- suppressMessages(flowWorkspace:::.groupByTree(gs))
+    gslist <- suppressMessages(groupByTree(gs))
     if(length(gslist) > 1)
       warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
     gs

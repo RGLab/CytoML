@@ -123,7 +123,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       #we have to create inverse gate on our end
       if(!isQuad)
       {
-        if(flowWorkspace:::isNegated(gs[fcs_guid][[1]], nodePath))
+        if(isNegated(gs[fcs_guid][[1]], nodePath))
           gate <- inverse(gate, rng)
       }
       #transform to raw scale
@@ -241,7 +241,7 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, guid_mapping){
 #' @param root the root node of the XML
 #' @param flowEnv the environment that stores the information parsed by 'read.GatingML'.
 #' @importFrom  XML xmlAttrs getNodeSet addChildren xmlAttrs<-
-#' @importFrom flowWorkspace pData
+#' @importFrom flowWorkspace pData getCompensationObj
 #' @return XML root node
 addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden){
   quad.pattern.cytobank <- c("++", "-+", "--","+-")
@@ -252,7 +252,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   transNames <- names(translist)
   rng <- range(gs[[1]], raw.scale = TRUE)
   #retrieve the prefix for latter trans matching
-  cmp <- flowWorkspace:::.cpp_getCompensation(gs@pointer, sampleNames(gs)[[1]])
+  cmp <- getCompensationObj(gs@pointer, sampleNames(gs)[[1]])
   prefix <- cmp$prefix
   suffix <- cmp$suffix
   id <- 0 # id for each local gate instances (i.e. one gate_id vs multiple ids representing tailored gates)

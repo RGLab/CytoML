@@ -136,7 +136,7 @@ read.gatingML.cytobank <- function(file, ...){
 parse.gateInfo <- function(file, ...)
 {
 
-  root <- xmlRoot(flowUtils:::smartTreeParse(file,...))
+  root <- xmlRoot(smartTreeParse(file,...))
 
   rbindlist(
     lapply(xmlChildren(root), function(node){

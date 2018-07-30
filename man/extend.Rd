@@ -52,7 +52,10 @@ sqrcut <- matrix(c(300,300,600,600,50,300,300,50),ncol=2,nrow=4)
 colnames(sqrcut) <- c("FSC-H","SSC-H")
 pg <- polygonGate(filterId="nonDebris", sqrcut)
 pg
-bound <- matrix(c(100,3e3,100,3e3), byrow = TRUE, nrow = 2, dimnames = list(c("FSC-H", "SSC-H"), c("min", "max")))
+bound <- matrix(c(100,3e3,100,3e3), 
+    byrow = TRUE, nrow = 2, 
+   dimnames = list(c("FSC-H", "SSC-H"), 
+     c("min", "max")))
 bound
 pg.extened <- extend(pg, bound, plot = TRUE)
 }

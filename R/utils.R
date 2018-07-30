@@ -1,5 +1,10 @@
 xmlElementsByTagName <- function(...)suppressWarnings(XML::xmlElementsByTagName(...))
-compact <- flowWorkspace:::compact
+
+compact <- function (x) 
+{
+  null <- vapply(x, is.null, logical(1))
+  x[!null]
+}
 
 #' the parameter range from the flow data associated with GatingHierarchy
 #' @param ... GatingHierarchy object
@@ -56,7 +61,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
   }else{
     chnls <- as.vector(parameters(comp))
     #retrieve the prefix for latter trans matching
-    cmp <- flowWorkspace:::.cpp_getCompensation(gs@pointer, sampleNames(gs)[[1]])
+    cmp <- getCompensationObj(gs@pointer, sampleNames(gs)[[1]])
     prefix <- cmp$prefix
     suffix <- cmp$suffix
     prefix_chnls_orig <- paste0(prefix, chnls, suffix)

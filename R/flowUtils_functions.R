@@ -31,8 +31,8 @@ targs <- function(tag, attrs=NULL, system="win", ...)
 ## workspace. NULL values are ignored. These are stored in inst/defaults.xml
 ## and new tags have to be added there.
 fjSettings <- function(type=c("win", "mac")) switch(match.arg(type),
-                                                    "win"=flowUtils:::.fuEnv$winDefaults,
-                                                    "mac"=flowUtils:::.fuEnv$macDefaults, stop("Unknown system!"))
+                                                    "win"=.fuEnv$winDefaults,
+                                                    "mac"=.fuEnv$macDefaults, stop("Unknown system!"))
 
 
 
@@ -57,4 +57,41 @@ xmlVertexNode <- function (xy)
   xmlTag("vertex", namespace = "gating", children = lapply(xy, 
                                                            function(x) xmlTag("coordinate", namespace = "gating", 
                                                                               attrs = list(`data-type:value` = x))))
+}
+
+# internals copied from flowUtils to avoid :::
+#' @importFrom XML xmlNamespace
+smartTreeParse <- function (file, ...) 
+{
+  handlers = list(comment = function(x, ...) {
+    NULL
+  }, startElement = function(x, ...) {
+    class(x) = c(paste(make.names(c(xmlNamespace(x), xmlName(x))), 
+                       collapse = "_"), make.names(xmlNamespace(x)), class(x))
+    x
+  })
+  xmlTreeParse(file, handlers = handlers, asTree = TRUE, fullNamespaceInfo = TRUE, 
+               ...)
+}
+
+# internals copied from flowUtils to avoid :::
+#' @importFrom  XML xmlSApply
+.fuEnv <-  new.env(parent=emptyenv())
+.onLoad <- function(...)
+{	
+  
+  mdef <- xmlSApply(xmlTreeParse(system.file("defaults.xml",
+                                             package="flowUtils"),
+                                 addAttributeNamespaces=TRUE)[["doc"]][[1]][["macdefaults"]],
+                    function(x)
+                      if(!is(x, "XMLCommentNode")) as.list(xmlAttrs(x)))
+  wdef <- xmlSApply(xmlTreeParse(system.file("defaults.xml",
+                                             package="flowUtils"),
+                                 addAttributeNamespaces=TRUE)[["doc"]][[1]][["windefaults"]],
+                    function(x)
+                      if(!is(x, "XMLCommentNode")) as.list(xmlAttrs(x)))
+  mdef <- mdef[!sapply(mdef, is.null)]
+  wdef <- wdef[!sapply(wdef, is.null)]
+  assign("winDefaults", wdef, .fuEnv)
+  assign("macDefaults", mdef, .fuEnv)
 }

@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: GatingML interface for openCyto
-Version: 1.7.7
+Version: 1.7.9
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -11,7 +11,7 @@ License: Artistic-2.0
 LazyData: TRUE
 Imports:
     flowCore (>= 1.43.10),
-    flowWorkspace (>= 3.29.1),
+    flowWorkspace (>= 3.29.5),
     openCyto (>= 1.11.3),
     XML,
     data.table,
@@ -27,6 +27,8 @@ Imports:
     utils,
     base64enc,
     plyr,
+    grDevices,
+    methods,
     ggcyto (>= 1.9.3)
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:

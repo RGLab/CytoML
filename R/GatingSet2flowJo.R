@@ -27,9 +27,11 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   #   if(grepl("/", chnl))
   #     stop("'/' is found in channel '", chnl, "'! Please update GatingSet by running 'gs <- fix_channel_slash(gs)'")
   # }
+  #NOTE we call a lot of flowWorkspace accessors, they need to be imported explicitly. Otherwise the user needs to load flowWorkspace explicitly before using CytoML.
+  # see all the NOTES in R CMD check that have to do with "no visible global function / binding / variable". 
   chnls <- colnames(gs)
   slash_loc <- sapply(chnls, function(thisCol)as.integer(gregexpr("/", thisCol)[[1]]), simplify = FALSE)
-  new_cnd <- flowWorkspace:::.fix_channel_slash(chnls, slash_loc)
+  new_cnd <- fix_channel_slash(chnls, slash_loc)
   if(!all(new_cnd == chnls)){
     gs <- clone(gs, isNew = FALSE, isEmpty = FALSE) # ensure everything else is cloned except hdf5
     gs <- updateChannels(gs, map = data.frame(old = chnls, new = new_cnd))
@@ -113,7 +115,7 @@ getSpilloverMat <- function(gh){
     compobj <- getCompensationMatrices(gh)
     if(!is.null(compobj)){
       mat <- compobj@spillover
-      comp <- flowWorkspace:::.cpp_getCompensation(gh@pointer,sampleNames(gh))
+      comp <- getCompensationObj(gh@pointer,sampleNames(gh))
       cid <- comp$cid
       prefix <- comp$prefix
       suffix <- comp$suffix
@@ -251,7 +253,7 @@ transformationNode <- function(gh, matInfo){
                 }else if(trans.type == "flowJo_linear"){
                   if(grepl("time", chnl, ignore.case = TRUE)){
                     rg <- range(exprs(fr)[, chnl])
-                    gain <- flowWorkspace:::compute.timestep(keyword(fr), rg, timestep.source = "TIMESTEP")
+                    gain <- compute_timestep(keyword(fr), rg, timestep.source = "TIMESTEP")
 
                   }else
                   {
@@ -338,7 +340,7 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, ...){
   stat <- getTotal(gh, "root", xml = FALSE)
   children <- getChildren(gh, "root")
   if(!showHidden)
-    children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
+    children <- children[!sapply(children, function(child)isHidden(gh, child))]
   param <- as.vector(parameters(getGate(gh, children[1])))
 
 
@@ -366,15 +368,15 @@ graphNode <- function(x, y){
 }
 
 constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.nodes, quad.gate = NULL){
-  if(!flowWorkspace:::isHidden(gh, pop)||showHidden){
+  if(!isHidden(gh, pop)||showHidden){
     if(is.null(quad.gate))
       gate <- getGate(gh, pop)
     else
       gate <- quad.gate
-    eventsInside <- !flowWorkspace:::isNegated(gh, pop)
+    eventsInside <- !isNegated(gh, pop)
     children <- getChildren(gh, pop)
     if(!showHidden)
-      children <- children[!sapply(children, function(child)flowWorkspace:::isHidden(gh, child))]
+      children <- children[!sapply(children, function(child)isHidden(gh, child))]
 
     isBool <- is(gate, "booleanFilter")
 
@@ -617,7 +619,7 @@ gateNode.default <- function(gate, ...)stop("unsupported gate type: ", class(gat
 
 gateNode.ellipsoidGate <- function(gate, ...){
 
-  gate <- as(gate, "polygonGate")
+  gate <- methods::as(gate, "polygonGate")
   gateNode(gate, ...)
 }
 
@@ -653,6 +655,7 @@ gateNode.rectangleGate <- function(gate, matInfo, ...){
 }
 
 #' @param quad a character of size 2, indicating the quadrant pattern .e.g. '+-')
+#' @noRd
 gateNode.quadGate <- function(gate, matInfo, ...){
   quad <- attr(gate, "quad.pattern")
   stopifnot(grepl("^[\\+-]{2}$", quad))

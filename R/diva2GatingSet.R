@@ -25,6 +25,7 @@ setClass("divaWorkspace", contains = "flowJoWorkspace")
 #' }
 #' @export
 #' @importFrom XML xmlTreeParse xpathApply xmlGetAttr
+#' @importFrom methods new
 openDiva <- function(file,options = 0,...){
   #message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
   tmp<-tempfile(fileext=".xml")
@@ -43,10 +44,10 @@ openDiva <- function(file,options = 0,...){
 
   ver <- xpathApply(x, paste0("/", rootNode),function(x)xmlGetAttr(x,"version"))[[1]]
   if(rootNode == "Workspace"){
-    x<-new("flowJoWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
+    x<-methods::new("flowJoWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
     x@.cache$flag <- TRUE
   }else if(rootNode == "bdfacs"){
-    x <- new("divaWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
+    x <- methods::new("divaWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
     x@.cache$flag <- TRUE
   }else
     stop("Unrecognized xml root node: ", rootNode)
@@ -57,9 +58,10 @@ openDiva <- function(file,options = 0,...){
 #' @rdname divaWorkspace-class
 #' @param x divaWorkspace
 #' @importFrom flowWorkspace getSamples
+#' @importFrom methods selectMethod
 #' @export
 setMethod("getSamples","divaWorkspace",function(x){
-      selectMethod("getSampleGroups","divaWorkspace")(x)
+      methods::selectMethod("getSampleGroups","divaWorkspace")(x)
     })
 
 #' @rdname divaWorkspace-class
@@ -113,6 +115,7 @@ setMethod("show",c("divaWorkspace"),function(object){
 #' @param obj divaWorkspace
 #' @param ... other arguments
 #' @importFrom flowWorkspace parseWorkspace
+#' @importFrom utils menu
 #' @export
 setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
       .preprocessorDiva(obj, ...)
@@ -134,7 +137,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
   if(is.null(name)){
     message("Choose which group of samples to import:\n");
-    groupInd <- menu(groups,graphics=FALSE);
+    groupInd <- utils::menu(groups,graphics=FALSE);
   }else if(is.numeric(name)){
     if(length(groups)<name)
       stop("Invalid sample group index.")
@@ -145,7 +148,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     groupInd <- match(name,groups)
   }
   group.name <- groups[groupInd]
-
+  # NOTE: This seems like a bug. Where is the specimen variable defined?
   sg <- subset(sg, specimen == group.name)
 #    browser()
   #filter by subset (sample name or numeric index)
@@ -167,6 +170,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
   #check duplicated sample names
 
   isDup <- duplicated(sn)
+  #NOTE This seems like a bug: where is sampleSelected defined?
   if(any(isDup))
     stop("Duplicated sample names detected within group: ", paste(sampleSelected[isDup], collapse = " "), "\n Please check if the appropriate group is selected.")
 
@@ -193,9 +197,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs
+#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated
 #' @importFrom ggcyto transform_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
+#' @noRd
 .parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, num_threads = 1,  ...){
 
   scale_level <- match.arg(scale_level, c("gate", "tube"))
@@ -255,7 +260,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
   num_threads <- min(num_threads, length(files))
   if(num_threads >1)
   {
-    require(parallel)
+    requireNamespace("parallel")
     file.group <- split(files, cut(seq_along(files),num_threads))
   }
   else
@@ -527,7 +532,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         fs[[sampleName]] <- data
 
       }
-      flowData(gs) <- fs
+      flowWorkspace::flowData(gs) <- fs
 
       gs@compensation <- complist
 
@@ -562,7 +567,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     gs <- suppressMessages(load_gs(gsfiles))
 
        # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
-    gslist <- suppressMessages(flowWorkspace:::.groupByTree(gs))
+    gslist <- suppressMessages(groupByTree(gs))
     if(length(gslist) > 1)
       warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
     gs

@@ -48,7 +48,7 @@ is.cytof <- function(gs){
 #to prepare the GatingML output that can be shared by both cytobank and flowJo modules
 ######################################
 #' @importFrom flowWorkspace getData
-#' @importFrom flowCore compensation identifier identifier<- compensatedParameter asinhtGml2 logicletGml2
+#' @importFrom flowCore compensation identifier identifier<- compensatedParameter asinhtGml2 logicletGml2 logtGml2
 export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type = c("cytobank", "flowJo"))
 {
   type <- match.arg(type)

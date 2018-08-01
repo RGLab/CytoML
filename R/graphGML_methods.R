@@ -287,7 +287,7 @@ setMethod("getCompensationMatrices", signature = "graphGML", definition = functi
 #' @param x graphGML
 #' @return transformerList object
 #' @importFrom flowCore eval parameters colnames
-#' @importFrom flowWorkspace transformerList asinh_Gml2 flow_trans asinhtGml2_trans logicleGml2_trans
+#' @importFrom flowWorkspace transformerList asinh_Gml2 flow_trans asinhtGml2_trans logicleGml2_trans logtGml2_trans
 #' @importFrom methods extends
 #' @export
 setMethod("getTransformations", signature = c(x = "graphGML"), function(x){

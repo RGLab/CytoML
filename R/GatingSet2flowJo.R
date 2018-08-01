@@ -6,7 +6,7 @@
 #' @param ... other arguments
 #'        showHidden whether to include the hidden population nodes in the output
 #' @export
-#' @importFrom flowWorkspace clone updateChannels
+#' @importFrom flowWorkspace clone updateChannels pData<-
 #' @return nothing
 #' @examples
 #' library(flowWorkspace)

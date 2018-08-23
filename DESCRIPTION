@@ -1,12 +1,12 @@
 Package: CytoML
 Type: Package
-Title: GatingML interface for openCyto
+Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
 Version: 1.7.9
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
-Description: This package is designed to use GatingML2.0 as the standard format
-    to exchange the gated data with other software platform.
+Description: Uses platform-specific implemenations of the GatingML2.0 standard 
+    to exchange gated cytometry data with other software platforms.
 License: Artistic-2.0
 LazyData: TRUE
 Imports:
@@ -38,6 +38,8 @@ Suggests:
     parallel
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
+BugReports: https://github.com/RGLab/CytoML/issues
+URL: https://github.com/RGLab/CytoML
 Collate: 
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'

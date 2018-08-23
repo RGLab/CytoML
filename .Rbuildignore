@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^CONDUCT\.md$
+^README\.Rmd$
+^README_files/*
+^README_files$

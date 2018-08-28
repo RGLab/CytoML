@@ -1,0 +1,210 @@
+---
+output: github_document
+editor_options: 
+  chunk_output_type: inline
+  
+---
+
+# CytoML: Cross-Platform Cytometry Data Sharing.
+
+This package is designed to import/export the hierarchical gated cytometry data to and from R (specifically the [openCyto](https://github.com/RGLab/openCyto) framework) using the [`gatingML2.0`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4874733/) and [`FCS3.0`](http://isac-net.org/Resources/Standards/FCS3-1.aspx) cytometry data standards. This package makes use of the `GatingSet` R object and data model so that imported data can easily be manipulated and visualized in R using tools like [openCyto](https://github.com/RGLab/openCyto) and [ggCyto](https://github.com/RGLab/ggcyto).
+
+
+## What problems does CytoML solve?
+
+CytoML allows you to:
+
+- Import manually gated data into R from [Diva](http://www.bdbiosciences.com/us/instruments/clinical/software/flow-cytometry-acquisition/bd-facsdiva-software/m/333333/overview), [FlowJo](https://www.flowjo.com/) and [Cytobank](https://cytobank.org/).
+- Combine manual gating strategies with automated gating strategies in R.
+- Export data gated manually, auto-gated, or gated using a combination of manual and automated strategies from R to [Diva](http://www.bdbiosciences.com/us/instruments/clinical/software/flow-cytometry-acquisition/bd-facsdiva-software/m/333333/overview), [FlowJo](https://www.flowjo.com/) and [Cytobank](https://cytobank.org/).
+- Share computational flow analyses with users on other platforms.
+- Perform comparative analyses between computational and manual gating approaches.
+
+
+## INSTALLATION
+
+CytoML can be installed in several ways:
+
+### For all versions:
+
+For all versions, you must have dependencies installed
+
+```r
+library(BiocManager)
+# This should pull all dependencies.
+BiocManager::install("openCyto") 
+
+# Then install latest dependencies from github, using devtools.
+install.packages("devtools") 
+library(devtools) #load it
+
+install_github("RGLab/flowWorkspace", ref="trunk")
+install_github("RGLab/openCyto", ref="trunk")
+```
+
+### Installing from [BioConductor](https://www.bioconductor.org).
+
+- [Current BioConductor Relase](https://doi.org/doi:10.18129/B9.bioc.CytoML)
+
+```r
+library(BiocManager)
+#this should pull all dependencies.
+BiocManager::install("CytoML", version = "devel") 
+```
+
+- [Current BioConductor Development Version](http://bioconductor.org/packages/devel/bioc/html/CytoML.html)
+
+```r
+library(BiocManager)
+#this should pull all dependencies.
+BiocManager::install("CytoML", version = "devel") 
+```
+
+### Installing from GitHub
+
+- [Latest GitHub Version](https://github.com/RGLab/CytoML)
+
+```r
+install.packges("devtools")
+devtools::install_github("RGLab/CytoML", ref = "trunk")
+```
+
+- [Latest GitHub Release](https://github.com/RGLab/CytoML/releases)
+
+```r
+install.packges("devtools")
+devtools::install_github("RGLab/CytoML@*release")
+```
+## Reproducible examples from the CytoML paper
+
+- A reproducible workflow can be found at the [RGLab site](http://www.rglab.org/CytoML).
+
+## Examples
+
+### Import data
+
+To import data you need the xml workspace and the raw FCS files.
+
+#### Import `gatingML` generated from [Cytobank](https://cytobank.org/).
+
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+library(CytoML)
+xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
+fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full.names = T)
+gs <- cytobank2GatingSet(xmlfile, fcsFiles)
+```
+
+#### Import a [Diva](http://www.bdbiosciences.com/us/instruments/clinical/software/flow-cytometry-acquisition/bd-facsdiva-software/m/333333/overview) workspace.
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
+# The path to the FCS files is stored in ws@path.
+# It can also be passed in to parseWorksapce via the `path` argument.
+gs <- parseWorkspace(ws, name = 2, subset = 1)
+```
+
+
+#### Interact with the gated data (`GatingSet`)
+
+We need `flowWorkspace` to interact with the imported data.
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+library(flowWorkspace)
+```
+
+We can visualize the gating tree as follows:
+
+```{r}
+#get the first sample
+gh <- gs[[1]]
+
+#plot the hierarchy tree
+plot(gh)
+```
+
+For more information see the [flowWorkspace](http://www.github.com/RGLab/flowWorkspace) package.
+
+We can print all the cell populations defined in the gating tree.
+
+```{r}
+#show all the cell populations(/nodes)
+getNodes(gh)
+```
+
+We can extract the cell population statistics. 
+
+```{r}
+#show the population statistics
+getPopStats(gh)
+```
+
+The `openCyto.count` column shows the cell counts computed via the import.
+The `xml.count` column shows the cell counts computed by FlowJo (note not all platforms report cell counts in the workspace). It is normal for these to differ by a few cells due to numerical differences in the implementation of data transformations. CytoML and openCyto are *reproducing* the data analysis from the raw data based on the information in the workspace.
+
+We can plot all the gates defined in the workspace.
+
+```{r}
+#plot the gates
+plotGate(gh) 
+```
+
+#### Access information about cells in a specific population.
+
+Because CytoML and flowWorkspace reproduce the entire analysis in a workspace in R, we have access to information about which cells are part of which cell popualtions.
+
+flowWorkspace has convenience methods to extract the cells from specific cell populations:
+
+```{r}
+getData(gh,"P3")
+```
+This returns a `flowFrame` with the cells in gate P3 (70% of the cells according to the plot).
+
+The matrix of expression can be extracted from a `flowFrame` using the `exprs()` method:
+
+```{r}
+e <- exprs(getData(gh,"P3"))
+class(e)
+dim(e)
+colnames(e)
+#compute the MFI of the fluorescence channels.
+colMeans(e[,8:15])
+```
+
+### Export gated data to other platforms.
+
+In order to export gated data, it must be in `GatingSet` format.
+
+#### Export a `GatingSet` from R to [Cytobank](https://cytobank.org/) or [FlowJo](https://www.flowjo.com/)
+
+Load something to export.
+
+```{r}
+dataDir <- system.file("extdata",package="flowWorkspaceData")
+gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+```
+
+##### Export to Cytobank
+
+```{r}
+#Cytobank
+outFile <- tempfile(fileext = ".xml")
+GatingSet2cytobank(gs, outFile)
+```
+
+##### Export to FlowJo
+
+```{r}
+#flowJo
+outFile <- tempfile(fileext = ".wsp")
+GatingSet2flowJo(gs, outFile)
+```
+
+## Next Steps
+
+See the [flowWorskspace](http://www.github.com/RGLab/flowWorkspace) and [openCyto](http://www.github.com/RGLab/openCyto] packages to learn more about what can be done with `GatingSet` objects.
+
+## Code of conduct 
+
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
+  By participating in this project you agree to abide by its terms.

@@ -486,7 +486,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
       #get dim from non-boolean children
       nonBool <- sapply(children, function(child){
         thisGate <- getGate(gh, child)
-        !is(thisGate, "booleanFilter")
+        !is.null(env.nodes[["DerivedParameters"]][[child]])||!is(thisGate, "booleanFilter")
       })
       if(sum(nonBool) == 0)
         stop("Can't find any non-boolean children node under ", pop)

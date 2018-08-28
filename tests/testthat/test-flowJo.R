@@ -81,7 +81,8 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   params <- parameters(getGate(gh, "CD4"))
   Rm("CD4", gs)
   Rm("CD8", gs)
-  
+  Rm("DNT", gs)
+  Rm("DPT", gs)
   #run flowClust
   
   fr <- getData(gh, "CD3+")
@@ -96,7 +97,7 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   stats.orig <- getPopStats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  outFile <- "~/test.wsp"
+  # outFile <- "~/test.wsp"
   expect_message(GatingSet2flowJo(gs, outFile), "DerivedParameter")
   
   # #parse it back in
@@ -105,3 +106,4 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   # stats.new <- getPopStats(gs1[[1]])
   # expect_equal(stats.orig, stats.new, tol = 5e-3)
 })
+

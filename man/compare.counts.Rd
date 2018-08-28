@@ -4,7 +4,8 @@
 \alias{compare.counts}
 \title{compare the counts to cytobank's exported csv so that the parsing result can be verified.}
 \usage{
-compare.counts(gs, file, id.vars = c("FCS Filename", "population"), ...)
+\method{compare}{counts}(gs, file, id.vars = c("FCS Filename", "population"),
+  ...)
 }
 \arguments{
 \item{gs}{parsed GatingSet}

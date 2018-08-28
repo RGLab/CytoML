@@ -6,7 +6,7 @@
 #' @param ... other arguments
 #'        showHidden whether to include the hidden population nodes in the output
 #' @export
-#' @importFrom flowWorkspace clone updateChannels
+#' @importFrom flowWorkspace clone updateChannels pData<-
 #' @return nothing
 #' @examples
 #' library(flowWorkspace)
@@ -39,7 +39,7 @@ GatingSet2flowJo <- function(gs, outFile, ...){
 
   pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
 
-  ws <- workspaceNode(gs)
+  ws <- workspaceNode(gs, outputdir = dirname(outFile))
   locale <- localeToCharset()[1]
   if(locale == "ISO8859-1")
     locale <- "ISO-8859-1"
@@ -83,23 +83,101 @@ groupNode <- function(sampleIds){
           )
 }
 
-SampleListNode <- function(gs, sampleIds, ...){
+SampleListNode <- function(gs, sampleIds, outputdir, ...){
   xmlNode("SampleList"
           , .children = lapply(sampleIds, function(sampleId){
                     guid <- sampleNames(gs)[sampleId]
                     gh <- gs[[guid]]
                     matInfo <- getSpilloverMat(gh)
 
-
+                    #global variable that keep records of the referenced NOT node
+                    #so that the same NOT node will not be generated repeatly if referred multiple times
+                    #it is also used to store the derived parameters and gate info
+                    #so that it doesn't need to be processed second time
+                    env.nodes <- new.env(parent = emptyenv())
+                    env.nodes[["DerivedParameters"]] <- new.env(parent = emptyenv())
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
                             , spilloverMatrixNode(matInfo)
                             , transformationNode(gh, matInfo)
+                            , DerivedParametersNode(gh, env.nodes, outputdir = outputdir, ...)
                             , keywordNode(gh)
-                            , sampleNode(gh, sampleId, matInfo, ...)
+                            , sampleNode(gh, sampleId = sampleId
+                                         , matInfo = matInfo
+                                         , env.nodes = env.nodes, ...)
                     )
                   })
         )
+}
+
+#' @importFrom flowWorkspace extract_cluster_pop_name_from_node
+DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.nodes, outputdir){
+  pname <- paste(cluster_name, gsub("/", ".", parent), sep = ".")
+  #create hash map for pop vs derived parameter info
+  pops <- levels(vec)  
+  for(pop_path in childnodes)
+  {
+    pop <- extract_cluster_pop_name_from_node(pop_path, cluster_name)
+    env.nodes[["DerivedParameters"]][[pop_path]] <- list(name = pname
+                                                         , value = match(pop, pops))
+      
+  }
+    
+  vec <- as.integer(vec)
+  vec[is.na(vec)] <- 0 #set NA to zeros
+  rg <- range(vec)
+  vec <- data.frame(vec)
+  colnames(vec) <- pname
+  
+  csvfile <- paste(sn, pname, "EPA.csv", sep = ".")
+  csvpath <- file.path(outputdir, csvfile)
+  write.csv(vec, csvpath, row.names = FALSE)
+  message("DerivedParameter: ", csvpath)
+  xmlNode("DerivedParameter"
+          , attrs = c(name = pname
+                    , type = "importCsv"
+                    , importFile = csvfile
+                    , range = as.character(rg[2] + 1)
+                    , columnIndex="1"
+                    )
+          , xmlNode("Transform"
+                    ,xmlNode("transforms:linear"
+                             , attrs = c("transforms:minRange" = "0"
+                                        , "transforms:maxRange" = as.character(rg[2] + 1)
+                                        , gain="1")
+                             , xmlNode("parameter"
+                                       , namespace = "data-type"
+                                       , "data-type:name" = pname)
+                             )
+                    )
+          )
+}
+
+#' @importFrom flowWorkspace gh_check_cluster_node gh_get_cluster_labels
+DerivedParametersNode <- function(gh, ...){
+  sn <- sampleNames(gh)
+  dpnodes <- lapply(getNodes(gh, path = "auto"), function(parent){
+                    childnodes <- getChildren(gh, parent, path = "auto")
+                    cluster_names <- compact(sapply(childnodes, function(nd){
+                                            gh_check_cluster_node(gh, nd)
+                                          }))
+                    lapply(unique(cluster_names), function(cl){
+                      vec <- gh_get_cluster_labels(gh, parent, cluster_method_name = cl) 
+                      
+                      DerivedParameterNode(sn, parent
+                                           , childnodes = names(which(cluster_names == cl))
+                                           , vec = vec
+                                           , cluster_name = cl
+                                           , ...)
+                    })
+                      
+                    
+              })
+  dpnodes <- compact(dpnodes)
+  dpnodes <- unlist(dpnodes, recursive = FALSE)
+  xmlNode("DerivedParameters"
+          , .children = dpnodes
+          )
 }
 
 datasetNode <- function(gh, sampleId){
@@ -334,11 +412,11 @@ fixChnlName <- function(chnl, matInfo){
 }
 
 #' @importFrom flowWorkspace getTotal
-sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, ...){
+sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...){
 
   sn <- pData(gh)[["name"]]
   stat <- getTotal(gh, "root", xml = FALSE)
-  children <- getChildren(gh, "root")
+  children <- getChildren(gh, "root", path = "auto")
   if(!showHidden)
     children <- children[!sapply(children, function(child)isHidden(gh, child))]
   param <- as.vector(parameters(getGate(gh, children[1])))
@@ -346,20 +424,23 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, ...){
 
   param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
   trans <- getTransformations(gh, only.function = FALSE)
-  #global variable that keep records of the referenced NOT node
-  #so that the same NOT node will not be generated repeatly if referred multiple times
-  env.nodes <- new.env(parent = emptyenv())
+  
   env.nodes[["NotNode"]] <- character(0)
   xmlNode("SampleNode", attrs = c(name = sn
                                   , count = stat
                                   , sampleID = sampleId
                                   )
-                      , graphNode(param[1], param[2])
+                      , graphNode(param)
                       , subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden, env.nodes = env.nodes, ...)
           )
 }
 
-graphNode <- function(x, y){
+graphNode <- function(param){
+  x <- param[1]
+  if(length(param)==1)
+    y <- ""
+  else
+    y <- param[2]
   xmlNode("Graph"
           , attrs = c(smoothing="0", backColor="#ffffff", foreColor="#000000", type="Pseudocolor", fast="1")
           , xmlNode("Axis", attrs = c(dimension="x", name= x, label="", auto="auto"))
@@ -368,22 +449,36 @@ graphNode <- function(x, y){
 }
 
 constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.nodes, quad.gate = NULL){
-  if(!isHidden(gh, pop)||showHidden){
+  if(!isHidden(gh, pop)||showHidden)
+  {
+    dpinfo <- env.nodes[["DerivedParameters"]][[pop]]
+    
     if(is.null(quad.gate))
-      gate <- getGate(gh, pop)
-    else
+    {
+      if(is.null(dpinfo))
+        gate <- getGate(gh, pop)
+      else
+      {
+        #create range gate for the clusterGate
+        coord <- dpinfo[["value"]]
+        coord <- list(c(coord - 0.5, coord + 0.5))
+        names(coord) <- dpinfo[["name"]]
+        gate <- rectangleGate(coord)
+      }
+    }else
       gate <- quad.gate
+    
     eventsInside <- !isNegated(gh, pop)
-    children <- getChildren(gh, pop)
+    children <- getChildren(gh, pop, path = "auto")
     if(!showHidden)
       children <- children[!sapply(children, function(child)isHidden(gh, child))]
 
-    isBool <- is(gate, "booleanFilter")
+    isBool <- is.null(dpinfo)&&is(gate, "booleanFilter")
 
     if(length(children) == 0){ #leaf node
       if(isBool){
         #use parent gate's dims for boolean node
-        gate.dim <- getGate(gh, getParent(gh, pop))
+        gate.dim <- getGate(gh, getParent(gh, pop, path = "auto"))
       }else
         gate.dim <- gate
       subNode <- NULL
@@ -391,7 +486,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
       #get dim from non-boolean children
       nonBool <- sapply(children, function(child){
         thisGate <- getGate(gh, child)
-        !is(thisGate, "booleanFilter")
+        !is.null(env.nodes[["DerivedParameters"]][[child]])||!is(thisGate, "booleanFilter")
       })
       if(sum(nonBool) == 0)
         stop("Can't find any non-boolean children node under ", pop)
@@ -419,7 +514,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
 
       list(xmlNode("Population"
                    , attrs = c(name = basename(pop), count = count)
-                   , graphNode(param[1], param[2])
+                   , graphNode(param)
                    , xmlNode("Gate"
                              , gateNode(gate, eventsInside, matInfo = matInfo)
                    )
@@ -549,7 +644,7 @@ booleanNode <- function(gate, pop, count, env.nodes, ...){
 boolXmlNode <- function(nodeName, pop, count, refs, param, subNode){
   xmlNode(nodeName
         , attrs = c(name = basename(pop), count = count)
-        , graphNode(param[1], param[2])
+        , graphNode(param)
         , xmlNode("Dependents", .children = lapply(refs
                                                    , function(ref){
                                                      xmlNode("Dependent", attrs = c(name = ref))

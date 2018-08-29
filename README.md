@@ -99,7 +99,21 @@ devtools::install_github("RGLab/CytoML@*release")
 ## Reproducible examples from the CytoML paper
 
   - A reproducible workflow can be found at the [RGLab
-    site](http://www.rglab.org/CytoML).
+    site](http://www.rglab.org/CytoML), and was prepared with the
+    release version of CytoML and its dependencies that can be installed
+    by:
+
+<!-- end list -->
+
+``` r
+devtools::install_github("RGLab/RProtoBufLib@v1.3.7")
+devtools::install_github("RGLab/cytolib@v1.3.2")
+devtools::install_github("RGLab/flowCore@v1.47.7")
+devtools::install_github("RGLab/flowWorkspace@v3.29.7")
+devtools::install_github("RGLab/openCyto@v1.19.2")
+devtools::install_github("RGLab/CytoML@1.7.10")
+devtools::install_github("RGLab/ggcyto@v1.9.12")
+```
 
 ## Examples
 
@@ -294,7 +308,7 @@ GatingSet2cytobank(gs, outFile)
     ## set to 'TRUE', data and gates will be re-transformed with cytobank's
     ## default scaling settings, which may affect how gates look like.
 
-    ## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmprlbWvn/filed187336c542a.xml"
+    ## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmpM2PAHX/file161a6407f9e0c.xml"
 
 ##### Export to FlowJo
 
@@ -304,7 +318,7 @@ outFile <- tempfile(fileext = ".wsp")
 GatingSet2flowJo(gs, outFile)
 ```
 
-    ## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmprlbWvn/filed1877040990a.wsp"
+    ## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmpM2PAHX/file161a615ad4c42.wsp"
 
 ## Next Steps
 

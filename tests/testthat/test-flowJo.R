@@ -78,7 +78,9 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
   gh <- gs[[1]]
-  params <- parameters(getGate(gh, "CD4"))
+  params1 <- parameters(getGate(gh, "CD4"))
+  params2 <- parameters(getGate(gh, "CD4/CCR7- 45RA+"))
+  
   Rm("CD4", gs)
   Rm("CD8", gs)
   Rm("DNT", gs)
@@ -87,12 +89,19 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   
   fr <- getData(gh, "CD3+")
   library(flowClust)
-  res <- flowClust(fr, varNames = params, K = 2, nu = 1, trans = 0)
-  # plot(res, data = fr)
+  res1 <- flowClust(fr, varNames = params1, K = 2, nu = 1, trans = 0)
+  # plot(res1, data = fr)
   #add results as factor
-  res <- Map(res)
-  res <- as.factor(res)
-  add(gh, res, parent = "CD3+", name = "flowclust")
+  res1 <- Map(res1)
+  res1 <- as.factor(res1)
+  add(gh, res1, parent = "CD3+", name = "flowclust1")
+  
+  res2 <- flowClust(fr, varNames = params2, K = 3, nu = 1, trans = 0)
+  # plot(res2, data = fr)
+  #add results as factor
+  res2 <- Map(res2)
+  res2 <- as.factor(res2)
+  add(gh, res2, parent = "CD3+", name = "flowclust2")
   
   stats.orig <- getPopStats(gs[[1]])
   #output to flowJo
@@ -101,9 +110,9 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   expect_message(GatingSet2flowJo(gs, outFile), "DerivedParameter")
   
   # #parse it back in
-  # ws <- openWorkspace(outFile)
-  # gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  # stats.new <- getPopStats(gs1[[1]])
-  # expect_equal(stats.orig, stats.new, tol = 5e-3)
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = dataDir, execute = FALSE)
+  stats.new <- getPopStats(gs1[[1]])
+  expect_equivalent(stats.orig[,c(1,3,5)], stats.new[,c(2,4,5)])
 })
 

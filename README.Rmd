@@ -85,7 +85,7 @@ devtools::install_github("RGLab/cytolib@v1.3.2")
 devtools::install_github("RGLab/flowCore@v1.47.7")
 devtools::install_github("RGLab/flowWorkspace@v3.29.7")
 devtools::install_github("RGLab/openCyto@v1.19.2")
-devtools::install_github("RGLab/CytoML@1.7.10")
+devtools::install_github("RGLab/CytoML@v1.7.10")
 devtools::install_github("RGLab/ggcyto@v1.9.12")
 ```
 

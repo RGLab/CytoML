@@ -100,10 +100,10 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   # outFile <- "~/test.wsp"
   expect_message(GatingSet2flowJo(gs, outFile), "DerivedParameter")
   
-  # #parse it back in
-  # ws <- openWorkspace(outFile)
-  # gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  # stats.new <- getPopStats(gs1[[1]])
-  # expect_equal(stats.orig, stats.new, tol = 5e-3)
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  stats.new <- getPopStats(gs1[[1]])
+  expect_equal(stats.orig[-(5:6)], stats.new, tol = 5e-3)
 })
 

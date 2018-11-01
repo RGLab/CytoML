@@ -9,6 +9,10 @@ test_that("diva--tcell ",{
   parsedStats <- getPopStats(gs[[1]])
   expect_equal(parsedStats[,openCyto.freq], parsedStats[,xml.freq], tol = 5e-3)
   expect_equal(getNodes(gs), c('root','/L','/L/P2','/L/P2/cd3','/L/P2/cd3/cd8','/L/P2/cd3/cd4'))
+  
+  #parse global worksheet
+  gs <- parseWorkspace(ws, name = 1, worksheet = "global")
+  expect_equal(getNodes(gs), c('root','/s','/s/s2'))
   })
 
 test_that("diva--2002-D-g001 ",{

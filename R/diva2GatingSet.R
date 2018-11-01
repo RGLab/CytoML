@@ -89,6 +89,18 @@ setMethod("getSampleGroups","divaWorkspace",function(x){
 
 }
 
+get_global_sheets<-function(x){
+  
+    res <- xpathApply(x@doc, "/bdfacs/experiment/acquisition_worksheets/worksheet_template",function(t){
+      
+        xmlGetAttr(t,"name")
+        
+      })
+    # res <- data.table(res)
+    # setnames(res, "res", "name")
+    unlist(res)
+}
+
 #' @rdname divaWorkspace-class
 #' @param object divaWorkspace
 #' @importFrom flowWorkspace show
@@ -125,15 +137,18 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
                                     , subset = NULL
                                     , path = obj@path
                                     , fast = TRUE
+                                    , worksheet = c("normal", "global")
                                     , ...)
 {
 
+  worksheet <- match.arg(worksheet)
   #sample info
   sg <- getSamples(obj)
 
   # filter by group name
   sg[["specimen"]] <- factor(sg[["specimen"]])
   groups <- levels(sg[["specimen"]])
+ template_sheet <- get_global_sheets(obj)[1]
 
   if(is.null(name)){
     message("Choose which group of samples to import:\n");
@@ -175,16 +190,44 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     stop("Duplicated sample names detected within group: ", paste(sampleSelected[isDup], collapse = " "), "\n Please check if the appropriate group is selected.")
 
 
-  message("Parsing ", nSample," samples");
   if(fast)
-    .parseDivaWorkspace(xmlFileName=file.path(obj@path,obj@file)
-                      ,samples = sn
-                      , groupName = group.name
-                      ,path=path
-                      ,xmlParserOption = obj@options
-                      ,ws = obj
-                      ,...)
-  else
+  {
+    
+    if(worksheet == "global")
+    {
+      message("parse the global template ...")
+      samples <- sn[1]
+    }
+    else
+    {
+      message("Parsing ", nSample," samples");
+      samples <- sn
+    }
+      
+    
+    thisCall <- quote(.parseDivaWorkspace(xmlFileName=file.path(obj@path,obj@file)
+                                          ,samples = samples
+                                          ,worksheet = worksheet
+                                          , template_sheet = template_sheet
+                                          , groupName = group.name
+                                          ,path=path
+                                          ,xmlParserOption = obj@options
+                                          ,ws = obj
+                                          ,...)
+                      )
+    if(worksheet == "global")
+    {
+      suppressMessages(gs <- eval(thisCall))
+      #cp gates to the all files
+      GatingSet(gs[[1]], sn, path = path)
+    }else
+      eval(thisCall)
+    
+    
+  }else
+  {
+    message("Parsing ", nSample," samples");
+    
     .parseDivaWorkspace_old(xmlFileName=file.path(obj@path,obj@file)
                         ,samples = sn
                         , groupName = group.name
@@ -192,7 +235,8 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
                         ,xmlParserOption = obj@options
                         ,ws = obj
                         ,...)
-
+    
+  }
 }
 
 #' @importFrom XML xpathSApply
@@ -201,18 +245,22 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 #' @importFrom ggcyto transform_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
-.parseDivaWorkspace <- function(xmlFileName,samples,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, num_threads = 1,  ...){
+.parseDivaWorkspace <- function(xmlFileName,samples
+                                ,worksheet = worksheet
+                                , template_sheet = "Global Sheet1"
+                                ,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, num_threads = 1,  ...){
 
   scale_level <- match.arg(scale_level, c("gate", "tube"))
   if(!file.exists(xmlFileName))
     stop(xmlFileName," not found!")
-#  gs <- new("GatingSet", guid = .uuid_gen(), flag = FALSE)
 
-
+  rootDoc <- ws@doc
+  
+  
   dataPaths <- vector("character")
   excludefiles<-vector("logical")
   for(file in samples){
-
+    
     #########################################################
     #get full path for each fcs
     #########################################################
@@ -223,11 +271,11 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     if(nFound == 0){
       warning("Can't find ",file," in directory: ",path,"\n");
       excludefiles<-c(excludefiles,TRUE);
-
+      
     }else if(nFound > 1){
       stop('Multiple files found for:', file)
     }else{
-
+      
       dataPaths<-c(dataPaths,dirname(absPath))
       excludefiles<-c(excludefiles,FALSE);
     }
@@ -237,16 +285,14 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     message("Removing ",length(which(excludefiles))," samples from the analysis since we can't find their FCS files.");
     samples<-samples[!excludefiles];
   }
-
-
+  
+  
   files<-file.path(dataPaths,samples)
-
+  
   if(length(files)==0)
     stop("not sample to be added to GatingSet!")
-
-
-  rootDoc <- ws@doc
-
+  
+  
   xpathGroup <- paste0("/bdfacs/experiment/specimen[@name='", groupName, "']")
   #determine the magic number to replace neg value for log10 trans
   log_decade <- xmlValue(rootDoc[["/bdfacs/experiment/log_decades"]])
@@ -285,17 +331,23 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
         sampleName <- basename(file)
-
+        
+          
         #get tube node
         xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
-        sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
-
+        if(worksheet == "normal")
+          gate_source <- xpathApply(rootDoc, xpathSample)[[1]]
+        else
+          gate_source <- xpathApply(rootDoc, paste0("/bdfacs/experiment/acquisition_worksheets/worksheet_template[@name='"
+                                                    , template_sheet, "']")
+                                    )[[1]]
+        
         # get comp & param for biexp
         biexp_para <- new.env(parent = emptyenv())
-        use_auto_biexp_scale <- as.logical(xmlValue(sampleNode[["instrument_settings"]][["use_auto_biexp_scale"]]))
+        use_auto_biexp_scale <- as.logical(xmlValue(gate_source[["instrument_settings"]][["use_auto_biexp_scale"]]))
         biexp_scale_node <- ifelse(use_auto_biexp_scale, "comp_biexp_scale", "manual_biexp_scale")
 
-        comp <- xpathApply(sampleNode, "instrument_settings/parameter", function(paramNode, biexp_para){
+        comp <- xpathApply(gate_source, "instrument_settings/parameter", function(paramNode, biexp_para){
 
           paramName <- xmlGetAttr(paramNode, "name")
 
@@ -371,7 +423,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
         this_biexp <- translist[[sampleName]]
         xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
-        sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
+        if(worksheet == "normal")
+          sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
+        else
+          sampleNode <- gate_source
         #assume the gates listed in xml follows the topological order
         rootNode.xml <- NULL
         gateNodes <- xpathApply(sampleNode, "gates/gate")
@@ -552,8 +607,9 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     thisCall[["mc.cores"]] <- num_threads
 
   }
-
+  
   eval(thisCall)
+  
   gsfiles <- list.files(tmp.dir, full.names = TRUE)
   if(num_threads >1)
   {

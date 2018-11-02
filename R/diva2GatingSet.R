@@ -336,12 +336,16 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         #get tube node
         xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
         if(worksheet == "normal")
+        {
           gate_source <- xpathApply(rootDoc, xpathSample)[[1]]
-        else
+          execute <- TRUE
+        }else
+        {
           gate_source <- xpathApply(rootDoc, paste0("/bdfacs/experiment/acquisition_worksheets/worksheet_template[@name='"
                                                     , template_sheet, "']")
                                     )[[1]]
-        
+          execute <- FALSE
+        }
         # get comp & param for biexp
         biexp_para <- new.env(parent = emptyenv())
         use_auto_biexp_scale <- as.logical(xmlValue(gate_source[["instrument_settings"]][["use_auto_biexp_scale"]]))
@@ -378,7 +382,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
         message("loading data: ",file);
-        data <- read.FCS(file)[, cnd]
+        data <- read.FCS(file)[, cnd]#has to load data regardless of execute flag because data range is needed for gate extension
 
         message("Compensating")
         #we use the spillover from FCS keyword
@@ -390,7 +394,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           stop("No spillover found in FCS!")
         else
           complist[[sampleName]] <- comp[[1]]
-
+        
         data <- compensate(data, comp[[1]])
 
         message("computing data range")
@@ -584,15 +588,18 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
             next
           }
         }#end of gate adding
-        fs[[sampleName]] <- data
+        if(execute)
+          fs[[sampleName]] <- data
 
       }
-      flowWorkspace::flowData(gs) <- fs
+      if(execute)
+        flowWorkspace::flowData(gs) <- fs
 
       gs@compensation <- complist
 
       gs@transformation <- translist
-      suppressMessages(recompute(gs))
+      if(execute)
+        suppressMessages(recompute(gs))
 
       message("done!")
 

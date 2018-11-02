@@ -10,8 +10,8 @@
 extend(gate, bound, data.range = NULL, plot = FALSE,
   limits = c("original", "extended"))
 
-\method{extend}{polygonGate}(gate, bound, data.range = NULL, plot = FALSE,
-  limits = c("original", "extended"))
+\method{extend}{polygonGate}(gate, bound, data.range = NULL,
+  plot = FALSE, limits = c("original", "extended"))
 
 \method{extend}{rectangleGate}(gate, ...)
 

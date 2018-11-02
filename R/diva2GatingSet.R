@@ -133,11 +133,15 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
       .preprocessorDiva(obj, ...)
     })
 
+#' @importFrom flowCore colnames<-
 .preprocessorDiva<- function(obj, name = NULL
                                     , subset = NULL
                                     , path = obj@path
                                     , fast = TRUE
                                     , worksheet = c("normal", "global")
+                                    , swap_cols = list(`FSC-H` = 'FSC-W'
+                                                , `SSC-H` = 'SSC-W') #diva seems to swap these data cols during importing fcs to experiments
+                             
                                     , ...)
 {
 
@@ -192,7 +196,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
   if(fast)
   {
-    
+   
     if(worksheet == "global")
     {
       message("parse the global template ...")
@@ -208,6 +212,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     thisCall <- quote(.parseDivaWorkspace(xmlFileName=file.path(obj@path,obj@file)
                                           ,samples = samples
                                           ,worksheet = worksheet
+                                          , swap_cols = swap_cols
                                           , template_sheet = template_sheet
                                           , groupName = group.name
                                           ,path=path
@@ -219,10 +224,11 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     {
       suppressMessages(gs <- eval(thisCall))
       #cp gates to the all files
-      GatingSet(gs[[1]], sn, path = path)
+      gs <- GatingSet(gs[[1]], sn, path = path , swap_cols = swap_cols)
     }else
-      eval(thisCall)
+      gs <- eval(thisCall)
     
+    gs
     
   }else
   {
@@ -238,17 +244,18 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     
   }
 }
-
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated
+#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated swap_data_cols
 #' @importFrom ggcyto transform_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
 .parseDivaWorkspace <- function(xmlFileName,samples
                                 ,worksheet = worksheet
                                 , template_sheet = "Global Sheet1"
-                                ,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, num_threads = 1,  ...){
+                                , swap_cols
+                                ,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, num_threads = 1
+                                ,  ...){
 
   scale_level <- match.arg(scale_level, c("gate", "tube"))
   if(!file.exists(xmlFileName))
@@ -318,7 +325,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
       files <- file.group[[grpid]]
       #load the raw data from FCS
-      fs <- read.ncdfFlowSet(files,isWriteSlice=FALSE,...)
+      fs <- read.ncdfFlowSet(files,isWriteSlice=FALSE, ...)
 
       gs <- GatingSet(fs)
 
@@ -382,8 +389,11 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
         message("loading data: ",file);
-        data <- read.FCS(file)[, cnd]#has to load data regardless of execute flag because data range is needed for gate extension
-
+        data <- read.FCS(file, ...)[, cnd]#has to load data regardless of execute flag because data range is needed for gate extension
+      
+        cols <- swap_data_cols(colnames(data), swap_cols)
+        if(!all(cols==colnames(data)))
+          colnames(data) <- cols
         message("Compensating")
         #we use the spillover from FCS keyword
         comp <- spillover(data)

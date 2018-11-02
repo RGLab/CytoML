@@ -4,8 +4,8 @@
 \alias{range.GatingHierarchy}
 \title{the parameter range from the flow data associated with GatingHierarchy}
 \usage{
-\method{range}{GatingHierarchy}(..., na.rm = FALSE, type = c("instrument",
-  "data"), raw.scale = FALSE)
+\method{range}{GatingHierarchy}(..., na.rm = FALSE,
+  type = c("instrument", "data"), raw.scale = FALSE)
 }
 \arguments{
 \item{...}{GatingHierarchy object}

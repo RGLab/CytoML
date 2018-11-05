@@ -2,7 +2,7 @@ context("parse diva workspace ..")
 
 test_that("PE_2", {
   ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
-  gs <- parseWorkspace(ws, name = 2, subset = 1)
+  gs <- parseWorkspace(ws, name = 2, subset = 1, swap_cols = FALSE)
   stats <- getPopStats(gs[[1]])
 
   expect_equal(stats[, xml.count], stats[, openCyto.count], tolerance = 0.0018)

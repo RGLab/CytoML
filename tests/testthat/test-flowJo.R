@@ -74,36 +74,37 @@ test_that("GatingSet2flowJo: manual gates with calibration table parsed and stor
   expect_equal(stats.orig, stats.new, tol = 5e-3)
 })
 
-# test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
-#   dataDir <- system.file("extdata",package="flowWorkspaceData")
-#   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
-#   gh <- gs[[1]]
-#   params <- parameters(getGate(gh, "CD4"))
-#   Rm("CD4", gs)
-#   Rm("CD8", gs)
-#   Rm("DNT", gs)
-#   Rm("DPT", gs)
-#   #run flowClust
-#   
-#   fr <- getData(gh, "CD3+")
-#   library(flowClust)
-#   res <- flowClust(fr, varNames = params, K = 2, nu = 1, trans = 0)
-#   # plot(res, data = fr)
-#   #add results as factor
-#   res <- Map(res)
-#   res <- as.factor(res)
-#   add(gh, res, parent = "CD3+", name = "flowclust")
-#   
-#   stats.orig <- getPopStats(gs[[1]])
-#   #output to flowJo
-#   outFile <- tempfile(fileext = ".wsp")
-#   # outFile <- "~/test.wsp"
-#   expect_message(GatingSet2flowJo(gs, outFile), "DerivedParameter")
-#   
-#   #parse it back in
-#   ws <- openWorkspace(outFile)
-#   gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-#   stats.new <- getPopStats(gs1[[1]])
-#   expect_equal(stats.orig[-(5:6)], stats.new, tol = 5e-3)
-# })
+test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
+  dataDir <- system.file("extdata",package="flowWorkspaceData")
+  gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+  gh <- gs[[1]]
+  params <- parameters(getGate(gh, "CD4"))
+  Rm("CD4", gs)
+  Rm("CD8", gs)
+  Rm("DNT", gs)
+  Rm("DPT", gs)
+  #run flowClust
+
+  fr <- getData(gh, "CD3+")
+  library(flowClust)
+  res <- flowClust(fr, varNames = params, K = 2, nu = 1, trans = 0)
+  # plot(res, data = fr)
+  #add results as factor
+  Map <- selectMethod("Map", sig = "flowClust")
+  res <- Map(res)
+  res <- as.factor(res)
+  add(gh, res, parent = "CD3+", name = "flowclust")
+
+  stats.orig <- getPopStats(gs[[1]])
+  #output to flowJo
+  outFile <- tempfile(fileext = ".wsp")
+  # outFile <- "~/test.wsp"
+  expect_message(GatingSet2flowJo(gs, outFile), "DerivedParameter")
+
+  #parse it back in
+  ws <- openWorkspace(outFile)
+  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  stats.new <- getPopStats(gs1[[1]])
+  expect_equal(stats.orig[-(5:6)], stats.new, tol = 5e-3)
+})
 

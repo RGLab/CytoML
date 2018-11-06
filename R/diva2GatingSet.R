@@ -342,9 +342,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           
         #get tube node
         xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
+        sampleNode.tube <- xpathApply(rootDoc, xpathSample)[[1]]
         if(worksheet == "normal")
         {
-          gate_source <- xpathApply(rootDoc, xpathSample)[[1]]
+          gate_source <- sampleNode.tube
           execute <- TRUE
         }else
         {
@@ -355,10 +356,12 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         }
         # get comp & param for biexp
         biexp_para <- new.env(parent = emptyenv())
-        use_auto_biexp_scale <- as.logical(xmlValue(gate_source[["instrument_settings"]][["use_auto_biexp_scale"]]))
+        #global worksheet doesn't seem to have the valid default scale parameters sometime
+        #so we parse it from the sample/tube-specific settings
+        use_auto_biexp_scale <- as.logical(xmlValue(sampleNode.tube[["instrument_settings"]][["use_auto_biexp_scale"]]))
         biexp_scale_node <- ifelse(use_auto_biexp_scale, "comp_biexp_scale", "manual_biexp_scale")
 
-        comp <- xpathApply(gate_source, "instrument_settings/parameter", function(paramNode, biexp_para){
+        comp <- xpathApply(sampleNode.tube, "instrument_settings/parameter", function(paramNode, biexp_para){
 
           paramName <- xmlGetAttr(paramNode, "name")
 
@@ -436,9 +439,9 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         gh <- gs[[sampleName]]
 
         this_biexp <- translist[[sampleName]]
-        xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
+        # xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
         if(worksheet == "normal")
-          sampleNode <- xpathApply(rootDoc, xpathSample)[[1]]
+          sampleNode <- sampleNode.tube#xpathApply(rootDoc, xpathSample)[[1]]
         else
           sampleNode <- gate_source
         #assume the gates listed in xml follows the topological order

@@ -3,6 +3,13 @@ context("diva parser ")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/diva"
 
+test_that("diva--global sheet ",{
+  ws <- openDiva(file.path(path, "181030_AD01_RN/181030_AD01_RN.xml"))
+  # gs1 <- parseWorkspace(ws, name = 3, subset = "G00159008_V05_01_003.fcs")
+  
+  gs2 <- parseWorkspace(ws, name = 3, subset = "G00159008_V05_01_003.fcs", worksheet = "global")
+  expect_equal(getPopStats(gs2[[1]])[, openCyto.freq], c(1,0.67,0.99,0.27,0.86,0.18,0.53,1,0.18,0.18,0.72,0.7,0.04,0.99), tol = 5e-3)
+})
 test_that("diva--swap ",{
   #This experiment exported by diva has the FCS swapped column for -W and -H
   ws <- openDiva(file.path(path, "exampleExp/exampleExp.xml"))

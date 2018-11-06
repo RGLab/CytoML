@@ -141,7 +141,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
                                     , worksheet = c("normal", "global")
                                     , swap_cols = list(`FSC-H` = 'FSC-W'
                                                 , `SSC-H` = 'SSC-W') #diva seems to swap these data cols during importing fcs to experiments
-                             
+                                    , verbose = FALSE
                                     , ...)
 {
 
@@ -218,11 +218,15 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
                                           ,path=path
                                           ,xmlParserOption = obj@options
                                           ,ws = obj
+                                          , verbose = verbose
                                           ,...)
                       )
     if(worksheet == "global")
     {
-      suppressMessages(gs <- eval(thisCall))
+      if(verbose)
+        gs <- eval(thisCall)
+      else
+        suppressMessages(gs <- eval(thisCall))
       #cp gates to the all files
       gs <- GatingSet(gs[[1]], sn, path = path , swap_cols = swap_cols)
     }else
@@ -451,7 +455,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
         for(gateNode in gateNodes)
         {
           nodeName <- xmlGetAttr(gateNode, "fullname")
-          nodeName <- gsub("\\\\", "/", nodeName)
+          nodeName <- normalize_gate_path(nodeName)
           nodeName <- basename(nodeName)
           if(verbose)
             message(nodeName)
@@ -459,7 +463,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           parent <- xmlElementsByTagName(gateNode, "parent")
           if(length(parent) > 0){
             parent <- xmlValue(parent[[1]])
-            parent <- gsub("\\\\", "/", parent)
+            parent <- normalize_gate_path(parent)
             parent <- gsub(rootNode.xml, "root", parent)
 
 
@@ -651,6 +655,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 }
 
+normalize_gate_path <- function(path){
+  path <- gsub("/", "|", path)#escape /
+  gsub("\\\\", "/", path)
+}
 #use the equation suggested by BD engineer last year
 #' @importFrom flowWorkspace logicle_trans
 generate_trans <- function(maxValue = 262144, pos = 4.5, r)

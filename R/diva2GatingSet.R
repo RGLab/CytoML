@@ -459,7 +459,10 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
           nodeName <- basename(nodeName)
           if(verbose)
             message(nodeName)
-          count <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]]))
+          if(worksheet == "normal")
+            count <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "num_events")[[1]]))
+          else
+            count <- 0#skip xml cnt for template gating
           parent <- xmlElementsByTagName(gateNode, "parent")
           if(length(parent) > 0){
             parent <- xmlValue(parent[[1]])

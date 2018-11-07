@@ -11,6 +11,7 @@ test_that("diva--escape forward slash ",{
   expect_equal(stats, c(1,0.45,1,0.63,0.34,0.16,0.17,1,0.16,0.33,0.79,0.02,0), tol = 5.3e-3)
 })
 
+#caution: this test case could be slow due to the large data
 test_that("diva--global sheet ",{
   ws <- openDiva(file.path(path, "181030_AD01_RN/181030_AD01_RN.xml"))
   # gs1 <- parseWorkspace(ws, name = 3, subset = "G00159008_V05_01_003.fcs")
@@ -22,16 +23,16 @@ test_that("diva--swap ",{
   #This experiment exported by diva has the FCS swapped column for -W and -H
   ws <- openDiva(file.path(path, "exampleExp/exampleExp.xml"))
   gs <- parseWorkspace(ws, name = 1, worksheet = "global")
-  parsedStats <- getPopStats(gs[[1]])
-  expect_equal(parsedStats[,openCyto.freq], parsedStats[,xml.freq], tol = 4e-3)
+  stats <- getPopStats(gs[[1]])[, openCyto.freq]
+  expect_equal(stats, c(1,0.69,0.94,0.97,0.92,0), tol = 5e-3)
   expect_equal(getNodes(gs), c('root','/P1','/P1/P2','/P1/P2/P3','/P1/P2/P3/P4', '/P1/P2/P3/P4/P5'))
   
   #if the FCS was exported separately, then we don't need to swap the data thus disable swapping 
   gs <- parseWorkspace(ws, name = 1, worksheet = "global"
                        , path = file.path(path, "exampleExp_export_as_fcs")
                        , swap_cols = FALSE)
-  parsedStats <- getPopStats(gs[[1]])
-  expect_equal(parsedStats[,openCyto.freq], parsedStats[,xml.freq], tol = 4e-3)
+  stats <- getPopStats(gs[[1]])[, openCyto.freq]
+  expect_equal(stats, c(1,0.69,0.94,0.97,0.92,0), tol = 5e-3)
   expect_equal(getNodes(gs), c('root','/P1','/P1/P2','/P1/P2/P3','/P1/P2/P3/P4', '/P1/P2/P3/P4/P5'))
   
 })

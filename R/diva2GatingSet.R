@@ -228,7 +228,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
       else
         suppressMessages(gs <- eval(thisCall))
       #cp gates to the all files
-      gs <- GatingSet(gs[[1]], sn, path = path , swap_cols = swap_cols)
+      gs <- GatingSet(gs[[1]], sn, path = path , swap_cols = swap_cols, ...)
     }else
       gs <- eval(thisCall)
     

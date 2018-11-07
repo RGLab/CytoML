@@ -5,19 +5,22 @@ path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/diva"
 
 test_that("diva--escape forward slash ",{
   ws <- openDiva(file.path(path, "Leggat_VRC/181019_AC03_DL/181019_AC03_DL.xml"))
-  gs <- parseWorkspace(ws, name = 2, worksheet = "global", subset = c("G00100001_V05_01_001.fcs"))
+  gs <- parseWorkspace(ws, name = 2, worksheet = "global", subset = c("G00100001_V05_01_001.fcs")
+                       # , which.lines = 7e3
+                       )
   stats <- getPopStats(gs[[1]])[, openCyto.freq]
   # paste(round(stats, 2), collapse = ",")
   expect_equal(stats, c(1,0.45,1,0.63,0.34,0.16,0.17,1,0.16,0.33,0.79,0.02,0), tol = 5.3e-3)
 })
 
-#caution: this test case could be slow due to the large data
+
 test_that("diva--global sheet ",{
   ws <- openDiva(file.path(path, "181030_AD01_RN/181030_AD01_RN.xml"))
-  # gs1 <- parseWorkspace(ws, name = 3, subset = "G00159008_V05_01_003.fcs")
-  
-  gs2 <- parseWorkspace(ws, name = 3, subset = "G00159008_V05_01_003.fcs", worksheet = "global")
-  expect_equal(getPopStats(gs2[[1]])[, openCyto.freq], c(1,0.67,0.99,0.27,0.86,0.18,0.53,1,0.18,0.18,0.72,0.7,0.04,0.99), tol = 5e-3)
+  set.seed(1)
+  gs <- parseWorkspace(ws, name = 3, subset = "G00159008_V05_01_003.fcs", worksheet = "global"
+                        , which.lines = 7e3)#speed up this test case by subsetting data  due to the large data
+  stats <- getPopStats(gs[[1]])[, openCyto.freq]
+  expect_equal(stats, c(1,0.67,0.99,0.27,0.86,0.18,0.53,1,0.18,0.18,0.72,0.7,0.04,0.99), tol = 1.6e-2)
 })
 test_that("diva--swap ",{
   #This experiment exported by diva has the FCS swapped column for -W and -H

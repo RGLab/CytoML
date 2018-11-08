@@ -40,13 +40,38 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
 
   ws <- workspaceNode(gs, outputdir = dirname(outFile))
-  locale <- localeToCharset()[1]
-  if(locale == "ISO8859-1")
-    locale <- "ISO-8859-1"
+  
+  
+  encoding <- localeToCharset()[1]
+  if(encoding == "ISO8859-1")
+  encoding <- "ISO-8859-1"
   ## Write out to an XML file (suppress the warning due to the usage of deprecated structure call in saveXML)
-  suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", locale)))
+  suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", encoding)
+                           )
+                   )
 }
 
+# overwrite XML:::saveXML.XMLNode
+#saveXML ignores encoding argument thus we are not sure what is used by the underlying textConnection Call
+#which causes trouble to read it back later on when the encoding info is assumed to be UTF-8
+# .saveXML <- function (doc, file = NULL, compression = 0, indent = TRUE, prefix = "<?xml version=\"1.0\"?>\n", 
+#           doctype = NULL, encoding = "UTF-8", ...) 
+# {
+#   cn = file(file, "w"
+#             # , encoding = encoding
+#             )
+#   sink(cn)
+#   on.exit(sink())
+#   on.exit(close(cn), add = TRUE)
+#   
+#   
+#   if (!is.null(prefix)) 
+#     cat(as.character(prefix))
+#   if (!is.null(doctype)) 
+#     cat(as(doctype, "character"), "\n")
+#   print(doc)
+#   file
+# }
 workspaceNode <- function(gs, ...){
   guids <- sampleNames(gs)
   sampleIds <- seq_along(guids)
@@ -387,9 +412,12 @@ keywordNode <- function(gh){
   kns <- kns[!grepl("flowCore", kns)]
   #skip spillover matrix for now since it requires the special care (see flowCore:::collapseDesc)
   kns <- kns[!grepl("SPILL", kns, ignore.case = TRUE)]
-
+  
   xmlNode("Keywords", .children = lapply(kns, function(kn){
-                          xmlNode("Keyword", attrs = c(name = kn, value = kw[[kn]]))
+                          kv <- kw[[kn]]
+                          kv <- paste(kv, collapse = " ") #handle the exceptional kw value that is multi-element vector
+                          kv <- enc2native(kv) #handle the special encoded character
+                          xmlNode("Keyword", attrs = c(name = kn, value = kv))
                 })
           )
 }

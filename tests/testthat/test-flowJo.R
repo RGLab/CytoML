@@ -90,7 +90,7 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   res <- flowClust(fr, varNames = params, K = 2, nu = 1, trans = 0)
   # plot(res, data = fr)
   #add results as factor
-  # Map <- selectMethod("Map", sig = "flowClust")
+  Map <- selectMethod("Map", sig = "flowClust")
   res <- Map(res)
   res <- as.factor(res)
   add(gh, res, parent = "CD3+", name = "flowclust")

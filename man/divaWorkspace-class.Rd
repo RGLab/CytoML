@@ -6,7 +6,7 @@
 \alias{getSamples,divaWorkspace-method}
 \alias{getSampleGroups,divaWorkspace-method}
 \alias{show,divaWorkspace-method}
-\alias{parseWorkspace,divaWorkspace-method}
+\alias{parseWorkspace.divaWorkspace}
 \title{divaWorkspace class
 Inherited from \link{flowJoWorkspace-class}}
 \usage{
@@ -16,7 +16,7 @@ Inherited from \link{flowJoWorkspace-class}}
 
 \S4method{show}{divaWorkspace}(object)
 
-\S4method{parseWorkspace}{divaWorkspace}(obj, ...)
+\method{parseWorkspace}{divaWorkspace}(obj, ...)
 }
 \arguments{
 \item{x}{divaWorkspace}

@@ -3,16 +3,15 @@
 \docType{class}
 \name{divaWorkspace-class}
 \alias{divaWorkspace-class}
-\alias{getSamples,divaWorkspace-method}
-\alias{getSampleGroups,divaWorkspace-method}
+\alias{getSamples.divaWorkspace}
+\alias{getSampleGroups.divaWorkspace}
 \alias{show,divaWorkspace-method}
 \alias{parseWorkspace.divaWorkspace}
-\title{divaWorkspace class
-Inherited from \link{flowJoWorkspace-class}}
+\title{divaWorkspace class}
 \usage{
-\S4method{getSamples}{divaWorkspace}(x)
+\method{getSamples}{divaWorkspace}(x)
 
-\S4method{getSampleGroups}{divaWorkspace}(x)
+\method{getSampleGroups}{divaWorkspace}(x)
 
 \S4method{show}{divaWorkspace}(object)
 
@@ -29,5 +28,4 @@ Inherited from \link{flowJoWorkspace-class}}
 }
 \description{
 divaWorkspace class
-Inherited from \link{flowJoWorkspace-class}
 }

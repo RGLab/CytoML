@@ -48,10 +48,7 @@ openDiva <- function(file,options = 0,...){
   rootNode <- names(xmlChildren(x))
 
   ver <- xpathApply(x, paste0("/", rootNode),function(x)xmlGetAttr(x,"version"))[[1]]
-  if(rootNode == "Workspace"){
-    x<-methods::new("flowJoWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
-    x@.cache$flag <- TRUE
-  }else if(rootNode == "bdfacs"){
+  if(rootNode == "bdfacs"){
     x <- methods::new("divaWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
     x@.cache$flag <- TRUE
   }else
@@ -65,16 +62,16 @@ openDiva <- function(file,options = 0,...){
 #' @importFrom flowWorkspace getSamples
 #' @importFrom methods selectMethod
 #' @export
-setMethod("getSamples","divaWorkspace",function(x){
-      methods::selectMethod("getSampleGroups","divaWorkspace")(x)
-    })
+getSamples.divaWorkspace <- function(x){
+      getSampleGroups(x)
+    }
 
 #' @rdname divaWorkspace-class
 #' @importFrom flowWorkspace getSampleGroups
 #' @export
-setMethod("getSampleGroups","divaWorkspace",function(x){
+getSampleGroups.divaWorkspace <- function(x){
       .getSampleGroupsDiva(x)
-    })
+    }
 
 #' @importFrom plyr ldply
 .getSampleGroupsDiva<-function(x){

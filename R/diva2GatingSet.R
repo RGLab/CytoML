@@ -1,8 +1,13 @@
 #' divaWorkspace class
-#' Inherited from \link{flowJoWorkspace-class}
-#' @importClassesFrom flowWorkspace flowJoWorkspace
 #' @exportClass divaWorkspace
-setClass("divaWorkspace", contains = "flowJoWorkspace")
+setClass("divaWorkspace"
+         ,representation(version="character"
+                         , file="character"
+                         , .cache="environment"
+                         , path="character"
+                         , doc="XMLInternalDocument"
+                         , options="integer")
+)
 # copied from "openWorkspace" method (flowWorkspace/diva branch)
 #' open Diva xml workspace
 #'
@@ -327,7 +332,8 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 
       files <- file.group[[grpid]]
       #load the raw data from FCS
-      fs <- read.ncdfFlowSet(files,isWriteSlice=FALSE, ...)
+      #TODO:allow creating empty gs even without reading FCS headers and adding samples later
+      fs <- load_cytoset_from_fcs(files,text.only = TRUE, is_h5 = TRUE, ...)
 
       gs <- GatingSet(fs)
 
@@ -610,12 +616,17 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
           fs[[sampleName]] <- data
 
       }
-      if(execute)
-        flowWorkspace::flowData(gs) <- fs
-
-      gs@compensation <- complist
-
-      gs@transformation <- translist
+      #TODO: create and expose R wrapper 'set_compensation' in flowWorkspace
+      complist <- sapply(complist, flowWorkspace:::check_comp, simplify = FALSE)
+      flowWorkspace:::cs_set_compensation(gs@pointer, complist, FALSE)
+      #TODO: create and expose R wrapper 'set_transformation' in flowWorkspace
+      for(sn in names(translist))
+      {
+        transobjs <- sapply(translist[[sn]], flowWorkspace:::parse_transformer, simplify = FALSE)
+        # browser()
+        flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
+        
+      }
       if(execute)
         suppressMessages(recompute(gs))
 

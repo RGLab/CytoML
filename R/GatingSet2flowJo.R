@@ -27,17 +27,16 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   #   if(grepl("/", chnl))
   #     stop("'/' is found in channel '", chnl, "'! Please update GatingSet by running 'gs <- fix_channel_slash(gs)'")
   # }
+  
   #NOTE we call a lot of flowWorkspace accessors, they need to be imported explicitly. Otherwise the user needs to load flowWorkspace explicitly before using CytoML.
   # see all the NOTES in R CMD check that have to do with "no visible global function / binding / variable". 
   chnls <- colnames(gs)
   slash_loc <- sapply(chnls, function(thisCol)as.integer(gregexpr("/", thisCol)[[1]]), simplify = FALSE)
   new_cnd <- fix_channel_slash(chnls, slash_loc)
   if(!all(new_cnd == chnls)){
-    gs <- clone(gs, isNew = FALSE, isEmpty = FALSE) # ensure everything else is cloned except hdf5
+    gs <- gs_copy_tree_only(gs) # ensure everything else is cloned except hdf5
     gs <- updateChannels(gs, map = data.frame(old = chnls, new = new_cnd))
   }
-
-  pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
 
   ws <- workspaceNode(gs, outputdir = dirname(outFile))
   
@@ -213,8 +212,6 @@ datasetNode <- function(gh, sampleId){
 
 }
 getSpilloverMat <- function(gh){
-  compobj <- gh@compensation
-  if(is.null(compobj)){
     compobj <- getCompensationMatrices(gh)
     if(!is.null(compobj)){
       mat <- compobj@spillover
@@ -228,15 +225,6 @@ getSpilloverMat <- function(gh){
       mat <- NULL
     }
 
-
-  }else{
-    sn <- sampleNames(gh)
-    compobj <- compobj[[sn]]
-    mat <- compobj@spillover
-    cid <- "1"
-    prefix <- ""
-    suffix <- ""
-  }
 
 
   list(mat = mat, prefix = prefix,  suffix = suffix, cid = 1)
@@ -374,7 +362,7 @@ transformationNode <- function(gh, matInfo){
                                        )
                   )
 
-                }else if(trans.type == "logicle"){
+                }else if(trans.type %in% c("logicle", "flowJo_logicle")){
                   param <- as.list(environment(func))
                   withBasis <- - 10 ^ (2 * as.vector(param[["w"]]))
                   transNode <- xmlNode("biex"

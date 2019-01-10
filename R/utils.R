@@ -130,7 +130,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                            , searchEnv = flowEnv
                            , transformationId = prefix_chnl)
 
-      if(type == "asinhtGml2"){
+      if(type %in% c("asinhtGml2", "flowJo_fasinh")){
         #extract parameters
         env <- environment(trans.func)
         transID <- paste0("Tr_Arcsinh_", prefix_chnl)
@@ -153,7 +153,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                                      , W = env[["W"]]
                                      , transformationId = transID
                                     )
-      }else if(type == "logicle"){
+      }else if(type %in% c("logicle", "flowJo_logicle")){
         #extract parameters
         env <- environment(trans.func)
         transID <- paste0("Tr_logicle_", prefix_chnl)
@@ -165,7 +165,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                                         , transformationId = transID
                                         )
         rescale.gate <- TRUE
-      }else if(type %in% c("flowJo_biexp", "flowJo_fasinh")){
+      }else if(type %in% c("flowJo_biexp")){
         transID <- paste0("Tr_logicle_", prefix_chnl)
         param <-  attr(trans.func,"parameters")
 

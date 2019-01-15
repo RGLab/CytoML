@@ -6,7 +6,7 @@
 #' @param ... other arguments
 #'        showHidden whether to include the hidden population nodes in the output
 #' @export
-#' @importFrom flowWorkspace clone updateChannels pData<-
+#' @importFrom flowWorkspace clone updateChannels pData<- cs_unlock cs_lock gs_copy_tree_only cs_load_meta 
 #' @return nothing
 #' @examples
 #' library(flowWorkspace)
@@ -35,12 +35,16 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   new_cnd <- fix_channel_slash(chnls, slash_loc)
   if(!all(new_cnd == chnls)){
     gs <- gs_copy_tree_only(gs) # ensure everything else is cloned except hdf5
+    cs <- getData(gs)
+    cs_unlock(cs)#temporarily allow it to be writable
     gs <- updateChannels(gs, map = data.frame(old = chnls, new = new_cnd))
+    cs_lock(cs)
   }
 
   ws <- workspaceNode(gs, outputdir = dirname(outFile))
   
-  
+  #restore meta from disk to prevent the change to be permanant
+  cs_load_meta(getData(gs))
   encoding <- localeToCharset()[1]
   if(encoding == "ISO8859-1")
   encoding <- "ISO-8859-1"

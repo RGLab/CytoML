@@ -280,9 +280,9 @@
           gate <- extend(gate, bound, t(data.ranges[[sn]]))
           #need transform since extention was performed on the raw-scale gate
           if(x.extend)
-            gate <- transform_gate(gate, x_biexp@.Data, xParam)
+            gate <- rescale_gate(gate, x_biexp@.Data, xParam)
           if(y.extend)
-            gate <- transform_gate(gate, y_biexp@.Data, yParam)
+            gate <- rescale_gate(gate, y_biexp@.Data, yParam)
         }
 
 

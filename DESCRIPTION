@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
-Version: 1.9.2
+Version: 1.9.3
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -29,7 +29,7 @@ Imports:
     plyr,
     grDevices,
     methods,
-    ggcyto (>= 1.9.3)
+    ggcyto (>= 1.11.4)
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
@@ -37,7 +37,7 @@ Suggests:
     knitr,
     parallel
 VignetteBuilder: knitr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 BugReports: https://github.com/RGLab/CytoML/issues
 URL: https://github.com/RGLab/CytoML
 Collate: 

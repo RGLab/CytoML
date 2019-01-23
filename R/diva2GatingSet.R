@@ -250,7 +250,7 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated swap_data_cols
+#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5 rbind2
 #' @importFrom ggcyto transform_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -328,16 +328,8 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
   thisCall <- quote(lapply(names(file.group), function(grpid){
 
       files <- file.group[[grpid]]
-      #load the raw data from FCS
-      #TODO:allow creating empty gs even without reading FCS headers and adding samples later
-      fs <- load_cytoset_from_fcs(files,text.only = TRUE, is_h5 = TRUE, ...)
-
-      gs <- GatingSet(fs)
-
-      cnd <- colnames(fs)
-
       # parse compp & trans
-      translist <- complist <- data.ranges <- list()
+      gslist <- translist <- complist <- data.ranges <- list()
       for(file in files)
       {
 
@@ -397,23 +389,32 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 
 
         message("loading data: ",file);
-        data <- read.FCS(file, ...)[, cnd]#has to load data regardless of execute flag because data range is needed for gate extension
-      
-        cols <- swap_data_cols(colnames(data), swap_cols)
-        if(!all(cols==colnames(data)))
-          colnames(data) <- cols
+        #load single sample into cs so that gs can be constructed from it
+        fs <- load_cytoset_from_fcs(file, ...)#has to load data regardless of execute flag because data range is needed for gate extension
+        cols <- swap_data_cols(colnames(fs), swap_cols)
+        if(!all(cols==colnames(fs)))
+          for(c1 in names(swap_cols))
+          {
+            c2 <- swap_cols[[c1]]
+            cs_swap_colnames(fs, c1, c2)					
+          }
+        
+        gs <- GatingSet(fs)
+        data <- get_cytoframe_from_cs(fs, sampleName)
+
         message("Compensating")
         #we use the spillover from FCS keyword
         comp <- spillover(data)
-        comp <- compact(comp)
-        if(length(comp) > 1)
-          stop("More than one spillover found in FCS!")
-        else if(length(comp) == 0)
-          stop("No spillover found in FCS!")
-        else
-          complist[[sampleName]] <- comp[[1]]
         
-        data <- compensate(data, comp[[1]])
+        # comp <- compact(comp)
+        # if(length(comp) > 1)
+        #   stop("More than one spillover found in FCS!")
+        # else if(length(comp) == 0)
+        #   stop("No spillover found in FCS!")
+        # else
+          complist[[sampleName]] <- comp#[[1]]
+        
+        data <- compensate(data, comp)
 
         message("computing data range")
         data.ranges[[sampleName]] <- range(data, "data")
@@ -610,9 +611,16 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
           }
         }#end of gate adding
         if(execute)
-          fs[[sampleName]] <- data
-
+        {
+          tmp <- tempfile()
+          cf_write_h5(data, tmp)
+          fs[[sampleName]] <- load_cytoframe_from_h5(tmp)
+          
+        }
+        gslist[[sampleName]] <- gs
       }
+      #merge samples into a single gs
+      gs <- rbind2(GatingSetList(gslist))
       #TODO: create and expose R wrapper 'set_compensation' in flowWorkspace
       complist <- sapply(complist, flowWorkspace:::check_comp, simplify = FALSE)
       flowWorkspace:::cs_set_compensation(gs@pointer, complist, FALSE)

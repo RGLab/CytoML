@@ -40,7 +40,7 @@ test_that("Time gate ",{
   thisPath <- file.path(path, "flin")
   wsFile <- file.path(thisPath, "A01.wsp")
   ws <- openWorkspace(wsFile)
-  gs <- parseWorkspace(ws, name = 1, subset = "Specimen_001_L11147 W-4_001.fcs")
+  gs <- parseWorkspace(ws, name = 1)
   stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")

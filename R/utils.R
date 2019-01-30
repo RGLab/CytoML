@@ -240,8 +240,8 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
         inv.fun <- orig.trans.obj[["inverse"]]
         trans.fun <- eval(gml2.trans.obj)
         #rescale
-        gate <- transform_gate(gate, inv.fun, param)
-        gate <- transform_gate(gate, trans.fun, param)
+        gate <- rescale_gate(gate, inv.fun, param)
+        gate <- rescale_gate(gate, trans.fun, param)
       }
 
 

@@ -29,7 +29,7 @@ Imports:
     plyr,
     grDevices,
     methods,
-    ggcyto (>= 1.9.3)
+    ggcyto (>= 1.11.4)
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,

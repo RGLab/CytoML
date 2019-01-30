@@ -251,7 +251,7 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
 #' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5 rbind2
-#' @importFrom ggcyto transform_gate
+#' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
 .parseDivaWorkspace <- function(xmlFileName,samples
@@ -583,9 +583,9 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
               gate <- extend(gate, bound, t(data.ranges[[sampleName]]))
               #need transform since extention was performed on the raw-scale gate
               if(x.extend)
-                gate <- transform_gate(gate, x_biexp@.Data, xParam)
+                gate <- rescale_gate(gate, x_biexp@.Data, xParam)
               if(y.extend)
-                gate <- transform_gate(gate, y_biexp@.Data, yParam)
+                gate <- rescale_gate(gate, y_biexp@.Data, yParam)
             }
 
 

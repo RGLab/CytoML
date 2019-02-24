@@ -2,6 +2,13 @@ context("GatingSet2cytobank and GatingSet2Cytobank ")
 
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/gatingML"
 
+test_that("read.gatingML.cytobank: gates drawn on both compensated and uncompensated axes",{
+  gm <- read.gatingML.cytobank(file.path(path, "CytExp_29783_Gates_v5.xml"))
+  
+  
+  expect_equal(length(getNodes(gm)), 10)
+})
+
 test_that("cytobank2gs--cytof: special character in channels and no comp ",{
 
   thisPath <- file.path(path, "43281")

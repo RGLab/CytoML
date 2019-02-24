@@ -169,6 +169,11 @@ parse.gateInfo <- function(file, ...)
 
                   dimNode <- xmlElementsByTagName(node, dimTag)
                   comp_ref <- unique(sapply(dimNode, function(i)xmlGetAttr(i, "compensation-ref")))
+                  comp_ref <- comp_ref[comp_ref != "uncompensated"]
+                  if(length(comp_ref)==0)
+                    comp_ref <- ""
+                  else if(length(comp_ref) > 1)
+                    stop(name, " gate is associated with multiple compensations: ", paste(comp_ref, collapse = ","))
                   trans_ref <- unique(unname(unlist(compact(sapply(dimNode, function(i)xmlGetAttr(i, "transformation-ref"))))))
                   trans_ref <- ifelse(is.null(trans_ref), "", trans_ref)
                   params <- paste(sapply(dimNode, function(i)xmlGetAttr(i[["fcs-dimension"]], "name")), collapse = ":")

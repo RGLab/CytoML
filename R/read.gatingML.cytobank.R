@@ -72,7 +72,7 @@ read.gatingML.cytobank <- function(file, ...){
 
   #construct tree from GateSets
   g <- constructTree(flowEnv, gateInfo)
-
+  
   #determine comps and trans to be used
 
   comp_refs <- gateInfo[, comp_ref]
@@ -359,8 +359,14 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
   #add gate
   sb <- gateInfo[id == gateID, ]
   nGates <- nrow(sb)
-  if(nGates > 1)
-    stop("multiple gates found for ", gateID)
+  if(nGates > 1){
+    uncomp.ind <- grep("uncompensated", sb$comp_ref) 
+    if(length(uncomp.ind) == 1){
+      sb<- sb[-uncomp.ind,]
+    } else{
+      stop("multiple gates found for ", gateID)
+    }
+  }
   #try to find the tailored gate
   tg_sb <- gateInfo[gate_id == sb[, gate_id] & fcs != "", ]
 

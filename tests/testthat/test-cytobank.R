@@ -26,18 +26,22 @@ test_that("flowJo to cytobank",{
 
 
 test_that("gatingML-cytobank parsing: cytotrol tcell",{
-  xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-
+  acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+  ce <- cytobankExperiment(acsfile)
+  xmlfile <- ce$gatingML
+  fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
   gs <<- cytobank2GatingSet(xmlfile, fcsFiles)
 
 
   #' ## verify the stats are correct
-  statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")
+  statsfile <- ce$attachments[1]
   dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 
 
   expect_equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 
+  #parse from ce
+  gs <- cytobank2GatingSet(ce)
 
 
 })

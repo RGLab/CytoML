@@ -29,7 +29,8 @@ Imports:
     plyr,
     grDevices,
     methods,
-    ggcyto (>= 1.11.4)
+    ggcyto (>= 1.11.4),
+    yaml
 biocViews: FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
@@ -44,6 +45,7 @@ Collate:
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
     'cytobank2GatingSet.R'
+    'cytobankExperiment.R'
     'diva2GatingSet.R'
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'

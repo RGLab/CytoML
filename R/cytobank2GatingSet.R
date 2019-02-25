@@ -1,8 +1,9 @@
-#' A wrapper that parse the gatingML and FCS files into GatingSet
-#' @param xml the full path of gatingML file
+#' A wrapper that parse the gatingML and FCS files (or cytobankExperiment object) into GatingSet
+#' @param x the cytobankExperiment object or the full path of gatingML file
 #' @param FCS FCS files to be loaded
 #' @return a GatingSet
 #' @export
+#' @rdname cytobank2GatingSet
 #' @examples
 #'
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
@@ -13,8 +14,8 @@
 #'
 #' @importFrom flowWorkspace GatingSet transform
 #' @importFrom ncdfFlow read.ncdfFlowSet
-cytobank2GatingSet <- function(xml, FCS){
-  g <- read.gatingML.cytobank(xml)
+cytobank2GatingSet.default <- function(x, FCS){
+  g <- read.gatingML.cytobank(x)
   fs <- read.ncdfFlowSet(FCS)
   gs <- GatingSet(fs)
 

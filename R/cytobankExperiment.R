@@ -39,6 +39,7 @@ cytobankExperiment <- function(acs, exdir = tempdir()){
 }
 #' @export
 cytobank2GatingSet <- function(x, ...)UseMethod("cytobank2GatingSet")
+#' @importFrom flowWorkspace markernames<-
 #' @export
 #' @method cytobank2GatingSet cytobankExperiment
 #' @rdname cytobank2GatingSet
@@ -83,6 +84,7 @@ getCompensationMatrices.cytobankExperiment <- function(x){
 }
 
 #' @rdname cytobankExperiment
+#' @importFrom flowWorkspace markernames
 #' @export
 setMethod("markernames",
           signature=signature(object="cytobankExperiment"),

@@ -47,7 +47,20 @@ cytobank2GatingSet.cytobankExperiment <- function(x, ...){
   gs <- cytobank2GatingSet(x$gatingML, list.files(x$fcsdir, full.names = TRUE))
   pData(gs) <- pData(ce)
   #update markers 
-  # markernames(ce)
+  markers.ce <- markernames(ce)
+  cols.ce <- colnames(ce)
+  
+  for(sn in names(markers.ce))
+  {
+    #prepare chnl vs marker map for update
+    markers.ce <- markers.ce[[sn]]
+    names(markers.ce) <- cols.ce
+    #filter out NA markers
+    gh <- gs[[sn]]
+    cols.nonNA <- subset(pData(parameters(getData(gh, use.exprs = FALSE))), !is.na(desc), "name", drop = TRUE)
+    
+    markernames(gh) <- markers.ce[cols.nonNA]
+  }
   gs
 }
 setOldClass("cytobankExperiment")
@@ -90,15 +103,14 @@ setMethod("markernames",
           signature=signature(object="cytobankExperiment"),
           definition=function(object){
             
-            panels <- get_panel_per_file(x)
+            panels <- get_panel_per_file(object)
             res <- lapply(panels, `[[`, "markers")
             if(length(unique(res)) > 1)
             {
               warning("markers are not consistent across samples!")
-              res
-            }else
-              res[[1]]
-              
+            }
+            res
+            
           })
 
 #' @rdname cytobankExperiment

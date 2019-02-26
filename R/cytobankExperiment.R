@@ -4,7 +4,7 @@
 #' @return cytobankExperiment object
 #' @importFrom yaml read_yaml
 #' @export
-cytobankExperiment <- function(acs, exdir = tempdir()){
+cytobankExperiment <- function(acs, exdir = tempfile()){
   message("Unpacking ACS file...")
   unzip(acs, exdir = exdir)
   path <- file.path(exdir, "experiments")
@@ -30,8 +30,13 @@ cytobankExperiment <- function(acs, exdir = tempdir()){
     unzip(z, exdir = attachdir)
     file.remove(z)
   }
+  gml <- list.files(expdir, pattern = "\\.xml", full.names = TRUE)
+  if(length(gml) > 1)
+    stop("More than one gatingML files found within ACS")
+  if(length(gml) == 0)
+    stop("No gatingML files found within ACS")
   structure(list(experiment = experiment_yaml
-                        , gatingML = list.files(expdir, pattern = "\\.xml", full.names = TRUE)
+                        , gatingML = gml
                         , fcsdir = fcsdir
                         , attachments = list.files(attachdir, pattern = "\\.csv$", full.names = TRUE)
                         )

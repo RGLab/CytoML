@@ -131,6 +131,8 @@ setMethod("show",c("divaWorkspace"),function(object){
 #' @importFrom flowWorkspace parseWorkspace
 #' @importFrom utils menu
 #' @export
+#' @method parseWorkspace divaWorkspace
+#' @export parseWorkspace
 parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 
 #' @importFrom flowCore colnames<-

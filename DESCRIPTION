@@ -7,7 +7,8 @@ Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
 Description: Uses platform-specific implemenations of the GatingML2.0 standard 
     to exchange gated cytometry data with other software platforms.
-License: Artistic-2.0
+License: file LICENSE
+License_restricts_use: yes
 LazyData: TRUE
 Imports:
     flowCore (>= 1.43.10),

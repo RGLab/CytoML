@@ -73,7 +73,7 @@ compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population"), 
 
   # extract the counts from our gating sets
   #load openCyto stats
-  opencyto_counts <- getPopStats(gs, statType = "count")
+  opencyto_counts <- getPopStats(gs, statType = "count", path = "auto")
 
   setnames(opencyto_counts, names(opencyto_counts), c("fcs_filename", "population", "parent", "count", "parent_count"))
   #add root entry

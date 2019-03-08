@@ -44,7 +44,7 @@ test_that("gatingML-cytobank parsing: cytotrol tcell",{
   gs <- cytobank2GatingSet(ce)
   dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
   expect_equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
-  expect_equal(names(pData(gs)), c("name", "Conditions", "Individuals"))
+  expect_setequal(names(pData(gs)), c("name", "Conditions", "Individuals"))
   expect_equal(markernames(gs)[c(1,4)], c("CD4", "CD3"))
 })
 

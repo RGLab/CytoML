@@ -12,7 +12,7 @@
 \alias{pData,cytobankExperiment-method}
 \title{Construct cytobankExperiment object from ACS file}
 \usage{
-cytobankExperiment(acs, exdir = tempdir())
+cytobankExperiment(acs, exdir = tempfile())
 
 \method{print}{cytobankExperiment}(x)
 

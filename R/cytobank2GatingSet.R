@@ -68,7 +68,7 @@ compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population"), 
   # Change column names
   setnames(cytobank_counts_long, c("FCS Filename"), c("fcs_filename"))
   # Properly format the column names
-  cytobank_counts_long <- cytobank_counts_long[,population := gsub("_EventCounts", "", population)]
+  cytobank_counts_long <- cytobank_counts_long[,population := gsub("(_EventCounts)|(Event Counts of )", "", population)]
 
 
   # extract the counts from our gating sets

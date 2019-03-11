@@ -50,6 +50,7 @@ cytobank2GatingSet <- function(x, ...)UseMethod("cytobank2GatingSet")
 #' @rdname cytobank2GatingSet
 cytobank2GatingSet.cytobankExperiment <- function(x, ...){
   gs <- cytobank2GatingSet(x$gatingML, list.files(x$fcsdir, full.names = TRUE))
+  ce <- x
   pData(gs) <- pData(ce)
   #update markers 
   markers.ce <- markernames(ce)
@@ -196,5 +197,6 @@ get_pd <- function(ce){
                                       , .rownames = sample[["filename"]]#sample[["sampleName"]]
                                     )
                       })
-  name_rows(res)
+  res <- name_rows(res)
+  res
 }

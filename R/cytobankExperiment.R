@@ -197,5 +197,6 @@ get_pd <- function(ce){
                                       , .rownames = sample[["filename"]]#sample[["sampleName"]]
                                     )
                       })
-  name_rows(res)
+  res <- name_rows(res)
+  res
 }

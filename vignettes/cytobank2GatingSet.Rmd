@@ -1,0 +1,62 @@
+---
+title: "How to import Cytobank into a GatingSet"
+author: "Mike Jiang"
+output: 
+  html_document: 
+    number_sections: yes
+    toc: yes
+    toc_float: true
+vignette: >    
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{How to import Cytobank into a GatingSet}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = "markup", message = FALSE, warning = FALSE)
+```
+
+This vignette demonstrates how the gatingML files exported from Cytobank can be imported into R as a GatingSet object.
+
+```{r}
+library(flowWorkspace)
+library(CytoML)
+acs <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+```
+
+Create `cytobankExperiment` object from the ACS bundle exported from Cytobank
+```{r}
+ce <- cytobankExperiment(acs)
+ce
+```
+
+**cytobankExperiment** is a wrapper around the `ACS` file, which can be inspected by various accessors.
+```{r}
+sampleNames(ce)
+colnames(ce)
+markernames(ce)
+pData(ce)
+```
+Then import `cytobankExperiment` into **GatingSet**
+```{r}
+gs <- cytobank2GatingSet(ce)
+```
+
+Alternatively, the import can be done by `gatingML` and `fcs` files that are downloaded separately form Cytobank without `ACS`.
+```{r, eval=FALSE}
+xmlfile <- ce$gatingML
+fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
+gs <- cytobank2GatingSet(xmlfile, fcsFiles)
+```
+However, it doesn't have the information from `yaml` file (part of `ACS`). E.g. sample tags (i.e. `pData`) and customized markernames. So it is recommended to import `ACS`.
+
+Inspect the results
+```{r}
+library(ggcyto)
+## Plot the gates
+autoplot(gs[[1]])
+# Extract the population statistics
+getPopStats(gs, statType = "count")
+```
+
+

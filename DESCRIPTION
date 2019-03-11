@@ -32,7 +32,7 @@ Imports:
     methods,
     ggcyto (>= 1.11.4),
     yaml
-biocViews: FlowCytometry, DataImport, DataRepresentation
+biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),

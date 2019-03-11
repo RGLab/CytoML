@@ -187,6 +187,18 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
                                            , transformationId = transID
                                       )
         rescale.gate <- TRUE
+      }else if(type == "logtGml2"){
+        stop("logtGml2 is not supported yet!")#there is some issue associated with gate truncation at negative side during exporting, need to further troubleshoot
+        
+        env <- environment(trans.func)
+        transID <- paste0("Tr_flog_", prefix_chnl)
+        flowEnv[[transID]] <- logtGml2(parameters = param.obj
+                                       , M = env[["decade"]]
+                                       , T = env[["max_val"]]
+                                       , boundMin = env[["min_val"]]
+                                       , transformationId = transID
+        )
+        rescale.gate <- TRUE
       }else{
         # browser()
         stop("unsupported trans: ", type)
@@ -240,8 +252,8 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
         inv.fun <- orig.trans.obj[["inverse"]]
         trans.fun <- eval(gml2.trans.obj)
         #rescale
-        gate <- transform_gate(gate, inv.fun, param)
-        gate <- transform_gate(gate, trans.fun, param)
+        gate <- rescale_gate(gate, inv.fun, param)
+        gate <- rescale_gate(gate, trans.fun, param)
       }
 
 

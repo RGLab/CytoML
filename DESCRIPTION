@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
-Version: 1.9.3
+Version: 1.9.4
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -11,7 +11,7 @@ License: Artistic-2.0
 LazyData: TRUE
 Imports:
     flowCore (>= 1.43.10),
-    flowWorkspace (>= 3.31.2),
+    flowWorkspace (>= 3.31.10),
     openCyto (>= 1.11.3),
     XML,
     data.table,
@@ -29,7 +29,8 @@ Imports:
     plyr,
     grDevices,
     methods,
-    ggcyto (>= 1.9.3)
+    ggcyto (>= 1.11.4),
+    yaml
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 Suggests:
     testthat,
@@ -37,16 +38,18 @@ Suggests:
     knitr,
     parallel
 VignetteBuilder: knitr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 BugReports: https://github.com/RGLab/CytoML/issues
 URL: https://github.com/RGLab/CytoML
 Collate: 
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
     'cytobank2GatingSet.R'
+    'cytobankExperiment.R'
     'diva2GatingSet.R'
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
     'parseDivaWorkspace_old.R'
     'utils.R'
+Encoding: UTF-8

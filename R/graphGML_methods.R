@@ -278,10 +278,11 @@ gating.graphGML <- function(gt, gs, ...) {
 #' @return compensation object or "FCS" when compensation comes from FCS keywords
 #' @export
 #' @importFrom flowWorkspace getCompensationMatrices
-setMethod("getCompensationMatrices", signature = "graphGML", definition = function(x){
+#' @method getCompensationMatrices graphGML
+getCompensationMatrices.graphGML <- function(x){
   x@graphData[["compensation"]]
 
-})
+}
 
 #' Extract transformations from graphGML object.
 #' @param x graphGML
@@ -290,7 +291,8 @@ setMethod("getCompensationMatrices", signature = "graphGML", definition = functi
 #' @importFrom flowWorkspace transformerList asinh_Gml2 flow_trans asinhtGml2_trans logicleGml2_trans logtGml2_trans
 #' @importFrom methods extends
 #' @export
-setMethod("getTransformations", signature = c(x = "graphGML"), function(x){
+#' @method getTransformations graphGML
+getTransformations.graphGML <- function(x){
   trans <- x@graphData[["transformations"]]
   if(!is.null(trans)){
     chnls <- names(trans)
@@ -318,7 +320,7 @@ setMethod("getTransformations", signature = c(x = "graphGML"), function(x){
     trans <- transformerList(chnls, trans)
   }
   trans
-})
+}
 
 #' compensate a GatingSet based on the compensation information stored in graphGML object
 #'

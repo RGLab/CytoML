@@ -1,6 +1,6 @@
 context("parse workspaces of various flowJo versions ")
 library(data.table)
-path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
+path <- "~/rglab/workspace/CytoML/wsTestSuite"
 
 sink("/dev/null")
 
@@ -188,9 +188,8 @@ test_that("Inverse function of flog ",{
       gs <- parseWorkspace(ws, name=1, emptyValue=FALSE)
       
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gs)
-      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      expect_equal(thisCounts, expectCounts)
+      res <- getPopStats(gs[[1]])
+      expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 2e-3)
       
       
       trans <- getTransformations(gh)

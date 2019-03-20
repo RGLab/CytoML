@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([flowWorkspace], [1.5.58], [wjiang2@fhcrc.org])
-AC_CONFIG_SRCDIR([src/R_GatingSet.cpp])
+AC_INIT([CytoML], [1.9.4], [wjiang2@fhcrc.org])
+AC_CONFIG_SRCDIR([src/parseFlowJoWorkspace.cpp])
 #AC_CONFIG_HEADERS([config.h])
 AC_ARG_WITH(xml2,
            [AS_HELP_STRING([--with-xml2=DIR],
@@ -74,7 +74,7 @@ fi
 PKG_LIBS="$XML2_LIBS"
 
 # Checks for library functions.
-AC_MSG_NOTICE([Using the following compilation and linking flags for flowWorkspace])
+AC_MSG_NOTICE([Using the following compilation and linking flags])
 AC_MSG_NOTICE([   PKG_CPPFLAGS=${PKG_CPPFLAGS}])
 AC_SUBST(PKG_CPPFLAGS)
 AC_MSG_NOTICE([   PKG_LIBS=${PKG_LIBS}])

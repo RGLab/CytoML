@@ -39,17 +39,17 @@ test_that("getFileNames workspace",
 test_that("getKeywordsBySampleID workspace",
     {
       thisExpectRes <- fjRes[["getkwByID_ws"]]
-      thisExpectRes <- lapply(fjRes[["getkwByID_ws"]], function(kw)flowWorkspace:::trimWhiteSpace(kw[["value"]]))
+      thisExpectRes <- lapply(fjRes[["getkwByID_ws"]], function(kw)trimws(kw[["value"]]))
       names(thisExpectRes) <- lapply(fjRes[["getkwByID_ws"]], "[[", "name")
       
-      expect_equal(flowWorkspace:::.getKeywordsBySampleID(ws@doc, sid = 1, sampleIDPath = "/Workspace/SampleList/Sample"), thisExpectRes)
+      expect_equal(.getKeywordsBySampleID(ws@doc, sid = 1, sampleIDPath = "/Workspace/SampleList/Sample"), thisExpectRes)
       
     })
 
 test_that("getKeywords workspace",
     {
       expect_error(getKeywords(ws, "CytoTrol_CytoTrol_1.fcs"), "Character 'CytoTrol_CytoTrol_1.fcs' can't uniquely identify")
-      thisExpectRes <- lapply(fjRes[["getkw_ws"]], flowWorkspace:::trimWhiteSpace)
+      thisExpectRes <- lapply(fjRes[["getkw_ws"]], trimws)
       expect_equal(getKeywords(ws, 1), thisExpectRes)
     })
 

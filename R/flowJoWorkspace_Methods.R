@@ -1,4 +1,5 @@
-
+#' @useDynLib CytoML,.registration = TRUE
+NULL
 #' @importClassesFrom XML XMLInternalDocument
 setOldClass("XMLInternalDocument")
 
@@ -64,11 +65,12 @@ setClass("flowJoWorkspace"
 #' }
 #' 
 #' @importFrom XML xmlTreeParse xmlAttrs xmlGetAttr xmlTreeParse xmlRoot xmlValue xpathApply
-#' @import flowCore ncdfFlow
+#' @importFrom flowWorkspace openWorkspace
 #' @aliases openWorkspace
 #' @rdname openWorkspace
 #' @export 
-setMethod("openWorkspace",signature=signature(file="character"),definition= function(file,options = 0,...){
+#' @export openWorkspace
+openWorkspace.character <- function(file,options = 0,...){
  	#message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
 	tmp<-tempfile(fileext=".xml")
     if(!file.exists(file))
@@ -85,14 +87,7 @@ setMethod("openWorkspace",signature=signature(file="character"),definition= func
 	x<-new("flowJoWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
 	x@.cache$flag=TRUE;
 	return(x);
-})
-
-#setAs("list", "GatingSet", function(from, to ){
-#	if(!all(unlist(lapply(from,function(y)class(y)=="GatingHierarchy"),use.names=FALSE))){
-#		stop("Can't coerce this list to class GatingSet");
-#	}
-#	new(to, set=from)
-#})
+}
 
 setMethod("show",c("flowJoWorkspace"),function(object){
 	cat("FlowJo Workspace Version ",object@version,"\n");
@@ -111,6 +106,9 @@ setMethod("show",c("flowJoWorkspace"),function(object){
 		cat("Workspace is closed.","\n")
 	}
 })
+
+#' @export
+setGeneric("closeWorkspace",function(workspace)standardGeneric("closeWorkspace"))
 
 #' @importFrom XML free
 #' @rdname openWorkspace
@@ -138,6 +136,9 @@ setMethod("closeWorkspace","flowJoWorkspace",function(workspace){
   }
   gsub("[0-9]", "", wsType)
 }
+
+#' @export
+setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 
 #' Parse a flowJo Workspace
 #' 
@@ -585,7 +586,7 @@ setMethod("parseWorkspace",signature("flowJoWorkspace"),function(obj, ...){
 #	message("c++ parsing done!")
   
   #gating
-  gs <- .addGatingHierarchies(gs,pd,execute,isNcdf, wsType = wsType, sampNloc = sampNloc, ws = ws, ...)
+  gs <- flowWorkspace:::.addGatingHierarchies(gs,pd,execute,isNcdf, wsType = wsType, sampNloc = sampNloc, ws = ws, ...)
   
 
   #attach pData
@@ -641,6 +642,44 @@ setMethod("parseWorkspace",signature("flowJoWorkspace"),function(obj, ...){
   gs
 }
 
+#' constructors for GatingSet 
+#' 
+#' construct object from xml workspace file and a list of sampleIDs (not intended to be called by user.)
+#' 
+#' @param x \code{character} or \code{flowSet} or \code{GatingHierarchy}
+#' @param y \code{character} or\code{missing}
+#' @param guids \code{character} vectors to uniquely identify each sample (Sometime FCS file names alone may not be unique)
+#' @param includeGates \code{logical} whether to parse the gates or just simply extract the flowJo stats
+#' @param sampNloc \code{character} scalar indicating where to get sampleName(or FCS filename) within xml workspace. It is either from "keyword" or "sampleNode".
+#' @param xmlParserOption \code{integer} option passed to \code{\link{xmlTreeParse}} 
+#' @param wsType \code{character} workspace type, can be value of "win", "macII", "vX", "macIII".
+#'  
+#' @rdname GatingSet-methods
+#' @aliases GatingSet
+#' @export 
+setMethod("GatingSet",c("character","character"),function(x,y, guids, includeGates=FALSE, sampNloc="keyword",xmlParserOption, wsType){
+			
+			xmlFileName<-x
+			sampleIDs<-y
+#			browser()
+			sampNloc<-match(sampNloc,c("keyword","sampleNode"))
+			if(is.na(sampNloc))
+				sampNloc<-0
+			stopifnot(!missing(xmlFileName))
+			
+			wsType <- match(wsType, c("win", "macII", "vX", "macIII"))
+			if(is.na(wsType))
+				stop("unrecognized workspace type: ", wsType)
+			
+			if(!file.exists(xmlFileName))
+				stop(xmlFileName," not found!")
+			Object<-new("GatingSet")
+			Object@pointer<-.cpp_parseWorkspace(xmlFileName,sampleIDs,guids,includeGates,as.integer(sampNloc),as.integer(xmlParserOption),as.integer(wsType))
+			identifier(Object) <- flowWorkspace:::.uuid_gen()
+			Object@flag <- FALSE
+			
+			return(Object)
+		})
 
 getFileNames <- function(ws){
   if(class(ws)!="flowJoWorkspace"){
@@ -663,8 +702,8 @@ getFileNames <- function(ws){
 }
 
 
-
-
+#' @export
+setGeneric("getKeywords",function(obj,y, ...)standardGeneric("getKeywords"))
 
 #' Get Keywords
 #' 
@@ -727,7 +766,7 @@ setMethod("getKeywords",c("flowJoWorkspace","numeric"),function(obj,y, ...){
                                       attr <- xmlAttrs(i)
                                       attrValue <- attr[["value"]]
                                       names(attrValue) <- attr[["name"]]
-                                      trimWhiteSpace(attrValue)
+                                      trimws(attrValue)
                                     })
   as.list(unlist(kw))
   
@@ -827,12 +866,8 @@ getFJWSubsetIndices<-function(ws,key=NULL,value=NULL,group,requiregates=TRUE){
 
 
 
-
-#Taken from limma (don't want to import and create a dependency)
-trimWhiteSpace<-function (x) 
-{
-    sub("[ \t\n\r]*$", "", sub("^[ \t\n\r]*", "", x))
-}
+#' @export
+setGeneric("getSamples",function(x,...)standardGeneric("getSamples"))
 
 #' Get a list of samples from a flowJo workspace
 #' 
@@ -862,6 +897,10 @@ setMethod("getSamples","flowJoWorkspace",function(x, sampNloc="keyword"){
       x <- x@doc
       .getSamples(x, wsType = wsType, sampNloc = sampNloc)
 })
+
+#' @export
+setGeneric("getSampleGroups",function(x)standardGeneric("getSampleGroups"))
+
 
 #' Get a table of sample groups from a flowJo workspace
 #' 

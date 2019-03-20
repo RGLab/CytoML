@@ -5,13 +5,13 @@
 #' @export
 #' @rdname cytobank2GatingSet
 #' @examples
-#'
+#' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' fcsFiles <- list.files(pattern = "CytoTrol", 
 #'       system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
 #' gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 #' #plotGate(gs[[1]])
-#'
+#' }
 #' @importFrom flowWorkspace GatingSet transform
 #' @importFrom ncdfFlow read.ncdfFlowSet
 cytobank2GatingSet.default <- function(x, FCS){

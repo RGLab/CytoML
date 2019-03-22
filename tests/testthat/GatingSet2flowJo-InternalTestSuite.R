@@ -1,6 +1,6 @@
 context("Exporting GatingSet to flowJo workspace")
 
-path <- "~/rglab/workspace/flowWorkspace/wsTestSuite"
+path <- "~/rglab/workspace/CytoML//wsTestSuite"
 
 test_that("GatingSet2flowJo: forward slash ",{
   thisPath <- file.path(path, "slash_issue_vX")

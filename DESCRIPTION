@@ -28,11 +28,13 @@ Imports:
     utils,
     base64enc,
     plyr,
+    dplyr,
     grDevices,
     methods,
     ggcyto (>= 1.11.4),
     yaml
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
+LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.8), cytolib(>= 2.1.12),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),
@@ -45,12 +47,15 @@ URL: https://github.com/RGLab/CytoML
 Collate: 
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
+    'RcppExports.R'
     'cytobank2GatingSet.R'
     'cytobankExperiment.R'
+    'flowJoWorkspace_Methods.R'
     'diva2GatingSet.R'
     'flowUtils_functions.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
     'parseDivaWorkspace_old.R'
     'utils.R'
+SystemRequirements: xml2, GNU make, C++11    
 Encoding: UTF-8

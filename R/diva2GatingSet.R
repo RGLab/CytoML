@@ -1,3 +1,6 @@
+#' @include flowJoWorkspace_Methods.R 
+NULL
+
 #' divaWorkspace class
 #' @exportClass divaWorkspace
 setClass("divaWorkspace"
@@ -59,7 +62,6 @@ openDiva <- function(file,options = 0,...){
 
 #' @rdname divaWorkspace-class
 #' @param x divaWorkspace
-#' @importFrom flowWorkspace getSamples
 #' @importFrom methods selectMethod
 #' @export
 getSamples.divaWorkspace <- function(x){
@@ -67,7 +69,6 @@ getSamples.divaWorkspace <- function(x){
     }
 
 #' @rdname divaWorkspace-class
-#' @importFrom flowWorkspace getSampleGroups
 #' @export
 getSampleGroups.divaWorkspace <- function(x){
       .getSampleGroupsDiva(x)
@@ -128,7 +129,6 @@ setMethod("show",c("divaWorkspace"),function(object){
 #' @rdname divaWorkspace-class
 #' @param obj divaWorkspace
 #' @param ... other arguments
-#' @importFrom flowWorkspace parseWorkspace
 #' @importFrom utils menu
 #' @export
 #' @method parseWorkspace divaWorkspace

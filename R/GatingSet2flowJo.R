@@ -157,7 +157,7 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
   csvfile <- paste(sn, pname, "EPA.csv", sep = ".")
   csvpath <- file.path(outputdir, csvfile)
   write.csv(vec, csvpath, row.names = FALSE)
-  message("DerivedParameter: ", csvpath)
+  message("DerivedParameter: ", normalizePath(csvpath))
   xmlNode("DerivedParameter"
           , attrs = c(name = pname
                     , type = "importCsv"

@@ -288,7 +288,7 @@
 
 
 
-        add(gh, gate, parent = parent, name = nodeName)
+        flowWorkspace:::gh_add_gate(gh, gate, parent = parent, name = nodeName)
         if(parent == "root")
           parent <- ""
         unique.path <- file.path(parent, nodeName)

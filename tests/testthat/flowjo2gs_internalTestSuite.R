@@ -11,7 +11,7 @@ test_that("set T value properly through PnE instead of PnR for flog transform wh
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name = 2, sampNloc = 'sampleNode')
   
-  res <- getPopStats(gs[[1]])
+  res <- gh_get_pop_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.015)
   
   
@@ -25,7 +25,7 @@ test_that("handle the linear transform with maxRange = 0",{
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name = 1)
   
-  res <- getPopStats(gs[[1]])
+  res <- gh_get_pop_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq])
   
   
@@ -38,7 +38,7 @@ test_that("skip ManuallyIncludedSamples",{
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name = 1, path = system.file("extdata", package = "flowCore"))
   
-  res <- getPopStats(gs[[1]])
+  res <- gh_get_pop_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.009)
   
   
@@ -61,7 +61,7 @@ test_that("search reference node for boolean gate ",{
   wsFile <- file.path(thisPath, "2583-Y-MAL067-FJ.xml")
   ws <- openWorkspace(wsFile)
   gs <- suppressWarnings(parseWorkspace(ws, name="Samples", subset = "1379326.fcs"))
-  res <- getPopStats(gs[[1]])
+  res <- gh_get_pop_stats(gs[[1]])
   expect_equal(nrow(res), 235)
   expect_equal(res[-10, xml.freq], res[-10, openCyto.freq], tol = 0.006)
   expect_equal(res[10, openCyto.count], 164)
@@ -69,8 +69,8 @@ test_that("search reference node for boolean gate ",{
   #skip leaf bool
   gs <- suppressWarnings(parseWorkspace(ws, name="Samples", subset = "1379326.fcs", leaf.bool = F))
   gh <- gs[[1]]
-  leaf.bool <- which(sapply(getNodes(gs), function(node)length(getChildren(gh, node))==0&&flowWorkspace:::.isBoolGate(gh,node)))
-  res <- getPopStats(gh)
+  leaf.bool <- which(sapply(gs_get_pop_paths(gs), function(node)length(gs_get_children(gh, node))==0&&flowWorkspace:::.isBoolGate(gh,node)))
+  res <- gh_get_pop_stats(gh)
   expect_true(all(is.na(res[leaf.bool,  openCyto.count])))
   expect_equal(res[-leaf.bool, xml.freq], res[-leaf.bool, openCyto.freq], tol = 0.006)
   })
@@ -81,7 +81,7 @@ test_that("vertical ellipsoidGate for vX ",{
   ws <- openWorkspace(wsFile)
   gs <- suppressWarnings(parseWorkspace(ws, name=1))
   
-  res <- getPopStats(gs[[1]])
+  res <- gh_get_pop_stats(gs[[1]])
   
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.02)
 })
@@ -92,7 +92,7 @@ test_that("skip gains from FCS for vX ",{
   ws <- openWorkspace(wsFile)
   gs <- suppressWarnings(parseWorkspace(ws, name=2))
   
-  res <- getPopStats(gs[[1]])
+  res <- gh_get_pop_stats(gs[[1]])
   
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 1e-3)
 })
@@ -104,7 +104,7 @@ test_that("gate extension ",{
       ws <- openWorkspace(wsFile)
       gs <- suppressWarnings(parseWorkspace(ws, name=3))
       
-      res <- getPopStats(gs[[1]])[xml.count != -1, ]
+      res <- gh_get_pop_stats(gs[[1]])[xml.count != -1, ]
       
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 3e-2)
     })
@@ -116,7 +116,7 @@ test_that("curlyQuad gate1 ",{
       ws <- openWorkspace(wsFile)
       gs <- suppressWarnings(parseWorkspace(ws, name=2))
       
-      res <- getPopStats(gs[[1]])
+      res <- gh_get_pop_stats(gs[[1]])
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 2e-3)
     })
 
@@ -126,7 +126,7 @@ test_that("curlyQuad gate1 ",{
       ws <- openWorkspace(wsFile)
       gs <- suppressWarnings(parseWorkspace(ws, name=2))
       
-      res <- getPopStats(gs[[1]])
+      res <- gh_get_pop_stats(gs[[1]])
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 7e-3)
     })
 
@@ -136,7 +136,7 @@ test_that("curlyQuad gate ",{
       ws <- openWorkspace(wsFile)
       gs <- parseWorkspace(ws, name=1)
       
-      res <- getPopStats(gs[[1]])
+      res <- gh_get_pop_stats(gs[[1]])
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 1.6e-2)
     })
 
@@ -146,7 +146,7 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
       ws <- openWorkspace(wsFile)
       gs <- parseWorkspace(ws, name=1, execute = T, sampNloc = "sampleNode", subset = "spillover_B2.fcs")
         
-      res <- getPopStats(gs[[1]])
+      res <- gh_get_pop_stats(gs[[1]])
       expect_equal(res[, xml.count], res[, openCyto.count], tol = 4e-3)
 })
 
@@ -155,11 +155,11 @@ test_that("No gate extension ",{
       wsFile <- file.path(thisPath, "08-Mar-2016.wsp")
       ws <- openWorkspace(wsFile)
       gs <- parseWorkspace(ws, name = 1, subset = 1) #default extend_val = 0 will extend the gate  
-      res <- getPopStats(gs[[1]])
+      res <- gh_get_pop_stats(gs[[1]])
       expect_gt(res[11, abs(xml.freq - openCyto.freq)], 0.1)
       
       gs <- parseWorkspace(ws, name = 1, extend_val = -2e3)#relax the threshold to disable extension
-      res <- getPopStats(gs[[1]])
+      res <- gh_get_pop_stats(gs[[1]])
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 4e-3)
     })
 
@@ -169,7 +169,7 @@ test_that("Time gate ",{
   wsFile <- file.path(thisPath, "A01.wsp")
   ws <- openWorkspace(wsFile)
   gs <- parseWorkspace(ws, name = 1, subset = 1)
-  res <- getPopStats(gs[[1]])
+  res <- gh_get_pop_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 9e-4)
 })
 test_that("Time gate2--when computed timestep is very different from $TIMESTEP ",{
@@ -177,7 +177,7 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
       wsFile <- file.path(thisPath, "MX1 Analysis VISC.xml")
       ws <- openWorkspace(wsFile)
       gs <- parseWorkspace(ws,name="Group 1",subset=11)
-      res <- getPopStats(gs[[1]])[xml.count!=-1,]
+      res <- gh_get_pop_stats(gs[[1]])[xml.count!=-1,]
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 8e-3)
     })
 test_that("Inverse function of flog ",{
@@ -188,7 +188,7 @@ test_that("Inverse function of flog ",{
       gs <- parseWorkspace(ws, name=1, emptyValue=FALSE)
       
       gh <- gs[[1]]
-      res <- getPopStats(gs[[1]])
+      res <- gh_get_pop_stats(gs[[1]])
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 2e-3)
       
       
@@ -213,7 +213,7 @@ test_that("v 10.0.6 - vX 1.8",{
       
       gh <- gs[[1]]
             
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[-1, xml.count], thisCounts[-1, openCyto.count], tol = 3.7e-3)
       
       #test double delimiter issue
@@ -229,12 +229,12 @@ test_that("v 10.0.6 - vX 1.8",{
               
       gs <- parseWorkspace(ws, name = "Bcell", subset = 1, isNcdf = T, path = tmp, emptyValue = F)#ncdf
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)            
+      thisCounts <- gh_get_pop_stats(gh)            
       expect_equal(thisCounts[-1, xml.count], thisCounts[-1, openCyto.count], tol = 3.7e-3)
       
       gs <- parseWorkspace(ws, name = "Bcell", subset = 1, isNcdf = F, path = tmp, emptyValue = F)#flowSet
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)            
+      thisCounts <- gh_get_pop_stats(gh)            
       expect_equal(thisCounts[-1, xml.count], thisCounts[-1, openCyto.count], tol = 3.7e-3)
     })
 
@@ -252,7 +252,7 @@ test_that("v 10.0.7 - vX 20.0 (ellipsoidGate)",{
       
       gh <- gs[[1]]
      
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
     })
 
@@ -289,7 +289,7 @@ test_that("v 10.0.7 - vX 20.0 (missing_namespace and flin)",{
 #      
 #      gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-#      thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+#      thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
 #      expect_equal(thisCounts, expectCounts)
 #    })
 
@@ -319,7 +319,7 @@ test_that("v 10.0.7 - vX 20.0 (McGill/treg) ellipseidGate (biexponential)",{
       
       gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[,xml.freq], thisCounts[,openCyto.freq], tol = 7e-4)
     })
 
@@ -341,7 +341,7 @@ test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
       gs <- parseWorkspace(ws, name = 1, subset = 3, sampNloc = "sampleNode", additional.keys = NULL)
       
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+      thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
       expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
       
     })
@@ -358,7 +358,7 @@ test_that("v 10.0.7 - vX 20.0 (cytof no compensation)",{
       expect_is(gs, "GatingSet")
 #      gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-#      thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+#      thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
 #      expect_equal(thisCounts, expectCounts)
     })
 
@@ -377,7 +377,7 @@ test_that("v 10.0.7r2 - vX 20.0 (NotNode)",{
       expect_is(g, "booleanFilter")
       expect_equal(g@deparse, "!LIVE/Single Cells/CD45+/CD20+")
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+      thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
       expect_equivalent(thisCounts[,c("xml.count", "node"), with = F], expectCounts[,c("flowJo.count", "node"), with = F])
     })
 
@@ -414,7 +414,7 @@ test_that("v 10.0.8r1 - vX 20.0 (OrNode)",{
   expect_equal(g@deparse, "FCS singlets/SSC singlets/Lymphocytes/CD8/F5/Live/Q6: CD44+ , CD62L+|FCS singlets/SSC singlets/Lymphocytes/CD8/F5/Live/Q7: CD44+ , CD62L-")
   
   expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-  thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+  thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
   expect_equivalent(thisCounts, expectCounts)
 })
 
@@ -431,7 +431,7 @@ test_that("v 10.0.8 - vX 20.0 (slash_issue_vX)",{
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.count], thisCounts[, openCyto.count], tol = 0.038)
       
       
@@ -448,7 +448,7 @@ test_that("v 10.2 - vX 20.0 (EllipsoidGate)",{
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.count], thisCounts[, openCyto.count], tol = 0.03)
       
       
@@ -466,7 +466,7 @@ test_that("v 7.6.1- win 1.6 (use default biexp trans when channel-specific trans
       expect_warning(gs <- parseWorkspace(ws, name = 2, path = thisPath), "Can't find the FCS")
       gh <- gs[[1]]
       
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
     })
 
@@ -481,7 +481,7 @@ test_that("v 7.6.5 - win 1.61 (PBMC)",{
       gs <- parseWorkspace(ws, name = 1, subset = 1, sampNloc = "sampleNode")
       gh <- gs[[1]]
             
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 9e-3)
             
     })
@@ -498,7 +498,7 @@ test_that("v 7.6.5 - win 1.61 (sampNloc = 'sampleNode')",{
       
       gs <- parseWorkspace(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sampNloc = "sampleNode", isNcdf = TRUE)
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-4)
       
     })
@@ -517,7 +517,7 @@ test_that("v 7.6.5 - win 1.61 (sampNloc = 'sampleNode')",{
 #       gs <- parseWorkspace(ws, name = 4, subset = 1, isNcdf = TRUE)
 #       gh <- gs[[1]]
 #       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-#       thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+#       thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
 #       expect_equal(thisCounts, expectCounts, tolerance = 1e-5, check.attributes = FALSE)
 #       
 #     })
@@ -533,7 +533,7 @@ test_that("v 9.0.1 - mac 2.0 (HVTN 080-0880)",{
       
       gs <- parseWorkspace(ws, name = 4, subset = 1, isNcdf = TRUE)
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-3)
       
     })
@@ -551,9 +551,9 @@ test_that("v 9.2 - mac 2.0 (ITN029)",{
       gs <- parseWorkspace(ws, name = 2, subset = 1, isNcdf = TRUE)
       gh <- gs[[1]]
       # expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      # thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+      # thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
       # expect_equal(thisCounts, expectCounts, check.attributes = FALSE)
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 7e-3)
       
     })
@@ -568,7 +568,7 @@ test_that("v 9.4.2 - mac 2.0",{
       
       gs <- parseWorkspace(ws, name = 2, subset = 1, isNcdf = TRUE)
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
       
     })
@@ -587,7 +587,7 @@ test_that("v 9.4.4 - mac 2.0 ",{
       
       gs <- parseWorkspace(ws, name = "Test", subset = 1)
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
       
     })
@@ -605,7 +605,7 @@ test_that("v 9.5.2 - mac 2.0",{
       gs <- parseWorkspace(ws, name = 2, subset = 1, path = file.path(thisPath,"Bcell"), isNcdf = TRUE)
       gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
       
       #create a temp folder and symlink to original files to test the feature of searching sample by keyword $FIL
@@ -618,7 +618,7 @@ test_that("v 9.5.2 - mac 2.0",{
       
       gs <- parseWorkspace(ws, name = 2, subset = 1, path = tmp)
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
       unlink(tmp,recursive = T)
     })
@@ -634,7 +634,7 @@ test_that("v 9.6.3 - mac 2.0 (ignore highValue for FSC/SSC)",{
       
       gs <- parseWorkspace(ws, name = 1, subset = "Specimen_001_Tube_024.fcs", isNcdf = TRUE)
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 7e-3)
       
     })
@@ -650,7 +650,7 @@ test_that("v 9.7.4 - mac 3.0",{
       gs <- parseWorkspace(ws, name = "CHI-002 PBMC control", subset = "CHI-002 PBMC control_101211.fcs", isNcdf = TRUE)
       gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      thisCounts <- getPopStats(gh, path = "full")[, list(xml.count,openCyto.count, node)]
+      thisCounts <- gh_get_pop_stats(gh, path = "full")[, list(xml.count,openCyto.count, node)]
       expectCounts[flowJo.count ==0, flowJo.count := -1]#fix the legacy counts
       expect_equal(thisCounts, expectCounts, check.attributes = FALSE, tol = 3.3e-3)
     })
@@ -666,7 +666,7 @@ test_that("v 9.7.5 - mac 3.0 (no compensation and using calibrationIndex)",{
       gs <- parseWorkspace(ws, name = 5, subset = "477889_env_cct_norm_concatenated.txt", isNcdf = TRUE)
       gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
-      thisCounts <- getPopStats(gh)[, list(xml.count,openCyto.count, node)]
+      thisCounts <- gh_get_pop_stats(gh)[, list(xml.count,openCyto.count, node)]
       expectCounts[flowJo.count ==0, flowJo.count := -1] #fix the legacy counts
       expect_equal(thisCounts, expectCounts, check.attributes = FALSE, tol = 2e-4)
     })
@@ -681,7 +681,7 @@ test_that("v 9.7.5 - mac 3.0 (boolGate that refers to the non-sibling nodes)",{
       
       gs <- parseWorkspace(ws, name = 2, subset = "434713.fcs", isNcdf = TRUE)
       gh <- gs[[1]]
-      thisCounts <- getPopStats(gh)
+      thisCounts <- gh_get_pop_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-3)
     })
 

@@ -140,14 +140,14 @@ We can print all the cell populations defined in the gating tree.
 
 ```{r}
 #show all the cell populations(/nodes)
-getNodes(gh)
+gs_get_pop_paths(gh)
 ```
 
 We can extract the cell population statistics. 
 
 ```{r}
 #show the population statistics
-getPopStats(gh)
+gh_get_pop_stats(gh)
 ```
 
 The `openCyto.count` column shows the cell counts computed via the import.

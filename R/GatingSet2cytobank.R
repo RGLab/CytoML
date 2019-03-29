@@ -5,7 +5,7 @@
 #'
 #' The process can be divided into four steps:
 #' 1. Read in gate geometry, compensation and transformation from gatingSet
-#' 2. Rescale gate boundaries with flowJoTrans() so gates can be displayed properly in Cytobank
+#' 2. Rescale gate boundaries with flowjo_biexp() so gates can be displayed properly in Cytobank
 #' 3. Save gates and hierarchy structure to R environment
 #' 4. Write environment out to gatingML using write.GatingML()
 #'
@@ -65,7 +65,7 @@ GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default
 export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, showHidden, rescale.gate = TRUE)
 {
   #add gates and pops(as GateSets)
-  nodePaths <- getNodes(gs, showHidden = showHidden)[-1]
+  nodePaths <- gs_get_pop_paths(gs, showHidden = showHidden)[-1]
   gh <- gs[[1]]
 
   fcs_guids <- sampleNames(gs)
@@ -130,7 +130,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       #and attach comp and trans reference to parameters
       gate <- processGate(gate, trans.Gm2objs, compId, flowEnv, rescale.gate, trans)
 
-      # parent <- getParent(gs, nodePath)
+      # parent <- gs_get_parent(gs, nodePath)
       # if(parent == "root")
       #   parent_id <- 0
       # else
@@ -187,7 +187,7 @@ addGateSets <- function(root, gs, showHidden, guid_mapping)
                       names(gate_id_path) <- curNode
                       # browser()
                       repeat{
-                        curNode <- getParent(gs, curNode)
+                        curNode <- gs_get_parent(gs, curNode)
                         if(curNode == "root")
                           break
                         else{
@@ -241,7 +241,7 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, guid_mapping){
 #' @param root the root node of the XML
 #' @param flowEnv the environment that stores the information parsed by 'read.GatingML'.
 #' @importFrom  XML xmlAttrs getNodeSet addChildren xmlAttrs<-
-#' @importFrom flowWorkspace pData getCompensationObj
+#' @importFrom flowWorkspace pData gs_get_compensation_internal
 #' @return XML root node
 addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden){
   quad.pattern.cytobank <- c("++", "-+", "--","+-")
@@ -252,7 +252,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   transNames <- names(translist)
   rng <- range(gs[[1]], raw.scale = TRUE)
   #retrieve the prefix for latter trans matching
-  cmp <- getCompensationObj(gs@pointer, sampleNames(gs)[[1]])
+  cmp <- gs_get_compensation_internal(gs@pointer, sampleNames(gs)[[1]])
   prefix <- cmp$prefix
   suffix <- cmp$suffix
   id <- 0 # id for each local gate instances (i.e. one gate_id vs multiple ids representing tailored gates)

@@ -51,7 +51,7 @@ cytobank2GatingSet.default <- function(x, FCS){
 #' dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 #' all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 #'
-#' @importFrom flowWorkspace getPopStats
+#' @importFrom flowWorkspace gh_get_pop_stats
 compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population"), ...){
   #load stats from cytobank
   id.vars <- match.arg(id.vars)
@@ -73,7 +73,7 @@ compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population"), 
 
   # extract the counts from our gating sets
   #load openCyto stats
-  opencyto_counts <- getPopStats(gs, statType = "count", path = "auto")
+  opencyto_counts <- gs_get_pop_stats(gs, statType = "count", path = "auto")
 
   setnames(opencyto_counts, names(opencyto_counts), c("fcs_filename", "population", "parent", "count", "parent_count"))
   #add root entry

@@ -29,7 +29,7 @@ getSampleGroups(ws)
 getSamples(ws)
 gs <- parseWorkspace(ws, name = 2, subset = 1)
 sampleNames(gs)
-getNodes(gs)
+gs_get_pop_paths(gs)
 plotGate(gs[[1]])
 }
 }

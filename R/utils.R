@@ -61,7 +61,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
   }else{
     chnls <- as.vector(parameters(comp))
     #retrieve the prefix for latter trans matching
-    cmp <- getCompensationObj(gs@pointer, sampleNames(gs)[[1]])
+    cmp <- gs_get_compensation_internal(gs@pointer, sampleNames(gs)[[1]])
     prefix <- cmp$prefix
     suffix <- cmp$suffix
     prefix_chnls_orig <- paste0(prefix, chnls, suffix)

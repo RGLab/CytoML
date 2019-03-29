@@ -27,7 +27,7 @@ test_that("autogating--tcell", {
   expect_warning(gating(gt, gs))
 
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
+  stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -35,7 +35,7 @@ test_that("autogating--tcell", {
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
+  stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
   ####################
@@ -48,21 +48,21 @@ test_that("autogating--tcell", {
   gt <- gatingTemplate(gtFile.orig)
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- getPopStats(gs[[1]])[, list(openCyto.count, node)]
+  stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
 
   GatingSet2flowJo(gs, outFile)
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  stats.new <- getPopStats(gs1[[1]])[, list(openCyto.count, node)]
+  stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })
 test_that("GatingSet2flowJo: manual gates with calibration table parsed and stored as biexp ",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
-  stats.orig <- getPopStats(gs[[1]])
+  stats.orig <- gh_get_pop_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   GatingSet2flowJo(gs, outFile)
@@ -70,7 +70,7 @@ test_that("GatingSet2flowJo: manual gates with calibration table parsed and stor
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  stats.new <- getPopStats(gs1[[1]])
+  stats.new <- gh_get_pop_stats(gs1[[1]])
   expect_equal(stats.orig, stats.new, tol = 5e-3)
 })
 
@@ -93,12 +93,12 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   Map <- selectMethod("Map", sig = "flowClust")
   res <- Map(res)
   res <- as.factor(res)
-  add(gh, res, parent = "CD3+", name = "flowclust")
+  flowWorkspace:::gh_add_gate(gh, res, parent = "CD3+", name = "flowclust")
 
   rect <- rectangleGate(`<B710-A>` = c(500, 1500), `<R780-A>` = c(3500, 4000))
-  add(gh, rect, parent = "flowclust_1", name = "rect")
+  flowWorkspace:::gh_add_gate(gh, rect, parent = "flowclust_1", name = "rect")
   recompute(gh)
-  stats.orig <- getPopStats(gs[[1]])
+  stats.orig <- gh_get_pop_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   # outFile <- "~/test.wsp"
@@ -107,7 +107,7 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   #parse it back in
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
-  stats.new <- getPopStats(gs1[[1]])
+  stats.new <- gh_get_pop_stats(gs1[[1]])
   expect_equal(stats.orig[-(5:7)], stats.new, tol = 5e-3)
 })
 
@@ -138,7 +138,7 @@ test_that("GatingSet2flowJo: handle special encoding in keywords ",{
   })
   names(clean.clust)<-sampleNames(fs_trans)
   
-  add(gs,clean.clust, parent="root",name = "Clean")
+  gs_add_gate(gs,clean.clust, parent="root",name = "Clean")
   recompute(gs)
   
   #add one gate
@@ -147,13 +147,13 @@ test_that("GatingSet2flowJo: handle special encoding in keywords ",{
   
   
   
-  nodeID<-add(gs, rg,parent="Clean_0")#it is added to root node by default if parent is not specified
+  nodeID<-gs_add_gate(gs, rg,parent="Clean_0")#it is added to root node by default if parent is not specified
   recompute(gs)
   autoplot(gs, "rectangle")
   
   #add a quadGate
   qg <- quadGate("FL1-H"=1e3, "FL2-H"=1.5e3)
-  nodeIDs<-add(gs,qg,parent="rectangle")
+  nodeIDs<-gs_add_gate(gs,qg,parent="rectangle")
   recompute(gs)
 
   outFile <- tempfile(fileext = ".wsp")
@@ -162,6 +162,6 @@ test_that("GatingSet2flowJo: handle special encoding in keywords ",{
   write.flowSet(fs, outDir)
   ws <- openWorkspace(outFile)
   gs2 <- parseWorkspace(ws, name = 1)
-  # stats1 <- getPopStats(gs)
+  # stats1 <- gh_get_pop_stats(gs)
   expect_is(gs2, "GatingSet")
 })

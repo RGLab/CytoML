@@ -85,7 +85,7 @@ setMethod("getChildren", signature = c("graphGML", "character"),
 #' @param y \code{character} child node path
 #' @return a graphNEL node
 #' @export
-#' @importFrom flowWorkspace getParent
+#' @importFrom flowWorkspace gs_get_parent
 setMethod("getParent", signature = c("graphGML", "character"),
           definition = function(obj, y) {
 
@@ -267,7 +267,7 @@ gating.graphGML <- function(gt, gs, ...) {
 
 
 
-    add(gs, this_gate, parent = parent, name = popName)
+    gs_add_gate(gs, this_gate, parent = parent, name = popName)
 
   }
   recompute(gs)

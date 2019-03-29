@@ -3,7 +3,7 @@ context("parse diva workspace ..")
 test_that("PE_2", {
   ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
   gs <- parseWorkspace(ws, name = 2, subset = 1, swap_cols = FALSE)
-  stats <- getPopStats(gs[[1]])
+  stats <- gh_get_pop_stats(gs[[1]])
 
   expect_equal(stats[, xml.count], stats[, openCyto.count], tolerance = 0.0018)
 
@@ -15,7 +15,7 @@ test_that("PE_2", {
   paste(sg[["sampleName"]], collapse = "','")
   # getSamples(ws)
 
-  expect_equal(getNodes(gs), c('root','/P1','/P1/P2','/P1/P2/P3','/P1/P2/P3/P4','/P1/P2/P3/P4/P5'))
+  expect_equal(gs_get_pop_paths(gs), c('root','/P1','/P1/P2','/P1/P2/P3','/P1/P2/P3/P4','/P1/P2/P3/P4/P5'))
 
 })
 

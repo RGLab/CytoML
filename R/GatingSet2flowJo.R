@@ -181,8 +181,8 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
 #' @importFrom flowWorkspace gh_check_cluster_node gh_get_cluster_labels
 DerivedParametersNode <- function(gh, ...){
   sn <- sampleNames(gh)
-  dpnodes <- lapply(getNodes(gh, path = "auto"), function(parent){
-                    childnodes <- getChildren(gh, parent, path = "auto")
+  dpnodes <- lapply(gs_get_pop_paths(gh, path = "auto"), function(parent){
+                    childnodes <- gs_get_children(gh, parent, path = "auto")
                     cluster_names <- compact(sapply(childnodes, function(nd){
                                             gh_check_cluster_node(gh, nd)
                                           }))
@@ -218,7 +218,7 @@ getSpilloverMat <- function(gh){
     compobj <- getCompensationMatrices(gh)
     if(!is.null(compobj)){
       mat <- compobj@spillover
-      comp <- getCompensationObj(gh@pointer,sampleNames(gh))
+      comp <- gs_get_compensation_internal(gh@pointer,sampleNames(gh))
       cid <- comp$cid
       prefix <- comp$prefix
       suffix <- comp$suffix
@@ -444,7 +444,7 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...
 
   sn <- pData(gh)[["name"]]
   stat <- getTotal(gh, "root", xml = FALSE)
-  children <- getChildren(gh, "root", path = "auto")
+  children <- gs_get_children(gh, "root", path = "auto")
   if(!showHidden)
     children <- children[!sapply(children, function(child)isHidden(gh, child))]
   param <- as.vector(parameters(getGate(gh, children[1])))
@@ -497,7 +497,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
       gate <- quad.gate
     
     eventsInside <- !isNegated(gh, pop)
-    children <- getChildren(gh, pop, path = "auto")
+    children <- gs_get_children(gh, pop, path = "auto")
     if(!showHidden)
       children <- children[!sapply(children, function(child)isHidden(gh, child))]
 
@@ -506,7 +506,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
     if(length(children) == 0){ #leaf node
       if(isBool){
         #use parent gate's dims for boolean node
-        gate.dim <- getGate(gh, getParent(gh, pop, path = "auto"))
+        gate.dim <- getGate(gh, gs_get_parent(gh, pop, path = "auto"))
       }else
         gate.dim <- gate
       subNode <- NULL
@@ -594,7 +594,7 @@ subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.
 #' @importFrom flowWorkspace filterObject
 booleanNode <- function(gate, pop, count, env.nodes, ...){
 
-  parsed <- filterObject(gate)
+  parsed <- filter_to_list(gate)
 
   op <- parsed[["op"]][-1]
   op <- unique(op)

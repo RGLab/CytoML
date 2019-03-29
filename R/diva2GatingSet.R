@@ -22,7 +22,7 @@ setClass("divaWorkspace", contains = "flowJoWorkspace")
 #' getSamples(ws)
 #' gs <- parseWorkspace(ws, name = 2, subset = 1)
 #' sampleNames(gs)
-#' getNodes(gs)
+#' gs_get_pop_paths(gs)
 #' plotGate(gs[[1]])
 #' }
 #' @export
@@ -588,7 +588,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
 
-            add(gh, gate, parent = parent, name = nodeName)
+            flowWorkspace:::gh_add_gate(gh, gate, parent = parent, name = nodeName)
             if(parent == "root")
               parent <- ""
             unique.path <- file.path(parent, nodeName)

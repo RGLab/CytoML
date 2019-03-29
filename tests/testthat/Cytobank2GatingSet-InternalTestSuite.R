@@ -16,7 +16,7 @@ test_that("cytobank2gs--cytof: special character in channels and no comp ",{
   fcs_files = list.files(path = file.path(thisPath,"fcs_files"), recursive=TRUE,full=TRUE)
   gs <- cytobank2GatingSet(gating_ml_cytobank_file, FCS = fcs_files[1])
   expect_is(gs, "GatingSet")
-  expect_equal(getNodes(gs, path = "auto")[-1], c('H+R+','MEFSK4+','CD54+','Nanog+','Lin28+'))
+  expect_equal(gs_get_pop_paths(gs, path = "auto")[-1], c('H+R+','MEFSK4+','CD54+','Nanog+','Lin28+'))
 })
 
 test_that("GatingSet2Cytobank--cytof ",{
@@ -24,7 +24,7 @@ test_that("GatingSet2Cytobank--cytof ",{
   thisPath <- file.path(path, "cytof")
   #load the original automated gating set
   gs_orig <- load_gs(file.path(thisPath, "gs"))
-  stats <- getPopStats(gs_orig)[order(Population),]
+  stats <- gs_get_pop_stats(gs_orig)[order(Population),]
 
   #export the gs_orig to xml
   outFile <- tempfile(fileext = ".xml")
@@ -39,7 +39,7 @@ test_that("GatingSet2Cytobank--cytof ",{
   sink(NULL, type = "message")
   close(con)
 
-  parsedStats <- getPopStats(gs_parsed)[order(Population),]
+  parsedStats <- gs_get_pop_stats(gs_parsed)[order(Population),]
   expect_equal(stats, parsedStats, tol = 1e-3)
 
   #upload xml to cytobank and download the cytobank version of xml
@@ -48,7 +48,7 @@ test_that("GatingSet2Cytobank--cytof ",{
   # xmlfile <- file.path(path, "ics/CytExp_52926_Gates_v5.xml")
   # gs_parsed <- cytobank2GatingSet(xmlfile, fcs)
   #
-  # parsedStats <- getPopStats(gs_parsed)[order(Population),]
+  # parsedStats <- gs_get_pop_stats(gs_parsed)[order(Population),]
   # expect_equal(stats, parsedStats, tol = 2e-4)
 
 })
@@ -60,7 +60,7 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
       gs_orig <- load_gs(file.path(thisPath, "autogating"))
       gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
       openCyto::toggle.helperGates(gt, gs_orig) #hide the helper gates
-      stats <- getPopStats(gs_orig)[order(Population),]
+      stats <- gs_get_pop_stats(gs_orig)[order(Population),]
 
       #export the gs_orig to xml
       tmp <- tempfile()
@@ -75,7 +75,7 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
       sink(NULL, type = "message")
       close(con)
 
-      parsedStats <- getPopStats(gs_parsed)[order(Population),]
+      parsedStats <- gs_get_pop_stats(gs_parsed)[order(Population),]
       expect_equal(stats, parsedStats, tol = 2e-4)
 
       #upload xml to cytobank and download the cytobank version of xml
@@ -84,7 +84,7 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
       xmlfile <- file.path(path, "ics/CytExp_52926_Gates_v5.xml")
       gs_parsed <- cytobank2GatingSet(xmlfile, fcs)
 
-      parsedStats <- getPopStats(gs_parsed)[order(Population),]
+      parsedStats <- gs_get_pop_stats(gs_parsed)[order(Population),]
       expect_equal(stats, parsedStats, tol = 2e-4)
 
     })

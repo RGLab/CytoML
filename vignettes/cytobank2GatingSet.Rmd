@@ -56,7 +56,7 @@ library(ggcyto)
 ## Plot the gates
 autoplot(gs[[1]])
 # Extract the population statistics
-getPopStats(gs, statType = "count")
+gs_get_pop_stats(gs, statType = "count")
 ```
 
 

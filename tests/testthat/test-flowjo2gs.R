@@ -50,13 +50,13 @@ test_that("parse without gating",{
       expect_that(gs1, is_a("GatingSet"));
       gh1 <- gs1[[1]]
       
-      thisStats <- getPopStats(gh1)[, list(xml.freq,xml.count, node)]
-      expectStats <- getPopStats(gh)[, list(xml.freq,xml.count, node)]
+      thisStats <- gh_get_pop_stats(gh1)[, list(xml.freq,xml.count, node)]
+      expectStats <- gh_get_pop_stats(gh)[, list(xml.freq,xml.count, node)]
       expect_equal(thisStats, expectStats)
       
       #exclude the gates that require extension since the extend_to are different 
       # based on whether data is loaded
-      nodes <- getNodes(gh)[ -c(6:13, 15:22)]
+      nodes <- gs_get_pop_paths(gh)[ -c(6:13, 15:22)]
       thisGates <- sapply(nodes[-1], getGate, obj = gh1)
       expectGates <- sapply(nodes[-1], getGate, obj = gh)
       expect_equal(thisGates, expectGates)
@@ -77,8 +77,8 @@ test_that("external comp", {
       gh1 <- gs1[[1]]
       expect_equal(comp, getCompensationMatrices(gh1))
       
-      thisStats <- getPopStats(gh1)
-      expectStats <- getPopStats(gh)
+      thisStats <- gh_get_pop_stats(gh1)
+      expectStats <- gh_get_pop_stats(gh)
       expect_equal(thisStats, expectStats)
       
       #a list of comp
@@ -91,7 +91,7 @@ test_that("external comp", {
       expect_is(gs1@compensation, "list")
       expect_equal(comp, gs1@compensation)
       gh1 <- gs1[[1]]
-      thisStats <- getPopStats(gh1)
+      thisStats <- gh_get_pop_stats(gh1)
       expect_equal(thisStats, expectStats)
       
       
@@ -119,7 +119,7 @@ test_that("external comp", {
 test_that("use additional keywords for guid",{
       dd <- capture.output(suppressMessages(gs2 <- try(parseWorkspace(ws, path = dataDir, name = 4, subset = "CytoTrol_CytoTrol_1.fcs", additional.keys = "$TOT"))))
       expect_equal(sampleNames(gs2[[1]]), paste(sampleNames(gh), trimws(keyword(gh)[["$TOT"]]), sep = "_"))
-      expect_equal(getPopStats(gs2[[1]]), getPopStats(gh))
+      expect_equal(gh_get_pop_stats(gs2[[1]]), gh_get_pop_stats(gh))
         
     })
 
@@ -138,7 +138,7 @@ test_that("supply sampleID--file mapping through 'path'",{
           , "not a valid file")
       mapping[["file"]] <- file.path(dataDir, "CytoTrol_CytoTrol_1.fcs")
       dd <- capture.output(suppressMessages(gs3 <- parseWorkspace(ws, path = mapping, name = 4, subset = "CytoTrol_CytoTrol_1.fcs")))
-      expect_equal(getPopStats(gs3[[1]]), getPopStats(gh))
+      expect_equal(gh_get_pop_stats(gs3[[1]]), gh_get_pop_stats(gh))
       
     })
 

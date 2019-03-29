@@ -16,8 +16,8 @@ test_that("flowJo to cytobank",{
   sink(NULL, type = "message")
 
 
-  stats.orig <- getPopStats(gs)
-  stats.new <- getPopStats(gs1)
+  stats.orig <- gs_get_pop_stats(gs)
+  stats.new <- gs_get_pop_stats(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y], tol = 2e-3)
@@ -78,8 +78,8 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   gs1 <- cytobank2GatingSet(outFile, fcsFiles)
   sink(NULL, type = "message")
 
-  stats.orig <- getPopStats(gs)
-  stats.new <- getPopStats(gs1)
+  stats.orig <- gs_get_pop_stats(gs)
+  stats.new <- gs_get_pop_stats(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
@@ -90,7 +90,7 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   sink(con, type = "message")
   gs1 <- cytobank2GatingSet(outFile, fcsFiles)
   sink(NULL, type = "message")
-  stats.new <- getPopStats(gs1)
+  stats.new <- gs_get_pop_stats(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
@@ -127,13 +127,13 @@ test_that("autogating to cytobank--tcell", {
 
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- getPopStats(gs[[1]])[order(node), list(openCyto.count, node)]
+  stats.orig <- gh_get_pop_stats(gs[[1]])[order(node), list(openCyto.count, node)]
   #output to cytobank
 
   GatingSet2cytobank(gs, outFile, cytobank.default.scale = F)
   #parse it back in
   gs1 <- cytobank2GatingSet(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs"))
-  stats.new <- getPopStats(gs1[[1]])[order(node), list(openCyto.count, node)]
+  stats.new <- gh_get_pop_stats(gs1[[1]])[order(node), list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })

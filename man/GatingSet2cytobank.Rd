@@ -32,7 +32,7 @@ that can be imported into cytobank.
 \details{
 The process can be divided into four steps:
 1. Read in gate geometry, compensation and transformation from gatingSet
-2. Rescale gate boundaries with flowJoTrans() so gates can be displayed properly in Cytobank
+2. Rescale gate boundaries with flowjo_biexp() so gates can be displayed properly in Cytobank
 3. Save gates and hierarchy structure to R environment
 4. Write environment out to gatingML using write.GatingML()
 }

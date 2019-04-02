@@ -292,7 +292,7 @@ getCompensationMatrices.graphGML <- function(x){
 #' @importFrom methods extends
 #' @export
 #' @method getTransformations graphGML
-getTransformations.graphGML <- function(x){
+getTransformations.graphGML <- function(x, ...){
   trans <- x@graphData[["transformations"]]
   if(!is.null(trans)){
     chnls <- names(trans)

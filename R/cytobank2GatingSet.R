@@ -16,7 +16,7 @@
 #' }
 #' @importFrom flowWorkspace GatingSet transform
 #' @importFrom ncdfFlow read.ncdfFlowSet
-cytobank2GatingSet.default <- function(x, FCS){
+cytobank2GatingSet.default <- function(x, FCS, ...){
   g <- read.gatingML.cytobank(x)
   fs <- read.ncdfFlowSet(FCS)
   gs <- GatingSet(fs)

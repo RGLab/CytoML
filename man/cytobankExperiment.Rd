@@ -14,7 +14,7 @@
 \usage{
 cytobankExperiment(acs, exdir = tempfile())
 
-\method{print}{cytobankExperiment}(x)
+\method{print}{cytobankExperiment}(x, ...)
 
 \method{getCompensationMatrices}{cytobankExperiment}(x)
 
@@ -23,7 +23,7 @@ cytobankExperiment(acs, exdir = tempfile())
 \S4method{colnames}{cytobankExperiment}(x, do.NULL = "missing",
   prefix = "missing")
 
-\method{getTransformations}{cytobankExperiment}(x)
+\method{getTransformations}{cytobankExperiment}(x, ...)
 
 \S4method{sampleNames}{cytobankExperiment}(object)
 
@@ -36,7 +36,11 @@ cytobankExperiment(acs, exdir = tempfile())
 
 \item{x}{cytobankExperiment object}
 
+\item{...}{not used}
+
 \item{object}{cytobankExperiment object}
+
+\item{do.NULL, prefix}{not used}
 }
 \value{
 cytobankExperiment object

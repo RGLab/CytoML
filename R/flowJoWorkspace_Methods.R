@@ -127,7 +127,7 @@ setMethod("closeWorkspace","flowJoWorkspace",function(workspace){
 #' @return the macthed workspace type
 #' @noRd 
 .getWorkspaceType <- function(wsversion){
-  curSupport <- unlist(flowWorkspace.par.get("flowJo_versions"))
+  curSupport <- unlist(CytoML.par.get("flowJo_versions"))
   ver_ind <- match(wsversion, curSupport)
   if(is.na(ver_ind))
     stop("Unsupported version: ", wsversion)
@@ -244,7 +244,7 @@ setMethod("parseWorkspace",signature("flowJoWorkspace"),function(obj, ...){
   	wsversion <- obj@version
     
     wsType <- .getWorkspaceType(wsversion)
-    wsNodePath <- flowWorkspace.par.get("nodePath")[[wsType]]
+    wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
     
     #sample info  
     allSamples <- .getSamples(x, wsType, sampNloc = sampNloc)
@@ -692,7 +692,7 @@ getFileNames <- function(ws){
   }
 }
 .getFileNames <- function(x, wsType){
-  wsNodePath <- flowWorkspace.par.get("nodePath")[[wsType]]
+  wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
   unlist(xpathApply(x, file.path(wsNodePath[["sample"]], "Keywords/Keyword[@name='$FIL']")
                     , function(x)xmlGetAttr(x,"value")
                     )
@@ -736,7 +736,7 @@ setMethod("getKeywords",c("flowJoWorkspace","character"),function(obj,y, ...){
       x <- obj@doc
       wsversion <- obj@version
       wsType <- .getWorkspaceType(wsversion)
-      wsNodePath <- flowWorkspace.par.get("nodePath")[[wsType]]
+      wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
       .getKeywordsBySampleName(obj@doc,y, wsNodePath[["sample"]], ...)
 })
 #' @rdname getKeywords
@@ -747,7 +747,7 @@ setMethod("getKeywords",c("flowJoWorkspace","numeric"),function(obj,y, ...){
       x <- obj@doc
       wsversion <- obj@version
       wsType <- .getWorkspaceType(wsversion)
-      wsNodePath <- flowWorkspace.par.get("nodePath")[[wsType]]
+      wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
       .getKeywordsBySampleID(obj@doc,y, wsNodePath[["sampleID"]],...)
     })
 
@@ -840,7 +840,7 @@ getFJWSubsetIndices<-function(ws,key=NULL,value=NULL,group,requiregates=TRUE){
     x <- ws@doc
     wsversion <- ws@version
     wsType <- .getWorkspaceType(wsversion)
-    wsNodePath <- flowWorkspace.par.get("nodePath")[[wsType]]
+    wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
     
 	s<- .getSamples(x, wsType);
 	#TODO Use the actual value of key to name the column
@@ -929,7 +929,7 @@ setMethod("getSampleGroups","flowJoWorkspace",function(x){
 #' @importFrom stats na.omit
 .getSampleGroups<-function(x, wsType){
   
-  wsNodePath <- flowWorkspace.par.get("nodePath")[[wsType]]
+  wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
   
 	if(grepl("mac", wsType)){
 		do.call(rbind,xpathApply(x, wsNodePath[["group"]],function(x){
@@ -980,7 +980,7 @@ setMethod("getSampleGroups","flowJoWorkspace",function(x){
 
 .getSamples<-function(x, wsType, sampNloc="keyword"){
     
-    wsNodePath <- flowWorkspace.par.get("nodePath")[[wsType]]
+    wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
 	lastwarn<-options("warn")[[1]]
 	options("warn"=-1)
 	top <- xmlRoot(x)

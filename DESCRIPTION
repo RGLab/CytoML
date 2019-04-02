@@ -56,5 +56,6 @@ Collate:
     'graphGML_methods.R'
     'parseDivaWorkspace_old.R'
     'utils.R'
+    'zzz.R'
 SystemRequirements: xml2, GNU make, C++11    
 Encoding: UTF-8

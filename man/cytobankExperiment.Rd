@@ -5,9 +5,11 @@
 \alias{cytobankExperiment}
 \alias{print.cytobankExperiment}
 \alias{getCompensationMatrices.cytobankExperiment}
+\alias{getCompensationMatrices}
 \alias{markernames,cytobankExperiment-method}
 \alias{colnames,cytobankExperiment-method}
 \alias{getTransformations.cytobankExperiment}
+\alias{getTransformations}
 \alias{sampleNames,cytobankExperiment-method}
 \alias{pData,cytobankExperiment-method}
 \title{Construct cytobankExperiment object from ACS file}

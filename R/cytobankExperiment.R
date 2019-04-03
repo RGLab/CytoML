@@ -93,6 +93,7 @@ print.cytobankExperiment <- function(x, ...){
 #' @rdname cytobankExperiment
 #' @method getCompensationMatrices cytobankExperiment
 #' @export
+#' @aliases getCompensationMatrices
 #' @export getCompensationMatrices
 getCompensationMatrices.cytobankExperiment <- function(x){
   comps <- x[["experiment"]][["compensations"]]
@@ -152,6 +153,7 @@ get_panel_per_file <- function(ce){
 #' @export
 #' @method getTransformations cytobankExperiment
 #' @export getTransformations
+#' @aliases getTransformations
 getTransformations.cytobankExperiment <- function(x, ...){
   chnls <- colnames(x)
   low.chnls <- tolower(chnls)

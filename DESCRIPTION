@@ -31,7 +31,8 @@ Imports:
     grDevices,
     methods,
     ggcyto (>= 1.11.4),
-    yaml
+    yaml,
+    lattice
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 1.3.7), cytolib(>= 1.3.3), RcppParallel
 Suggests:

@@ -12,10 +12,12 @@ NULL
 #' @importFrom graph nodeData
 #' @export
 #' @examples
+#' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xmlfile)
 #' getNodes(g)
 #' getNodes(g, only.names = FALSE)
+#' }
 setMethod("getNodes", signature = c("graphGML"),
           definition = function(x, y
                                   , order = c("default", "bfs", "dfs", "tsort")
@@ -68,10 +70,12 @@ setMethod("getNodes", signature = c("graphGML"),
 #' @export
 #' @return a graphNEL node
 #' @examples
+#' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xmlfile)
 #' getChildren(g, "GateSet_722326")
 #' getParent(g, "GateSet_722326")
+#' }
 #' @importClassesFrom methods character ANY data.frame environment list logical matrix missing numeric oldClass
 #' @importFrom flowWorkspace getChildren
 setMethod("getChildren", signature = c("graphGML", "character"),
@@ -136,10 +140,11 @@ setMethod("show", signature = c("graphGML"),
 #' @importFrom graph nodeData nodes<- nodeRenderInfo<-
 #' @importFrom Rgraphviz renderGraph layoutGraph
 #' @examples
+#' \dontrun{
 #' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xmlfile)
 #' plot(g)
-#'
+#'}
 setMethod("plot", signature = c(x = "graphGML", y = "missing"), definition = function(x, y = "missing", label = c("popName", "gateName")){
   label <- match.arg(label, c("popName", "gateName"))
   if(label == "popName")
@@ -286,13 +291,14 @@ getCompensationMatrices.graphGML <- function(x){
 
 #' Extract transformations from graphGML object.
 #' @param x graphGML
+#' @param ... not used
 #' @return transformerList object
 #' @importFrom flowCore eval parameters colnames
 #' @importFrom flowWorkspace transformerList asinh_Gml2 flow_trans asinhtGml2_trans logicleGml2_trans logtGml2_trans
 #' @importFrom methods extends
 #' @export
 #' @method getTransformations graphGML
-getTransformations.graphGML <- function(x){
+getTransformations.graphGML <- function(x, ...){
   trans <- x@graphData[["transformations"]]
   if(!is.null(trans)){
     chnls <- names(trans)

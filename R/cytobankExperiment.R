@@ -42,9 +42,11 @@ cytobankExperiment <- function(acs, exdir = tempfile()){
                         )
                    , class = "cytobankExperiment")
 }
+#' @rdname cytobank2GatingSet
 #' @export
 cytobank2GatingSet <- function(x, ...)UseMethod("cytobank2GatingSet")
 #' @importFrom flowWorkspace markernames<-
+#' @param ... other arguments
 #' @export
 #' @method cytobank2GatingSet cytobankExperiment
 #' @rdname cytobank2GatingSet
@@ -73,9 +75,10 @@ setOldClass("cytobankExperiment")
 
 #' @param x cytobankExperiment object
 #' @rdname cytobankExperiment
+#' @param ... not used
 #' @export
 #' @method print cytobankExperiment
-print.cytobankExperiment <- function(x){
+print.cytobankExperiment <- function(x, ...){
   exp <- x[["experiment"]]
   cat("cytobank Experiment: ", exp[["name"]],"\n");
   cat("gatingML File: ",x[["gatingML"]], "\n");
@@ -90,6 +93,7 @@ print.cytobankExperiment <- function(x){
 #' @rdname cytobankExperiment
 #' @method getCompensationMatrices cytobankExperiment
 #' @export
+#' @aliases getCompensationMatrices
 #' @export getCompensationMatrices
 getCompensationMatrices.cytobankExperiment <- function(x){
   comps <- x[["experiment"]][["compensations"]]
@@ -122,6 +126,7 @@ setMethod("markernames",
           })
 
 #' @rdname cytobankExperiment
+#' @param do.NULL,prefix not used
 #' @export
 setMethod("colnames",
           signature=signature(x="cytobankExperiment"),
@@ -148,7 +153,8 @@ get_panel_per_file <- function(ce){
 #' @export
 #' @method getTransformations cytobankExperiment
 #' @export getTransformations
-getTransformations.cytobankExperiment <- function(x){
+#' @aliases getTransformations
+getTransformations.cytobankExperiment <- function(x, ...){
   chnls <- colnames(x)
   low.chnls <- tolower(chnls)
   scales <- x$experiment$scales

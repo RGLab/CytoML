@@ -6,15 +6,17 @@
 #' @rdname cytobank2GatingSet
 #' @examples
 #' \dontrun{
-#' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-#' fcsFiles <- list.files(pattern = "CytoTrol", 
-#'       system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
-#' gs <- cytobank2GatingSet(xmlfile, fcsFiles)
-#' #plotGate(gs[[1]])
+#' acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+#' ce <- cytobankExperiment(acsfile)
+#' xmlfile <- ce$gatingML
+#' fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
+#' gs <<- cytobank2GatingSet(xmlfile, fcsFiles)
+#' library(ggcyto)
+#' autoplot(gs[[1]])
 #' }
 #' @importFrom flowWorkspace GatingSet transform
 #' @importFrom ncdfFlow read.ncdfFlowSet
-cytobank2GatingSet.default <- function(x, FCS){
+cytobank2GatingSet.default <- function(x, FCS, ...){
   g <- read.gatingML.cytobank(x)
   fs <- read.ncdfFlowSet(FCS)
   gs <- GatingSet(fs)
@@ -42,12 +44,11 @@ cytobank2GatingSet.default <- function(x, FCS){
 #' @export compare.counts
 #' @examples
 #'
-#' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-#' fcsFiles <- list.files(pattern = "CytoTrol", 
-#'         system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
-#' gs <- cytobank2GatingSet(xmlfile, fcsFiles)
+#' acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+#' ce <- cytobankExperiment(acsfile)
+#' gs <- cytobank2GatingSet(ce)
 #' ## verify the stats are correct
-#' statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")
+#' statsfile <- ce$attachments[1]
 #' dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 #' all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 #'

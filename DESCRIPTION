@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
-Version: 1.9.5
+Version: 1.9.6
 Date: 2016-04-15
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -31,7 +31,8 @@ Imports:
     grDevices,
     methods,
     ggcyto (>= 1.11.4),
-    yaml
+    yaml,
+    lattice
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 1.3.7), cytolib(>= 1.3.3), RcppParallel
 Suggests:
@@ -56,5 +57,6 @@ Collate:
     'graphGML_methods.R'
     'parseDivaWorkspace_old.R'
     'utils.R'
+    'zzz.R'
 SystemRequirements: xml2, GNU make, C++11    
 Encoding: UTF-8

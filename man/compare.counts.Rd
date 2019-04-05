@@ -23,12 +23,11 @@ compare the counts to cytobank's exported csv so that the parsing result can be 
 }
 \examples{
 
-xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-fcsFiles <- list.files(pattern = "CytoTrol", 
-        system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
-gs <- cytobank2GatingSet(xmlfile, fcsFiles)
+acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+ce <- cytobankExperiment(acsfile)
+gs <- cytobank2GatingSet(ce)
 ## verify the stats are correct
-statsfile <- system.file("extdata/cytotrol_tcell_cytobank_counts.csv", package = "CytoML")
+statsfile <- ce$attachments[1]
 dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 

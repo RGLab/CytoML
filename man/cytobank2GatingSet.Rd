@@ -2,10 +2,13 @@
 % Please edit documentation in R/cytobank2GatingSet.R, R/cytobankExperiment.R
 \name{cytobank2GatingSet.default}
 \alias{cytobank2GatingSet.default}
+\alias{cytobank2GatingSet}
 \alias{cytobank2GatingSet.cytobankExperiment}
 \title{A wrapper that parse the gatingML and FCS files (or cytobankExperiment object) into GatingSet}
 \usage{
-\method{cytobank2GatingSet}{default}(x, FCS)
+\method{cytobank2GatingSet}{default}(x, FCS, ...)
+
+cytobank2GatingSet(x, ...)
 
 \method{cytobank2GatingSet}{cytobankExperiment}(x, ...)
 }
@@ -13,6 +16,8 @@
 \item{x}{the cytobankExperiment object or the full path of gatingML file}
 
 \item{FCS}{FCS files to be loaded}
+
+\item{...}{other arguments}
 }
 \value{
 a GatingSet
@@ -22,10 +27,12 @@ A wrapper that parse the gatingML and FCS files (or cytobankExperiment object) i
 }
 \examples{
 \dontrun{
-xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-fcsFiles <- list.files(pattern = "CytoTrol", 
-      system.file("extdata", package = "flowWorkspaceData"), full = TRUE)
-gs <- cytobank2GatingSet(xmlfile, fcsFiles)
-#plotGate(gs[[1]])
+acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+ce <- cytobankExperiment(acsfile)
+xmlfile <- ce$gatingML
+fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
+gs <<- cytobank2GatingSet(xmlfile, fcsFiles)
+library(ggcyto)
+autoplot(gs[[1]])
 }
 }

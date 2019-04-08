@@ -164,7 +164,7 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean ga
   Rm("bool6", gs)
 
   autoplot(gs[[1]], gs_get_children(gs[[1]], "cd4"))
-  getTotal(gs[[1]], "bool5")
+  gh_get_count(gs[[1]], "bool5")
   plotGate(gs, "bool4", bool = T)
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
@@ -175,7 +175,7 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean ga
   ws <- openWorkspace(outFile)
   gs1 <- parseWorkspace(ws, name = 1, path = thisPath)
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
-  expect_equal(getTotal(gs1[[1]], "Prf-"), 90423)
+  expect_equal(gh_get_count(gs1[[1]], "Prf-"), 90423)
   expect_equal(stats.orig, stats.new[-26,], tol = 1.6e-4)
 })
 

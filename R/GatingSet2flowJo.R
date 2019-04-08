@@ -6,7 +6,7 @@
 #' @param ... other arguments
 #'        showHidden whether to include the hidden population nodes in the output
 #' @export
-#' @importFrom flowWorkspace clone updateChannels pData<-
+#' @importFrom flowWorkspace gs_clone updateChannels pData<-
 #' @return nothing
 #' @examples
 #' library(flowWorkspace)
@@ -33,7 +33,7 @@ GatingSet2flowJo <- function(gs, outFile, ...){
   slash_loc <- sapply(chnls, function(thisCol)as.integer(gregexpr("/", thisCol)[[1]]), simplify = FALSE)
   new_cnd <- fix_channel_slash(chnls, slash_loc)
   if(!all(new_cnd == chnls)){
-    gs <- clone(gs, isNew = FALSE, isEmpty = FALSE) # ensure everything else is cloned except hdf5
+    gs <- gs_clone(gs, isNew = FALSE, isEmpty = FALSE) # ensure everything else is gs_cloned except hdf5
     gs <- updateChannels(gs, map = data.frame(old = chnls, new = new_cnd))
   }
 
@@ -215,7 +215,7 @@ datasetNode <- function(gh, sampleId){
 getSpilloverMat <- function(gh){
   compobj <- gh@compensation
   if(is.null(compobj)){
-    compobj <- getCompensationMatrices(gh)
+    compobj <- gh_get_compensations(gh)
     if(!is.null(compobj)){
       mat <- compobj@spillover
       comp <- gs_get_compensation_internal(gh@pointer,sampleNames(gh))
@@ -288,10 +288,10 @@ spilloverNodes <- function(mat){
 #' @importFrom flowCore exprs
 transformationNode <- function(gh, matInfo){
 
-  trans.objs <- getTransformations(gh, only.function = FALSE)
+  trans.objs <- gh_get_transformations(gh, only.function = FALSE)
   if(length(trans.objs) == 0)
     stop("No transformation is found in GatingSet!")
-  fr <- getData(gh)
+  fr <- gh_get_data(gh)
 
   chnls <- colnames(fr)
   # chnls <- names(trans.objs)
@@ -439,19 +439,19 @@ fixChnlName <- function(chnl, matInfo){
 
 }
 
-#' @importFrom flowWorkspace getTotal
+#' @importFrom flowWorkspace gh_get_count
 sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...){
 
   sn <- pData(gh)[["name"]]
-  stat <- getTotal(gh, "root", xml = FALSE)
+  stat <- gh_get_count(gh, "root", xml = FALSE)
   children <- gs_get_children(gh, "root", path = "auto")
   if(!showHidden)
-    children <- children[!sapply(children, function(child)isHidden(gh, child))]
-  param <- as.vector(parameters(getGate(gh, children[1])))
+    children <- children[!sapply(children, function(child)gh_is_hidden(gh, child))]
+  param <- as.vector(parameters(gh_get_gate(gh, children[1])))
 
 
   param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
-  trans <- getTransformations(gh, only.function = FALSE)
+  trans <- gh_get_transformations(gh, only.function = FALSE)
   
   env.nodes[["NotNode"]] <- character(0)
   xmlNode("SampleNode", attrs = c(name = sn
@@ -477,14 +477,14 @@ graphNode <- function(param){
 }
 
 constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.nodes, quad.gate = NULL){
-  if(!isHidden(gh, pop)||showHidden)
+  if(!gh_is_hidden(gh, pop)||showHidden)
   {
     dpinfo <- env.nodes[["DerivedParameters"]][[pop]]
     
     if(is.null(quad.gate))
     {
       if(is.null(dpinfo))
-        gate <- getGate(gh, pop)
+        gate <- gh_get_gate(gh, pop)
       else
       {
         #create range gate for the clusterGate
@@ -496,31 +496,31 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
     }else
       gate <- quad.gate
     
-    eventsInside <- !isNegated(gh, pop)
+    eventsInside <- !gh_is_negated(gh, pop)
     children <- gs_get_children(gh, pop, path = "auto")
     if(!showHidden)
-      children <- children[!sapply(children, function(child)isHidden(gh, child))]
+      children <- children[!sapply(children, function(child)gh_is_hidden(gh, child))]
 
     isBool <- is.null(dpinfo)&&is(gate, "booleanFilter")
 
     if(length(children) == 0){ #leaf node
       if(isBool){
         #use parent gate's dims for boolean node
-        gate.dim <- getGate(gh, gs_get_parent(gh, pop, path = "auto"))
+        gate.dim <- gh_get_gate(gh, gs_get_parent(gh, pop, path = "auto"))
       }else
         gate.dim <- gate
       subNode <- NULL
     }else{
       #get dim from non-boolean children
       nonBool <- sapply(children, function(child){
-        thisGate <- getGate(gh, child)
+        thisGate <- gh_get_gate(gh, child)
         !is.null(env.nodes[["DerivedParameters"]][[child]])||!is(thisGate, "booleanFilter")
       })
       if(sum(nonBool) == 0)
         stop("Can't find any non-boolean children node under ", pop)
 
       children.dim <- children[nonBool]
-      gate.dim <- getGate(gh, children.dim[1]) #pick the first children node for dim
+      gate.dim <- gh_get_gate(gh, children.dim[1]) #pick the first children node for dim
       subNode <- subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden, env.nodes = env.nodes)
     }
 
@@ -531,7 +531,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
 
     param <- as.vector(parameters(gate.dim))
     param <- sapply(param, fixChnlName, matInfo = matInfo, USE.NAMES = FALSE)
-    count <- getTotal(gh, pop, xml = FALSE)
+    count <- gh_get_count(gh, pop, xml = FALSE)
 
     if(is.na(count))
       count <- -1

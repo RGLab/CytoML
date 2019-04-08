@@ -192,8 +192,8 @@ test_that("Inverse function of flog ",{
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 2e-3)
       
       
-      trans <- getTransformations(gh)
-      inverse <- getTransformations(gh, inverse = T)
+      trans <- gh_get_transformations(gh)
+      inverse <- gh_get_transformations(gh, inverse = T)
       raw <- c(1, 1e2, 1e3,1e5)
       log <- trans[[1]](raw)
       expect_equal(inverse[[1]](log), raw)
@@ -272,7 +272,7 @@ test_that("v 10.0.7 - vX 20.0 (missing_namespace and flin)",{
       gs <- parseWorkspace(ws, name = 1, subset = 1, execute = FALSE)
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
-      trans <- getTransformations(gh, only = F, channel = "all")
+      trans <- gh_get_transformations(gh, only = F, channel = "all")
       expect_equal(trans[[2]][["name"]], "flowJo_flog")
     })
 
@@ -301,7 +301,7 @@ test_that("v 10.0.7 - vX 20.0 (McGill/treg) ellipseidGate (biexponential)",{
       ws <- openWorkspace(wsFile)
       gs <- parseWorkspace(ws, name = 3, subset = 4, execute = FALSE)
       expect_is(gs, "GatingSet")
-      g <- getGate(gs[[1]], "CD4Ellipse")
+      g <- gh_get_gate(gs[[1]], "CD4Ellipse")
       #transformed ellipse Gate
       expect_is(g, "polygonGate")
       expect_equal(range(g@boundaries[, "Comp-APC-A"]), c(143.918, 207.082), tol = 1e-6)
@@ -309,7 +309,7 @@ test_that("v 10.0.7 - vX 20.0 (McGill/treg) ellipseidGate (biexponential)",{
       
       #skip gate transform
       gs <- parseWorkspace(ws, name = 3, subset = 4, execute = FALSE, transform = FALSE)
-      g <- getGate(gs[[1]], "CD4Ellipse")
+      g <- gh_get_gate(gs[[1]], "CD4Ellipse")
       expect_is(g, "polygonGate")
       #ellipsoidGate should be in 256 * 256 scale
       expect_equal(range(g@boundaries[, "Comp-APC-A"]), c(143.918, 207.082), tol = 1e-6)
@@ -373,7 +373,7 @@ test_that("v 10.0.7r2 - vX 20.0 (NotNode)",{
       
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
-      g <- getGate(gh, "CD20+⁻")
+      g <- gh_get_gate(gh, "CD20+⁻")
       expect_is(g, "booleanFilter")
       expect_equal(g@deparse, "!LIVE/Single Cells/CD45+/CD20+")
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
@@ -393,7 +393,7 @@ test_that("v 10.2 - vX 20.0 (AndNode)",{
       expect_is(gs, "GatingSet")
       
       gh <- gs[[1]]
-      g <- getGate(gh, "CD4/CD107+IFNg+IL2+Mip1b+TNF+")
+      g <- gh_get_gate(gh, "CD4/CD107+IFNg+IL2+Mip1b+TNF+")
       expect_is(g, "booleanFilter")
       expect_equal(g@deparse, "Lymphocytes/Single Cells/CD3/CD4/CD107&Lymphocytes/Single Cells/CD3/CD4/IFNg&Lymphocytes/Single Cells/CD3/CD4/IL2&Lymphocytes/Single Cells/CD3/CD4/Mip1b&Lymphocytes/Single Cells/CD3/CD4/TNF")
     })
@@ -409,7 +409,7 @@ test_that("v 10.0.8r1 - vX 20.0 (OrNode)",{
   
   expect_is(gs, "GatingSet")
   gh <- gs[[1]]
-  g <- getGate(gh, "CD44+")
+  g <- gh_get_gate(gh, "CD44+")
   expect_is(g, "booleanFilter")
   expect_equal(g@deparse, "FCS singlets/SSC singlets/Lymphocytes/CD8/F5/Live/Q6: CD44+ , CD62L+|FCS singlets/SSC singlets/Lymphocytes/CD8/F5/Live/Q7: CD44+ , CD62L-")
   

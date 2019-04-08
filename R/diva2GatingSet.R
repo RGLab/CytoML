@@ -249,7 +249,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated swap_data_cols
+#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep gh_is_hidden gh_is_negated swap_data_cols
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -593,7 +593,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
               parent <- ""
             unique.path <- file.path(parent, nodeName)
             #Can't do the gating in
-            # ind <- getIndices(gh, parent)
+            # ind <- gh_get_indices(gh, parent)
             # ind <- as.logic(Subset(data[ind, ], gate))
             # updateIndices(gh, unique.path, ind)
             # suppressMessages(recompute(gh, unique.path))
@@ -612,7 +612,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
       }
       if(execute)
-        flowWorkspace::flowData(gs) <- fs
+        flowWorkspace::gs_cyto_data(gs) <- fs
 
       gs@compensation <- complist
 

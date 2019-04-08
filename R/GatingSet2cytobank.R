@@ -69,7 +69,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
   gh <- gs[[1]]
 
   fcs_guids <- sampleNames(gs)
-  rng <- range(getData(gh, use.exprs = FALSE))
+  rng <- range(gh_get_data(gh, use.exprs = FALSE))
   grp.list <- sapply(fcs_guids, function(sn){
     grps <- ggcyto:::merge.quad.gates(gs[[sn]], nodePaths)
     #unlist the grp so that the gates that can't be merged to quadgates
@@ -108,7 +108,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       isQuad <- FALSE
       nodePath <- gate.obj
       # gate_id <- nodePath
-      gates <- getGate(gs, nodePath)
+      gates <- gs_get_gate(gs, nodePath)
       # gate_id <- gate_id + 1#increment gate id
 
     }
@@ -123,7 +123,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       #we have to create inverse gate on our end
       if(!isQuad)
       {
-        if(isNegated(gs[fcs_guid][[1]], nodePath))
+        if(gh_is_negated(gs[fcs_guid][[1]], nodePath))
           gate <- inverse(gate, rng)
       }
       #transform to raw scale
@@ -248,7 +248,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   pd <- pData(gs)
   # fcs_names <- pd[["name"]]
   fcs_guids <- rownames(pd)
-  translist <- getTransformations(gs[[1]], only.function = FALSE)
+  translist <- gh_get_transformations(gs[[1]], only.function = FALSE)
   transNames <- names(translist)
   rng <- range(gs[[1]], raw.scale = TRUE)
   #retrieve the prefix for latter trans matching

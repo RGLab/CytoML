@@ -139,7 +139,7 @@
   gs <- compensate(gs, complist)
 
   message("computing data range")
-  data.ranges <- sapply(sampleNames(gs), function(sn)range(getData(gs[[sn]]), "data"), simplify = FALSE)
+  data.ranges <- sapply(sampleNames(gs), function(sn)range(gh_get_data(gs[[sn]]), "data"), simplify = FALSE)
 
   message(paste("transforming ..."))
   gs <- transform(gs, translist)

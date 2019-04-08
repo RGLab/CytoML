@@ -78,14 +78,14 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
   gh <- gs[[1]]
-  params <- parameters(getGate(gh, "CD4"))
+  params <- parameters(gh_get_gate(gh, "CD4"))
   Rm("CD4", gs)
   Rm("CD8", gs)
   Rm("DNT", gs)
   Rm("DPT", gs)
   #run flowClust
 
-  fr <- getData(gh, "CD3+")
+  fr <- gh_get_data(gh, "CD3+")
   library(flowClust)
   res <- flowClust(fr, varNames = params, K = 2, nu = 1, trans = 0)
   # plot(res, data = fr)
@@ -118,7 +118,7 @@ test_that("GatingSet2flowJo: handle special encoding in keywords ",{
   biexpTrans <- flowJo_biexp_trans(channelRange=4096, maxValue=262144, pos=4.5,neg=0, widthBasis=-10)
   transList <- transformerList(colnames(fs[[1]])[3:6], biexpTrans)
   gs<-transform(gs,transList)
-  fs_trans<- getData(gs)
+  fs_trans<- gs_get_data(gs)
   
   ###Adding the cluster
   clean.inds <- lapply(1:length(fs_trans), function(i1) return(list(ind=which(exprs(fs_trans[[i1]])[,"Time"]>793))))

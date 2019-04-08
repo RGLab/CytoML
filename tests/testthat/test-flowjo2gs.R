@@ -57,15 +57,15 @@ test_that("parse without gating",{
       #exclude the gates that require extension since the extend_to are different 
       # based on whether data is loaded
       nodes <- gs_get_pop_paths(gh)[ -c(6:13, 15:22)]
-      thisGates <- sapply(nodes[-1], getGate, obj = gh1)
-      expectGates <- sapply(nodes[-1], getGate, obj = gh)
+      thisGates <- sapply(nodes[-1], gh_get_gate, obj = gh1)
+      expectGates <- sapply(nodes[-1], gh_get_gate, obj = gh)
       expect_equal(thisGates, expectGates)
       
       
     })
 
 test_that("external comp", {
-      comp <- getCompensationMatrices(gh)
+      comp <- gh_get_compensations(gh)
       #single comp
       dd <- capture.output(suppressWarnings(suppressMessages(
                           gs1 <- try(parseWorkspace(ws, name = 4
@@ -75,7 +75,7 @@ test_that("external comp", {
       expect_is(gs1@compensation, "list")
       
       gh1 <- gs1[[1]]
-      expect_equal(comp, getCompensationMatrices(gh1))
+      expect_equal(comp, gh_get_compensations(gh1))
       
       thisStats <- gh_get_pop_stats(gh1)
       expectStats <- gh_get_pop_stats(gh)

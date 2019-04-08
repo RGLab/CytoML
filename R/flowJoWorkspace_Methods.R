@@ -611,8 +611,8 @@ setMethod("parseWorkspace",signature("flowJoWorkspace"),function(obj, ...){
 #     invisible(lapply(gs, function(gh){
 #       
 #       sn <- sampleNames(gh)
-#       fj.count <- as.integer(getTotal(gh, "root", xml = T))
-#       fc.count <- as.integer(getTotal(gh, "root", xml = F))
+#       fj.count <- as.integer(gh_get_count(gh, "root", xml = T))
+#       fc.count <- as.integer(gh_get_count(gh, "root", xml = F))
 #       
 #       if(fj.count == -1){
 #         warning("root count for xml is not available: ", sn)

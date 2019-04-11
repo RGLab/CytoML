@@ -1,3 +1,5 @@
+context("GatingSet2cytobank ..")
+
 test_that("flowJo to cytobank",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))

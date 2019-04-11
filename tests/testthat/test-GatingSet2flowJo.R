@@ -1,3 +1,4 @@
+context("GatingSet2flowJo ..")
 
 test_that("autogating--tcell", {
   dataDir <- system.file("extdata",package="flowWorkspaceData")

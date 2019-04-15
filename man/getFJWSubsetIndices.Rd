@@ -8,7 +8,7 @@ getFJWSubsetIndices(ws, key = NULL, value = NULL, group,
   requiregates = TRUE)
 }
 \arguments{
-\item{ws}{\code{flowJoWorkspace} object}
+\item{ws}{\code{flowjo_workspace} object}
 
 \item{key}{\code{character} The name of the keyword.}
 
@@ -22,11 +22,11 @@ getFJWSubsetIndices(ws, key = NULL, value = NULL, group,
 A numeric vector of indices.
 }
 \description{
-This function will calculate the indices of a subset of samples in a flowJoWorkspace, based on a keyword/value filter. It is applied to a specific group of samples in the workspace. The output is meant to be passed to the subset= argument of parseWorkspace.
+This function will calculate the indices of a subset of samples in a flowjo_workspace, based on a keyword/value filter. It is applied to a specific group of samples in the workspace. The output is meant to be passed to the subset= argument of flowjo_to_gatingset.
 }
 \details{
-Returns an index vector into the samples in a flowJo workspace for use with parseWorkspace(subset=), based on a keyword/value filter in a specific group of samples.
+Returns an index vector into the samples in a flowJo workspace for use with flowjo_to_gatingset(subset=), based on a keyword/value filter in a specific group of samples.
 }
 \seealso{
-\code{\link{parseWorkspace}}
+\code{\link{flowjo_to_gatingset}}
 }

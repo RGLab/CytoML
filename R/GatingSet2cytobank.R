@@ -34,11 +34,16 @@
 #'
 #' #output to cytobank
 #' outFile <- tempfile(fileext = ".xml")
-#' GatingSet2cytobank(gs, outFile) #type by default is 'cytobank'
+#' gatingset_to_cytobank(gs, outFile) #type by default is 'cytobank'
 #'
-#'
-GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE, ...){
-
+#' @rdname gatingset_to_cytobank
+GatingSet2cytobank <- function(...){
+  .Deprecated("gatingset_to_cytobank")
+  gatingset_to_cytobank(...)
+}
+#' @export
+#' @rdname gatingset_to_cytobank
+gatingset_to_cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE, ...){
   #convert comp and trans as GML2 compatible format and save to env
   if(cytobank.default.scale)
     warning("With 'cytobank.default.scale' set to 'TRUE', data and gates will be re-transformed with cytobank's default scaling settings, which may affect how gates look like.")
@@ -237,7 +242,7 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, guid_mapping){
 }
 
 #' add customInfo nodes to each gate node and add BooleanAndGates
-#' @inheritParams GatingSet2cytobank
+#' @inheritParams gatingset_to_cytobank
 #' @param root the root node of the XML
 #' @param flowEnv the environment that stores the information parsed by 'read.GatingML'.
 #' @importFrom  XML xmlAttrs getNodeSet addChildren xmlAttrs<-

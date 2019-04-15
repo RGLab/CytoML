@@ -2,18 +2,18 @@ context("Exporting GatingSet to flowJo workspace")
 
 path <- "~/rglab/workspace/CytoML//wsTestSuite"
 
-test_that("GatingSet2flowJo: forward slash ",{
+test_that("gatingset_to_flowjo: forward slash ",{
   thisPath <- file.path(path, "slash_issue_vX")
   gs <- load_gs(file.path(thisPath, "gs"))
 
   stats.orig <- gh_get_pop_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, additional.keys = NULL)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
   stats.new <- gh_get_pop_stats(gs1[[1]])
   expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq])
 })
@@ -21,16 +21,16 @@ test_that("GatingSet2flowJo: forward slash ",{
 test_that("OrNode ",{
   thisPath <- file.path(path, "combineNode/OrNode")
   wsFile <- file.path(thisPath, "Test_EW.wsp")
-  ws <- openWorkspace(wsFile)
-  gs <- parseWorkspace(ws, name = 1, path = file.path(path))
+  ws <- open_flowjo_xml(wsFile)
+  gs <- flowjo_to_gatingset(ws, name = 1, path = file.path(path))
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
 })
@@ -39,16 +39,16 @@ test_that("OrNode ",{
 test_that("Time gate ",{
   thisPath <- file.path(path, "flin")
   wsFile <- file.path(thisPath, "A01.wsp")
-  ws <- openWorkspace(wsFile)
-  gs <- parseWorkspace(ws, name = 1, subset = 1)
+  ws <- open_flowjo_xml(wsFile)
+  gs <- flowjo_to_gatingset(ws, name = 1, subset = 1)
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
 })
@@ -56,84 +56,84 @@ test_that("Time gate ",{
 test_that("Time gate2--when computed timestep is very different from $TIMESTEP ",{
   thisPath <- file.path(path, "timegate")
   wsFile <- file.path(thisPath, "MX1 Analysis VISC.xml")
-  ws <- openWorkspace(wsFile)
-  gs <- parseWorkspace(ws,name="Group 1",subset=11)
+  ws <- open_flowjo_xml(wsFile)
+  gs <- flowjo_to_gatingset(ws,name="Group 1",subset=11)
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 1.3e-5)
 })
 test_that("EllipsoidGate defined on log-transformed channels ",{
   thisPath <- file.path(path, "ellipsoid_log")
   wsFile <- file.path(thisPath, "xml_spillover2.xml")
-  ws <- openWorkspace(wsFile)
-  gs <- parseWorkspace(ws, name=1, execute = T, sampNloc = "sampleNode", subset = "spillover_B2.fcs")
+  ws <- open_flowjo_xml(wsFile)
+  gs <- flowjo_to_gatingset(ws, name=1, execute = T, sampNloc = "sampleNode", subset = "spillover_B2.fcs")
 
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, sampNloc = "sampleNode")
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
 })
-test_that("GatingSet2flowJo: rectangleGate + boolgate",{
+test_that("gatingset_to_flowjo: rectangleGate + boolgate",{
   dataDir <- "/fh/fast/gottardo_r/mike_working/wsTestSuite/curlyQuad/example1"
-  ws <- openWorkspace(file.path(dataDir, "20151208_TBNK_DS.xml"))
-  gs <- parseWorkspace(ws, subset = 1, name = 2)
+  ws <- open_flowjo_xml(file.path(dataDir, "20151208_TBNK_DS.xml"))
+  gs <- flowjo_to_gatingset(ws, subset = 1, name = 2)
 
   stats.orig <- gh_get_pop_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #load it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
   stats.new <- gh_get_pop_stats(gs1[[1]])
   expect_equal(stats.orig, stats.new, tol = 3e-3)
 })
 
 
-test_that("GatingSet2flowJo: no comp + fasinh ",{
+test_that("gatingset_to_flowjo: no comp + fasinh ",{
   thisPath <- file.path(path, "PROVIDE")
   wsFile <- file.path(thisPath, "batch1 local and week 53.wsp")
 
-  ws <- openWorkspace(wsFile)
-  gs <- parseWorkspace(ws, name = 1, subset = 3, sampNloc = "sampleNode", additional.keys = NULL)
+  ws <- open_flowjo_xml(wsFile)
+  gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, sampNloc = "sampleNode", additional.keys = NULL)
   stats.orig <- gh_get_pop_stats(gs[[1]])[order(node), list(node, openCyto.count)]
 
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath, sampNloc = "sampleNode", additional.keys = NULL)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, sampNloc = "sampleNode", additional.keys = NULL)
   stats.new <- gh_get_pop_stats(gs1[[1]])[order(node), list(node, openCyto.count)]
   expect_equal(stats.orig, stats.new)
 })
 
-test_that("GatingSet2flowJo: no transformation",{
+test_that("gatingset_to_flowjo: no transformation",{
 
   gs <- load_gs("/fh/fast/gottardo_r/mike_working/lyoplate_out/gated_data/manual/gslist-bcell/cgRoygodqg")
   stats.orig <- gh_get_pop_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  expect_error(GatingSet2flowJo(gs, outFile), "No transformation is found in GatingSet!")
+  expect_error(gatingset_to_flowjo(gs, outFile), "No transformation is found in GatingSet!")
 
 })
 
-test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean gate",{
+test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean gate",{
   thisPath <- file.path(path, "gatingML/ics")
   #load the original automated gating set
   gs <- load_gs(file.path(thisPath, "autogating"))
@@ -160,7 +160,7 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean ga
   bf <- booleanFilter(cd4/GzB|cd4/Prf&cd4/IFNg)
   gs_add_gate(gs, bf, name = "bool6", parent = "cd4")
   recompute(gs)
-  expect_error(GatingSet2flowJo(gs, outFile), "And gate and Or gate can't not be used together!")
+  expect_error(gatingset_to_flowjo(gs, outFile), "And gate and Or gate can't not be used together!")
   Rm("bool6", gs)
 
   autoplot(gs[[1]], gs_get_children(gs[[1]], "cd4"))
@@ -169,11 +169,11 @@ test_that("GatingSet2flowJo: automated gates+hidden gate + Infinity + boolean ga
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = thisPath)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(gh_get_count(gs1[[1]], "Prf-"), 90423)
   expect_equal(stats.orig, stats.new[-26,], tol = 1.6e-4)

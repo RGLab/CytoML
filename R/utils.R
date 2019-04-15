@@ -238,7 +238,7 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
     if(nMatched == 0){
 
       chnl <- gate@parameters[[i]]@parameters
-      #can't use "uncompensated" because it will cause multiple entries when paring gate back into openCyto through cytobank2GatingSet
+      #can't use "uncompensated" because it will cause multiple entries when paring gate back into openCyto through cytobank_to_gatingset
       gate@parameters[[i]] <- compensatedParameter(chnl
                                                    , spillRefId = compId #"uncompensated"
                                                    , searchEnv = flowEnv

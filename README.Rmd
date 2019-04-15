@@ -103,16 +103,16 @@ To import data you need the xml workspace and the raw FCS files.
 library(CytoML)
 xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full.names = T)
-gs <- cytobank2GatingSet(xmlfile, fcsFiles)
+gs <- cytobank_to_gatingset(xmlfile, fcsFiles)
 ```
 
 #### Import a [Diva](http://www.bdbiosciences.com/us/instruments/clinical/software/flow-cytometry-acquisition/bd-facsdiva-software/m/333333/overview) workspace.
 
 ```{r, message = FALSE, warning = FALSE, error = FALSE}
-ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
+ws <- open_diva_xml(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
 # The path to the FCS files is stored in ws@path.
 # It can also be passed in to parseWorksapce via the `path` argument.
-gs <- parseWorkspace(ws, name = 2, subset = 1)
+gs <- diva_to_gatingset(ws, name = 2, subset = 1)
 ```
 
 
@@ -200,7 +200,7 @@ gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 ```{r}
 #Cytobank
 outFile <- tempfile(fileext = ".xml")
-GatingSet2cytobank(gs, outFile)
+gatingset_to_cytobank(gs, outFile)
 ```
 
 ##### Export to FlowJo
@@ -208,7 +208,7 @@ GatingSet2cytobank(gs, outFile)
 ```{r}
 #flowJo
 outFile <- tempfile(fileext = ".wsp")
-GatingSet2flowJo(gs, outFile)
+gatingset_to_flowjo(gs, outFile)
 ```
 
 ## Next Steps

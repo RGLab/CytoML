@@ -2,17 +2,20 @@
 % Please edit documentation in R/GatingSet2flowJo.R
 \name{GatingSet2flowJo}
 \alias{GatingSet2flowJo}
+\alias{gatingset_to_flowjo}
 \title{Convert a GatingSet to flowJo workspace}
 \usage{
-GatingSet2flowJo(gs, outFile, ...)
+GatingSet2flowJo(...)
+
+gatingset_to_flowjo(gs, outFile, ...)
 }
 \arguments{
+\item{...}{other arguments
+showHidden whether to include the hidden population nodes in the output}
+
 \item{gs}{a GatingSet object}
 
 \item{outFile}{the workspace file path to write}
-
-\item{...}{other arguments
-showHidden whether to include the hidden population nodes in the output}
 }
 \value{
 nothing
@@ -28,7 +31,6 @@ gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 
 #output to flowJo
 outFile <- tempfile(fileext = ".wsp")
-GatingSet2flowJo(gs, outFile)
-
+gatingset_to_flowjo(gs, outFile)
 
 }

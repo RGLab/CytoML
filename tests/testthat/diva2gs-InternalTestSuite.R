@@ -4,8 +4,8 @@ context("diva parser ")
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/diva"
 
 test_that("diva--escape forward slash ",{
-  ws <- openDiva(file.path(path, "Leggat_VRC/181019_AC03_DL/181019_AC03_DL.xml"))
-  gs <- parseWorkspace(ws, name = 2, worksheet = "global", subset = c("G00100001_V05_01_001.fcs")
+  ws <- open_diva_xml(file.path(path, "Leggat_VRC/181019_AC03_DL/181019_AC03_DL.xml"))
+  gs <- diva_to_gatingset(ws, name = 2, worksheet = "global", subset = c("G00100001_V05_01_001.fcs")
                        # , which.lines = 7e3
                        )
   stats <- gh_get_pop_stats(gs[[1]])[, openCyto.freq]
@@ -15,23 +15,23 @@ test_that("diva--escape forward slash ",{
 
 
 test_that("diva--global sheet ",{
-  ws <- openDiva(file.path(path, "181030_AD01_RN/181030_AD01_RN.xml"))
+  ws <- open_diva_xml(file.path(path, "181030_AD01_RN/181030_AD01_RN.xml"))
   set.seed(1)
-  gs <- parseWorkspace(ws, name = 3, subset = "G00159008_V05_01_003.fcs", worksheet = "global"
+  gs <- diva_to_gatingset(ws, name = 3, subset = "G00159008_V05_01_003.fcs", worksheet = "global"
                         , which.lines = 7e3)#speed up this test case by subsetting data  due to the large data
   stats <- gh_get_pop_stats(gs[[1]])[, openCyto.freq]
   expect_equal(stats, c(1,0.67,0.99,0.27,0.86,0.18,0.53,1,0.18,0.18,0.72,0.7,0.04,0.99), tol = 1.6e-2)
 })
 test_that("diva--swap ",{
   #This experiment exported by diva has the FCS swapped column for -W and -H
-  ws <- openDiva(file.path(path, "exampleExp/exampleExp.xml"))
-  gs <- parseWorkspace(ws, name = 1, worksheet = "global")
+  ws <- open_diva_xml(file.path(path, "exampleExp/exampleExp.xml"))
+  gs <- diva_to_gatingset(ws, name = 1, worksheet = "global")
   stats <- gh_get_pop_stats(gs[[1]])[, openCyto.freq]
   expect_equal(stats, c(1,0.69,0.94,0.97,0.92,0), tol = 5e-3)
   expect_equal(gs_get_pop_paths(gs), c('root','/P1','/P1/P2','/P1/P2/P3','/P1/P2/P3/P4', '/P1/P2/P3/P4/P5'))
   
   #if the FCS was exported separately, then we don't need to swap the data thus disable swapping 
-  gs <- parseWorkspace(ws, name = 1, worksheet = "global"
+  gs <- diva_to_gatingset(ws, name = 1, worksheet = "global"
                        , path = file.path(path, "exampleExp_export_as_fcs")
                        , swap_cols = FALSE)
   stats <- gh_get_pop_stats(gs[[1]])[, openCyto.freq]
@@ -41,20 +41,20 @@ test_that("diva--swap ",{
 })
 
 test_that("diva--tcell ",{
-  ws <- openDiva(file.path(path, "tcell/tcell.xml"))
-  gs <- parseWorkspace(ws, name = 1)
+  ws <- open_diva_xml(file.path(path, "tcell/tcell.xml"))
+  gs <- diva_to_gatingset(ws, name = 1)
   parsedStats <- gh_get_pop_stats(gs[[1]])
   expect_equal(parsedStats[,openCyto.freq], parsedStats[,xml.freq], tol = 5e-3)
   expect_equal(gs_get_pop_paths(gs), c('root','/L','/L/P2','/L/P2/cd3','/L/P2/cd3/cd8','/L/P2/cd3/cd4'))
   
   #parse global worksheet
-  gs <- parseWorkspace(ws, name = 1, worksheet = "global")
+  gs <- diva_to_gatingset(ws, name = 1, worksheet = "global")
   expect_equal(gs_get_pop_paths(gs), c('root','/s','/s/s2'))
   })
 
 test_that("diva--2002-D-g001 ",{
-  ws <- openDiva(file.path(path, "2002-D-g001/2002-D-g001.xml"))
-  gs <- parseWorkspace(ws, name = 2, subset = "SO1_Naive Sort_003.fcs")
+  ws <- open_diva_xml(file.path(path, "2002-D-g001/2002-D-g001.xml"))
+  gs <- diva_to_gatingset(ws, name = 2, subset = "SO1_Naive Sort_003.fcs")
   parsedStats <- gh_get_pop_stats(gs[[1]])
   expectRes <- fread(file.path(path, "2002-D-g001/2002-D-g001.csv"), skip = "Population")
   setnames(expectRes, c("Population", "%Parent"), c("node", "openCyto.freq"))

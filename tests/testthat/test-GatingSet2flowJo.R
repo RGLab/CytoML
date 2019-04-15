@@ -1,4 +1,4 @@
-context("GatingSet2flowJo ..")
+context("gatingset_to_flowjo ..")
 
 test_that("autogating--tcell", {
   dataDir <- system.file("extdata",package="flowWorkspaceData")
@@ -31,11 +31,11 @@ test_that("autogating--tcell", {
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
@@ -52,38 +52,38 @@ test_that("autogating--tcell", {
   stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
 
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
   stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })
-test_that("GatingSet2flowJo: manual gates with calibration table parsed and stored as biexp ",{
+test_that("gatingset_to_flowjo: manual gates with calibration table parsed and stored as biexp ",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
   stats.orig <- gh_get_pop_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
   stats.new <- gh_get_pop_stats(gs1[[1]])
   expect_equal(stats.orig, stats.new, tol = 5e-3)
 })
 
-test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
+test_that("gatingset_to_flowjo: export clustering results as derived parameters ",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
   gh <- gs[[1]]
   params <- parameters(gh_get_gate(gh, "CD4"))
-  Rm("CD4", gs)
-  Rm("CD8", gs)
-  Rm("DNT", gs)
-  Rm("DPT", gs)
+  gs_remove_gate("CD4", gs)
+  gs_remove_gate("CD8", gs)
+  gs_remove_gate("DNT", gs)
+  gs_remove_gate("DPT", gs)
   #run flowClust
 
   fr <- gh_get_data(gh, "CD3+")
@@ -103,16 +103,16 @@ test_that("GatingSet2flowJo: export clustering results as derived parameters ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   # outFile <- "~/test.wsp"
-  expect_message(GatingSet2flowJo(gs, outFile), "DerivedParameter")
+  expect_message(gatingset_to_flowjo(gs, outFile), "DerivedParameter")
 
   #parse it back in
-  ws <- openWorkspace(outFile)
-  gs1 <- parseWorkspace(ws, name = 1, path = dataDir)
+  ws <- open_flowjo_xml(outFile)
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
   stats.new <- gh_get_pop_stats(gs1[[1]])
   expect_equal(stats.orig[-(5:7)], stats.new, tol = 5e-3)
 })
 
-test_that("GatingSet2flowJo: handle special encoding in keywords ",{
+test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   data(GvHD)
   fs<-GvHD[1:3]
   gs <- GatingSet(fs)
@@ -159,10 +159,10 @@ test_that("GatingSet2flowJo: handle special encoding in keywords ",{
 
   outFile <- tempfile(fileext = ".wsp")
   outDir <- dirname(outFile)
-  GatingSet2flowJo(gs, outFile)
+  gatingset_to_flowjo(gs, outFile)
   write.flowSet(fs, outDir)
-  ws <- openWorkspace(outFile)
-  gs2 <- parseWorkspace(ws, name = 1)
+  ws <- open_flowjo_xml(outFile)
+  gs2 <- flowjo_to_gatingset(ws, name = 1)
   # stats1 <- gh_get_pop_stats(gs)
   expect_is(gs2, "GatingSet")
 })

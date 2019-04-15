@@ -16,10 +16,16 @@
 #'
 #' #output to flowJo
 #' outFile <- tempfile(fileext = ".wsp")
-#' GatingSet2flowJo(gs, outFile)
+#' gatingset_to_flowjo(gs, outFile)
 #'
-#'
-GatingSet2flowJo <- function(gs, outFile, ...){
+#' @rdname gatingset_to_flowjo
+GatingSet2flowJo <- function(...){
+  .Deprecated("gatingset_to_flowjo")
+  gatingset_to_flowjo(...)
+  }
+#' @export
+#' @rdname gatingset_to_flowjo
+gatingset_to_flowjo <- function(gs, outFile, ...){
   #validity check for slash
   # for(chnl in colnames(gs))
   # {

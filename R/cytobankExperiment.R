@@ -79,7 +79,7 @@ cytobank_to_gatingset.cytobank_experiment <- function(x, ...){
     names(markers.ce) <- cols.ce
     #filter out NA markers
     gh <- gs[[sn]]
-    cols.nonNA <- subset(pData(parameters(gh_get_data(gh, use.exprs = FALSE))), !is.na(desc), "name", drop = TRUE)
+    cols.nonNA <- subset(pData(parameters(gh_pop_get_data(gh, use.exprs = FALSE))), !is.na(desc), "name", drop = TRUE)
     
     markernames(gh) <- markers.ce[cols.nonNA]
   }

@@ -605,34 +605,11 @@ flowjo_to_gatingset <- function(obj, name = NULL
     
   message("done!")
 
-  # It is probably unnecessary since the previous check on
-  # the $TOT keywords (through default 'keywords' argument) should be sufficient
-
-  #compare the root counts between fc and fj                  
-  #double check if the correct raw file is used 
-#   if(execute){
-#     invisible(lapply(gs, function(gh){
-#       
-#       sn <- sampleNames(gh)
-#       fj.count <- as.integer(gh_get_count(gh, "root", xml = T))
-#       fc.count <- as.integer(gh_get_count(gh, "root", xml = F))
-#       
-#       if(fj.count == -1){
-#         warning("root count for xml is not available: ", sn)
-#       }else{
-#         if(fj.count != fc.count)
-#           stop("Total event counts mismatched between flowJo and flowCore!", sn)  
-#       }        
-#       
-#     }))  
-#   }
-  
-  
-  #we don't want to return the splitted gs since they share the same cdf and externalptr
+    #we don't want to return the splitted gs since they share the same cdf and externalptr
   #thus should be handled differently(more efficiently) from the regular gslist
   
 #    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed                
-  gslist <- suppressMessages(groupByTree(gs))
+  gslist <- suppressMessages(gs_split_by_tree(gs))
   if(length(gslist) > 1)
     warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
 #    if(length(gslist) == 1){

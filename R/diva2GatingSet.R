@@ -246,7 +246,7 @@ diva_to_gatingset<- function(obj, name = NULL
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep gh_is_hidden gh_is_negated swap_data_cols
+#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -585,14 +585,14 @@ diva_to_gatingset<- function(obj, name = NULL
 
 
 
-            flowWorkspace:::gh_add_gate(gh, gate, parent = parent, name = nodeName)
+			pop_add(gate, gh, parent = parent, name = nodeName)
             if(parent == "root")
               parent <- ""
             unique.path <- file.path(parent, nodeName)
             #Can't do the gating in
-            # ind <- gh_get_indices(gh, parent)
+            # ind <- gh_pop_get_indices(gh, parent)
             # ind <- as.logic(Subset(data[ind, ], gate))
-            # updateIndices(gh, unique.path, ind)
+            # gh_pop_set_indices(gh, unique.path, ind)
             # suppressMessages(recompute(gh, unique.path))
             #save the xml counts
             set.count.xml(gh, unique.path, count)
@@ -646,7 +646,7 @@ diva_to_gatingset<- function(obj, name = NULL
     gs <- suppressMessages(load_gs(gsfiles))
 
        # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
-    gslist <- suppressMessages(groupByTree(gs))
+    gslist <- suppressMessages(gs_split_by_tree(gs))
     if(length(gslist) > 1)
       warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
     gs

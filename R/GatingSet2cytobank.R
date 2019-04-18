@@ -74,7 +74,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
   gh <- gs[[1]]
 
   fcs_guids <- sampleNames(gs)
-  rng <- range(gh_get_data(gh, use.exprs = FALSE))
+  rng <- range(gh_pop_get_data(gh, use.exprs = FALSE))
   grp.list <- sapply(fcs_guids, function(sn){
     grps <- ggcyto:::merge.quad.gates(gs[[sn]], nodePaths)
     #unlist the grp so that the gates that can't be merged to quadgates
@@ -113,7 +113,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       isQuad <- FALSE
       nodePath <- gate.obj
       # gate_id <- nodePath
-      gates <- gs_get_gate(gs, nodePath)
+      gates <- gs_pop_get_gate(gs, nodePath)
       # gate_id <- gate_id + 1#increment gate id
 
     }
@@ -128,14 +128,14 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       #we have to create inverse gate on our end
       if(!isQuad)
       {
-        if(gh_is_negated(gs[fcs_guid][[1]], nodePath))
+        if(gh_pop_is_negated(gs[fcs_guid][[1]], nodePath))
           gate <- inverse(gate, rng)
       }
       #transform to raw scale
       #and attach comp and trans reference to parameters
       gate <- processGate(gate, trans.Gm2objs, compId, flowEnv, rescale.gate, trans)
 
-      # parent <- gs_get_parent(gs, nodePath)
+      # parent <- gs_pop_get_parent(gs, nodePath)
       # if(parent == "root")
       #   parent_id <- 0
       # else
@@ -192,7 +192,7 @@ addGateSets <- function(root, gs, showHidden, guid_mapping)
                       names(gate_id_path) <- curNode
                       # browser()
                       repeat{
-                        curNode <- gs_get_parent(gs, curNode)
+                        curNode <- gs_pop_get_parent(gs, curNode)
                         if(curNode == "root")
                           break
                         else{

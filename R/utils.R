@@ -21,7 +21,7 @@ compact <- function (x)
 range.GatingHierarchy <- function(..., na.rm = FALSE, type = c("instrument", "data"), raw.scale = FALSE){
   type <- match.arg(type)
   gh <- list(...)[[1]]
-  fr <- gh_get_data(gh, use.exprs = type == "data")
+  fr <- gh_pop_get_data(gh, use.exprs = type == "data")
   rng <- range(fr, type = type)
   if(raw.scale)
   {
@@ -47,7 +47,7 @@ is.cytof <- function(gs){
 #common APIs related to processing comp, trans, gates
 #to prepare the GatingML output that can be shared by both cytobank and flowJo modules
 ######################################
-#' @importFrom flowWorkspace gh_get_data
+#' @importFrom flowWorkspace gh_pop_get_data
 #' @importFrom flowCore compensation identifier identifier<- compensatedParameter asinhtGml2 logicletGml2 logtGml2
 export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type = c("cytobank", "flowJo"))
 {
@@ -56,7 +56,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
   comp <- gh_get_compensations(gs[[1]])#assuming the comp is identical across samples
   if(is.null(comp)){
     #no compensation and channel names in transformation are not prefixed
-    chnls <- colnames(gs_get_data(gs))
+    chnls <- colnames(gs_pop_get_data(gs))
     prefix_chnls_orig <- chnls
   }else{
     chnls <- as.vector(parameters(comp))

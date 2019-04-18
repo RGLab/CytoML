@@ -28,7 +28,7 @@ test_that("autogating--tcell", {
   expect_warning(gating(gt, gs))
 
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
+  stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
@@ -36,7 +36,7 @@ test_that("autogating--tcell", {
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
-  stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
+  stats.new <- gh_pop_compare_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
   ####################
@@ -49,21 +49,21 @@ test_that("autogating--tcell", {
   gt <- gatingTemplate(gtFile.orig)
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- gh_get_pop_stats(gs[[1]])[, list(openCyto.count, node)]
+  stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
 
   gatingset_to_flowjo(gs, outFile)
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
-  stats.new <- gh_get_pop_stats(gs1[[1]])[, list(openCyto.count, node)]
+  stats.new <- gh_pop_compare_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })
 test_that("gatingset_to_flowjo: manual gates with calibration table parsed and stored as biexp ",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
-  stats.orig <- gh_get_pop_stats(gs[[1]])
+  stats.orig <- gh_pop_compare_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
@@ -71,7 +71,7 @@ test_that("gatingset_to_flowjo: manual gates with calibration table parsed and s
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
-  stats.new <- gh_get_pop_stats(gs1[[1]])
+  stats.new <- gh_pop_compare_stats(gs1[[1]])
   expect_equal(stats.orig, stats.new, tol = 5e-3)
 })
 
@@ -79,14 +79,14 @@ test_that("gatingset_to_flowjo: export clustering results as derived parameters 
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
   gh <- gs[[1]]
-  params <- parameters(gh_get_gate(gh, "CD4"))
-  gs_remove_gate("CD4", gs)
-  gs_remove_gate("CD8", gs)
-  gs_remove_gate("DNT", gs)
-  gs_remove_gate("DPT", gs)
+  params <- parameters(gh_pop_get_gate(gh, "CD4"))
+  gs_pop_remove("CD4", gs = gs)
+  gs_pop_remove("CD8", gs = gs)
+  gs_pop_remove("DNT", gs = gs)
+  gs_pop_remove("DPT", gs = gs)
   #run flowClust
 
-  fr <- gh_get_data(gh, "CD3+")
+  fr <- gh_pop_get_data(gh, "CD3+")
   library(flowClust)
   res <- flowClust(fr, varNames = params, K = 2, nu = 1, trans = 0)
   # plot(res, data = fr)
@@ -94,12 +94,12 @@ test_that("gatingset_to_flowjo: export clustering results as derived parameters 
   Map <- selectMethod("Map", sig = "flowClust")
   res <- Map(res)
   res <- as.factor(res)
-  flowWorkspace:::gh_add_gate(gh, res, parent = "CD3+", name = "flowclust")
+  pop_add(res, gh, parent = "CD3+", name = "flowclust")
 
   rect <- rectangleGate(`<B710-A>` = c(500, 1500), `<R780-A>` = c(3500, 4000))
-  flowWorkspace:::gh_add_gate(gh, rect, parent = "flowclust_1", name = "rect")
+  pop_add(rect, gh, parent = "flowclust_1", name = "rect")
   recompute(gh)
-  stats.orig <- gh_get_pop_stats(gs[[1]])
+  stats.orig <- gh_pop_compare_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   # outFile <- "~/test.wsp"
@@ -108,7 +108,7 @@ test_that("gatingset_to_flowjo: export clustering results as derived parameters 
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
-  stats.new <- gh_get_pop_stats(gs1[[1]])
+  stats.new <- gh_pop_compare_stats(gs1[[1]])
   expect_equal(stats.orig[-(5:7)], stats.new, tol = 5e-3)
 })
 
@@ -119,7 +119,7 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   biexpTrans <- flowJo_biexp_trans(channelRange=4096, maxValue=262144, pos=4.5,neg=0, widthBasis=-10)
   transList <- transformerList(colnames(fs[[1]])[3:6], biexpTrans)
   gs<-transform(gs,transList)
-  fs_trans<- gs_get_data(gs)
+  fs_trans<- gs_pop_get_data(gs)
   
   ###Adding the cluster
   clean.inds <- lapply(1:length(fs_trans), function(i1) return(list(ind=which(exprs(fs_trans[[i1]])[,"Time"]>793))))
@@ -139,7 +139,7 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   })
   names(clean.clust)<-sampleNames(fs_trans)
   
-  gs_add_gate(gs,clean.clust, parent="root",name = "Clean")
+  gs_pop_add(gs,clean.clust, parent="root",name = "Clean")
   recompute(gs)
   
   #add one gate
@@ -148,13 +148,13 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   
   
   
-  nodeID<-gs_add_gate(gs, rg,parent="Clean_0")#it is added to root node by default if parent is not specified
+  nodeID<-gs_pop_add(gs, rg,parent="Clean_0")#it is added to root node by default if parent is not specified
   recompute(gs)
   autoplot(gs, "rectangle")
   
   #add a quadGate
   qg <- quadGate("FL1-H"=1e3, "FL2-H"=1.5e3)
-  nodeIDs<-gs_add_gate(gs,qg,parent="rectangle")
+  nodeIDs<-gs_pop_add(gs,qg,parent="rectangle")
   recompute(gs)
 
   outFile <- tempfile(fileext = ".wsp")
@@ -163,6 +163,6 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   write.flowSet(fs, outDir)
   ws <- open_flowjo_xml(outFile)
   gs2 <- flowjo_to_gatingset(ws, name = 1)
-  # stats1 <- gh_get_pop_stats(gs)
+  # stats1 <- gh_pop_compare_stats(gs)
   expect_is(gs2, "GatingSet")
 })

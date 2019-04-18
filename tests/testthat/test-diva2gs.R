@@ -3,7 +3,7 @@ context("parse diva workspace ..")
 test_that("PE_2", {
   ws <- open_diva_xml(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
   gs <- diva_to_gatingset(ws, name = 2, subset = 1, swap_cols = FALSE)
-  stats <- gh_get_pop_stats(gs[[1]])
+  stats <- gh_pop_compare_stats(gs[[1]])
 
   expect_equal(stats[, xml.count], stats[, openCyto.count], tolerance = 0.0018)
 

@@ -4,8 +4,8 @@ test_that("flowJo to cytobank",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
   #rm negated gate since we have some issue when load the inversed cytobank gate back in
-  moveNode(gs, "singlets", "root")
-  gs_remove_gate("not debris", gs)
+  gh_pop_move(gs, "singlets", "root")
+  gs_pop_remove("not debris", gs = gs)
 
   outFile <- tempfile(fileext = ".xml")
   expect_warning(gatingset_to_cytobank(gs, outFile))
@@ -18,8 +18,8 @@ test_that("flowJo to cytobank",{
   sink(NULL, type = "message")
 
 
-  stats.orig <- gs_get_pop_stats(gs)
-  stats.new <- gs_get_pop_stats(gs1)
+  stats.orig <- gs_pop_get_count_fast(gs)
+  stats.new <- gs_pop_get_count_fast(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y], tol = 2e-3)
@@ -80,8 +80,8 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   gs1 <- cytobank_to_gatingset(outFile, fcsFiles)
   sink(NULL, type = "message")
 
-  stats.orig <- gs_get_pop_stats(gs)
-  stats.new <- gs_get_pop_stats(gs1)
+  stats.orig <- gs_pop_get_count_fast(gs)
+  stats.new <- gs_pop_get_count_fast(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
@@ -92,7 +92,7 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   sink(con, type = "message")
   gs1 <- cytobank_to_gatingset(outFile, fcsFiles)
   sink(NULL, type = "message")
-  stats.new <- gs_get_pop_stats(gs1)
+  stats.new <- gs_pop_get_count_fast(gs1)
   stats <- merge(stats.orig, stats.new, by = c("name", "Population", "Parent"))
 
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
@@ -129,13 +129,13 @@ test_that("autogating to cytobank--tcell", {
 
   expect_warning(gating(gt, gs))
   toggle.helperGates(gt, gs) #hide the helper gates
-  stats.orig <- gh_get_pop_stats(gs[[1]])[order(node), list(openCyto.count, node)]
+  stats.orig <- gh_pop_compare_stats(gs[[1]])[order(node), list(openCyto.count, node)]
   #output to cytobank
 
   gatingset_to_cytobank(gs, outFile, cytobank.default.scale = F)
   #parse it back in
   gs1 <- cytobank_to_gatingset(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs"))
-  stats.new <- gh_get_pop_stats(gs1[[1]])[order(node), list(openCyto.count, node)]
+  stats.new <- gh_pop_compare_stats(gs1[[1]])[order(node), list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 
 })

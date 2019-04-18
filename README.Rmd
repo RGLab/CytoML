@@ -147,7 +147,7 @@ We can extract the cell population statistics.
 
 ```{r}
 #show the population statistics
-gh_get_pop_stats(gh)
+gh_pop_compare_stats(gh)
 ```
 
 The `openCyto.count` column shows the cell counts computed via the import.
@@ -167,14 +167,14 @@ Because CytoML and flowWorkspace reproduce the entire analysis in a workspace in
 flowWorkspace has convenience methods to extract the cells from specific cell populations:
 
 ```{r}
-gh_get_data(gh,"P3")
+gh_pop_get_data(gh,"P3")
 ```
 This returns a `flowFrame` with the cells in gate P3 (70% of the cells according to the plot).
 
 The matrix of expression can be extracted from a `flowFrame` using the `exprs()` method:
 
 ```{r}
-e <- exprs(gh_get_data(gh,"P3"))
+e <- exprs(gh_pop_get_data(gh,"P3"))
 class(e)
 dim(e)
 colnames(e)

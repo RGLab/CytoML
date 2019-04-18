@@ -86,7 +86,7 @@ setMethod("getChildren", signature = c("graphGML", "character"),
 #' @param obj \code{graphGML}
 #' @param y \code{character} child node path
 #' @return a graphNEL node
-#' @importFrom flowWorkspace gs_get_parent getParent
+#' @importFrom flowWorkspace gs_pop_get_parent getParent
 setMethod("getParent", signature = c("graphGML", "character"),
           definition = function(obj, y) {
 
@@ -191,7 +191,7 @@ setMethod("gating", signature = c("graphGML", "GatingSet"), function(x, y, ...){
   gating.graphGML(x, y, ...)
 })
 
-#' @importFrom flowWorkspace gs_set_node_name add recompute sampleNames
+#' @importFrom flowWorkspace gs_pop_set_name add recompute sampleNames
 #' @importFrom RBGL tsort
 gating.graphGML <- function(gt, gs, ...) {
 
@@ -214,7 +214,7 @@ gating.graphGML <- function(gt, gs, ...) {
     }
 
 
-    gs_nodes <- basename(gs_get_children(gs[[1]], parent))
+    gs_nodes <- basename(gs_pop_get_children(gs[[1]], parent))
 
     if (length(gs_nodes) == 0)
       isGated <- FALSE
@@ -265,7 +265,7 @@ gating.graphGML <- function(gt, gs, ...) {
 
 
 
-    gs_add_gate(gs, this_gate, parent = parent, name = popName)
+    gs_pop_add(gs, this_gate, parent = parent, name = popName)
 
   }
   recompute(gs)
@@ -336,7 +336,7 @@ setMethod("compensate", signature = c("GatingSet", "graphGML"), function(x, spil
     skip <- FALSE
   }else if(comp == "FCS"){
     # prefix <- FALSE
-    fs <- gs_get_data(x)
+    fs <- gs_pop_get_data(x)
     fr <- fs[[1, use.exprs = FALSE]]
     #can't use spillover method directly because it will error out when none is found
     mat <- keyword(fr, c("spillover", "SPILL"))

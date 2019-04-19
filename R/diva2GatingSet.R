@@ -246,7 +246,7 @@ diva_to_gatingset<- function(obj, name = NULL
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols
+#' @importFrom flowWorkspace gh_pop_set_xml_count GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -595,12 +595,12 @@ diva_to_gatingset<- function(obj, name = NULL
             # gh_pop_set_indices(gh, unique.path, ind)
             # suppressMessages(recompute(gh, unique.path))
             #save the xml counts
-            set.count.xml(gh, unique.path, count)
+            gh_pop_set_xml_count(gh, unique.path, count)
           }else{
             rootNode.xml <- nodeName
             if(rootNode.xml!="All Events")
               stop("unrecognized root node: ", rootNode.xml)
-            set.count.xml(gh, "root", count)
+            gh_pop_set_xml_count(gh, "root", count)
             next
           }
         }#end of gate adding

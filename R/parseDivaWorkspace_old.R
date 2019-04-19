@@ -294,12 +294,12 @@
         unique.path <- file.path(parent, nodeName)
         suppressMessages(recompute(gh, unique.path))
         #save the xml counts
-        set.count.xml(gh, unique.path, count)
+        gh_pop_set_xml_count(gh, unique.path, count)
       }else{
         rootNode.xml <- nodeName
         if(rootNode.xml!="All Events")
           stop("unrecognized root node: ", rootNode.xml)
-        set.count.xml(gh, "root", count)
+        gh_pop_set_xml_count(gh, "root", count)
         next
       }
 

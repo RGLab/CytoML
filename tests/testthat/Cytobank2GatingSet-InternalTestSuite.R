@@ -21,7 +21,7 @@ test_that("cytobank2gs--cytof: special character in channels and no comp ",{
 
 test_that("GatingSet2Cytobank--cytof ",{
 
-  thisPath <- file.path(path, "cytof")
+  thisPath <- file.path(path, "cytof/legacy")
   #load the original automated gating set
   gs_orig <- load_gs(file.path(thisPath, "gs"))
   stats <- gs_pop_get_count_fast(gs_orig)[order(Population),]
@@ -57,9 +57,9 @@ test_that("GatingSet2Cytobank--cytof ",{
 test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channels ",{
       thisPath <- file.path(path, "ics")
       #load the original automated gating set
-      gs_orig <- load_gs(file.path(thisPath, "autogating"))
+      gs_orig <- load_gs(file.path(thisPath, "legacy/autogating"))
       gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
-      openCyto::toggle.helperGates(gt, gs_orig) #hide the helper gates
+	  gt_toggle_helpergates(gt, gs_orig) #hide the helper gates
       stats <- gs_pop_get_count_fast(gs_orig)[order(Population),]
 
       #export the gs_orig to xml

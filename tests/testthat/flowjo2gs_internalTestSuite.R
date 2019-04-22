@@ -69,7 +69,7 @@ test_that("search reference node for boolean gate ",{
   #skip leaf bool
   gs <- suppressWarnings(flowjo_to_gatingset(ws, name="Samples", subset = "1379326.fcs", leaf.bool = F))
   gh <- gs[[1]]
-  leaf.bool <- which(sapply(gs_get_pop_paths(gs), function(node)length(gs_pop_get_children(gh, node))==0&&flowWorkspace:::.isBoolGate(gh,node)))
+  leaf.bool <- which(sapply(gs_get_pop_paths(gs), function(node)length(gs_pop_get_children(gh, node))==0&&gh_pop_is_bool_gate(gh,node)))
   res <- gh_pop_compare_stats(gh)
   expect_true(all(is.na(res[leaf.bool,  openCyto.count])))
   expect_equal(res[-leaf.bool, xml.freq], res[-leaf.bool, openCyto.freq], tol = 0.006)

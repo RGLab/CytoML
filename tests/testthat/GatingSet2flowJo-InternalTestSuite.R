@@ -4,7 +4,7 @@ path <- "~/rglab/workspace/CytoML//wsTestSuite"
 
 test_that("gatingset_to_flowjo: forward slash ",{
   thisPath <- file.path(path, "slash_issue_vX")
-  gs <- load_gs(file.path(thisPath, "gs"))
+  gs <- load_gs(file.path(thisPath, "legacy/gs"))
 
   stats.orig <- gh_pop_compare_stats(gs[[1]])
   #output to flowJo
@@ -87,7 +87,7 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
   expect_equal(stats.orig, stats.new)
 })
 test_that("gatingset_to_flowjo: rectangleGate + boolgate",{
-  dataDir <- "/fh/fast/gottardo_r/mike_working/wsTestSuite/curlyQuad/example1"
+  dataDir <- file.path(path, "curlyQuad/example1")
   ws <- open_flowjo_xml(file.path(dataDir, "20151208_TBNK_DS.xml"))
   gs <- flowjo_to_gatingset(ws, subset = 1, name = 2)
 
@@ -125,7 +125,7 @@ test_that("gatingset_to_flowjo: no comp + fasinh ",{
 
 test_that("gatingset_to_flowjo: no transformation",{
 
-  gs <- load_gs("/fh/fast/gottardo_r/mike_working/lyoplate_out/gated_data/manual/gslist-bcell/cgRoygodqg")
+  gs <- load_gs("~/rglab/workspace/flowWorkspace/lyoplate_out/gated_data/legacy/manual/gslist-bcell/cgRoygodqg")
   stats.orig <- gh_pop_compare_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -136,9 +136,9 @@ test_that("gatingset_to_flowjo: no transformation",{
 test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean gate",{
   thisPath <- file.path(path, "gatingML/ics")
   #load the original automated gating set
-  gs <- load_gs(file.path(thisPath, "autogating"))
+  gs <- load_gs(file.path(thisPath, "legacy/autogating"))
   gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
-  toggle.helperGates(gt, gs) #hide the helper gates
+  gt_toggle_helpergates(gt, gs) #hide the helper gates
 
   #add AND gate
   bf <- booleanFilter(cd4/GzB&cd4/Prf)
@@ -161,7 +161,7 @@ test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean
   gs_pop_add(gs, bf, name = "bool6", parent = "cd4")
   recompute(gs)
   expect_error(gatingset_to_flowjo(gs, outFile), "And gate and Or gate can't not be used together!")
-  Rm("bool6", gs)
+  gs_pop_remove("bool6", gs)
 
   autoplot(gs[[1]], gs_pop_get_children(gs[[1]], "cd4"))
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]

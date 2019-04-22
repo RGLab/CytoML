@@ -191,7 +191,7 @@ setMethod("gating", signature = c("graphGML", "GatingSet"), function(x, y, ...){
   gating.graphGML(x, y, ...)
 })
 
-#' @importFrom flowWorkspace gs_pop_set_name add recompute sampleNames
+#' @importFrom flowWorkspace gs_pop_set_name gs_pop_get_children recompute sampleNames gs_pop_add
 #' @importFrom RBGL tsort
 gating.graphGML <- function(gt, gs, ...) {
 
@@ -327,7 +327,7 @@ getTransformations.graphGML <- function(x, ...){
 #' @param ... unused.
 #' @return compensated GatingSet
 #' @importFrom flowCore compensate
-#' @importFrom flowCore compensate
+#' @importFrom flowWorkspace gs_pop_get_data
 setMethod("compensate", signature = c("GatingSet", "graphGML"), function(x, spillover, ...){
 
   comp <- getCompensationMatrices(spillover)

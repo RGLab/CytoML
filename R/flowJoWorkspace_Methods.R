@@ -27,7 +27,7 @@ setOldClass("XMLInternalDocument")
 #'   wsfile<-list.files(d,pattern="A2004Analysis.xml",full=TRUE)
 #'   ws <- open_flowjo_xml(wsfile);
 #'   ws
-#'   getSamples(ws)
+#'   fj_ws_get_samples(ws)
 #' 
 #' @name flowjo_workspace-class
 #' @rdname flowjo_workspace-class
@@ -700,7 +700,7 @@ getFileNames <- function(ws){
 #'   wsfile<-list.files(d,pattern="manual.xml",full=TRUE)
 #'   ws <- open_flowjo_xml(wsfile);
 #'   
-#'   getSamples(ws)
+#'   fj_ws_get_samples(ws)
 #'   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
 #'   print(res[[1]])
 #'   fj_ws_get_keywords(ws, 1)
@@ -853,7 +853,7 @@ getFJWSubsetIndices<-function(ws,key=NULL,value=NULL,group,requiregates=TRUE){
 #' @examples
 #'       \dontrun{
 #'         #ws is a flowjo_workspace
-#'         getSamples(ws);
+#'         fj_ws_get_samples(ws);
 #'       }
 #' @aliases getSamples
 #' @rdname getSamples

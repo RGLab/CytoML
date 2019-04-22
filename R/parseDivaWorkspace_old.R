@@ -288,7 +288,7 @@
 
 
 
-        flowWorkspace:::gh_pop_add(gh, gate, parent = parent, name = nodeName)
+        pop_add(gate, gh, parent = parent, name = nodeName)
         if(parent == "root")
           parent <- ""
         unique.path <- file.path(parent, nodeName)

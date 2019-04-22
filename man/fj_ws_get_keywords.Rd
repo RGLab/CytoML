@@ -32,7 +32,7 @@ Retrieve a list of keywords from a \code{flowjo_workspace}
   wsfile<-list.files(d,pattern="manual.xml",full=TRUE)
   ws <- open_flowjo_xml(wsfile);
   
-  getSamples(ws)
+  fj_ws_get_samples(ws)
   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
   print(res[[1]])
   fj_ws_get_keywords(ws, 1)

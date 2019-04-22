@@ -45,7 +45,7 @@ library(flowWorkspace)
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 
-Rm("CD8", gs)
+gs_pop_remove(gs, "CD8")
 
 #output to cytobank
 outFile <- tempfile(fileext = ".xml")

@@ -26,7 +26,7 @@ Objects can be created by calls of the form \code{new("flowjo_workspace.xml", ..
   wsfile<-list.files(d,pattern="A2004Analysis.xml",full=TRUE)
   ws <- open_flowjo_xml(wsfile);
   ws
-  getSamples(ws)
+  fj_ws_get_samples(ws)
 
 }
 \seealso{

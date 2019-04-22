@@ -27,6 +27,6 @@ Returns a \code{data.frame} of samples in the \code{flowjo_workspace}, including
 \examples{
       \dontrun{
         #ws is a flowjo_workspace
-        getSamples(ws);
+        fj_ws_get_samples(ws);
       }
 }

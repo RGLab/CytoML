@@ -3,7 +3,7 @@ context("gatingset_to_cytobank and GatingSet2Cytobank ")
 path <- "~/rglab/workspace/flowWorkspace/wsTestSuite/gatingML"
 
 test_that("read.gatingML.cytobank: gates drawn on both compensated and uncompensated axes",{
-  gm <- read.gatingML.cytobank(file.path(path, "CytExp_29783_Gates_v5.xml"))
+  gm <- CytoML:::read.gatingML.cytobank(file.path(path, "CytExp_29783_Gates_v5.xml"))
   
   
   expect_equal(length(getNodes(gm)), 10)
@@ -92,7 +92,7 @@ test_that("gatingML-cytobank parsing: custom comp and gates with prefixed channe
 
 test_that("gatingML-cytobank parsing: no transformations",{
   xmlfile <- file.path(path, "no_trans.xml")
-  g <- read.gatingML.cytobank(xmlfile)
+  g <- CytoML:::read.gatingML.cytobank(xmlfile)
   expect_is(g, "graphGML")
   expect_null(getTransformations(g))
 })

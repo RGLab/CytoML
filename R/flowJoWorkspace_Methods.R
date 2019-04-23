@@ -429,7 +429,7 @@ flowjo_to_gatingset <- function(obj, name = NULL
                 
                 #try to search by file name first
                 filename.pattern <- gsub(charToEsc, "\\\\\\1", filename)
-                absPath <- list.files(pattern=paste("^",filename.pattern,"",sep=""),path=path,recursive=TRUE,full.names=TRUE)
+                absPath <- list.files(pattern=paste("^",filename.pattern,"$",sep=""),path=path,recursive=TRUE,full.names=TRUE)
                 nFound <- length(absPath)
                 isFileNameSearchFailed <- nFound == 0
                 #searching file by keyword $FIL when it is enabled

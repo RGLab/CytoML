@@ -128,7 +128,7 @@ test_that("autogating to cytobank--tcell", {
   gt <- gatingTemplate(gtFile.orig)
 
   expect_warning(gating(gt, gs))
-  toggle.helperGates(gt, gs) #hide the helper gates
+  gt_toggle_helpergates(gt, gs) #hide the helper gates
   stats.orig <- gh_pop_compare_stats(gs[[1]])[order(node), list(openCyto.count, node)]
   #output to cytobank
 

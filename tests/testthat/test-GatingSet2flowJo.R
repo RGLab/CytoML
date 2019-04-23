@@ -27,7 +27,7 @@ test_that("autogating--tcell", {
   gt <- gatingTemplate(gtFile)
   expect_warning(gating(gt, gs))
 
-  toggle.helperGates(gt, gs) #hide the helper gates
+  gt_toggle_helpergates(gt, gs) #hide the helper gates
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -48,7 +48,7 @@ test_that("autogating--tcell", {
   gs <- transform(gs, trans)
   gt <- gatingTemplate(gtFile.orig)
   expect_warning(gating(gt, gs))
-  toggle.helperGates(gt, gs) #hide the helper gates
+  gt_toggle_helpergates(gt, gs) #hide the helper gates
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
 

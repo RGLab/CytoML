@@ -55,7 +55,7 @@ install_github("RGLab/openCyto", ref="trunk")
 ### Installing from [BioConductor](https://www.bioconductor.org).
 
   - [Current BioConductor
-    Relase](https://doi.org/doi:10.18129/B9.bioc.CytoML)
+    Release](https://doi.org/doi:10.18129/B9.bioc.CytoML)
 
 <!-- end list -->
 
@@ -83,7 +83,7 @@ BiocManager::install("CytoML", version = "devel")
 <!-- end list -->
 
 ``` r
-install.packges("devtools")
+install.packages("devtools")
 devtools::install_github("RGLab/CytoML", ref = "trunk")
 ```
 
@@ -92,7 +92,7 @@ devtools::install_github("RGLab/CytoML", ref = "trunk")
 <!-- end list -->
 
 ``` r
-install.packges("devtools")
+install.packages("devtools")
 devtools::install_github("RGLab/CytoML@*release")
 ```
 
@@ -209,7 +209,7 @@ plotGate(gh)
 
 Because CytoML and flowWorkspace reproduce the entire analysis in a
 workspace in R, we have access to information about which cells are part
-of which cell popualtions.
+of which cell populations.
 
 flowWorkspace has convenience methods to extract the cells from specific
 cell populations:
@@ -324,7 +324,7 @@ GatingSet2flowJo(gs, outFile)
 ## Next Steps
 
 See the [flowWorskspace](http://www.github.com/RGLab/flowWorkspace) and
-\[openCyto\](<http://www.github.com/RGLab/openCyto>\] packages to learn
+[openCyto](http://www.github.com/RGLab/openCyto] packages to learn
 more about what can be done with `GatingSet` objects.
 
 ## Code of conduct

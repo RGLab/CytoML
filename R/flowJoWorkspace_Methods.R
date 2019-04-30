@@ -304,7 +304,7 @@ setMethod("parseWorkspace",signature("flowJoWorkspace"),function(obj, ...){
                     ,...)
 		
 }
-
+#' @importFrom flowCore read.FCSheader
 .parse.pData <- function(obj, keywords, sg, keywords.source, execute, additional.keys, additional.sampleID
                           , path, keyword.ignore.case, subset, emptyValue = TRUE
                           , ... #other arguments ignored

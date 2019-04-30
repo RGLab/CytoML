@@ -439,9 +439,16 @@ public:
 			caltbl.setY(y);
 			caltbl.setX(x);
 			unsigned nX = x.size();
-			bt->maxValue = caltbl.getX()[nX-1];
-			bt->channelRange = caltbl.getY()[nX-1];
+			if(nX==0)
+			{//assign the default values when caltbl is not present in xml
+				bt->maxValue = 262144;
+				bt->channelRange = 4096;
 
+			}else
+			{
+				bt->maxValue = caltbl.getX()[nX-1];
+				bt->channelRange = caltbl.getY()[nX-1];
+			}
 			transformation * curTran = bt;
 			/*
 			 * sometime, the biexp parameters may not be stored properly

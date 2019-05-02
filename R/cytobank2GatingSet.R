@@ -1,22 +1,22 @@
-#' A wrapper that parse the gatingML and FCS files (or cytobankExperiment object) into GatingSet
-#' @param x the cytobankExperiment object or the full path of gatingML file
+#' A wrapper that parse the gatingML and FCS files (or cytobank_experiment object) into GatingSet
+#' @param x the cytobank_experiment object or the full path of gatingML file
 #' @param FCS FCS files to be loaded
 #' @return a GatingSet
 #' @export
-#' @rdname cytobank2GatingSet
+#' @rdname cytobank_to_gatingset
 #' @examples
 #' \dontrun{
 #' acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
-#' ce <- cytobankExperiment(acsfile)
+#' ce <- open_cytobank_experiment(acsfile)
 #' xmlfile <- ce$gatingML
 #' fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
-#' gs <<- cytobank2GatingSet(xmlfile, fcsFiles)
+#' gs <<- cytobank_to_gatingset(xmlfile, fcsFiles)
 #' library(ggcyto)
 #' autoplot(gs[[1]])
 #' }
 #' @importFrom flowWorkspace GatingSet transform
 #' @importFrom ncdfFlow read.ncdfFlowSet
-cytobank2GatingSet.default <- function(x, FCS, ...){
+cytobank_to_gatingset.default <- function(x, FCS, ...){
   g <- read.gatingML.cytobank(x)
   fs <- read.ncdfFlowSet(FCS)
   gs <- GatingSet(fs)
@@ -41,19 +41,19 @@ cytobank2GatingSet.default <- function(x, FCS, ...){
 #' @param id.vars either "population" or "FCS filename" that tells whether the stats file format is one population per row or FCS file per row.
 #' @param ... arguments passed to data.table::fread function
 #' @return a data.table (in long format) that contains the counts from openCyto and Cytobank side by side.
-#' @export compare.counts
+#' @export gs_compare_cytobank_counts
 #' @examples
 #'
 #' acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
-#' ce <- cytobankExperiment(acsfile)
-#' gs <- cytobank2GatingSet(ce)
+#' ce <- open_cytobank_experiment(acsfile)
+#' gs <- cytobank_to_gatingset(ce)
 #' ## verify the stats are correct
 #' statsfile <- ce$attachments[1]
-#' dt_merged <- compare.counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
+#' dt_merged <- gs_compare_cytobank_counts(gs, statsfile, id.vars = "population", skip = "FCS Filename")
 #' all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 #'
-#' @importFrom flowWorkspace getPopStats
-compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population"), ...){
+#' @importFrom flowWorkspace gh_pop_compare_stats gs_pop_get_count_fast
+gs_compare_cytobank_counts <- function(gs, file, id.vars = c("FCS Filename", "population"), ...){
   #load stats from cytobank
   id.vars <- match.arg(id.vars)
   variable.name <- ifelse(id.vars == "population", "FCS Filename", "population")
@@ -74,7 +74,7 @@ compare.counts <- function(gs, file, id.vars = c("FCS Filename", "population"), 
 
   # extract the counts from our gating sets
   #load openCyto stats
-  opencyto_counts <- getPopStats(gs, statType = "count", path = "auto")
+  opencyto_counts <- gs_pop_get_count_fast(gs, statType = "count", path = "auto")
 
   setnames(opencyto_counts, names(opencyto_counts), c("fcs_filename", "population", "parent", "count", "parent_count"))
   #add root entry

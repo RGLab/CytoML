@@ -1,10 +1,17 @@
-#' Construct cytobankExperiment object from ACS file
+#' Construct cytobank_experiment object from ACS file
 #' @param acs ACS file exported from Cytobank
 #' @param exdir he directory to extract files to
-#' @return cytobankExperiment object
+#' @return cytobank_experiment object
 #' @importFrom yaml read_yaml
+#' @rdname open_cytobank_experiment
 #' @export
-cytobankExperiment <- function(acs, exdir = tempfile()){
+cytobankExperiment <- function(...){
+  .Deprecated("open_cytobank_experiment")
+  open_cytobank_experiment(...)
+}
+#' @rdname open_cytobank_experiment
+#' @export
+open_cytobank_experiment <- function(acs, exdir = tempfile()){
   message("Unpacking ACS file...")
   unzip(acs, exdir = exdir)
   path <- file.path(exdir, "experiments")
@@ -40,18 +47,25 @@ cytobankExperiment <- function(acs, exdir = tempfile()){
                         , fcsdir = fcsdir
                         , attachments = list.files(attachdir, pattern = "\\.csv$", full.names = TRUE)
                         )
-                   , class = "cytobankExperiment")
+                   , class = "cytobank_experiment")
 }
-#' @rdname cytobank2GatingSet
+#' @rdname cytobank_to_gatingset
 #' @export
-cytobank2GatingSet <- function(x, ...)UseMethod("cytobank2GatingSet")
+cytobank2GatingSet <- function(...)
+{
+  .Deprecated("cytobank_to_gatingset")
+  cytobank_to_gatingset(...)
+}
+#' @rdname cytobank_to_gatingset
+#' @export
+cytobank_to_gatingset <- function(x, ...)UseMethod("cytobank_to_gatingset")
 #' @importFrom flowWorkspace markernames<-
 #' @param ... other arguments
 #' @export
-#' @method cytobank2GatingSet cytobankExperiment
-#' @rdname cytobank2GatingSet
-cytobank2GatingSet.cytobankExperiment <- function(x, ...){
-  gs <- cytobank2GatingSet(x$gatingML, list.files(x$fcsdir, full.names = TRUE))
+#' @method cytobank_to_gatingset cytobank_experiment
+#' @rdname cytobank_to_gatingset
+cytobank_to_gatingset.cytobank_experiment <- function(x, ...){
+  gs <- cytobank_to_gatingset(x$gatingML, list.files(x$fcsdir, full.names = TRUE))
   ce <- x
   pData(gs) <- pData(ce)
   #update markers 
@@ -65,20 +79,20 @@ cytobank2GatingSet.cytobankExperiment <- function(x, ...){
     names(markers.ce) <- cols.ce
     #filter out NA markers
     gh <- gs[[sn]]
-    cols.nonNA <- subset(pData(parameters(getData(gh, use.exprs = FALSE))), !is.na(desc), "name", drop = TRUE)
+    cols.nonNA <- subset(pData(parameters(gh_pop_get_data(gh, use.exprs = FALSE))), !is.na(desc), "name", drop = TRUE)
     
     markernames(gh) <- markers.ce[cols.nonNA]
   }
   gs
 }
-setOldClass("cytobankExperiment")
+setOldClass("cytobank_experiment")
 
-#' @param x cytobankExperiment object
-#' @rdname cytobankExperiment
+#' @param x cytobank_experiment object
+#' @rdname cytobank_experiment
 #' @param ... not used
 #' @export
-#' @method print cytobankExperiment
-print.cytobankExperiment <- function(x, ...){
+#' @method print cytobank_experiment
+print.cytobank_experiment <- function(x, ...){
   exp <- x[["experiment"]]
   cat("cytobank Experiment: ", exp[["name"]],"\n");
   cat("gatingML File: ",x[["gatingML"]], "\n");
@@ -90,12 +104,9 @@ print.cytobankExperiment <- function(x, ...){
 }
 
 
-#' @rdname cytobankExperiment
-#' @method getCompensationMatrices cytobankExperiment
+#' @rdname cytobank_experiment
 #' @export
-#' @aliases getCompensationMatrices
-#' @export getCompensationMatrices
-getCompensationMatrices.cytobankExperiment <- function(x){
+ce_get_cmpensations <- function(x){
   comps <- x[["experiment"]][["compensations"]]
   comp_names <- sapply(comps,`[[`, "name")
   res <- lapply(comps, function(comp.i){
@@ -108,11 +119,11 @@ getCompensationMatrices.cytobankExperiment <- function(x){
   res
 }
 
-#' @rdname cytobankExperiment
+#' @rdname cytobank_experiment
 #' @importFrom flowWorkspace markernames
 #' @export
 setMethod("markernames",
-          signature=signature(object="cytobankExperiment"),
+          signature=signature(object="cytobank_experiment"),
           definition=function(object){
             
             panels <- get_panel_per_file(object)
@@ -125,11 +136,11 @@ setMethod("markernames",
             
           })
 
-#' @rdname cytobankExperiment
+#' @rdname cytobank_experiment
 #' @param do.NULL,prefix not used
 #' @export
 setMethod("colnames",
-          signature=signature(x="cytobankExperiment"),
+          signature=signature(x="cytobank_experiment"),
           definition=function(x, do.NULL="missing", prefix="missing"){
             panels <- get_panel_per_file(x)
             res <- lapply(panels, `[[`, "channels")
@@ -149,12 +160,9 @@ get_panel_per_file <- function(ce){
   names(res) <- sampleNames(ce)
   res
 }
-#' @rdname cytobankExperiment
+#' @rdname cytobank_experiment
 #' @export
-#' @method getTransformations cytobankExperiment
-#' @export getTransformations
-#' @aliases getTransformations
-getTransformations.cytobankExperiment <- function(x, ...){
+ce_get_transformations <- function(x, ...){
   chnls <- colnames(x)
   low.chnls <- tolower(chnls)
   scales <- x$experiment$scales
@@ -182,16 +190,16 @@ getTransformations.cytobankExperiment <- function(x, ...){
   transformerList(names(res), res)
 }
 
-#' @rdname cytobankExperiment
+#' @rdname cytobank_experiment
 #' @export
-setMethod("sampleNames","cytobankExperiment",function(object){
+setMethod("sampleNames","cytobank_experiment",function(object){
   rownames(pData(object))
 })
 
-#' @param object cytobankExperiment object
-#' @rdname cytobankExperiment
+#' @param object cytobank_experiment object
+#' @rdname cytobank_experiment
 #' @export
-setMethod("pData","cytobankExperiment",function(object){
+setMethod("pData","cytobank_experiment",function(object){
   get_pd(object)
 })
 

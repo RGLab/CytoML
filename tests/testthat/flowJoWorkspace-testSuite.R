@@ -46,11 +46,11 @@ test_that("getKeywordsBySampleID workspace",
       
     })
 
-test_that("getKeywords workspace",
+test_that("fj_ws_get_keywords workspace",
     {
-      expect_error(getKeywords(ws, "CytoTrol_CytoTrol_1.fcs"), "Character 'CytoTrol_CytoTrol_1.fcs' can't uniquely identify")
+      expect_error(fj_ws_get_keywords(ws, "CytoTrol_CytoTrol_1.fcs"), "Character 'CytoTrol_CytoTrol_1.fcs' can't uniquely identify")
       thisExpectRes <- lapply(fjRes[["getkw_ws"]], trimws)
-      expect_equal(getKeywords(ws, 1), thisExpectRes)
+      expect_equal(fj_ws_get_keywords(ws, 1), thisExpectRes)
     })
 
 test_that(".getKeyword workspace",
@@ -76,11 +76,11 @@ test_that("getFJWSubsetIndices workspace",
 test_that(".getSamples workspace",
     {
       expect_equal(.getSamples(ws@doc, wsType = "macII"), fjRes[[".getSamples"]])
-      expect_equal(getSamples(ws), fjRes[[".getSamples"]])
+      expect_equal(fj_ws_get_samples(ws), fjRes[[".getSamples"]])
     })
 
 test_that(".getSampleGroups workspace",
     {
       expect_equal(.getSampleGroups(ws@doc, wsType = "macII"), fjRes[[".getSampleGroups"]])
-      expect_equal(getSampleGroups(ws), fjRes[[".getSampleGroups"]])
+      expect_equal(fj_ws_get_sample_groups(ws), fjRes[[".getSampleGroups"]])
     })

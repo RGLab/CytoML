@@ -72,7 +72,7 @@ autoplot(gs[[1]])
 ## Export to Cytobank 
 ```{r}
 outFile <- tempfile(fileext = ".xml")
-GatingSet2cytobank(gs, outFile)
+gatingset_to_cytobank(gs, outFile)
 ```
 Note that the resulted `xml` file is a standard `GatingML2.0` file with some additional `custom_info` added so that it can be recognized by `Cytobank`. Here is the example gate plot from `Cytobank` after the gatingML is imported.
 ![Gates in Cytobank](cytobank.png)
@@ -81,7 +81,7 @@ Note that the resulted `xml` file is a standard `GatingML2.0` file with some add
 ## Export to FlowJo 
 ```{r}
 outFile <- tempfile(fileext = ".wsp")
-GatingSet2flowJo(gs, outFile)
+gatingset_to_flowjo(gs, outFile)
 ```
 The resutled `wsp` file is a `XML`-based `flowJo` workspace and can be loaded into `flowJo`(V10) along with orginal FCS files.Here is the gate plots from `flowJo` after it is imported.
 ![Gates in flowJo](flowJo.png)

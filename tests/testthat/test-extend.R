@@ -1,3 +1,5 @@
+context("extend.polygonGate ..")
+
 chnls <- c("FSC-H","SSC-H")
 data.range <- data.frame(min = c(-1, -1), max = c(4e3, 4e3), row.names = chnls)
 sqrcut <- matrix(c(300, 50

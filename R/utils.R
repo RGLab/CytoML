@@ -21,12 +21,12 @@ compact <- function (x)
 range.GatingHierarchy <- function(..., na.rm = FALSE, type = c("instrument", "data"), raw.scale = FALSE){
   type <- match.arg(type)
   gh <- list(...)[[1]]
-  fr <- getData(gh, use.exprs = type == "data")
+  fr <- gh_pop_get_data(gh, use.exprs = type == "data")
   rng <- range(fr, type = type)
   if(raw.scale)
   {
     chnls <- names(rng)
-    translist <- getTransformations(gh, only.function = FALSE)
+    translist <- gh_get_transformations(gh, only.function = FALSE)
     for(chnl in chnls)
     {
       trans <- translist[[chnl]]
@@ -47,21 +47,21 @@ is.cytof <- function(gs){
 #common APIs related to processing comp, trans, gates
 #to prepare the GatingML output that can be shared by both cytobank and flowJo modules
 ######################################
-#' @importFrom flowWorkspace getData
+#' @importFrom flowWorkspace gh_pop_get_data
 #' @importFrom flowCore compensation identifier identifier<- compensatedParameter asinhtGml2 logicletGml2 logtGml2
 export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type = c("cytobank", "flowJo"))
 {
   type <- match.arg(type)
   #parse comp and channel names
-  comp <- getCompensationMatrices(gs[[1]])#assuming the comp is identical across samples
+  comp <- gh_get_compensations(gs[[1]])#assuming the comp is identical across samples
   if(is.null(comp)){
     #no compensation and channel names in transformation are not prefixed
-    chnls <- colnames(getData(gs))
+    chnls <- colnames(gs_pop_get_data(gs))
     prefix_chnls_orig <- chnls
   }else{
     chnls <- as.vector(parameters(comp))
     #retrieve the prefix for latter trans matching
-    cmp <- getCompensationObj(gs@pointer, sampleNames(gs)[[1]])
+    cmp <- gs_get_compensation_internal(gs@pointer, sampleNames(gs)[[1]])
     prefix <- cmp$prefix
     suffix <- cmp$suffix
     prefix_chnls_orig <- paste0(prefix, chnls, suffix)
@@ -102,7 +102,7 @@ export_comp_trans <- function(gs, flowEnv, cytobank.default.scale = FALSE, type 
 
 
   #add trans (assume it is identical across samples)
-  trans <- getTransformations(gs[[1]], only.function = FALSE)
+  trans <- gh_get_transformations(gs[[1]], only.function = FALSE)
 
   if(length(trans) == 0)
     stop("no transformation is found in GatingSet!")
@@ -238,7 +238,7 @@ processGate <- function(gate, gml2.trans, compId, flowEnv, rescale.gate = FALSE,
     if(nMatched == 0){
 
       chnl <- gate@parameters[[i]]@parameters
-      #can't use "uncompensated" because it will cause multiple entries when paring gate back into openCyto through cytobank2GatingSet
+      #can't use "uncompensated" because it will cause multiple entries when paring gate back into openCyto through cytobank_to_gatingset
       gate@parameters[[i]] <- compensatedParameter(chnl
                                                    , spillRefId = compId #"uncompensated"
                                                    , searchEnv = flowEnv

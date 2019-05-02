@@ -1,34 +1,39 @@
 #' @include flowJoWorkspace_Methods.R 
 NULL
+#' diva_workspace class
+#' Inherited from \link{flowjo_workspace-class}
+#' @exportClass diva_workspace
+setClass("diva_workspace", contains = "flowjo_workspace")
 
-#' divaWorkspace class
-#' Inherited from \link{flowJoWorkspace-class}
-#' @exportClass divaWorkspace
-setClass("divaWorkspace", contains = "flowJoWorkspace")
-# copied from "openWorkspace" method (flowWorkspace/diva branch)
 #' open Diva xml workspace
 #'
 #' @param file xml file
 #' @param options argument passed to \link{xmlTreeParse}
 #' @param ... arguments passed to \link{xmlTreeParse}
-#' @return a \code{divaWorkspace} object
+#' @return a \code{diva_workspace} object
 #' @examples
 #' \dontrun{
 #' library(flowWorkspace)
 #' library(CytoML)
-#' ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
+#' ws <- open_diva_xml(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
 #' ws
-#' getSampleGroups(ws)
-#' getSamples(ws)
-#' gs <- parseWorkspace(ws, name = 2, subset = 1)
+#' diva_get_sample_groups(ws)
+#' gs <- diva_to_gatingset(ws, name = 2, subset = 1)
 #' sampleNames(gs)
-#' getNodes(gs)
+#' gs_get_pop_paths(gs)
 #' plotGate(gs[[1]])
 #' }
-#' @export
 #' @importFrom XML xmlTreeParse xpathApply xmlGetAttr
 #' @importFrom methods new
-openDiva <- function(file,options = 0,...){
+#' @export
+#' @rdname open_diva_xml
+openDiva <- function(...){
+  .Deprecated("open_diva_xml")
+  open_diva_xml(...)
+}
+#' @export
+#' @rdname open_diva_xml
+open_diva_xml <- function(file,options = 0,...){
   #message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
   tmp<-tempfile(fileext=".xml")
   if(!file.exists(file))
@@ -45,11 +50,8 @@ openDiva <- function(file,options = 0,...){
   rootNode <- names(xmlChildren(x))
 
   ver <- xpathApply(x, paste0("/", rootNode),function(x)xmlGetAttr(x,"version"))[[1]]
-  if(rootNode == "Workspace"){
-    x<-methods::new("flowJoWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
-    x@.cache$flag <- TRUE
-  }else if(rootNode == "bdfacs"){
-    x <- methods::new("divaWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
+  if(rootNode == "bdfacs"){
+    x <- methods::new("diva_workspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
     x@.cache$flag <- TRUE
   }else
     stop("Unrecognized xml root node: ", rootNode)
@@ -57,22 +59,10 @@ openDiva <- function(file,options = 0,...){
   return(x);
 }
 
-#' @rdname divaWorkspace-class
-#' @param x divaWorkspace
-#' @importFrom methods selectMethod
+#' @rdname diva_workspace-class
 #' @export
-setMethod("getSamples","divaWorkspace",function(x){
-      methods::selectMethod("getSampleGroups","divaWorkspace")(x)
-    })
-
-#' @rdname divaWorkspace-class
-#' @export
-setMethod("getSampleGroups","divaWorkspace",function(x){
-      .getSampleGroupsDiva(x)
-    })
-
 #' @importFrom plyr ldply
-.getSampleGroupsDiva<-function(x){
+diva_get_sample_groups <- function(x){
     ldply(
         xpathApply(x@doc, "/bdfacs/experiment/specimen",function(specimen){
               samples <- xpathApply(specimen, "tube",function(tube){
@@ -89,6 +79,12 @@ setMethod("getSampleGroups","divaWorkspace",function(x){
 
 }
 
+#' @rdname diva_workspace-class
+#' @param x diva_workspace
+#' @importFrom methods selectMethod
+#' @export
+diva_get_samples <- diva_get_sample_groups
+
 get_global_sheets<-function(x){
   
     res <- xpathApply(x@doc, "/bdfacs/experiment/acquisition_worksheets/worksheet_template",function(t){
@@ -101,11 +97,11 @@ get_global_sheets<-function(x){
     unlist(res)
 }
 
-#' @rdname divaWorkspace-class
-#' @param object divaWorkspace
+#' @rdname diva_workspace-class
+#' @param object diva_workspace
 #' @importFrom flowWorkspace show
 #' @export
-setMethod("show",c("divaWorkspace"),function(object){
+setMethod("show",c("diva_workspace"),function(object){
       cat("Diva Workspace Version ",object@version,"\n");
       cat("File location: ",object@path,"\n");
       cat("File name: ",object@file,"\n");
@@ -113,7 +109,7 @@ setMethod("show",c("divaWorkspace"),function(object){
         cat("Workspace is open.","\n");
         cat("\nGroups in Workspace\n");
 
-        sg <- getSampleGroups(object)
+        sg <- diva_get_sample_groups(object)
 
         tbl <- data.frame(table(sg$specimen))
         colnames(tbl) <- c("specimen", "samples")
@@ -123,17 +119,18 @@ setMethod("show",c("divaWorkspace"),function(object){
       }
     })
 
-#' @rdname divaWorkspace-class
-#' @param obj divaWorkspace
+#' @rdname diva_workspace-class
+#' @param obj diva_workspace
 #' @param ... other arguments
 #' @importFrom utils menu
 #' @export
-setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
-      .preprocessorDiva(obj, ...)
+setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
+    .Deprecated("diva_to_gatingset")
+    diva_to_gatingset(obj, ...)
     })
 
 #' @importFrom flowCore colnames<-
-.preprocessorDiva<- function(obj, name = NULL
+diva_to_gatingset<- function(obj, name = NULL
                                     , subset = NULL
                                     , path = obj@path
                                     , fast = TRUE
@@ -146,7 +143,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
   worksheet <- match.arg(worksheet)
   #sample info
-  sg <- getSamples(obj)
+  sg <- diva_get_samples(obj)
 
   # filter by group name
   sg[["specimen"]] <- factor(sg[["specimen"]])
@@ -249,7 +246,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated swap_data_cols
+#' @importFrom flowWorkspace gh_pop_set_xml_count GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -588,22 +585,22 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
 
 
-            add(gh, gate, parent = parent, name = nodeName)
+			pop_add(gate, gh, parent = parent, name = nodeName)
             if(parent == "root")
               parent <- ""
             unique.path <- file.path(parent, nodeName)
             #Can't do the gating in
-            # ind <- getIndices(gh, parent)
+            # ind <- gh_pop_get_indices(gh, parent)
             # ind <- as.logic(Subset(data[ind, ], gate))
-            # updateIndices(gh, unique.path, ind)
+            # gh_pop_set_indices(gh, unique.path, ind)
             # suppressMessages(recompute(gh, unique.path))
             #save the xml counts
-            set.count.xml(gh, unique.path, count)
+            gh_pop_set_xml_count(gh, unique.path, count)
           }else{
             rootNode.xml <- nodeName
             if(rootNode.xml!="All Events")
               stop("unrecognized root node: ", rootNode.xml)
-            set.count.xml(gh, "root", count)
+            gh_pop_set_xml_count(gh, "root", count)
             next
           }
         }#end of gate adding
@@ -612,7 +609,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
 
       }
       if(execute)
-        flowWorkspace::flowData(gs) <- fs
+        flowWorkspace::gs_cyto_data(gs) <- fs
 
       gs@compensation <- complist
 
@@ -649,7 +646,7 @@ setMethod("parseWorkspace",signature("divaWorkspace"),function(obj, ...){
     gs <- suppressMessages(load_gs(gsfiles))
 
        # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
-    gslist <- suppressMessages(groupByTree(gs))
+    gslist <- suppressMessages(gs_split_by_tree(gs))
     if(length(gslist) > 1)
       warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
     gs

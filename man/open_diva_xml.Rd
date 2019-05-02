@@ -2,19 +2,22 @@
 % Please edit documentation in R/diva2GatingSet.R
 \name{openDiva}
 \alias{openDiva}
+\alias{open_diva_xml}
 \title{open Diva xml workspace}
 \usage{
-openDiva(file, options = 0, ...)
+openDiva(...)
+
+open_diva_xml(file, options = 0, ...)
 }
 \arguments{
+\item{...}{arguments passed to \link{xmlTreeParse}}
+
 \item{file}{xml file}
 
 \item{options}{argument passed to \link{xmlTreeParse}}
-
-\item{...}{arguments passed to \link{xmlTreeParse}}
 }
 \value{
-a \code{divaWorkspace} object
+a \code{diva_workspace} object
 }
 \description{
 open Diva xml workspace
@@ -23,13 +26,12 @@ open Diva xml workspace
 \dontrun{
 library(flowWorkspace)
 library(CytoML)
-ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
+ws <- open_diva_xml(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
 ws
-getSampleGroups(ws)
-getSamples(ws)
-gs <- parseWorkspace(ws, name = 2, subset = 1)
+diva_get_sample_groups(ws)
+gs <- diva_to_gatingset(ws, name = 2, subset = 1)
 sampleNames(gs)
-getNodes(gs)
+gs_get_pop_paths(gs)
 plotGate(gs[[1]])
 }
 }

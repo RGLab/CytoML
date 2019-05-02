@@ -139,7 +139,7 @@
   gs <- compensate(gs, complist)
 
   message("computing data range")
-  data.ranges <- sapply(sampleNames(gs), function(sn)range(getData(gs[[sn]]), "data"), simplify = FALSE)
+  data.ranges <- sapply(sampleNames(gs), function(sn)range(gh_pop_get_data(gs[[sn]]), "data"), simplify = FALSE)
 
   message(paste("transforming ..."))
   gs <- transform(gs, translist)
@@ -288,18 +288,18 @@
 
 
 
-        add(gh, gate, parent = parent, name = nodeName)
+        pop_add(gate, gh, parent = parent, name = nodeName)
         if(parent == "root")
           parent <- ""
         unique.path <- file.path(parent, nodeName)
         suppressMessages(recompute(gh, unique.path))
         #save the xml counts
-        set.count.xml(gh, unique.path, count)
+        gh_pop_set_xml_count(gh, unique.path, count)
       }else{
         rootNode.xml <- nodeName
         if(rootNode.xml!="All Events")
           stop("unrecognized root node: ", rootNode.xml)
-        set.count.xml(gh, "root", count)
+        gh_pop_set_xml_count(gh, "root", count)
         next
       }
 
@@ -321,7 +321,7 @@
   #thus should be handled differently(more efficiently) from the regular gslist
 
   #    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
-  gslist <- suppressMessages(groupByTree(gs))
+  gslist <- suppressMessages(gs_split_by_tree(gs))
   if(length(gslist) > 1)
     warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
   #    if(length(gslist) == 1){

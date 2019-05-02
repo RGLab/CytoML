@@ -7,7 +7,6 @@
 #'
 #' @importClassesFrom graph graphNEL graphBase graph
 #' @importClassesFrom Biobase AssayData
-#' @export
 setClass("graphGML", contains = "graphNEL")
 
 #' Parser for gatingML exported by Cytobank
@@ -17,7 +16,6 @@ setClass("graphGML", contains = "graphNEL")
 #'
 #' @param file Gating-ML XML file
 #' @param ... additional arguments passed to the handlers of 'xmlTreeParse'
-#' @export
 #' @importFrom flowUtils read.gatingML
 #' @importFrom flowCore parameters parameters<-
 #' @importFrom methods is

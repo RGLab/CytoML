@@ -13,7 +13,7 @@ test_that("autogating--tcell", {
   gs <- compensate(gs, comp)
 
   #transform
-  trans <- flowJo_biexp_trans()
+  trans <- flowjo_biexp_trans()
   trans <- transformerList(chnls, trans)
   gs <- transform(gs, trans)
 
@@ -116,7 +116,7 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   data(GvHD)
   fs<-GvHD[1:3]
   gs <- GatingSet(fs)
-  biexpTrans <- flowJo_biexp_trans(channelRange=4096, maxValue=262144, pos=4.5,neg=0, widthBasis=-10)
+  biexpTrans <- flowjo_biexp_trans(channelRange=4096, maxValue=262144, pos=4.5,neg=0, widthBasis=-10)
   transList <- transformerList(colnames(fs[[1]])[3:6], biexpTrans)
   gs<-transform(gs,transList)
   fs_trans<- gs_pop_get_data(gs)

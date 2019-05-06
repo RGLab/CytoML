@@ -1,3 +1,12 @@
+# This file was copied from the flowUtils package on 5/6/2019.
+# This represents the work of Josef Spidlen and the other flowUtils 
+# authors who are also accordingly credited in the authors list for CytoML.
+# 
+# Details:
+# https://github.com/jspidlen/flowUtils/
+# GitHub version: 1.35.8
+# Bioconductor version: 1.49.0
+
 #############################################
 ## Code related to writing Gating-ML files ##
 #############################################

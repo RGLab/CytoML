@@ -41,7 +41,7 @@ comp <- compensation(comp)
 gs <- compensate(gs, comp)
 
 #transform
-trans <- flowJo_biexp_trans()
+trans <- flowjo_biexp_trans()
 trans <- transformerList(chnls, trans)
 gs <- transform(gs, trans)
 ```

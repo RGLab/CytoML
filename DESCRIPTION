@@ -3,7 +3,7 @@ Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
 Version: 1.11.1
 Date: 2016-04-15
-Author: Mike Jiang
+Author: Mike Jiang, J. Spidlen., N. Gopalakrishnan, F. Hahne, B. Ellis, R. Gentleman, M. Dalphin, N. Le Meur, B. Purcell
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
 Description: Uses platform-specific implemenations of the GatingML2.0 standard 
     to exchange gated cytometry data with other software platforms.
@@ -15,7 +15,6 @@ Imports:
     openCyto (>= 1.11.3),
     XML,
     data.table,
-    flowUtils (>= 1.35.7),
     jsonlite,
     RBGL,
     ncdfFlow,
@@ -32,7 +31,10 @@ Imports:
     methods,
     ggcyto (>= 1.11.4),
     yaml,
-    lattice
+    lattice,
+    stats,
+    corpcor,
+    RUnit
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 1.3.7), cytolib(>= 1.3.3), RcppParallel
 Suggests:
@@ -45,18 +47,26 @@ RoxygenNote: 6.1.1
 BugReports: https://github.com/RGLab/CytoML/issues
 URL: https://github.com/RGLab/CytoML
 Collate: 
+    'AllClasses.R'
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
     'RcppExports.R'
+    'gate-methods.R'
+    'compensation.R'
     'cytobank2GatingSet.R'
     'cytobankExperiment.R'
     'flowJoWorkspace_Methods.R'
     'diva2GatingSet.R'
     'flowUtils_functions.R'
+    'gatingML.R'
     'read.gatingML.cytobank.R'
     'graphGML_methods.R'
+    'helperFunctions.R'
+    'parameter-methods.R'
     'parseDivaWorkspace_old.R'
+    'transforms.R'
     'utils.R'
+    'writeGatingML.R'
     'zzz.R'
 SystemRequirements: xml2, GNU make, C++11    
 Encoding: UTF-8

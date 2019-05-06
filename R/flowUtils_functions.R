@@ -81,12 +81,12 @@ smartTreeParse <- function (file, ...)
 {	
   
   mdef <- xmlSApply(xmlTreeParse(system.file("defaults.xml",
-                                             package="flowUtils"),
+                                             package="CytoML"),
                                  addAttributeNamespaces=TRUE)[["doc"]][[1]][["macdefaults"]],
                     function(x)
                       if(!is(x, "XMLCommentNode")) as.list(xmlAttrs(x)))
   wdef <- xmlSApply(xmlTreeParse(system.file("defaults.xml",
-                                             package="flowUtils"),
+                                             package="CytoML"),
                                  addAttributeNamespaces=TRUE)[["doc"]][[1]][["windefaults"]],
                     function(x)
                       if(!is(x, "XMLCommentNode")) as.list(xmlAttrs(x)))

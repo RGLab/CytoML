@@ -17,7 +17,7 @@ The gate and population name are stored in nodeData of each node.
 Compensation and transformations are stored in graphData.
 }
 \description{
-The Default parser (flowUtils::read.gatingML) does not  parse the population tree as well as
+The Default parser (read.gatingML) does not  parse the population tree as well as
 the custom information from cytobank. (e.g. gate name, fcs filename).
 }
 \examples{

@@ -11,12 +11,11 @@ setClass("graphGML", contains = "graphNEL")
 
 #' Parser for gatingML exported by Cytobank
 #'
-#' The Default parser (flowUtils::read.gatingML) does not  parse the population tree as well as
+#' The Default parser (read.gatingML) does not  parse the population tree as well as
 #' the custom information from cytobank. (e.g. gate name, fcs filename).
 #'
 #' @param file Gating-ML XML file
 #' @param ... additional arguments passed to the handlers of 'xmlTreeParse'
-#' @importFrom flowUtils read.gatingML
 #' @importFrom flowCore parameters parameters<-
 #' @importFrom methods is
 #' @return a graphGML that represents the population tree.

@@ -129,6 +129,7 @@ setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
     diva_to_gatingset(obj, ...)
     })
 
+#' @export
 #' @importFrom flowCore colnames<-
 diva_to_gatingset<- function(obj, name = NULL
                                     , subset = NULL

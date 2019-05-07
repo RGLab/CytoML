@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
-Version: 1.12.0
+Version: 1.12.1
 Date: 2016-04-15
 Author: Mike Jiang, J. Spidlen., N. Gopalakrishnan, F. Hahne, B. Ellis, R. Gentleman, M. Dalphin, N. Le Meur, B. Purcell
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>

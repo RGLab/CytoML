@@ -7,6 +7,7 @@
 \alias{diva_get_samples}
 \alias{show,diva_workspace-method}
 \alias{parseWorkspace,diva_workspace-method}
+\alias{diva_to_gatingset}
 \title{diva_workspace class
 Inherited from \link{flowjo_workspace-class}}
 \usage{
@@ -17,6 +18,11 @@ diva_get_samples(x)
 \S4method{show}{diva_workspace}(object)
 
 \S4method{parseWorkspace}{diva_workspace}(obj, ...)
+
+diva_to_gatingset(obj, name = NULL, subset = NULL, path = obj@path,
+  fast = TRUE, worksheet = c("normal", "global"),
+  swap_cols = list(`FSC-H` = "FSC-W", `SSC-H` = "SSC-W"),
+  verbose = FALSE, ...)
 }
 \arguments{
 \item{x}{diva_workspace}

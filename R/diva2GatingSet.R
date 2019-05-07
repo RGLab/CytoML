@@ -121,15 +121,16 @@ setMethod("show",c("diva_workspace"),function(object){
     })
 
 #' @rdname diva_workspace-class
-#' @param obj diva_workspace
-#' @param ... other arguments
-#' @importFrom utils menu
 #' @export
 setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
     .Deprecated("diva_to_gatingset")
     diva_to_gatingset(obj, ...)
     })
 
+#' @rdname diva_workspace-class
+#' @param obj diva_workspace
+#' @param ... other arguments
+#' @importFrom utils menu
 #' @export
 #' @importFrom flowCore colnames<-
 diva_to_gatingset<- function(obj, name = NULL

@@ -725,7 +725,7 @@ gateAttr <- function(eventsInside){
   )
 }
 
-#modified based on flowUtils:::xmlDimensionNode
+#modified based on xmlDimensionNode
 xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 {
   min <- ggcyto:::.fixInf(min)
@@ -767,7 +767,7 @@ gateNode.polygonGate <- function(gate, matInfo, ...){
           )
 }
 # gateNode.ellipsoidGate <- function(gate){
-  # flowUtils:::xmlEllipsoidGateNode(gate)
+  # xmlEllipsoidGateNode(gate)
 # }
 gateNode.rectangleGate <- function(gate, matInfo, ...){
   param <- parameters(gate)

@@ -9,7 +9,6 @@
 #' 3. Save gates and hierarchy structure to R environment
 #' 4. Write environment out to gatingML using write.GatingML()
 #'
-#' @importFrom  flowUtils write.gatingML
 #' @importFrom XML saveXML xmlTreeParse xmlRoot
 #' @importFrom utils localeToCharset packageVersion
 #' @export
@@ -54,7 +53,7 @@ gatingset_to_cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.defa
   export_gates_cytobank(gs, flowEnv, res[["trans.Gm2objs"]], res[["trans"]], res[["compId"]], showHidden = showHidden, ...)
 
   tmp <- tempfile(fileext = ".xml")#ensure correct file extension for xmlTreeParse to work
-  flowUtils::write.gatingML(flowEnv, tmp)
+  write.gatingML(flowEnv, tmp)
   tree <- xmlTreeParse(tmp, trim = FALSE)
   root <- xmlRoot(tree)
   # browser()

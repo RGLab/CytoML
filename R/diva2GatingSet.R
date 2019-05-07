@@ -113,6 +113,7 @@ setMethod("show",c("diva_workspace"),function(object){
 
         tbl <- data.frame(table(sg$specimen))
         colnames(tbl) <- c("specimen", "samples")
+        tbl <- tbl[match(unique(sg$specimen), tbl$specimen),]
         print(tbl)
       }else{
         cat("Workspace is closed.","\n")

@@ -10,6 +10,7 @@
 #' @include gate-methods.R
 NULL
 
+#' @importFrom XML names.XMLNode
 getTransformationList <- function(dimensionList, flowEnv)
 {  
     len=length(dimensionList)

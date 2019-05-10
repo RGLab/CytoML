@@ -422,7 +422,7 @@ diva_to_gatingset<- function(obj, name = NULL
         #transform data in default flowCore logicle or log10 scale
         trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
-          maxValue <- 262144#TODO:this_para[["max"]]^10
+          maxValue <- 262144#TODO:10^this_para[["max"]]
           pos <- 4.5
           r <- abs(this_para[["biexp_scale"]])
           trans <- generate_trans(maxValue, pos, r)
@@ -658,12 +658,13 @@ normalize_gate_path <- function(path){
   path <- gsub("/", "|", path)#escape /
   gsub("\\\\", "/", path)
 }
+
 #use the equation suggested by BD engineer last year
 #' @importFrom flowWorkspace logicle_trans
 generate_trans <- function(maxValue = 262144, pos = 4.5, r)
 {
   if(r == 0)
-    r <- maxValue/10^pos
+    return (logtGml2_trans())# r <- maxValue/10^pos
   w <- (pos - log10(maxValue/r))/2
   if(w < 0)
     w <- 0

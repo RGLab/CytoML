@@ -500,6 +500,11 @@ diva_to_gatingset<- function(obj, name = NULL
                 #rescale gate to data scale
                 if(scale_level=="gate")
                 {
+                  if(x_parameter_scale_value!=0)#non-log10 scale for gate
+                  {
+                    if(this_biexp[[xParam]]$name == "logtGml2")
+                      stop("Data was scaled by log10 but gate (", nodeName, ") is at biexp scale!Can't proceed the parsing")
+                  }
                   trans.gate <- generate_trans(r = x_parameter_scale_value)
                   mat[1, ] <- trans.gate$inverse(mat[1, ])
                   mat[1, ] <- x_biexp(mat[1, ])
@@ -528,6 +533,11 @@ diva_to_gatingset<- function(obj, name = NULL
                 #rescale gate to data scale
                 if(scale_level=="gate")
                 {
+                  if(y_parameter_scale_value!=0)#non-log10 scale for gate
+                  {
+                    if(this_biexp[[yParam]]$name == "logtGml2")
+                      stop("Data was scaled by log10 but gate (", nodeName, ") is at biexp scale!Can't proceed the parsing")
+                  }
                   trans.gate <- generate_trans(r = y_parameter_scale_value)
                   mat[2, ] <- trans.gate$inverse(mat[2, ])
                   mat[2, ] <- y_biexp(mat[2, ])

@@ -11,6 +11,7 @@
 NULL
 
 #' @importFrom XML names.XMLNode
+#' @importFrom flowCore unitytransform transformReference
 getTransformationList <- function(dimensionList, flowEnv)
 {  
     len=length(dimensionList)

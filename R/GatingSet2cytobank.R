@@ -43,6 +43,9 @@ GatingSet2cytobank <- function(...){
 #' @export
 #' @rdname gatingset_to_cytobank
 gatingset_to_cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE, ...){
+  #have a dry run of saveXML served as a validity check on outFile to throw error at early stage instead of the end of long process
+  suppressWarnings(saveXML(xmlNode("Workspace"), file=outFile))
+  
   #convert comp and trans as GML2 compatible format and save to env
   if(cytobank.default.scale)
     warning("With 'cytobank.default.scale' set to 'TRUE', data and gates will be re-transformed with cytobank's default scaling settings, which may affect how gates look like.")

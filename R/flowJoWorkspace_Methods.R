@@ -1,40 +1,72 @@
 #' @useDynLib CytoML,.registration = TRUE
 NULL
 
-#' Open a flowJo workspace
+#' An R representation of a flowJo workspace.
+#' 
+#' Objects can be created by calls of the form \code{new("flowjo_workspace.xml", ...)}.
 #'
-#' Open a flowJo workspace and return a \code{flowJoWorkspace} object.
-#' Close a flowJoWorkspace, destroying the internal representation of the XML document, and freeing the associated memory.
-#'
+#' @section Slots: 
+#' \describe{
+#'   \item{\code{version}:}{Object of class \code{"character"}. The version of the XML workspace. }
+#'   \item{\code{file}:}{Object of class \code{"character"}. The file name. }
+#'   \item{\code{.cache}:}{Object of class \code{"environment"}. An environment for internal use.  }
+#' 	\item{\code{path}:}{Object of class \code{"character"}. The path to the file. }
+#'   \item{\code{doc}:}{Object of class \code{"XMLInternalDocument"}. The XML document object. }
+#'   \item{\code{options}:}{Object of class \code{"integer"}. The XML parsing options passed to \code{\link{xmlTreeParse}}. }
+#'   }
+#' 
+#' @seealso 
+#'   \code{\linkS4class{GatingSet}} 
+#'   \code{\linkS4class{GatingHierarchy}}
+#' 
+#' @examples
+#'   require(flowWorkspaceData)
+#'   d<-system.file("extdata",package="flowWorkspaceData")
+#'   wsfile<-list.files(d,pattern="A2004Analysis.xml",full=TRUE)
+#'   ws <- open_flowjo_xml(wsfile);
+#'   ws
+#'   fj_ws_get_samples(ws)
+#' 
+#' @name flowjo_workspace-class
+#' @rdname flowjo_workspace-class
+#' @exportClass flowjo_workspace
+#' @aliases 
+#' show,flowjo_workspace-method
+setClass("flowjo_workspace",representation(doc="externalptr"))
+
+
+#' Open/Close a flowJo workspace
+#' 
+#' Open a flowJo workspace and return a \code{flowjo_workspace} object.
+#' Close a flowjo_workspace, destroying the internal representation of the XML document, and freeing the associated memory.
+#' 
 #' @param file Full path to the XML flowJo workspace file.
 #' @param options xml parsing options passed to \code{\link{xmlTreeParse}}. See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption for details.
 #' @param ... other arguments passed to \code{\link{xmlTreeParse}}
-#' @param workspace A \code{flowJoWorkspace}
+#' @param workspace A \code{flowjo_workspace}
 #' @details
-#' 	Open an XML flowJo workspace file and return a \code{flowJoWorkspace} object. The workspace is represented using a \code{XMLInternalDocument} object.
+#' 	Open an XML flowJo workspace file and return a \code{flowjo_workspace} object. The workspace is represented using a \code{XMLInternalDocument} object.
 #' 	Close a flowJoWorkpsace after finishing with it. This is necessary to explicitly clean up the C-based representation of the XML tree. (See the XML package).
-#' @return  a \code{flowJoWorkspace} object.
+#' @return  a \code{flowjo_workspace} object.
 #' @examples
 #' \dontrun{
 #' 	file<-"myworkspace.xml"
-#' 	ws<-openWorkspace(file);
+#' 	ws<-open_flowjo_xml(file);
 #' 	ws
 #' }
 #'
 #' @importFrom XML xmlTreeParse xmlAttrs xmlGetAttr xmlTreeParse xmlRoot xmlValue xpathApply
 #' @import flowCore ncdfFlow
-#' @importFrom flowWorkspace openWorkspace
 #' @export 
-#' @export openWorkspace
-openWorkspace.character <- function(file,options = 0, sampNloc = "keyword"){
+open_flowjo_xml <- function(file,options = 0, sampNloc = "keyword"){
   valid_values <- c("keyword", "sampleNode")
   sampNloc <- match.arg(sampNloc, valid_values)
   file <- path.expand(file)
-  new("flowJoWorkspace", doc = open_workspace(file, sample_name_location = match(sampNloc,valid_values), xmlParserOption = options))
+  new("flowjo_workspace", doc = open_workspace(file, sample_name_location = match(sampNloc,valid_values), xmlParserOption = options))
   
 }
 
-setMethod("show",c("flowJoWorkspace"),function(object){
+setMethod("show",c("flowjo_workspace"),function(object){
 #	cat("FlowJo Workspace Version ",get_version(object),"\n");
       cat("File location: ",get_xml_file_path(object@doc),"\n");
       cat("\nGroups in Workspace\n");
@@ -44,15 +76,20 @@ setMethod("show",c("flowJoWorkspace"),function(object){
       print(data.frame(Name=rownames(tbl),"Num.Samples"=diag(tbl)))
       
     })
-
 #' @export
-parseWorkspace <- function (x, ...) {
-	UseMethod("parseWorkspace")
-}
+setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
+
+#' @importFrom flowWorkspace openWorkspace
+setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
+			.Deprecated("flowjo_to_gatingset")
+			flowjo_to_gatingset(obj, ...)
+			
+		})
+
 #' Parse a flowJo Workspace
 #' 
 #' Function to parse a flowJo Workspace, generate a \code{GatingHierarchy} or \code{GatingSet} object, and associated flowCore gates. The data are not loaded or acted upon until an explicit call to \code{recompute()} is made on the \code{GatingHierarchy} objects in the \code{GatingSet}.
-#' @param obj A \code{flowJoWorkspace} to be parsed.
+#' @param obj A \code{flowjo_workspace} to be parsed.
 #' @param ...
 #'      \itemize{
 #'      	\item name \code{numeric} or \code{character}. The name or index of the group of samples to be imported. If \code{NULL}, the groups are printed to the screen and one can be selected interactively. Usually, multiple groups are defined in the flowJo workspace file.
@@ -87,46 +124,46 @@ parseWorkspace <- function (x, ...) {
 #'      	\item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
 #'      	}
 #' @details
-#' A flowJoWorkspace is generated with a call to \code{openWorkspace()}, passing the name of the xml workspace file. This returns a \code{flowJoWorkspace}, which can be parsed using the \code{parseWorkspace()} method. The function can be called non-interactively by passing the index or name of the group of samples to be imported via \code{parseWorkspace(obj,name=x)}, where \code{x} is either the numeric index, or the name. 
+#' A flowjo_workspace is generated with a call to \code{open_flowjo_xml()}, passing the name of the xml workspace file. This returns a \code{flowjo_workspace}, which can be parsed using the \code{flowjo_to_gatingset()} method. The function can be called non-interactively by passing the index or name of the group of samples to be imported via \code{flowjo_to_gatingset(obj,name=x)}, where \code{x} is either the numeric index, or the name. 
 #' The \code{subset} argument allows one to select a set of files from the chosen sample group. The routine will take the intersection of the files in the sample group, the files specified in \code{subset} and the files available on disk, and import them. 
 #' @return 
 #'  a \code{GatingSet}, which is a wrapper around a list of \code{GatingHierarchy} objects, each representing a single sample in the workspace. The \code{GatingHierarchy} objects contain \code{graphNEL} trees that  represent the gating hierarchy of each sample. Each node in the \code{GatingHierarchy} has associated data, including the population counts from flowJo, the parent population counts, the \code{flowCore} gates generated from the flowJo workspace gate definitions. Data are not yet loaded or acted upon at this stage. To execute the gating of each data file, a call to \code{execute()} must be made on each \code{GatingHierarchy} object in the \code{GatingSet}. This is done automatically by default, and there is no more reason to set this argument to FALSE. 
-#' @seealso \code{\link{getSampleGroups}},\code{\link{GatingSet}}
+#' @seealso \code{\link{fj_ws_get_sample_groups}},\code{\link{GatingSet}}
 #' @examples
 #' \dontrun{
 #' 	 #f is a xml file name of a flowJo workspace
-#' 	ws <- openWorkspace(f)
+#' 	ws <- open_flowjo_xml(f)
 #'  #parse the second group
-#' 	gs <- parseWorkspace(ws, name = 2); #assume that the fcs files are under the same folder as workspace
+#' 	gs <- flowjo_to_gatingset(ws, name = 2); #assume that the fcs files are under the same folder as workspace
 #' 
 #'  
-#'  gs <- parseWorkspace(ws, name = 4
+#'  gs <- flowjo_to_gatingset(ws, name = 4
 #'                         , path = dataDir     #specify the FCS path 
 #'                         , subset = "CytoTrol_CytoTrol_1.fcs")     #subset the parsing by FCS filename
 #' 
 #'  
 #' 
-#'  gs <- parseWorkspace(ws, path = dataDir, name = 4
+#'  gs <- flowjo_to_gatingset(ws, path = dataDir, name = 4
 #'                          , keywords = c("PATIENT ID", "SAMPLE ID", "$TOT", "EXPERIMENT NAME") #tell the parser to extract keywords as pData
 #'                          , keywords.source = "XML" # keywords are extracted from xml workspace (alternatively can be set to "FCS")
 #'                          , additional.keys = c("PATIENT ID") #use additional keywords together with FCS filename to uniquely identify samples
 #'                          , execute = F) # parse workspace without the actual gating (can save time if just want to get the info from xml)
 #' 
 #' #subset by pData (extracted from keywords)
-#' gs <- parseWorkspace(ws, path = dataDir, name = 4
+#' gs <- flowjo_to_gatingset(ws, path = dataDir, name = 4
 #'                          , subset = `TUBE NAME` %in% c("CytoTrol_1", "CytoTrol_2")
 #'                          , keywords = "TUBE NAME")
 #' 
 #' 
 #' #overide the default compensation defined in xml with the customized compenstations
-#' gs <- parseWorkspace(ws, name = 2, compensation = comps); #comp is either a compensation object or a list of compensation objects
+#' gs <- flowjo_to_gatingset(ws, name = 2, compensation = comps); #comp is either a compensation object or a list of compensation objects
 #' }
-#' @aliases parseWorkspace
-#' @rdname parseWorkspace
+#' @aliases flowjo_to_gatingset
+#' @rdname flowjo_to_gatingset
 #' @export 
 #' @importFrom utils menu
 #' @importFrom RcppParallel RcppParallelLibs
-parseWorkspace.flowJoWorkspace <- function(ws, name = NULL
+flowjo_to_gatingset <- function(ws, name = NULL
     , subset = list()
     , execute = TRUE
     , path = ""
@@ -171,7 +208,7 @@ parseWorkspace.flowJoWorkspace <- function(ws, name = NULL
   if(is(subset, "numeric"))#convert numeric index to sample names
   {
     subset <- as.character(getSamples(ws, groupInd)[subset, "name"])
-  }
+ }
   
   if(is(subset, "character"))
   {
@@ -235,11 +272,6 @@ parseWorkspace.flowJoWorkspace <- function(ws, name = NULL
   gs
 }
 
-#' @export
-parseWorkspace.default <- function(ws, ...){
-  stop("Workspace object passed to parseWorkspace is of unsupported type")
-}
-
 
 check_comp <- function(compensation){
 	if(is(compensation, "compensation")){
@@ -253,62 +285,59 @@ check_comp <- function(compensation){
 }
 
 
-
-
 #' Get Keywords
 #'
 #' Retrieve keywords associated with a workspace
 #'
-#' @param obj A \code{flowJoWorkspace}
+#' @param obj A \code{flowjo_workspace}
 #' @param y c\code{character} or \code{numeric} specifying the sample name or sample ID
 #' @param ... other arguments
 #'      sampNloc a \code{character} the location where the sample name is specified. See \code{parseWorkspace} for more details.
 #'
 #' @details
-#'   Retrieve a list of keywords from a \code{flowJoWorkspace}
+#'   Retrieve a list of keywords from a \code{flowjo_workspace}
 #' @return A list of keyword - value pairs.
 #' @examples
 #'
 #'   d<-system.file("extdata",package="flowWorkspaceData")
 #'   wsfile<-list.files(d,pattern="manual.xml",full=TRUE)
-#'   ws <- openWorkspace(wsfile);
+#'   ws <- flowjo_to_gatingset(wsfile);
 #'
 #'   getSamples(ws)
-#'   res <- try(getKeywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
+#'   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
 #'   print(res[[1]])
-#'   getKeywords(ws, 1)
-#' @aliases getKeywords
-#' @rdname getKeywords
+#'   fj_ws_get_keywords(ws, 1)
 #' @export
-#' @export
-setGeneric("getKeywords",function(obj,y, ...)standardGeneric("getKeywords"))
-
-setMethod("getKeywords",c("flowJoWorkspace","character"),function(obj,y, ...){
-      if(length(y) > 1)
+fj_ws_get_keywords <- function(obj,y, ...){
+	if(length(y) > 1)
         stop("getKeywords can only work with one sample at a time!")
       as.list(get_keywords_by_name(obj@doc, y))
-    })
-#' @rdname getKeywords
-#' @export
-setMethod("getKeywords",c("flowJoWorkspace","numeric"),function(obj,y, ...){
-      if(length(y) > 1)
-        stop("getKeywords can only work with one sample at a time!")
-      as.list(get_keywords_by_id(obj@doc, y))
-    })
+    }
 
 
-#' @export
-getSamples <- function (x, ...) {
-	UseMethod("getSamples")
-}
+#'   ws <- open_flowjo_xml(wsfile);
+#'   
+#'   fj_ws_get_samples(ws)
+#'   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
+#'   print(res[[1]])
+#'   fj_ws_get_keywords(ws, 1)
+#' @aliases fj_ws_get_keywords
+#' @rdname fj_ws_get_keywords
+#' @export 
+getKeywords <- function(...){
+  .Deprecated("fj_ws_get_keywords")
+  fj_ws_get_keywords(...)
+  }
+
+
 #' Get a list of samples from a flowJo workspace
 #'
 #' Return  a data frame of samples contained in a flowJo workspace
-#' @param x A \code{flowJoWorkspace}
+#' @param x A \code{flowjo_workspace}
 #' @param group_id \code{integer} specifies the group from which samples are returned
 #' @details
 #' The samples with 0 populations are excluded.
-#' Returns a \code{data.frame} of samples in the \code{flowJoWorkspace}, including their
+#' Returns a \code{data.frame} of samples in the \code{flowjo_workspace}, including their
 #' \code{sampleID}, \code{name}
 #'
 #' @return
@@ -316,13 +345,11 @@ getSamples <- function (x, ...) {
 #'
 #' @examples
 #'       \dontrun{
-#'         #ws is a flowJoWorkspace
-#'         getSamples(ws);
+#'         #ws is a flowjo_workspace
+#'         fj_ws_get_samples(ws);
 #'       }
-#' @aliases getSamples
-#' @rdname getSamples
 #' @export
-getSamples.flowJoWorkspace <- function(x, group_id = NULL)
+fj_ws_get_samples <- function(x, group_id = NULL)
 {
   res <- get_samples(x@doc)
   if(!is.null(group_id))
@@ -332,31 +359,29 @@ getSamples.flowJoWorkspace <- function(x, group_id = NULL)
   res <- do.call(rbind, res)
   unique(res)
 }
-
-#' @export
-getSampleGroups <- function (x, ...) {
-	UseMethod("getSampleGroups")
-}
+#' @export  
+getSamples <- function(...){
+  .Deprecated("fj_ws_get_samples")
+  fj_ws_get_samples(...)
+  }
 #' Get a table of sample groups from a flowJo workspace
 #'
 #'   Return a data frame of sample group information from a flowJo workspace
-#' @param x A \code{flowJoWorkspace} object.
+#' @param x A \code{flowjo_workspace} object.
 #' @details 
 #' Note that the samples with 0 populations are also included (since count populations requires traversing xml for all samples thus can be expensive)
 #' Returns a table of samples and groups defined in the flowJo workspace
 #' @return
 #'   A \code{data.frame} containing the \code{groupName}, \code{groupID}, and \code{sampleID} for each sample in the workspace. Each sample may be associated with multiple groups.
-#' @seealso \code{\link{flowJoWorkspace-class}} \code{\link{openWorkspace}}
+#' @seealso \code{\link{flowjo_workspace-class}} \code{\link{flowjo_to_gatingset}}
 #'
 #' @examples
 #'   \dontrun{
-#'     #ws is a flowJoWorkspace
-#'     getSampleGroups(ws);
+#'     #ws is a flowjo_workspace
+#'     fj_ws_get_sample_groups(ws);
 #'   }
-#' @aliases getSampleGroups
-#' @rdname getSampleGroups
 #' @export
-getSampleGroups.flowJoWorkspace <- function(x){
+fj_ws_get_sample_groups <- function(x){
   res <- get_sample_groups(x@doc)
   df <- mapply(res[["groupName"]], res[["groupID"]], res[["sampleID"]]
                , FUN = function(x, y, z){
@@ -366,6 +391,14 @@ getSampleGroups.flowJoWorkspace <- function(x){
   colnames(df) <-  c("groupName", "groupID", "sampleID")
   df
 }
+#' @aliases fj_ws_get_sample_groups
+#' @rdname fj_ws_get_sample_groups
+#' @export 
+getSampleGroups <- function(...){
+  .Deprecated("fj_ws_get_sample_groups")
+  fj_ws_get_sample_groups(...)
+}
+
 
 
 

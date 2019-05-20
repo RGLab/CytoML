@@ -5,11 +5,10 @@
 #'
 #' The process can be divided into four steps:
 #' 1. Read in gate geometry, compensation and transformation from gatingSet
-#' 2. Rescale gate boundaries with flowJoTrans() so gates can be displayed properly in Cytobank
+#' 2. Rescale gate boundaries with flowjo_biexp() so gates can be displayed properly in Cytobank
 #' 3. Save gates and hierarchy structure to R environment
 #' 4. Write environment out to gatingML using write.GatingML()
 #'
-#' @importFrom  flowUtils write.gatingML
 #' @importFrom XML saveXML xmlTreeParse xmlRoot
 #' @importFrom utils localeToCharset packageVersion
 #' @export
@@ -30,15 +29,23 @@
 #' dataDir <- system.file("extdata",package="flowWorkspaceData")
 #' gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 #'
-#' Rm("CD8", gs)
+#' gs_pop_remove(gs, "CD8")
 #'
 #' #output to cytobank
 #' outFile <- tempfile(fileext = ".xml")
-#' GatingSet2cytobank(gs, outFile) #type by default is 'cytobank'
+#' gatingset_to_cytobank(gs, outFile) #type by default is 'cytobank'
 #'
-#'
-GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE, ...){
-
+#' @rdname gatingset_to_cytobank
+GatingSet2cytobank <- function(...){
+  .Deprecated("gatingset_to_cytobank")
+  gatingset_to_cytobank(...)
+}
+#' @export
+#' @rdname gatingset_to_cytobank
+gatingset_to_cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE, ...){
+  #have a dry run of saveXML served as a validity check on outFile to throw error at early stage instead of the end of long process
+  suppressWarnings(saveXML(xmlNode("Workspace"), file=outFile))
+  
   #convert comp and trans as GML2 compatible format and save to env
   if(cytobank.default.scale)
     warning("With 'cytobank.default.scale' set to 'TRUE', data and gates will be re-transformed with cytobank's default scaling settings, which may affect how gates look like.")
@@ -49,7 +56,7 @@ GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default
   export_gates_cytobank(gs, flowEnv, res[["trans.Gm2objs"]], res[["trans"]], res[["compId"]], showHidden = showHidden, ...)
 
   tmp <- tempfile(fileext = ".xml")#ensure correct file extension for xmlTreeParse to work
-  flowUtils::write.gatingML(flowEnv, tmp)
+  write.gatingML(flowEnv, tmp)
   tree <- xmlTreeParse(tmp, trim = FALSE)
   root <- xmlRoot(tree)
   # browser()
@@ -65,11 +72,11 @@ GatingSet2cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default
 export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, showHidden, rescale.gate = TRUE)
 {
   #add gates and pops(as GateSets)
-  nodePaths <- getNodes(gs, showHidden = showHidden)[-1]
+  nodePaths <- gs_get_pop_paths(gs, showHidden = showHidden)[-1]
   gh <- gs[[1]]
 
   fcs_guids <- sampleNames(gs)
-  rng <- range(getData(gh, use.exprs = FALSE))
+  rng <- range(gh_pop_get_data(gh, use.exprs = FALSE))
   grp.list <- sapply(fcs_guids, function(sn){
     grps <- ggcyto:::merge.quad.gates(gs[[sn]], nodePaths)
     #unlist the grp so that the gates that can't be merged to quadgates
@@ -108,7 +115,7 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       isQuad <- FALSE
       nodePath <- gate.obj
       # gate_id <- nodePath
-      gates <- getGate(gs, nodePath)
+      gates <- gs_pop_get_gate(gs, nodePath)
       # gate_id <- gate_id + 1#increment gate id
 
     }
@@ -123,14 +130,14 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
       #we have to create inverse gate on our end
       if(!isQuad)
       {
-        if(isNegated(gs[fcs_guid][[1]], nodePath))
+        if(gh_pop_is_negated(gs[fcs_guid][[1]], nodePath))
           gate <- inverse(gate, rng)
       }
       #transform to raw scale
       #and attach comp and trans reference to parameters
       gate <- processGate(gate, trans.Gm2objs, compId, flowEnv, rescale.gate, trans)
 
-      # parent <- getParent(gs, nodePath)
+      # parent <- gs_pop_get_parent(gs, nodePath)
       # if(parent == "root")
       #   parent_id <- 0
       # else
@@ -187,7 +194,7 @@ addGateSets <- function(root, gs, showHidden, guid_mapping)
                       names(gate_id_path) <- curNode
                       # browser()
                       repeat{
-                        curNode <- getParent(gs, curNode)
+                        curNode <- gs_pop_get_parent(gs, curNode)
                         if(curNode == "root")
                           break
                         else{
@@ -237,22 +244,22 @@ GateSetNode <- function(gate_id, pop_name, gate_id_path, guid_mapping){
 }
 
 #' add customInfo nodes to each gate node and add BooleanAndGates
-#' @inheritParams GatingSet2cytobank
+#' @inheritParams gatingset_to_cytobank
 #' @param root the root node of the XML
 #' @param flowEnv the environment that stores the information parsed by 'read.GatingML'.
 #' @importFrom  XML xmlAttrs getNodeSet addChildren xmlAttrs<-
-#' @importFrom flowWorkspace pData getCompensationObj
+#' @importFrom flowWorkspace pData gs_get_compensation_internal
 #' @return XML root node
 addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden){
   quad.pattern.cytobank <- c("++", "-+", "--","+-")
   pd <- pData(gs)
   # fcs_names <- pd[["name"]]
   fcs_guids <- rownames(pd)
-  translist <- getTransformations(gs[[1]], only.function = FALSE)
+  translist <- gh_get_transformations(gs[[1]], only.function = FALSE)
   transNames <- names(translist)
   rng <- range(gs[[1]], raw.scale = TRUE)
   #retrieve the prefix for latter trans matching
-  cmp <- getCompensationObj(gs@pointer, sampleNames(gs)[[1]])
+  cmp <- gs_get_compensation_internal(gs@pointer, sampleNames(gs)[[1]])
   prefix <- cmp$prefix
   suffix <- cmp$suffix
   id <- 0 # id for each local gate instances (i.e. one gate_id vs multiple ids representing tailored gates)

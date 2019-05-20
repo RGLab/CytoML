@@ -7,27 +7,26 @@
 #'
 #' @importClassesFrom graph graphNEL graphBase graph
 #' @importClassesFrom Biobase AssayData
-#' @export
 setClass("graphGML", contains = "graphNEL")
 
 #' Parser for gatingML exported by Cytobank
 #'
-#' The Default parser (flowUtils::read.gatingML) does not  parse the population tree as well as
+#' The Default parser (read.gatingML) does not  parse the population tree as well as
 #' the custom information from cytobank. (e.g. gate name, fcs filename).
 #'
 #' @param file Gating-ML XML file
 #' @param ... additional arguments passed to the handlers of 'xmlTreeParse'
-#' @export
-#' @importFrom flowUtils read.gatingML
 #' @importFrom flowCore parameters parameters<-
 #' @importFrom methods is
 #' @return a graphGML that represents the population tree.
 #' The gate and population name are stored in nodeData of each node.
 #' Compensation and transformations are stored in graphData.
 #' @examples
+#' \dontrun{
 #' xml <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
 #' g <- read.gatingML.cytobank(xml) #parse the population tree
 #' #plot(g) #visualize it
+#' }
 read.gatingML.cytobank <- function(file, ...){
 
   #parse all the elements:gate, GateSets, comp, trans

@@ -18,15 +18,15 @@ test_that("getKeywordsBySampleID workspace",
       thisExpectRes <- lapply(fjRes[["getkwByID_ws"]], function(kw)trimws(kw[["value"]]))
       names(thisExpectRes) <- lapply(fjRes[["getkwByID_ws"]], "[[", "name")
       
-      expect_equal(getKeywords(ws, 1), thisExpectRes)
+      expect_equal(fj_ws_get_keywords(ws, 1), thisExpectRes)
       
     })
 
-test_that("getKeywords workspace",
+test_that("fj_ws_get_keywords workspace",
     {
-      expect_error(getKeywords(ws, "CytoTrol_CytoTrol_1.fcs"), "Multiple sample nodes found")
+      expect_error(fj_ws_get_keywords(ws, "CytoTrol_CytoTrol_1.fcs"), "Multiple sample nodes found")
       thisExpectRes <- lapply(fjRes[["getkw_ws"]], trimws)
-      expect_equal(getKeywords(ws, 1), thisExpectRes)
+      expect_equal(fj_ws_get_keywords(ws, 1), thisExpectRes)
     })
 
 
@@ -46,5 +46,4 @@ test_that("getSamples&getSampleGroups workspace",
       # thisExpect <- thisExpect[-excludeIds, ]#now we getSampleGroups also include the samples with 0 populations
       expect_equivalent(thisRes, thisExpect)
     })
-
 

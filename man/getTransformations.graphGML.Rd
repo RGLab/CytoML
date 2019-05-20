@@ -4,10 +4,12 @@
 \alias{getTransformations.graphGML}
 \title{Extract transformations from graphGML object.}
 \usage{
-\method{getTransformations}{graphGML}(x)
+\method{getTransformations}{graphGML}(x, ...)
 }
 \arguments{
 \item{x}{graphGML}
+
+\item{...}{not used}
 }
 \value{
 transformerList object

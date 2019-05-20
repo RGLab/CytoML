@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+
+<defaults>
+<windefaults>
+  
+ <!--Workspace-->
+ <Workspace version="1.6" flowJoVersion="7.5b134" modDate="Tue Jun 30 15:35:27 PDT 2009" useFreqParent="1" drawRowBorders="1" drawColumnBorders="1" isTemplate="0" curGroup="All Samples" groupPaneHeight="-1" nonAutoSaveFileName="anonymous"/>
+  
+ <!--WindowPosition-->
+ <WindowPosition x="20" y="20" width="600" height="400" displayed="1" panelState="NULL"/>
+  
+ <!--TextTraits-->
+ <TextTraits font="SansSerif" size="12" name="Workspace" style="plain" color="#000000" background="#FFFFFF" just="left"/>
+  
+ <!--Columns-->
+ <Columns wsSortOrder="$BTIM" wsSortAscending="1"/>
+  
+ <!--TColumn-->
+ <TColumn name="Name" width="240"/>
+  
+ <!--Groups-->
+ <Groups/>
+  
+ <!--GroupNode-->
+ <GroupNode name="All Samples" annotation="" owningGroup="All Samples" expanded="1" sortPriority="10" count="0"/>
+  
+ <!--Group-->
+ <Group name="All Samples" foreground="#000000" fontStyle="bold" live="1" synchronized="0"/>
+  
+ <!--Criteria-->
+ <Criteria/>
+  
+ <!--SampleRefs-->
+ <SampleRefs/>
+  
+ <!--SampleRef-->
+ <SampleRef sampleID="1"/>
+  
+ <!--Graph-->
+ <Graph backColor="#FFFFFF" foreColor="#000000" smoothing="0" type="Pseudocolor" fast="1" histogramSmoothingCount="0" showOutliers="0" tint="None" xDisplayScale="" yDisplayScale="" showAxes="" drawLargeDots="0" lineWeight="Hairline" scientificNotation="1" smoothingHighResolution="1" contourHighResolution="1" showGates="1" showFreqOnPlots="1" showGateNameOnPlots="1" showMedians="0" showUncomped="0" showGrid="0" lastYAxisName="" rowCount="NULL"/>
+  
+ <!--Axis-->
+ <Axis dimension="x" name="" max="NULL"/>
+  
+ <!--SampleList-->
+ <SampleList/>
+  
+ <!--Sample-->
+ <Sample/>
+  
+ <!--DataSet-->
+ <DataSet uri="anonymous" sampleID="1" baseChannel="3.0" extraNegs="0.0" posDecades="4.5"/>
+  
+ <!--Keywords-->
+ <Keywords/>
+  
+ <!--Keyword-->
+ <Keyword name="anonymous" value="NA"/>
+  
+ <!--SampleNode-->
+ <SampleNode name="anonymous" annotation="" owningGroup="" expanded="1" sortPriority="10" count="0" sampleID="1"/>
+  
+ <!--Subpopulations-->
+ <Subpopulations/>
+  
+ <!--Population-->
+ <Population name="anonymous" annotation="" owningGroup="" expanded="1" sortPriority="10" count="0"/>
+  
+ <!--Gate-->
+ <Gate gating:id="1" xmlns:gating="dummy"/>
+  
+ <!--gating:RectangleGate-->
+ <gating:RectangleGate eventsInside="1" annoOffsetX="0" annoOffsetY="0" tint="#000000" isTinted="0" lineWeight="Hairline" isFJGate="1" xmlns:gating="dummy"/>
+  
+ <!--gating:PolygonGate-->
+ <gating:PolygonGate eventsInside="1" annoOffsetX="0" annoOffsetY="0" tint="#000000" isTinted="0" lineWeight="Hairline" isFJGate="1" xmlns:gating="dummy"/>
+  
+ <!--gating:EllipsoidGate-->
+ <gating:EllipsoidGate gating:distance="0" eventsInside="1" annoOffsetX="0" annoOffsetY="0" tint="#000000" isTinted="0" lineWeight="Hairline" isFJGate="1" xmlns:gating="dummy"/>              
+  
+ <!--gating:dimension-->
+ <gating:dimension gating:min="0" gating:max="0" xmlns:gating="dummy"/>
+  
+ <!--gating:coordinate-->
+ <gating:coordinate data-type:value="0" xmlns:gating="dummy" xmlns:data-type="dummy"/>
+  
+ <!--gating:vertex-->
+ <gating:vertex xmlns:gating="dummy"/>
+ 
+ <!--gating:foci-->
+ <gating:foci xmlns:gating="dummy"/>
+ 
+ <!--gating:vertex-->
+ <gating:edge xmlns:gating="dummy"/>
+  
+ <!--data-type:parameter-->
+ <data-type:parameter data-type:name="anonymous" xmlns:data-type="dummy"/>
+  
+ <!--TableEditor-->
+ <TableEditor title="anonymous" current="Untitled"/>
+  
+ <!--Table-->
+ <Table name="Untitled" destination="FlowJo" autoopen="0" quickclose="0" heatmaps="0"/>
+  
+ <!--FigList-->
+ <FigList/>
+  
+ <!--Iteration-->
+ <Iteration iterationType="Off" iterationValue="" discriminator="" panelSize="1" groupName=""/>
+  
+ <!--LayoutEditor-->
+ <LayoutEditor title="anonymous" current="Untitled" layoutstate="Untitled"/>
+  
+ <!--Layout-->
+ <Layout orientation="1" simpleUI="0" name="Untitled" pagescale="1.0" scale="1.0" showGrid="0" showPageBreaks="1"/>
+  
+ <!--CompensationEditor-->
+ <CompensationEditor title="anonymous"/>
+  
+ <!--DivaSettings-->
+ <DivaSettings logSideSc="0" logForwSc="0" logAllNonSc="1" logAllFluors="1" baseChannel="3.0" pulseHeight="5.0" pulseArea="5.0" autoTransform="1" numDecades="4.5" extraNegs="0.0" widthBasis="-10" pulseAccuriArea="7.0" pulseAccuriHeight="7.0" linearParameters=""/>
+</windefaults>
+
+
+
+
+
+<macdefaults>
+  <!-- Worspace -->
+  <Workspace version="2.0" flowJoVersion="8.9b6" dateSaved="Donnerstag, 30. Juli 2009" timeSaved="14:36:38 Uhr" versionList="; 8.9b6" anySampleHasAcqComp="1" curGroup="All Samples" isTemplate="0" SciBookRect="44,435,294,865" SciBookPaneSize="162"/>
+ <!--AutoCompensationScripts-->
+ <AutoCompensationScripts/>
+ <!--Axis-->
+ <Axis name="" dimemsion="1"/>
+ <!--AxisLabelText-->
+ <AxisLabelText justification="Center" macFontNumber="2001" macFontName="Arial"/>
+ <!--AxisText-->
+ <AxisText justification="Center" macFontNumber="2001" macFontName="Arial"/>
+ <!--CalibrationTables-->
+ <CalibrationTables/>
+ <!--Column-->
+ <Column name="Name" width="177" tabPosition="57" justification="Left" type="Name"/>
+ <!--Columns-->
+ <Columns groupListHeight="98" sampleListHeight="151"/>
+ <!--CompensationMatrices-->
+ <CompensationMatrices HideUnusedMatrices="0"/>
+ <!--DataSet-->
+ <DataSet locationType="MacAlias" aliasSize="414"/>
+ <!--DT_32BitKeepAsLinear-->
+ <DT_32BitKeepAsLinear/>
+ <!--Ellipse-->
+ <Ellipse name="FSC-A, SSC-A subset" bounds="104,24,174,70" editable="0" gateBitID="1" lineColor="Transparent" lineArrow="None" xAxisName="FSC-A" yAxisName="SSC-A"/>
+ <!--EventLimit-->
+ <EventLimit Type="GlobalPreferences"/>
+ <!--GateText-->
+ <GateText justification="Center" macFontNumber="2001" macFontName="Arial"/>
+ <!--Graph-->
+ <Graph type="Undefined" highResolution="1" prevGraphType="Pseudocolor" prevHighResolution="1" foreColor="Black" backColor="White"/>
+ <!--Group-->
+ <Group groupID="0" TextStyle="Bold" foreground="Black"/>
+ <!--GroupNode-->
+ <GroupNode groupID="0" hasTwistDown="0" Selected="1" name="All Samples" owningGroup="All Samples"/>
+ <!--Groups-->
+ <Groups nextGroupID="1" sortOrder="ByName"/>
+ <!--Keyword-->
+ <Keyword name="EXPERIMENT NAME"/>
+ <!--Keywords-->
+ <Keywords/>
+ <!--LayoutEditor-->
+ <LayoutEditor/>
+ <!--Parameter-->
+ <Parameter name="FSC-A" label="" bits="32" range="4096" log="0" lowValue="0" highValue="4096" decades="0" gain="0.015625"/>
+ <!--ParameterNames-->
+ <ParameterNames/>
+ <!--Polygon-->
+ <Polygon/>
+ <!--PolygonGate-->
+ <PolygonGate/>
+ <!--PolyRect-->
+ <PolyRect name="FSC-A, SSC-A subset" bounds="64,33,123,63" editable="0" selected="1" gateBitID="8" lineColor="Transparent" lineArrow="None" xAxisName="FSC-A" yAxisName="SSC-A"/>
+ <!--Population-->
+ <Population expanded="1" name="FSC-A, SSC-A subset" count="28"/>
+ <!--Preferences-->
+ <Preferences DT_UseCustomTransform="1" DT_TransformCompByDefault="1" DT_TransformAllPararameters="0" DT_32BitLogScaleTopEnd="0" DT_32BitFirstChannel="3" DT_32BitTopDecadeOffset="0" DT_32BitAreaDecades="5" DT_32BitOtherDecades="4" DT_32BitCustomDecades="4.5" DT_32BitCustomExtra="0" DT_32BitCustomWidth="-10" DT_32BitFPUseCustom="1" DT_32BitFPExtra="1" DT_32BitFPDecades="4.5" DT_32BitConvertFSToLog="0" DT_32BitConvertSSToLog="0" DT_32BitConvertFlToLog="1" DT_32BitConvertAllNonScToLog="0" DT_IgnoreFileScaling="0"/>
+ <!--Sample-->
+ <Sample eventCount="90745" sampleNumber="" sampleID="1" compensationID="-1"/>
+ <!--SampleList-->
+ <SampleList nextSampleID="1"/>
+ <!--SampleNode-->
+ <SampleNode sampleID="1" expanded="1" Selected="1" name="AD008a_AS3171.fcs" count="90745"/>
+ <!--SampleRef-->
+ <SampleRef sampleID="1"/>
+ <!--SampleRefs-->
+ <SampleRefs/>
+ <!--SciBook-->
+ <SciBook/>
+ <!--StainChannelList-->
+ <StainChannelList/>
+ <!--String-->
+ <String/>
+ <!--StringArray-->
+ <StringArray/>
+ <!--Table-->
+ <Table name="InputParameterTransform_Gain1_Offset1"/>
+ <!--TableEditor-->
+ <TableEditor/>
+ <!--text-->
+ <text/>
+ <!--Vertex-->
+ <Vertex x="32768" y="1.781759977340698e5"/>
+ <!--WindowPosition-->
+ <WindowPosition y="159" x="445" width="435" height="288"/>
+</macdefaults>
+
+</defaults>

@@ -1,40 +1,39 @@
 #' @include flowJoWorkspace_Methods.R 
 NULL
+#' diva_workspace class
+#' Inherited from \link{flowjo_workspace-class}
+#' @exportClass diva_workspace
+setClass("diva_workspace", contains = "flowjo_workspace")
 
-#' divaWorkspace class
-#' @exportClass divaWorkspace
-setClass("divaWorkspace"
-         ,representation(version="character"
-                         , file="character"
-                         , .cache="environment"
-                         , path="character"
-                         , doc="XMLInternalDocument"
-                         , options="integer")
-)
-# copied from "openWorkspace" method (flowWorkspace/diva branch)
 #' open Diva xml workspace
 #'
 #' @param file xml file
 #' @param options argument passed to \link{xmlTreeParse}
 #' @param ... arguments passed to \link{xmlTreeParse}
-#' @return a \code{divaWorkspace} object
+#' @return a \code{diva_workspace} object
 #' @examples
 #' \dontrun{
 #' library(flowWorkspace)
 #' library(CytoML)
-#' ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
+#' ws <- open_diva_xml(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
 #' ws
-#' getSampleGroups(ws)
-#' getSamples(ws)
-#' gs <- parseWorkspace(ws, name = 2, subset = 1)
+#' diva_get_sample_groups(ws)
+#' gs <- diva_to_gatingset(ws, name = 2, subset = 1)
 #' sampleNames(gs)
-#' getNodes(gs)
+#' gs_get_pop_paths(gs)
 #' plotGate(gs[[1]])
 #' }
-#' @export
 #' @importFrom XML xmlTreeParse xpathApply xmlGetAttr
 #' @importFrom methods new
-openDiva <- function(file,options = 0,...){
+#' @export
+#' @rdname open_diva_xml
+openDiva <- function(...){
+  .Deprecated("open_diva_xml")
+  open_diva_xml(...)
+}
+#' @export
+#' @rdname open_diva_xml
+open_diva_xml <- function(file,options = 0,...){
   #message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
   tmp<-tempfile(fileext=".xml")
   if(!file.exists(file))
@@ -52,7 +51,7 @@ openDiva <- function(file,options = 0,...){
 
   ver <- xpathApply(x, paste0("/", rootNode),function(x)xmlGetAttr(x,"version"))[[1]]
   if(rootNode == "bdfacs"){
-    x <- methods::new("divaWorkspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
+    x <- methods::new("diva_workspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
     x@.cache$flag <- TRUE
   }else
     stop("Unrecognized xml root node: ", rootNode)
@@ -60,22 +59,10 @@ openDiva <- function(file,options = 0,...){
   return(x);
 }
 
-#' @rdname divaWorkspace-class
-#' @param x divaWorkspace
-#' @importFrom methods selectMethod
+#' @rdname diva_workspace-class
 #' @export
-getSamples.divaWorkspace <- function(x){
-      getSampleGroups(x)
-    }
-
-#' @rdname divaWorkspace-class
-#' @export
-getSampleGroups.divaWorkspace <- function(x){
-      .getSampleGroupsDiva(x)
-    }
-
 #' @importFrom plyr ldply
-.getSampleGroupsDiva<-function(x){
+diva_get_sample_groups <- function(x){
     ldply(
         xpathApply(x@doc, "/bdfacs/experiment/specimen",function(specimen){
               samples <- xpathApply(specimen, "tube",function(tube){
@@ -92,6 +79,12 @@ getSampleGroups.divaWorkspace <- function(x){
 
 }
 
+#' @rdname diva_workspace-class
+#' @param x diva_workspace
+#' @importFrom methods selectMethod
+#' @export
+diva_get_samples <- diva_get_sample_groups
+
 get_global_sheets<-function(x){
   
     res <- xpathApply(x@doc, "/bdfacs/experiment/acquisition_worksheets/worksheet_template",function(t){
@@ -104,11 +97,11 @@ get_global_sheets<-function(x){
     unlist(res)
 }
 
-#' @rdname divaWorkspace-class
-#' @param object divaWorkspace
+#' @rdname diva_workspace-class
+#' @param object diva_workspace
 #' @importFrom flowWorkspace show
 #' @export
-setMethod("show",c("divaWorkspace"),function(object){
+setMethod("show",c("diva_workspace"),function(object){
       cat("Diva Workspace Version ",object@version,"\n");
       cat("File location: ",object@path,"\n");
       cat("File name: ",object@file,"\n");
@@ -116,27 +109,31 @@ setMethod("show",c("divaWorkspace"),function(object){
         cat("Workspace is open.","\n");
         cat("\nGroups in Workspace\n");
 
-        sg <- getSampleGroups(object)
+        sg <- diva_get_sample_groups(object)
 
         tbl <- data.frame(table(sg$specimen))
         colnames(tbl) <- c("specimen", "samples")
+        tbl <- tbl[match(unique(sg$specimen), tbl$specimen),]
         print(tbl)
       }else{
         cat("Workspace is closed.","\n")
       }
     })
 
-#' @rdname divaWorkspace-class
-#' @param obj divaWorkspace
+#' @rdname diva_workspace-class
+#' @export
+setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
+    .Deprecated("diva_to_gatingset")
+    diva_to_gatingset(obj, ...)
+    })
+
+#' @rdname diva_workspace-class
+#' @param obj diva_workspace
 #' @param ... other arguments
 #' @importFrom utils menu
 #' @export
-#' @method parseWorkspace divaWorkspace
-#' @export parseWorkspace
-parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
-
 #' @importFrom flowCore colnames<-
-.preprocessorDiva<- function(obj, name = NULL
+diva_to_gatingset<- function(obj, name = NULL
                                     , subset = NULL
                                     , path = obj@path
                                     , fast = TRUE
@@ -149,7 +146,7 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 
   worksheet <- match.arg(worksheet)
   #sample info
-  sg <- getSamples(obj)
+  sg <- diva_get_samples(obj)
 
   # filter by group name
   sg[["specimen"]] <- factor(sg[["specimen"]])
@@ -252,7 +249,7 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace set.count.xml GatingSetList save_gs load_gs groupByTree fix_channel_slash compute_timestep isHidden isNegated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5 rbind2
+#' @importFrom flowWorkspace gh_pop_set_xml_count GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5 rbind2
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -430,7 +427,7 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
         #transform data in default flowCore logicle or log10 scale
         trans <- sapply(params, function(pn){
           this_para <- biexp_para[[pn]]
-          maxValue <- 262144#TODO:this_para[["max"]]^10
+          maxValue <- 262144#TODO:10^this_para[["max"]]
           pos <- 4.5
           r <- abs(this_para[["biexp_scale"]])
           trans <- generate_trans(maxValue, pos, r)
@@ -508,6 +505,11 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
                 #rescale gate to data scale
                 if(scale_level=="gate")
                 {
+                  if(x_parameter_scale_value!=0)#non-log10 scale for gate
+                  {
+                    if(this_biexp[[xParam]]$name == "logtGml2")
+                      stop("Data was scaled by log10 but gate (", nodeName, ") is at biexp scale!Can't proceed the parsing")
+                  }
                   trans.gate <- generate_trans(r = x_parameter_scale_value)
                   mat[1, ] <- trans.gate$inverse(mat[1, ])
                   mat[1, ] <- x_biexp(mat[1, ])
@@ -536,6 +538,11 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
                 #rescale gate to data scale
                 if(scale_level=="gate")
                 {
+                  if(y_parameter_scale_value!=0)#non-log10 scale for gate
+                  {
+                    if(this_biexp[[yParam]]$name == "logtGml2")
+                      stop("Data was scaled by log10 but gate (", nodeName, ") is at biexp scale!Can't proceed the parsing")
+                  }
                   trans.gate <- generate_trans(r = y_parameter_scale_value)
                   mat[2, ] <- trans.gate$inverse(mat[2, ])
                   mat[2, ] <- y_biexp(mat[2, ])
@@ -593,22 +600,22 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
 
 
 
-            add(gh, gate, parent = parent, name = nodeName)
+			pop_add(gate, gh, parent = parent, name = nodeName)
             if(parent == "root")
               parent <- ""
             unique.path <- file.path(parent, nodeName)
             #Can't do the gating in
-            # ind <- getIndices(gh, parent)
+            # ind <- gh_pop_get_indices(gh, parent)
             # ind <- as.logic(Subset(data[ind, ], gate))
-            # updateIndices(gh, unique.path, ind)
+            # gh_pop_set_indices(gh, unique.path, ind)
             # suppressMessages(recompute(gh, unique.path))
             #save the xml counts
-            set.count.xml(gh, unique.path, count)
+            gh_pop_set_xml_count(gh, unique.path, count)
           }else{
             rootNode.xml <- nodeName
             if(rootNode.xml!="All Events")
               stop("unrecognized root node: ", rootNode.xml)
-            set.count.xml(gh, "root", count)
+            gh_pop_set_xml_count(gh, "root", count)
             next
           }
         }#end of gate adding
@@ -634,7 +641,7 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
         flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
         
       }
-      if(execute)
+     if(execute)
         suppressMessages(recompute(gs))
 
       message("done!")
@@ -666,7 +673,7 @@ parseWorkspace.divaWorkspace <- function(obj, ...){ .preprocessorDiva(obj, ...)}
     gs <- suppressMessages(load_gs(gsfiles))
 
        # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
-    gslist <- suppressMessages(groupByTree(gs))
+    gslist <- suppressMessages(gs_split_by_tree(gs))
     if(length(gslist) > 1)
       warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
     gs
@@ -678,12 +685,13 @@ normalize_gate_path <- function(path){
   path <- gsub("/", "|", path)#escape /
   gsub("\\\\", "/", path)
 }
+
 #use the equation suggested by BD engineer last year
 #' @importFrom flowWorkspace logicle_trans
 generate_trans <- function(maxValue = 262144, pos = 4.5, r)
 {
   if(r == 0)
-    r <- maxValue/10^pos
+    return (logtGml2_trans())# r <- maxValue/10^pos
   w <- (pos - log10(maxValue/r))/2
   if(w < 0)
     w <- 0

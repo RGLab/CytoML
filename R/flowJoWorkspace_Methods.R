@@ -186,7 +186,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
 {
   
   # determine the group
-  g <- getSampleGroups(ws)
+  g <- fj_ws_get_sample_groups(ws)
   groups<-levels(g$groupName)
   
   if(is.null(name)){
@@ -266,7 +266,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
   p <- do.call(parse_workspace, args)
   gs <- new("GatingSet", pointer = p)
   #    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed                
-  gslist <- suppressMessages(groupByTree(gs))
+  gslist <- suppressMessages(gs_split_by_tree(gs))
   if(length(gslist) > 1)
 	  warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
   gs

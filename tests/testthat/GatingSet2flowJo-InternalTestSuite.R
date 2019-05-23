@@ -160,13 +160,13 @@ test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean
   bf <- booleanFilter(cd4/GzB|cd4/Prf&cd4/IFNg)
   gs_pop_add(gs, bf, name = "bool6", parent = "cd4")
   recompute(gs)
+  outFile <- tempfile(fileext = ".wsp")
   expect_error(gatingset_to_flowjo(gs, outFile), "And gate and Or gate can't not be used together!")
   gs_pop_remove(gs, "bool6")
 
   autoplot(gs[[1]], gs_pop_get_children(gs[[1]], "cd4"))
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
-  outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
 
   #parse it back in

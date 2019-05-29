@@ -4,7 +4,7 @@ path <- "~/rglab/workspace/CytoML//wsTestSuite"
 
 test_that("gatingset_to_flowjo: forward slash ",{
   thisPath <- file.path(path, "slash_issue_vX")
-  gs <- load_gs(file.path(thisPath, "legacy/gs"))
+  gs <- load_gs(file.path(thisPath, "gs"))
 
   stats.orig <- gh_pop_compare_stats(gs[[1]])
   #output to flowJo
@@ -125,7 +125,7 @@ test_that("gatingset_to_flowjo: no comp + fasinh ",{
 
 test_that("gatingset_to_flowjo: no transformation",{
 
-  gs <- load_gs("~/rglab/workspace/flowWorkspace/lyoplate_out/gated_data/legacy/manual/gslist-bcell/cgRoygodqg")
+  gs <- load_gs("~/rglab/workspace/flowWorkspace/lyoplate_out/gated_data/manual/gslist-bcell/cgRoygodqg")
   stats.orig <- gh_pop_compare_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -136,7 +136,7 @@ test_that("gatingset_to_flowjo: no transformation",{
 test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean gate",{
   thisPath <- file.path(path, "gatingML/ics")
   #load the original automated gating set
-  gs <- load_gs(file.path(thisPath, "legacy/autogating"))
+  gs <- load_gs(file.path(thisPath, "autogating"))
   gt <- openCyto::gatingTemplate(file.path(thisPath, "template/gt_080.csv"))
   gt_toggle_helpergates(gt, gs) #hide the helper gates
 

@@ -311,7 +311,14 @@ check_comp <- function(compensation){
 fj_ws_get_keywords <- function(obj,y, ...){
 	if(length(y) > 1)
         stop("getKeywords can only work with one sample at a time!")
-      as.list(get_keywords_by_name(obj@doc, y))
+	if(is.character(y))
+		func <- get_keywords_by_name
+	else
+	{
+		y <- as.integer(y)
+		func <- get_keywords_by_id
+	}
+      as.list(func(obj@doc, y))
     }
 
 

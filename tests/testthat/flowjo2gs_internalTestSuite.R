@@ -70,7 +70,7 @@ test_that("skip ManuallyIncludedSamples",{
     })
 
 test_that("Handle duplicate sample names",{
-  wsFile <- file.path(path, "SDY416", "Ustekin_G26_sas_IMMPORT2.495809.xml")
+  wsFile <- file.path(path, "duplicatedSampleID", "Ustekin_G26_sas_IMMPORT2.495809.xml")
   ws <- open_flowjo_xml(wsFile)
   expect_error(flowjo_to_gatingset(ws, name = 1, subset = 429:440), "Duplicated")
   gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, subset = 429:440, additional.sampleID = TRUE))

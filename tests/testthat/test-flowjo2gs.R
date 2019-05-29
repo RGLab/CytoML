@@ -81,13 +81,13 @@ test_that("external comp", {
       expect_equal(thisStats, expectStats)
       
       #a list of comp
-      comp <- getCompensationMatrices(gs1)
+      comp <- gs_get_compensations(gs1)
       dd <- capture.output(suppressWarnings(suppressMessages(
               gs1 <- try(flowjo_to_gatingset(ws, name = 4
                       , compensation = comp
                       , execute = TRUE)))))
       expect_that(gs1, is_a("GatingSet"));
-      expect_equal(comp,  getCompensationMatrices(gs1))
+      expect_equal(comp,  gs_get_compensations(gs1))
       gh1 <- gs1[[1]]
       thisStats <- gh_pop_compare_stats(gh1)
       expect_equal(thisStats, expectStats)
@@ -98,7 +98,7 @@ test_that("external comp", {
       names(comp)[3] <- "dd"
       dd <- capture.output(suppressWarnings(suppressMessages(gs1 <- flowjo_to_gatingset(ws, name = 4, compensation = comp))))
       expect_that(gs1, is_a("GatingSet"));
-      expect_equal(comp[1:2],  getCompensationMatrices(gs1))
+      expect_equal(comp[1:2],  gs_get_compensations(gs1))
       
     })
 

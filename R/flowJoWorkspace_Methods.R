@@ -71,7 +71,7 @@ setMethod("show",c("flowjo_workspace"),function(object){
       cat("File location: ",get_xml_file_path(object@doc),"\n");
       cat("\nGroups in Workspace\n");
       
-      sg <- getSampleGroups(object)
+      sg <- fj_ws_get_sample_groups(object)
       tbl<-table(Name=sg$groupName,GroupID=sg$groupID)
       print(data.frame(Name=rownames(tbl),"Num.Samples"=diag(tbl)))
       
@@ -207,7 +207,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
     stop("invalid 'subset' argument!")
   if(is(subset, "numeric"))#convert numeric index to sample names
   {
-    subset <- as.character(getSamples(ws, groupInd)[subset, "name"])
+    subset <- as.character(fj_ws_get_samples(ws, groupInd)[subset, "name"])
  }
   
   if(is(subset, "character"))
@@ -303,7 +303,7 @@ check_comp <- function(compensation){
 #'   wsfile<-list.files(d,pattern="manual.xml",full=TRUE)
 #'   ws <- flowjo_to_gatingset(wsfile);
 #'
-#'   getSamples(ws)
+#'   fj_ws_get_samples(ws)
 #'   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
 #'   print(res[[1]])
 #'   fj_ws_get_keywords(ws, 1)

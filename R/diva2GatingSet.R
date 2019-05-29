@@ -395,11 +395,13 @@ diva_to_gatingset<- function(obj, name = NULL
 
 
         message("loading data: ",file);
-        data <- read.FCS(file, ...)[, cnd]#has to load data regardless of execute flag because data range is needed for gate extension
+        data <- read.FCS(file, ...)#has to load data regardless of execute flag because data range is needed for gate extension
       
         cols <- swap_data_cols(colnames(data), swap_cols)
         if(!all(cols==colnames(data)))
           colnames(data) <- cols
+        data <- data[, cnd]#keep it ordered the same as h5 so that it can be written successfully
+        
         message("Compensating")
         #we use the spillover from FCS keyword
         comp <- spillover(data)

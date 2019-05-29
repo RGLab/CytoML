@@ -33,7 +33,7 @@ test_that("fj_ws_get_keywords workspace",
 
 test_that("getSamples&getSampleGroups workspace",
     {
-      thisRes <- getSamples(ws)
+      thisRes <- fj_ws_get_samples(ws)
       thisExpect <- fjRes[[".getSamples"]]
       #record the rows to be removed
       excludeIds <- as.integer(rownames(subset(thisExpect, pop.counts <=0)))
@@ -41,7 +41,7 @@ test_that("getSamples&getSampleGroups workspace",
       expect_equivalent(thisRes, thisExpect)
       
       
-      thisRes <- getSampleGroups(ws)
+      thisRes <- fj_ws_get_sample_groups(ws)
       thisExpect <- fjRes[[".getSampleGroups"]]
       # thisExpect <- thisExpect[-excludeIds, ]#now we getSampleGroups also include the samples with 0 populations
       expect_equivalent(thisRes, thisExpect)

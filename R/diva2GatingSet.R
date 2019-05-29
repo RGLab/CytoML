@@ -3,7 +3,13 @@ NULL
 #' diva_workspace class
 #' Inherited from \link{flowjo_workspace-class}
 #' @exportClass diva_workspace
-setClass("diva_workspace", contains = "flowjo_workspace")
+setClass("diva_workspace" ,representation(version="character"
+                                           , file="character"
+                                           , .cache="environment"
+                                           , path="character"
+                                           , doc="XMLInternalDocument"
+                                           , options="integer")
+)
 
 #' open Diva xml workspace
 #'

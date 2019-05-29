@@ -218,7 +218,7 @@ test_that("Inverse function of flog ",{
       capture.output(gs <- flowjo_to_gatingset(ws, name=1, emptyValue=FALSE))
       
       gh <- gs[[1]]
-      thisCounts <- gh_pop_compare_stats(gs)
+      thisCounts <- gs_pop_get_count_fast(gs, path = "auto")
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       expect_equal(thisCounts, expectCounts)
     

@@ -24,6 +24,7 @@ algorithms from `openCtyo`. Here we will demontrate the latter.
 ## Automated gating
 ### Load raw FCS files into GatingSet
 ```{r}
+library(ncdfFlow)
 library(flowWorkspace)
 library(CytoML)
 dataDir <- system.file("extdata",package="flowWorkspaceData")

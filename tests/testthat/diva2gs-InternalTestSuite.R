@@ -60,7 +60,10 @@ test_that("diva--tcell ",{
   
   #parse global worksheet
   gs <- diva_to_gatingset(ws, name = 1, worksheet = "global")
-  expect_equal(gs_get_pop_paths(gs), c('root','/s','/s/s2'))
+  expect_equal(gs_get_pop_paths(gs), c('root','/s','/s/s2','/s/s2/P1','/s/s2/P2'))
+  parsedStats <- gh_pop_compare_stats(gs[[1]])
+  expect_equal(parsedStats[,openCyto.freq], c(1,.73,.757,.305,.569), tol = 2e-2)
+  
   })
 
 test_that("diva--2002-D-g001 ",{
@@ -72,6 +75,6 @@ test_that("diva--2002-D-g001 ",{
   expectRes[, openCyto.freq := openCyto.freq / 100]
   parsedStats[, openCyto.freq := round(openCyto.freq, digits = 3)]
 
-  expect_equal(parsedStats[-1,list(node, openCyto.freq)], expectRes[-1,list(node, openCyto.freq)], tol = 1.09e-3)
+  expect_equal(parsedStats[-1,list(node, openCyto.freq)], expectRes[-1,list(node, openCyto.freq)], tol = 6e-3)
 
 })

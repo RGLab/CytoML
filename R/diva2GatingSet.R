@@ -263,7 +263,7 @@ diva_to_gatingset<- function(obj, name = NULL
                                 ,worksheet = worksheet
                                 , template_sheet = "Global Sheet1"
                                 , swap_cols
-                                ,path,xmlParserOption, ws, groupName, scale_level = "gate", verbose = FALSE, num_threads = 1
+                                ,path,xmlParserOption, ws, groupName, scale_level = "tube", verbose = FALSE, num_threads = 1
                                 ,  ...){
 
   scale_level <- match.arg(scale_level, c("gate", "tube"))

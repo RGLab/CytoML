@@ -336,6 +336,7 @@ public:
 				gh->compensate(fr);
 				gh->transform_gate();
 				gh->transform_data(fr);
+				fr.scale_time_channel();
 				gh->extendGate(fr, config_const.gate_extend_trigger_value);
 				gh->gating(fr, 0,false, config_const.compute_leaf_bool_node);
 

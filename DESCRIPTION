@@ -12,7 +12,7 @@ License_restricts_use: yes
 LazyData: TRUE
 Imports:
     flowCore (>= 1.43.10),
-    flowWorkspace (>= 4.0.3),
+    flowWorkspace (>= 4.0.7),
     openCyto (>= 1.11.3),
     XML,
     data.table,
@@ -37,7 +37,7 @@ Imports:
     corpcor,
     RUnit
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
-LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.8), cytolib(>= 2.1.12),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
+LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.9), cytolib(>= 2.1.12),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),

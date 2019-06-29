@@ -4,6 +4,20 @@ path <- "~/rglab/workspace/CytoML/wsTestSuite"
 
 sink("/dev/null")
 
+test_that("derived parameters",{
+  
+  wsFile <- file.path(path, "derivedparam.wsp")
+  
+  ws <- open_flowjo_xml(wsFile)
+  # flowWorkspace::set_log_level("GatingSet")
+  gs <- flowjo_to_gatingset(ws, name = 1, execute = F)
+  # set_log_level("none")
+  
+  expect_equal(gs_get_pop_paths(gs, path = "auto")[-1], c("Lymphocytes", "CD3"))
+  
+  
+})
+
 test_that("set T value properly through PnE instead of PnR for flog transform when FCS data is log scale",{
   
   wsFile <- file.path(path, "flog_PnE/Liver.wsp")

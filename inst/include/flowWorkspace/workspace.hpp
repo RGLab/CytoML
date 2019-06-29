@@ -64,8 +64,7 @@ struct xpath{
 class workspace{
 public:
 	 xpath nodePath;
-//protected:
-
+	 unordered_set<string> derived_params;
 	 xmlDoc * doc;
 
 public:
@@ -127,16 +126,14 @@ public:
 	 	return(u);
 	 }
 
-	 unordered_set<string> get_derivedparameters(wsSampleNode sampleNode){
-		 unordered_set<string> derived;
+	 void get_derivedparameters(wsSampleNode sampleNode){
 		 xmlXPathObjectPtr res=sampleNode.xpathInNode("*/DerivedParameter");
 		 for(int i = 0; i < res->nodesetval->nodeNr; i++)
 		 {
 			 wsNode curP(res->nodesetval->nodeTab[i]);
-			 derived.insert(curP.getProperty("name"));
+			 derived_params.insert(curP.getProperty("name"));
 		 }
 		xmlXPathFreeObject(res);
-		return derived;
 	 }
 	 /*
 	  * recursively append the populations to the tree
@@ -144,7 +141,7 @@ public:
 	  * we still can add it as it is because gating path is stored as population names instead of actual VertexID.
 	  * Thus we will deal with the the boolean gate in the actual gating process
 	  */
-	 void addPopulation(populationTree &tree, VertexID parentID ,wsNode * parentNode,bool isParseGate, const unordered_set<string> & derived_params)
+	 void addPopulation(populationTree &tree, VertexID parentID ,wsNode * parentNode,bool isParseGate)
 	 {
 
 
@@ -208,7 +205,7 @@ public:
 					//update the node map for the easy query by pop name
 
 					//recursively add its descendants
-					addPopulation(tree, curChildID,&curChildNode,isParseGate, derived_params);
+					addPopulation(tree, curChildID,&curChildNode,isParseGate);
 
 	 			}
 			}
@@ -222,6 +219,9 @@ public:
 	 {
 
 	 	wsRootNode root=getRoot(curSampleNode);
+	 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			COUT<<endl<<"parsing DerivedParameters..."<<endl;
+	 	get_derivedparameters(curSampleNode);
 	 	if(isParseGate)
 	 	{
 
@@ -258,16 +258,13 @@ public:
 	 		gh = GatingHierarchy(comp, transFlag, trans);
 
 	 	}
-	 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"parsing DerivedParameters..."<<endl;
-	 	unordered_set<string> derived_params = get_derivedparameters(curSampleNode);
 
 	 	if(g_loglevel>=POPULATION_LEVEL)
 	 		COUT<<endl<<"parsing populations..."<<endl;
 
 	 	populationTree &tree = gh.getTree();
 	 	VertexID pVerID=addRoot(tree, root);
-	 	addPopulation(tree, pVerID,&root,isParseGate, derived_params);
+	 	addPopulation(tree, pVerID,&root,isParseGate);
 
 	 }
 

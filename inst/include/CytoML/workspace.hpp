@@ -57,8 +57,7 @@ struct xpath{
 class workspace{
 public:
 	 xpath nodePath;
-
-
+	 unordered_set<string> derived_params;
 	 xmlDoc * doc;
 	 wsNode doc_root;
 public:
@@ -106,16 +105,14 @@ public:
 	 }
 
 
-	 unordered_set<string> get_derivedparameters(wsSampleNode sampleNode){
-		 unordered_set<string> derived;
+	 void get_derivedparameters(wsSampleNode sampleNode){
 		 xmlXPathObjectPtr res=sampleNode.xpathInNode("*/DerivedParameter");
 		 for(int i = 0; i < res->nodesetval->nodeNr; i++)
 		 {
 			 wsNode curP(res->nodesetval->nodeTab[i]);
-			 derived.insert(curP.getProperty("name"));
+			 derived_params.insert(curP.getProperty("name"));
 		 }
 		xmlXPathFreeObject(res);
-		return derived;
 	 }
 	 /*
 	  * recursively append the populations to the tree
@@ -123,7 +120,7 @@ public:
 	  * we still can add it as it is because gating path is stored as population names instead of actual VertexID.
 	  * Thus we will deal with the the boolean gate in the actual gating process
 	  */
-	 void addPopulation(populationTree &tree, VertexID parentID ,wsNode * parentNode,bool isParseGate, const unordered_set<string> & derived_params)
+	 void addPopulation(populationTree &tree, VertexID parentID ,wsNode * parentNode,bool isParseGate)
 	 {
 
 
@@ -186,13 +183,69 @@ public:
 					boost::add_edge(parentID,curChildID,tree);
 					//update the node map for the easy query by pop name
 					//recursively add its descendants
-					addPopulation(tree, curChildID,&curChildNode,isParseGate, derived_params);
+					addPopulation(tree, curChildID,&curChildNode,isParseGate);
 
 	 			}
 			}
 
 
 	 }
+	 /*
+	  * Constructor that starts from a particular sampleNode from workspace to build a tree
+	  */
+	 void ws2gh(GatingHierarchy & gh, wsSampleNode curSampleNode,bool isParseGate,trans_global_vec * _gTrans,biexpTrans * _globalBiExpTrans,linTrans * _globalLinTrans)
+	 {
+
+	 	wsRootNode root=getRoot(curSampleNode);
+	 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			COUT<<endl<<"parsing DerivedParameters..."<<endl;
+	 	get_derivedparameters(curSampleNode);
+	 	if(isParseGate)
+	 	{
+
+	 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+	 			COUT<<endl<<"parsing compensation..."<<endl;
+	 		compensation comp=getCompensation(curSampleNode);
+
+	 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+	 			COUT<<endl<<"parsing trans flags..."<<endl;
+	 		PARAM_VEC transFlag=getTransFlag(curSampleNode);
+
+	 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+	 			COUT<<endl<<"parsing transformation..."<<endl;
+
+	 		//prefixed version
+	 		trans_local trans = getTransformation(root,comp,transFlag,_gTrans,_globalBiExpTrans,_globalLinTrans, true);
+
+	 		/*
+	 		 * unprefixed version. Both version of trans are added (sometime they are identical)
+	 		 * so that the trans defined on uncompensated channel (e.g. SSC-A) can still be valid
+	 		 * without being necessarily adding comp prefix.
+	 		 * It is mainly to patch the legacy workspace of mac or win where the implicit trans is added for channel
+	 		 * when its 'log' keyword is 1.
+	 		 * vX doesn't have this issue since trans for each parameter/channel
+	 		 * is explicitly defined in transform node.
+	 		 */
+	 		trans_local trans_raw=getTransformation(root,comp,transFlag,_gTrans,_globalBiExpTrans,_globalLinTrans, false);
+	 		//merge raw version of trans map to theprefixed version
+	 		trans_map tp = trans_raw.getTransMap();
+	 		for(trans_map::iterator it=tp.begin();it!=tp.end();it++)
+	 		{
+	 			trans.addTrans(it->first, it->second);
+	 		}
+	 		gh = GatingHierarchy(comp, transFlag, trans);
+
+	 	}
+
+	 	if(g_loglevel>=POPULATION_LEVEL)
+	 		COUT<<endl<<"parsing populations..."<<endl;
+
+	 	populationTree &tree = gh.getTree();
+	 	VertexID pVerID=addRoot(tree, root);
+	 	addPopulation(tree, pVerID,&root,isParseGate);
+
+	 }
+>>>>>>> trunk:inst/include/flowWorkspace/workspace.hpp
 
 
 	 wsSampleNode get_sample_node(string sampleID){

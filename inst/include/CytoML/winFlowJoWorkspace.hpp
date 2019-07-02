@@ -756,6 +756,12 @@ public:
 			 */
 			if(pname.empty())
 				pname="*";
+			if(derived_params.find(pname)!=derived_params.end())
+			{
+				if(g_loglevel>=GATING_SET_LEVEL)
+					COUT<<"skip parsing transformation for derived parameters:"<<pname<<endl;
+				continue;
+			}
 
 			string transType=(const char*)transNode.getNodePtr()->name;
 		    if(transType.compare("logicle")==0)

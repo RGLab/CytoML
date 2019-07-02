@@ -229,7 +229,6 @@ datasetNode <- function(gh, sampleId){
 getSpilloverMat <- function(gh){
     compobj <- gh_get_compensations(gh)
     if(!is.null(compobj)){
-      mat <- compobj@spillover
       comp <- gs_get_compensation_internal(gh@pointer,sampleNames(gh))
       cid <- comp$cid
       prefix <- comp$prefix
@@ -237,10 +236,16 @@ getSpilloverMat <- function(gh){
     }else{
       prefix <- ""
       suffix <- ""
-      mat <- NULL
     }
 
-
+  
+  if(is(compobj, "compensation")){
+    mat <- compobj@spillover
+  }else if(is(compobj, "matrix")){
+    mat <- compobj
+  }else{
+    mat <- NULL
+  }
 
   list(mat = mat, prefix = prefix,  suffix = suffix, cid = 1)
 

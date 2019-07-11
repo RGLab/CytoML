@@ -143,7 +143,7 @@ public:
 	 	}
 	 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			COUT<<endl<<"parsing DerivedParameters..."<<endl;
-	 	unordered_set<string> derived_params = get_derivedparameters(curSampleNode);
+	 	get_derivedparameters(curSampleNode);
 
 	 	if(g_loglevel>=POPULATION_LEVEL)
 	 		COUT<<endl<<"parsing populations..."<<endl;
@@ -157,7 +157,7 @@ public:
 	 	VertexID pVerID=0;
 	 	nodeProperties & np = tree[0];
 	 	to_popNode(root, np);
-	 	addPopulation(tree, pVerID,&root,is_parse_gate, derived_params);
+	 	addPopulation(tree, pVerID,&root,is_parse_gate);
 
 	 	return gh;
 

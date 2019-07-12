@@ -1,4 +1,4 @@
-Package: CytoML
+Package: cytoml2
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
 Version: 2.9.3

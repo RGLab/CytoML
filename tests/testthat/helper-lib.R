@@ -1,4 +1,5 @@
 library(XML)
+library(flowCore)
 library(flowWorkspace)
 library(openCyto)
 library(ggcyto)

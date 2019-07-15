@@ -7,6 +7,17 @@
 
 using namespace Rcpp;
 
+// graph_node
+string graph_node(vector<string> params);
+RcppExport SEXP _cytoml2_graph_node(SEXP paramsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< vector<string> >::type params(paramsSEXP);
+    rcpp_result_gen = Rcpp::wrap(graph_node(params));
+    return rcpp_result_gen;
+END_RCPP
+}
 // open_workspace
 XPtr<flowJoWorkspace> open_workspace(string filename, int sample_name_location, int xmlParserOption);
 RcppExport SEXP _cytoml2_open_workspace(SEXP filenameSEXP, SEXP sample_name_locationSEXP, SEXP xmlParserOptionSEXP) {
@@ -110,6 +121,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_cytoml2_graph_node", (DL_FUNC) &_cytoml2_graph_node, 1},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

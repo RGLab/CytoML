@@ -10,6 +10,11 @@ AC_ARG_WITH(xml2,
                            [root directory of xml2 installation (defaults to /usr/local)])],
            [XML2_DIR="${with_xml2}"],
 	   [XML2_DIR="yes"])
+AC_ARG_WITH(cytolib-ml,
+           [AS_HELP_STRING([--with-cytolib-ml=DIR],
+                           [root directory of cytolib-ml installation (defaults to /usr/local)])],
+           [CYTOLIBML_DIR="${with_cytolib-ml}"],
+	   [CYTOLIBML_DIR="yes"])
 
 
 # Checks for libraries.
@@ -65,13 +70,24 @@ else
         XML2_LIBS="-L${XML2_DIR}/lib -lxml2"
 fi
 
+AC_MSG_NOTICE([setting cytolib-ml flags...])
 
-PKG_CPPFLAGS="$XML2_CFLAGS"
+if test  "${CYTOLIBML_DIR}" = "yes" ; then
+        CYTOLIBML_CFLAGS="-I/usr/local/include/cytolib-ml"
+		CYTOLIBML_LIBS="/usr/local/lib/libcytolib-ml.a"        
+else
+        AC_MSG_NOTICE([Using cytolib-ml dir '${CYTOLIBML_DIR}'])
+
+        CYTOLIBML_CFLAGS="-I${CYTOLIBML_DIR}/include/cytolib-ml"
+        CYTOLIBML_LIBS="${CYTOLIBML_DIR}/lib/libcytolib-ml.a"
+fi
+PKG_CPPFLAGS="$XML2_CFLAGS $CYTOLIBML_CFLAGS"
+
 if grep -q "^clang" <<< "${CC}" ; then
   PKG_CPPFLAGS+=" -ftemplate-depth=900"
 fi
 
-PKG_LIBS="$XML2_LIBS"
+PKG_LIBS="$XML2_LIBS $CYTOLIBML_LIBS"
 
 # Checks for library functions.
 AC_MSG_NOTICE([Using the following compilation and linking flags])

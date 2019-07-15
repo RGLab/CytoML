@@ -470,8 +470,12 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...
                       , subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden, env.nodes = env.nodes, ...)
           )
 }
-
 graphNode <- function(param){
+  if(length(param) == 0)
+    param <- c("NULL", "NULL")#keep backward compatible for dealing with DerivedParameter
+  xmlTreeParse(graph_node(param))[[1]][[1]]
+}
+graphNode_old <- function(param){
   x <- param[1]
   if(length(param)==1)
     y <- ""

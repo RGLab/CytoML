@@ -69,5 +69,5 @@ Collate:
     'utils.R'
     'writeGatingML.R'
     'zzz.R'
-SystemRequirements: xml2, GNU make, C++11    
+SystemRequirements: cytolib-ml, xml2, GNU make, C++11    
 Encoding: UTF-8

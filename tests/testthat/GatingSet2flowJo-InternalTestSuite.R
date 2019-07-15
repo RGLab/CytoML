@@ -10,7 +10,8 @@ test_that("gatingset_to_flowjo: forward slash ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
@@ -27,7 +28,8 @@ test_that("OrNode ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -45,7 +47,8 @@ test_that("Time gate ",{
  #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -62,7 +65,8 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -79,7 +83,8 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -95,7 +100,8 @@ test_that("GatingSet2flowJo: rectangleGate + boolgate",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #load it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
@@ -115,7 +121,8 @@ test_that("gatingset_to_flowjo: no comp + fasinh ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
@@ -170,7 +177,8 @@ test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)

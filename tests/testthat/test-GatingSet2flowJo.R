@@ -34,11 +34,7 @@ test_that("autogating--tcell", {
   gatingset_to_flowjo(gs, outFile)
 
   #cross validatation test
-  outFile_old <- tempfile(fileext = ".wsp")
-  CytoML::gatingset_to_flowjo(gs, outFile_old)
-  f1 <- scan(outFile, what = "character", quiet = TRUE)
-  f2 <- scan(outFile_old, what = "character", quiet = TRUE)
-  expect_equal(f1, f2)
+  cross_validate(gs, outFile)
   
   #parse it back in
   ws <- open_flowjo_xml(outFile)
@@ -61,11 +57,7 @@ test_that("autogating--tcell", {
 
   gatingset_to_flowjo(gs, outFile)
   #cross validatation test
-  outFile_old <- tempfile(fileext = ".wsp")
-  CytoML::gatingset_to_flowjo(gs, outFile_old)
-  f1 <- scan(outFile, what = "character", quiet = TRUE)
-  f2 <- scan(outFile_old, what = "character", quiet = TRUE)
-  expect_equal(f1, f2)
+  cross_validate(gs, outFile)
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
@@ -82,12 +74,8 @@ test_that("gatingset_to_flowjo: manual gates with calibration table parsed and s
   gatingset_to_flowjo(gs, outFile)
   
   #cross validatation test
-  outFile_old <- tempfile(fileext = ".wsp")
-  CytoML::gatingset_to_flowjo(gs, outFile_old)
-  f1 <- scan(outFile, what = "character", quiet = TRUE)
-  f2 <- scan(outFile_old, what = "character", quiet = TRUE)
-  expect_equal(f1, f2)
-  
+  cross_validate(gs, outFile)
+
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
@@ -126,11 +114,7 @@ test_that("gatingset_to_flowjo: export clustering results as derived parameters 
   expect_message(gatingset_to_flowjo(gs, outFile), "DerivedParameter")
   
   #cross validatation test
-  outFile_old <- tempfile(fileext = ".wsp")
-  CytoML::gatingset_to_flowjo(gs, outFile_old)
-  f1 <- scan(outFile, what = "character", quiet = TRUE)
-  f2 <- scan(outFile_old, what = "character", quiet = TRUE)
-  expect_equal(f1, f2)
+  cross_validate(gs, outFile)
   
   #parse it back in
   ws <- open_flowjo_xml(outFile)
@@ -189,11 +173,7 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   gatingset_to_flowjo(gs, outFile)
   
   #cross validatation test
-  outFile_old <- tempfile(fileext = ".wsp")
-  CytoML::gatingset_to_flowjo(gs, outFile_old)
-  f1 <- scan(outFile, what = "character", quiet = TRUE)
-  f2 <- scan(outFile_old, what = "character", quiet = TRUE)
-  expect_equal(f1, f2)
+  cross_validate(gs, outFile)
   
   write.flowSet(fs, outDir)
   ws <- open_flowjo_xml(outFile)

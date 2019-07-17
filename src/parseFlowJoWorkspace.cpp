@@ -11,7 +11,6 @@
 using namespace Rcpp;
 using namespace cytolib;
 using namespace CytoML;
-CYTOLIB_INIT()
 WS_INIT()
 
 GatingSet * getGsPtr(SEXP _gsPtr){

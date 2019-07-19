@@ -97,6 +97,10 @@ public:
 
 		GatingHierarchyPtr gh(new GatingHierarchy());
 		wsRootNode root=getRoot(curSampleNode);
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			 COUT<<endl<<"parsing DerivedParameters..."<<endl;
+		get_derivedparameters(curSampleNode);
+
 	 	if(is_parse_gate)
 	 	{
 

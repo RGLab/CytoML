@@ -372,12 +372,12 @@ public:
 
 	  }
 
-	  CurlyGuadGate* getGate(wsCurlyQuadGateNode & node){
+	  CurlyQuadGate* getGate(wsCurlyQuadGateNode & node){
 	  	//get intersection point
 	  	xmlXPathObjectPtr resPara=node.xpathInNode(nodePath.gateDim);
 	  	int nParam=resPara->nodesetval->nodeNr;
 	  	if(nParam!=2)
-	  		throw(logic_error("invalid number of dimensions for CurlyGuad gate!"));
+	  		throw(logic_error("invalid number of dimensions for CurlyQuad gate!"));
 	  	/*
 	  	 * parse the parameters
 	  	 */
@@ -428,7 +428,7 @@ public:
 	  	vert.push_back(intersect);
 	  	pp.setVertices(vert);
 	  	pp.setName(dims);
-	  	CurlyGuadGate * g=new CurlyGuadGate(pp, quad);
+	  	CurlyQuadGate * g=new CurlyQuadGate(pp, quad);
 	  	return(g);
 
 	  }
@@ -679,10 +679,10 @@ public:
 	  		}
 	  		else if(xmlStrEqual(gateType,(const xmlChar *)"CurlyQuad"))
 	  		{
-	  			wsCurlyQuadGateNode curlyGNode(gNode.getNodePtr());
+	  			wsCurlyQuadGateNode curlyQNode(gNode.getNodePtr());
 	  			if(g_loglevel>=GATE_LEVEL)
 	  				COUT<<"parsing CurlyQuad.."<<endl;
-	  			return(getGate(curlyGNode));
+	  			return(getGate(curlyQNode));
 	  		}
 	  		else
 	  		{

@@ -2,6 +2,8 @@
 #define WSTYPE_HPP_
 
 #include "wsNode.hpp"
+#include <cytolib/global.hpp>
+
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 using namespace cytolib;

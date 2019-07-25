@@ -10,6 +10,7 @@
 
 #include "workspace.hpp"
 #include "cytolib/trans_group.hpp"
+#include <cytolib/H5CytoFrame.hpp>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
@@ -97,6 +98,10 @@ public:
 
 		GatingHierarchyPtr gh(new GatingHierarchy());
 		wsRootNode root=getRoot(curSampleNode);
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			 COUT<<endl<<"parsing DerivedParameters..."<<endl;
+		get_derivedparameters(curSampleNode);
+
 	 	if(is_parse_gate)
 	 	{
 
@@ -208,7 +213,7 @@ public:
 				data_dir = path_dir_name(xml_filepath);
 				data_dir = data_dir.empty() ? "." : data_dir; 
 			}
-			h5_dir = gsPtr->generate_h5_folder(h5_dir);
+			h5_dir = fs::path(gsPtr->generate_h5_folder(h5_dir.string()));
 		 }
 
 		/*

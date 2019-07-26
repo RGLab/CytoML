@@ -5,6 +5,10 @@ graph_node <- function(params) {
     .Call(`_cytoml2_graph_node`, params)
 }
 
+bool_node <- function(bool_gate, pop, count, NotNode_set, params, subNode) {
+    .Call(`_cytoml2_bool_node`, bool_gate, pop, count, NotNode_set, params, subNode)
+}
+
 open_workspace <- function(filename, sample_name_location, xmlParserOption) {
     .Call(`_cytoml2_open_workspace`, filename, sample_name_location, xmlParserOption)
 }

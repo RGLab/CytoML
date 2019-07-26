@@ -548,7 +548,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
     if(is.na(count))
       count <- -1
     if(isBool){
-      booleanNode(gate, pop, count, env.nodes = env.nodes, param = param, subNode = subNode)
+		booleanNode(gate, pop, count, env.nodes = env.nodes, param = param, subNode = subNode)
 
     }else{
 
@@ -602,11 +602,15 @@ subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.
 
     xmlNode("Subpopulations", .children = unlist(subPops, recursive = FALSE, use.names = FALSE))
 }
-booleanNode <- function(gate, pop, count, env.nodes, subNode){
-	xmlTreeParse(bool_node(gate, pop, count, env.nodes[["NotNode"]], subNode))[[1]][[1]]
+booleanNode <- function(gate, pop, count, env.nodes, param, subNode){
+  g <- filter_to_list(gate)
+  g["negated"] <- FALSE
+  not_nodes <- env.nodes[["NotNode"]]
+	xmlTreeParse(bool_node(g, pop, count, not_nodes, param, toString(subNode)))[[1]][[1]]
+	env.nodes[["NotNode"]] <- not_nodes
 }
 #' @importFrom flowWorkspace filterObject
-booleanNode_old <- function(gate, pop, count, env.nodes, ...){
+booleanNode_old <- function(gate, pop, count, env.nodes, param, subNode){
 
   parsed <- filter_to_list(gate)
 
@@ -632,7 +636,7 @@ booleanNode_old <- function(gate, pop, count, env.nodes, ...){
     if(pop %in% env.nodes[["NotNode"]]){
       res <- list(NULL)
     }else{
-      res <- boolXmlNode(nodeName, pop, count, refs, ...)
+      res <- boolXmlNode(nodeName, pop, count, refs, param)
       res <- list(res)
       env.nodes[["NotNode"]] <- c(env.nodes[["NotNode"]], pop)
     }
@@ -648,7 +652,7 @@ booleanNode_old <- function(gate, pop, count, env.nodes, ...){
       }else
         stop("unsupported logical operation: ", op)
 
-      res <- boolXmlNode(nodeName, pop, count, refs, ...)
+      res <- boolXmlNode(nodeName, pop, count, refs, param)
       res <- list(res)
     }else{ # with Not gates included
 
@@ -668,14 +672,14 @@ booleanNode_old <- function(gate, pop, count, env.nodes, ...){
                               exprs <- as.symbol(paste0("!", ref))
                               new.gate <- eval(substitute(booleanFilter(v), list(v = exprs)))
 
-							  booleanNode_old(new.gate, pop = basename(new.ref), count = -1, env.nodes = env.nodes, ...)[[1]]
+							  booleanNode(new.gate, pop = basename(new.ref), count = -1, env.nodes = env.nodes, ...)[[1]]
                             }
 
                           })
       #take core of the bool gate based on newly generated NOT gates
       exprs <- as.symbol(paste0(new.refs, collapse = op))
       new.gate <- eval(substitute(booleanFilter(v), list(v = exprs)))
-      new.node <- booleanNode_old(new.gate, pop = pop, count = count, env.nodes = env.nodes, ...)
+      new.node <- booleanNode(new.gate, pop = pop, count = count, env.nodes = env.nodes, ...)
       res <- c(not.nodes, new.node)
 
     }
@@ -683,7 +687,7 @@ booleanNode_old <- function(gate, pop, count, env.nodes, ...){
   res
 }
 
-boolXmlNode_old <- function(nodeName, pop, count, refs, param, subNode){
+boolXmlNode <- function(nodeName, pop, count, refs, param){
   xmlNode(nodeName
         , attrs = c(name = basename(pop), count = count)
         , graphNode(param)
@@ -692,7 +696,6 @@ boolXmlNode_old <- function(nodeName, pop, count, refs, param, subNode){
                                                      xmlNode("Dependent", attrs = c(name = ref))
                                                    })
         )
-        , subNode
   )
 
 }

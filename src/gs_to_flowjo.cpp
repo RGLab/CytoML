@@ -194,29 +194,45 @@ gate * newGate(List filter){
 string graph_node(vector<string> params){
 	xml_document doc;//create empty doc
 	xml_node ws_node = doc.append_child();//add first dummy node
+	ws_node.set_name("dummy");
 	flowjo_xml_node node(ws_node);//wrap into flowjo node as the starting point
 
 	return node.append_graph_node(params).to_string();
 }
 
 //[[Rcpp::export]]
-string bool_node(List bool_gate, string pop, int count, CharacterVector NotNode_set
+List bool_node(List bool_gate, string pop, int count, vector<string> not_node_vec
 					, vector<string> params, string subNode){
 	xml_document doc;//create empty doc
 	xml_node ws_node = doc.append_child();//add first dummy node
+	ws_node.set_name("dummy");//avoid R xml parsing warning about the default ':anonymous' node name
+
 	flowjo_xml_node node(ws_node);//wrap into flowjo node as the starting point
-	unordered_set<string> not_node;
-	for(auto n : NotNode_set)
-		not_node.insert(as<string>(n));
-//	Rcout << "start cast"<< endl;
-	boolGate * g = dynamic_cast<boolGate*>(newGate(bool_gate));
+	unordered_set<string> not_node_set;
+	for(auto n : not_node_vec)
+	  not_node_set.insert(n);
+	// Rcout << not_node.size()<< endl;
+	unique_ptr<boolGate> g(dynamic_cast<boolGate*>(newGate(bool_gate)));
 //	Rcout << "start gate_node"<< endl;
-	flowjo_xml_node gate_node = node.generate_bool_pop(*g, pop, count, not_node, params, subNode);
-	delete g;
+  try{
+	  flowjo_xml_node gate_node = node.generate_bool_pop(*g, pop, count, not_node_set, params, subNode);
+  }
+  catch(const std::exception &e)
+  {
+    stop(e.what());
+  }
+  catch(const char * c)
+  {
+    stop(c);
+  }
+	// Rcout << not_node.size()<< endl;
 	//update NotNode_set
-	NotNode_set.erase(0, NotNode_set.size());
-	for(auto n : not_node)
-		NotNode_set.push_back(n);
-	return node.to_string();
+	not_node_vec.clear();
+	// Rcout << NotNode_set.size()<< endl;
+	for(auto n : not_node_set)
+	  not_node_vec.push_back(n);
+	// Rcout << NotNode_set.size()<< endl;
+	return List::create(node.to_string(), not_node_vec);
+	 
 
 }

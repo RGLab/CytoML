@@ -606,9 +606,10 @@ booleanNode <- function(gate, pop, count, env.nodes, param, subNode){
   g <- filter_to_list(gate)
   g["negated"] <- FALSE
   not_nodes <- env.nodes[["NotNode"]]
-	res <- xmlChildren(xmlTreeParse(bool_node(g, pop, count, not_nodes, param, suppressWarnings(toString(subNode))))[[1]][[1]])
-	env.nodes[["NotNode"]] <- not_nodes
-	res
+	res <- bool_node(g, pop, count, not_nodes, param, suppressWarnings(toString(subNode)))
+	
+	env.nodes[["NotNode"]] <- res[[2]]
+	xmlChildren(xmlTreeParse(res[[1]])[[1]][[1]])
 }
 #' @importFrom flowWorkspace filterObject
 booleanNode_old <- function(gate, pop, count, env.nodes, param, subNode){

@@ -19,18 +19,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // bool_node
-string bool_node(List bool_gate, string pop, int count, CharacterVector NotNode_set, vector<string> params, string subNode);
-RcppExport SEXP _cytoml2_bool_node(SEXP bool_gateSEXP, SEXP popSEXP, SEXP countSEXP, SEXP NotNode_setSEXP, SEXP paramsSEXP, SEXP subNodeSEXP) {
+List bool_node(List bool_gate, string pop, int count, vector<string> not_node_vec, vector<string> params, string subNode);
+RcppExport SEXP _cytoml2_bool_node(SEXP bool_gateSEXP, SEXP popSEXP, SEXP countSEXP, SEXP not_node_vecSEXP, SEXP paramsSEXP, SEXP subNodeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type bool_gate(bool_gateSEXP);
     Rcpp::traits::input_parameter< string >::type pop(popSEXP);
     Rcpp::traits::input_parameter< int >::type count(countSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type NotNode_set(NotNode_setSEXP);
+    Rcpp::traits::input_parameter< vector<string> >::type not_node_vec(not_node_vecSEXP);
     Rcpp::traits::input_parameter< vector<string> >::type params(paramsSEXP);
     Rcpp::traits::input_parameter< string >::type subNode(subNodeSEXP);
-    rcpp_result_gen = Rcpp::wrap(bool_node(bool_gate, pop, count, NotNode_set, params, subNode));
+    rcpp_result_gen = Rcpp::wrap(bool_node(bool_gate, pop, count, not_node_vec, params, subNode));
     return rcpp_result_gen;
 END_RCPP
 }

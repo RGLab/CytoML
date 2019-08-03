@@ -255,10 +255,15 @@ gating.graphGML <- function(gt, gs, ...) {
 
     #update gates that are tailored for specific samples
     tailor_gate <- gateInfo[["tailored_gate"]]
-    tg_sn <- names(tailor_gate)
-    tg_sn <- tg_sn[tg_sn %in% sn] #filter tailor gates in case sample set provided are not complete
-    if(length(tg_sn) >0){
-      this_tgs <- lapply(tailor_gate[tg_sn], extend,bound = bound)
+    #lookup by fcs name|fileid
+    tg_idx <- tailor_gate[["file_vs_gateid"]][sn]
+    tg_idx <- tg_idx[!is.na(tg_idx)]
+    dup <- duplicated(tg_idx)
+    if(any(dup))
+      stop("Unexpected behavior!The same tailor gate is matched by both file id and file name!", paste(names(tg_idx[dup]), collapse = " "))
+    if(length(tg_idx) > 0){
+      this_tgs <- lapply(tailor_gate[["gateid_vs_gate"]][tg_idx], extend,bound = bound)
+      tg_sn <- names(tg_idx)
       this_gate[tg_sn] <- this_tgs
     }
 

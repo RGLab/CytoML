@@ -10,15 +10,15 @@
 
 
 
-#include "flowWorkspace/openWorkspace.hpp"
-#include "flowWorkspace/flowJoWorkspace.hpp"
+#include "CytoML/openWorkspace.hpp"
+#include "CytoML/flowJoWorkspace.hpp"
 #include "cytolib/GatingSet.hpp"
 #include "cytolib/GatingHierarchy.hpp"
 #include "cytolib/transformation.hpp"
 #include "cytolib/spline.hpp"
 using namespace std;
 using namespace cytolib;
-using namespace flowWorkspace;
+using namespace CytoML;
 
 struct testCase{
 	string filename; //xml file name

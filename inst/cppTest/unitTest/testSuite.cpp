@@ -5,7 +5,7 @@
 #include <chrono>
 #include "test_header.hpp"
 
-CYTOLIB_INIT()
+//CYTOLIB_INIT()
 
 WS_INIT()
 

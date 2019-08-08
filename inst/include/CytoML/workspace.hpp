@@ -85,7 +85,7 @@ public:
 	 virtual trans_global_vec getGlobalTrans()=0;
 	 virtual wsRootNode getRoot(wsSampleNode sampleNode)=0;
 	 virtual wsPopNodeSet getSubPop(wsNode *)=0;
-	 virtual gate * getGate(wsPopNode &)=0;//gate is dynamically allocated within this function,it is currently freed within gate pointer owner object nodeProperties
+	 virtual gatePtr getGate(wsPopNode &)=0;//gate is dynamically allocated within this function,it is currently freed within gate pointer owner object nodeProperties
 	 virtual void to_popNode(wsRootNode &, nodeProperties &)=0;
 	 virtual void to_popNode(wsPopNode &,nodeProperties &,bool isGating)=0;
 	 virtual bool is_fix_slash_in_channel_name(){return false;}
@@ -158,7 +158,7 @@ public:
 	 			 * check if the pop uses derived parameters
 	 			 */
 	 			bool is_use_derived = false;
-	 			gate * g = curChild.getGate();
+	 			auto g = curChild.getGate();
 	 			int gtype = g->getType();
 	 			if(gtype!=LOGICALGATE&&gtype!=BOOLGATE&&gtype!=CLUSTERGATE)
 	 			{

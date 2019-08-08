@@ -349,12 +349,12 @@ public:
 	   * to the gate coordinates due to the historical storage of gate points in 256 * 256 scale
 	   * in windows version of flowJo
 	   */
-	  ellipsoidGate* getGate(wsEllipseGateNode & node){
+	  gatePtr getGate(wsEllipseGateNode & node){
 	  	/*
 	  	 * using the same routine of polygon gate to parse 4 ellipse coordinates
 	  	 */
 	  	wsPolyGateNode pGNode(node.getNodePtr());
-	  	polygonGate * pg=getGate(pGNode, "*[local-name()='edge']/*[local-name()='vertex']");
+	  	auto pg=dynamic_pointer_cast<polygonGate>(getGate(pGNode, "*[local-name()='edge']/*[local-name()='vertex']"));
 	  	vector<coordinate> v=pg->getParam().getVertices();
 
 
@@ -364,15 +364,11 @@ public:
 	  	if(v.size()!=4)
 	  		throw(domain_error("invalid number of antipode pionts of ellipse gate!"));
 
-	  	ellipsoidGate * g=new ellipsoidGate(v, pg->getParam().getNameArray());
-
-	  	delete pg;
-
-	  	return(g);
+	  	return gatePtr(new ellipsoidGate(v, pg->getParam().getNameArray()));
 
 	  }
 
-	  CurlyQuadGate* getGate(wsCurlyQuadGateNode & node){
+	  gatePtr getGate(wsCurlyQuadGateNode & node){
 	  	//get intersection point
 	  	xmlXPathObjectPtr resPara=node.xpathInNode(nodePath.gateDim);
 	  	int nParam=resPara->nodesetval->nodeNr;
@@ -428,8 +424,7 @@ public:
 	  	vert.push_back(intersect);
 	  	pp.setVertices(vert);
 	  	pp.setName(dims);
-	  	CurlyQuadGate * g=new CurlyQuadGate(pp, quad);
-	  	return(g);
+	  	return gatePtr(new CurlyQuadGate(pp, quad));
 
 	  }
 
@@ -438,13 +433,13 @@ public:
 	   * resides in vertexPath, default is "*[local-name()='vertex']", which is for polygon
 	   * "*[local-name()='edge']/*[local-name()='vertex']" is for ellipsoidGate
 	   */
-	  polygonGate* getGate(wsPolyGateNode & node, string vertexPath = "*[local-name()='vertex']"){
+	  gatePtr getGate(wsPolyGateNode & node, string vertexPath = "*[local-name()='vertex']"){
 	  	/*
 	  	 * not sure what is the criteria for using ellipseGate
 	  	 * since it is of the same format of polygonGate
 	  	 */
 
-	  			polygonGate * gate=new polygonGate();
+	  			unique_ptr<polygonGate> gate(new polygonGate());
 	  			//get the negate flag
 	  			gate->setNegate(node.getProperty("eventsInside")=="0");
 	  			paramPoly p;
@@ -502,11 +497,11 @@ public:
 	  			p.setName(pn);
 	  			p.setVertices(v);
 	  			gate->setParam(p);
-	  			return gate;
+	  			return gatePtr(gate.release());
 	  }
 
-	  gate * getGate(wsRectGateNode & node){
-	  			gate * thisGate = NULL;
+	  gatePtr getGate(wsRectGateNode & node){
+		  	  gatePtr thisGate;
 	  			//get parameter name
 	  			xmlXPathObjectPtr resPara=node.xpathInNode(nodePath.gateDim);
 	  			int nParam=resPara->nodesetval->nodeNr;
@@ -540,16 +535,16 @@ public:
 	  				/*
 	  				 * parse as rangeGate
 	  				 */
-	  				rangeGate * g=new rangeGate();
+	  				unique_ptr<rangeGate> g(new rangeGate());
 	  				if(g_loglevel>=GATE_LEVEL)
 	  					COUT<<"constructing rangeGate.."<<endl;
 	  				//get the negate flag
 	  				g->setNegate(node.getProperty("eventsInside")=="0");
 	  				g->setParam(r.at(0));
-	  				thisGate=g;
+	  				thisGate.reset(g.release());
 
 	  			}else if(nParam==2){
-	  				rectGate * g=new rectGate();
+	  				unique_ptr<rectGate> g(new rectGate());
 	  				if(g_loglevel>=GATE_LEVEL)
 	  					COUT<<"constructing rectGate.."<<endl;
 	  				//get the negate flag
@@ -591,7 +586,7 @@ public:
 	  				p.setVertices(v);
 	  				p.setName(pn);
 	  				g->setParam(p);
-	  				thisGate=g;
+	  				thisGate.reset(g.release());
 
 	  			}else if(nParam!=2)
 	  			{
@@ -605,7 +600,7 @@ public:
 
 	  			return thisGate;
 	  }
-	  gate* getGate(wsPopNode & node){
+	  gatePtr getGate(wsPopNode & node){
 
 	  	if(node.getName()=="NotNode"){
 	  		/*
@@ -618,10 +613,10 @@ public:
 	  		wsNode curGPNode(resPaths->nodesetval->nodeTab[0]);
 	  		vector<string> gPaths;
 	  		gPaths.push_back(curGPNode.getProperty("name"));
-	  		boolGate * gate=new boolGate();
+	  		unique_ptr<boolGate> gate(new boolGate());
 	  		xmlXPathFreeObject(resPaths);
 	  		gate->boolOpSpec = parseBooleanSpec("!G0", gPaths);
-	  		return gate;
+			return gatePtr(gate.release());
 	  	}else if(node.getName()=="OrNode"||node.getName()=="AndNode"){
 	  		/*
 	  		 * NotNode is a special population node that negate its dependent
@@ -642,10 +637,10 @@ public:
 	  			specs << op << "G" << i ;
 	  		}
 
-	  		boolGate * gate=new boolGate();
+	  		unique_ptr<boolGate> gate(new boolGate());
 	  		xmlXPathFreeObject(resPaths);
 	  		gate->boolOpSpec = parseBooleanSpec(specs.str(), gPaths);
-	  		return gate;
+			return gatePtr(gate.release());
 	  	}else{
 
 

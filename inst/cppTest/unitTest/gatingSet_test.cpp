@@ -69,7 +69,7 @@ void gh_accessor_test(GatingHierarchy& gh){
 			cout<<node.getStats(false)["count"]<<endl;
 			if(u!=ROOTNODE)
 			{
-				gate * g=node.getGate();
+				gatePtr g=node.getGate();
 				cout<<typeid(*g).name()<<endl;
 
 
@@ -80,10 +80,10 @@ void gh_accessor_test(GatingHierarchy& gh){
 		 * getPopNames with full path
 		 */
 		cout<<endl<<"node list with/without full path:"<<endl;
-		vector<string> popNames=gh.getPopPaths(REGULAR,true,true);
+		vector<string> popNames=gh.getNodePaths(REGULAR,true,true);
 		for(vector<string>::iterator it=popNames.begin();it!=popNames.end();it++)
 			cout<<*it<<endl;
-		popNames=gh.getPopPaths(REGULAR,false,true);
+		popNames=gh.getNodePaths(REGULAR,false,true);
 		for(vector<string>::iterator it=popNames.begin();it!=popNames.end();it++)
 			cout<<*it<<endl;
 

@@ -567,16 +567,16 @@ public:
 
 
 
-	rangeGate* getGate(wsRangeGateNode & node){
+	gatePtr getGate(wsRangeGateNode & node){
 		/*
 		 * using the same routine of polygon gate to parse ellipse
 		 */
 		wsPolyGateNode pGNode(node.getNodePtr());
-		polygonGate * g1=getGate(pGNode);
+		auto g1=dynamic_pointer_cast<polygonGate>(getGate(pGNode));
 		/*
 		 * convert to the rangeGate data structure after the preliminary parsing step
 		 */
-		rangeGate *g=new rangeGate();
+		unique_ptr<rangeGate> g(new rangeGate());
 
 
 		vector<coordinate> v=g1->getParam().getVertices();
@@ -598,20 +598,19 @@ public:
 			pRange.setMax(max(p1.y,p2.y));
 		}
 		g->setParam(pRange);
-		delete g1;
-		return(g);
+		return gatePtr(g.release());
 
 	}
 
 
 
 
-	ellipseGate* getGate(wsEllipseGateNode & node){
+	gatePtr getGate(wsEllipseGateNode & node){
 		/*
 		 * using the same routine of polygon gate to parse 4 ellipse coordinates
 		 */
 		wsPolyGateNode pGNode(node.getNodePtr());
-		polygonGate * pg=getGate(pGNode);
+		auto pg=dynamic_pointer_cast<polygonGate>(getGate(pGNode));
 		vector<coordinate> v=pg->getParam().getVertices();
 
 
@@ -620,20 +619,13 @@ public:
 		 */
 		if(v.size()!=4)
 			throw(domain_error("invalid number of antipode pionts of ellipse gate!"));
-		ellipseGate * g=new ellipseGate(v, pg->getParam().getNameArray());
-
-
-
-		delete pg;
-
-		return(g);
-
+		return gatePtr(new ellipseGate(v, pg->getParam().getNameArray()));
 	}
 	/*
 	 * TODO:query gate node and param node by name instead of by positions
 	 */
-	polygonGate* getGate(wsPolyGateNode & node){
-				polygonGate * gate=new polygonGate();
+	gatePtr getGate(wsPolyGateNode & node){
+				unique_ptr<polygonGate> gate(new polygonGate());
 				/*
 				 * re-fetch the children node from the current pop node
 				 */
@@ -677,7 +669,7 @@ public:
 				p.setVertices(v);
 				p.setName(pn);
 				gate->setParam(p);
-				return gate;
+				return gatePtr(gate.release());
 	}
 
 	/*
@@ -692,8 +684,8 @@ public:
 	 * into VertexID. and this keeps the generic design of classes intact because the gating path is not
 	 * xml-structure specific concept.
 	 */
-	boolGate* getGate(wsBooleanGateNode & node){
-		boolGate * gate=new boolGate();
+	gatePtr getGate(wsBooleanGateNode & node){
+		unique_ptr<boolGate> gate(new boolGate());
 
 		//get the negate flag
 		gate->setNegate(!node.getProperty("negated").empty());
@@ -727,13 +719,13 @@ public:
 
 		gate->boolOpSpec=parseBooleanSpec(specs,gPaths);
 
-		return gate;
+		return gatePtr(gate.release());
 
 	}
 
 
 
-	gate* getGate(wsPopNode & node){
+	gatePtr getGate(wsPopNode & node){
 
 		/*
 		 * try BooleanGate first

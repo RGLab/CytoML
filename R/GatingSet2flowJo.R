@@ -556,7 +556,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
                    , attrs = c(name = basename(pop), count = count)
                    , graphNode(param)
                    , xmlNode("Gate"
-                             , gateNode(gate, eventsInside, matInfo = matInfo)
+                             , gateNode(gate, matInfo=matInfo, eventsInside)
                    )
                    , subNode
       )
@@ -752,6 +752,26 @@ xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
                     )
         )
 
+}
+
+gateNode_new <- function(gate, matInfo, eventsInside){
+  # browser()
+  if(is(gate, "quadGate")){
+    # Preprocess to get it in to approprate rectangleGate form
+    quad <- attr(gate, "quad.pattern")
+    stopifnot(grepl("^[\\+-]{2}$", quad))
+    quad <- strsplit(quad, split = "")[[1]]
+    param <- parameters(gate)
+    x_bounds <- switch(quad[1], "-"= c(-Inf, gate@boundary[1]), "+"= c(gate@boundary[1], Inf))
+    y_bounds <- switch(quad[2], "-"= c(-Inf, gate@boundary[2]), "+"= c(gate@boundary[2], Inf))
+    mat <- cbind(x_bounds, y_bounds)
+    dimnames(mat) <- list(c("min", "max"), param)
+    gate <- rectangleGate(filterId = gate@filterId, .gate=mat)
+  }
+  gate <- filter_to_list(gate)
+  gate["negated"] <- FALSE
+  # Generates namespace prefix warnings for "gating:". Still have to fix.
+  xmlChildren(xmlTreeParse(gate_node(gate, matInfo, eventsInside))[[1]][[1]])[[1]]
 }
 
 gateNode <- function(gate, ...)UseMethod("gateNode")

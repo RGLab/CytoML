@@ -34,6 +34,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// gate_node
+String gate_node(List filter, List matInfo, bool eventsInside);
+RcppExport SEXP _cytoml2_gate_node(SEXP filterSEXP, SEXP matInfoSEXP, SEXP eventsInsideSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type filter(filterSEXP);
+    Rcpp::traits::input_parameter< List >::type matInfo(matInfoSEXP);
+    Rcpp::traits::input_parameter< bool >::type eventsInside(eventsInsideSEXP);
+    rcpp_result_gen = Rcpp::wrap(gate_node(filter, matInfo, eventsInside));
+    return rcpp_result_gen;
+END_RCPP
+}
 // open_workspace
 XPtr<flowJoWorkspace> open_workspace(string filename, int sample_name_location, int xmlParserOption);
 RcppExport SEXP _cytoml2_open_workspace(SEXP filenameSEXP, SEXP sample_name_locationSEXP, SEXP xmlParserOptionSEXP) {
@@ -139,6 +152,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_cytoml2_graph_node", (DL_FUNC) &_cytoml2_graph_node, 1},
     {"_cytoml2_bool_node", (DL_FUNC) &_cytoml2_bool_node, 6},
+    {"_cytoml2_gate_node", (DL_FUNC) &_cytoml2_gate_node, 3},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

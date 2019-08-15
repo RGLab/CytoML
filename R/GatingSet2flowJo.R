@@ -470,12 +470,8 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...
                       , subPopulationNode(gh, children, trans, matInfo = matInfo, showHidden = showHidden, env.nodes = env.nodes, ...)
           )
 }
+
 graphNode <- function(param){
-  if(length(param) == 0)
-    param <- c("NULL", "NULL")#keep backward compatible for dealing with DerivedParameter
-  xmlTreeParse(graph_node(param))[[1]][[1]]
-}
-graphNode_old <- function(param){
   x <- param[1]
   if(length(param)==1)
     y <- ""
@@ -564,7 +560,13 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
     }
   }
 }
+
 subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.nodes){
+	res <- append_subpopulation_node(gh@pointer, sampleNames(gh), pops, showHidden)
+	xmlTreeParse(res)[[1]][[1]][[1]]
+	
+}
+subPopulationNode_old <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.nodes){
   #reconstruct quadgate when needed
   groups <- ggcyto:::merge.quad.gates(gh, pops)
 
@@ -602,17 +604,9 @@ subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.
 
     xmlNode("Subpopulations", .children = unlist(subPops, recursive = FALSE, use.names = FALSE))
 }
-booleanNode <- function(gate, pop, count, env.nodes, param, subNode){
-  g <- filter_to_list(gate)
-  g["negated"] <- FALSE
-  not_nodes <- env.nodes[["NotNode"]]
-	res <- bool_node(g, pop, count, not_nodes, param, suppressWarnings(toString(subNode)))
-	
-	env.nodes[["NotNode"]] <- res[[2]]
-	xmlChildren(xmlTreeParse(res[[1]])[[1]][[1]])
-}
+
 #' @importFrom flowWorkspace filterObject
-booleanNode_old <- function(gate, pop, count, env.nodes, param, subNode){
+booleanNode <- function(gate, pop, count, env.nodes, param, subNode){
 
   parsed <- filter_to_list(gate)
 

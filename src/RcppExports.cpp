@@ -7,30 +7,17 @@
 
 using namespace Rcpp;
 
-// graph_node
-string graph_node(vector<string> params);
-RcppExport SEXP _cytoml2_graph_node(SEXP paramsSEXP) {
+// append_subpopulation_node
+string append_subpopulation_node(XPtr<GatingSet> gs, string sn, vector<string> pops, bool show_hidden);
+RcppExport SEXP _cytoml2_append_subpopulation_node(SEXP gsSEXP, SEXP snSEXP, SEXP popsSEXP, SEXP show_hiddenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< vector<string> >::type params(paramsSEXP);
-    rcpp_result_gen = Rcpp::wrap(graph_node(params));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bool_node
-List bool_node(List bool_gate, string pop, int count, vector<string> not_node_vec, vector<string> params, string subNode);
-RcppExport SEXP _cytoml2_bool_node(SEXP bool_gateSEXP, SEXP popSEXP, SEXP countSEXP, SEXP not_node_vecSEXP, SEXP paramsSEXP, SEXP subNodeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type bool_gate(bool_gateSEXP);
-    Rcpp::traits::input_parameter< string >::type pop(popSEXP);
-    Rcpp::traits::input_parameter< int >::type count(countSEXP);
-    Rcpp::traits::input_parameter< vector<string> >::type not_node_vec(not_node_vecSEXP);
-    Rcpp::traits::input_parameter< vector<string> >::type params(paramsSEXP);
-    Rcpp::traits::input_parameter< string >::type subNode(subNodeSEXP);
-    rcpp_result_gen = Rcpp::wrap(bool_node(bool_gate, pop, count, not_node_vec, params, subNode));
+    Rcpp::traits::input_parameter< XPtr<GatingSet> >::type gs(gsSEXP);
+    Rcpp::traits::input_parameter< string >::type sn(snSEXP);
+    Rcpp::traits::input_parameter< vector<string> >::type pops(popsSEXP);
+    Rcpp::traits::input_parameter< bool >::type show_hidden(show_hiddenSEXP);
+    rcpp_result_gen = Rcpp::wrap(append_subpopulation_node(gs, sn, pops, show_hidden));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -137,8 +124,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_cytoml2_graph_node", (DL_FUNC) &_cytoml2_graph_node, 1},
-    {"_cytoml2_bool_node", (DL_FUNC) &_cytoml2_bool_node, 6},
+    {"_cytoml2_append_subpopulation_node", (DL_FUNC) &_cytoml2_append_subpopulation_node, 4},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

@@ -190,17 +190,6 @@ gate * newGate(List filter){
 
 }
 
-compensation * newComp(List matInfo){
-  compensation * comp = new compensation();
-  comp->prefix = as<String>(matInfo["prefix"]);
-  comp->suffix = as<String>(matInfo["suffix"]);
-  if(matInfo["mat"] != R_NilValue){
-    comp->marker = as<vector<string>>(colnames(matInfo["mat"]));
-    comp->spillOver = as<vector<double>>(matInfo["mat"]);
-  }
-  return comp;
-}
-
 //[[Rcpp::export]]
 string graph_node(vector<string> params){
 	xml_document doc;//create empty doc
@@ -246,28 +235,4 @@ List bool_node(List bool_gate, string pop, int count, vector<string> not_node_ve
 	return List::create(node.to_string(), not_node_vec);
 	 
 
-}
-
-//[[Rcpp::export]]
-String gate_node(List filter, List matInfo, bool eventsInside){
-  xml_document doc;//create empty doc
-  xml_node ws_node = doc.append_child();//add first dummy node
-  ws_node.set_name("dummy");//avoid R xml parsing warning about the default ':anonymous' node name
-  // ws_node.append_attribute("xmlns:gating").set_value("");//avoid R xml parsing warning about undefined Namespace prefix
-  flowjo_xml_node node(ws_node);//wrap into flowjo node as the starting point
-  
-  gate * g = newGate(filter);
-  compensation * comp = newComp(matInfo);
-  try{
-    flowjo_xml_node gate_node = node.generate_gate_pop(*g, *comp, eventsInside);
-  }
-  catch(const std::exception &e)
-  {
-    stop(e.what());
-  }
-  catch(const char * c)
-  {
-    stop(c);
-  }
-  return node.to_string();
 }

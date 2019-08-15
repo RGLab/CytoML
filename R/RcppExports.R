@@ -9,10 +9,6 @@ bool_node <- function(bool_gate, pop, count, not_node_vec, params, subNode) {
     .Call(`_cytoml2_bool_node`, bool_gate, pop, count, not_node_vec, params, subNode)
 }
 
-gate_node <- function(filter, matInfo, eventsInside) {
-    .Call(`_cytoml2_gate_node`, filter, matInfo, eventsInside)
-}
-
 open_workspace <- function(filename, sample_name_location, xmlParserOption) {
     .Call(`_cytoml2_open_workspace`, filename, sample_name_location, xmlParserOption)
 }

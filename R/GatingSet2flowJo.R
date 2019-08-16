@@ -182,7 +182,7 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
           , xmlNode("Transform"
                     ,xmlNode("transforms:linear"
                              , attrs = c("transforms:minRange" = "0"
-                                        , "transforms:maxRange" = as.character(rg[2] + 1)
+                                        , "transforms:maxRange" = format_float(rg[2] + 1)
                                         , gain="1")
                              , xmlNode("parameter"
                                        , namespace = "data-type"
@@ -284,7 +284,7 @@ spilloverNodes <- function(mat){
             , .children = lapply(names(coefVec), function(chnl){
                 xmlNode("transforms:coefficient",
                         attrs = c("data-type:parameter" = chnl
-                                  , "transforms:value" = as.character(coefVec[chnl])
+                                  , "transforms:value" = format_float(coefVec[chnl])
                                 )
                         )
                 })
@@ -731,7 +731,12 @@ gateAttr <- function(eventsInside){
     , percentY="0"
   )
 }
-
+#customize precision for double to match up to pugixml behavior
+format_float <- function(x){
+  if(!is.null(x))
+    x <- format(x, digits = 17)
+  x
+}
 #modified based on xmlDimensionNode
 xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 {
@@ -739,7 +744,7 @@ xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
   max <- ggcyto:::.fixInf(max)
   xmlNode("dimension"
           , namespace = "gating"
-          , attrs = c("gating:min" = min, "gating:max" = max)
+          , attrs = c("gating:min" = format_float(min), "gating:max" = format_float(max))
           , xmlNode("fcs-dimension"
                     , namespace = "data-type"
                     , attrs = c("data-type:name" = parameter)

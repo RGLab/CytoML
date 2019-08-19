@@ -735,9 +735,13 @@ format_float <- function(x){
 #modified based on xmlDimensionNode
 xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 {
-  min <- ggcyto:::.fixInf(min)
-  max <- ggcyto:::.fixInf(max)
-  xmlNode("dimension"
+#  min <- ggcyto:::.fixInf(min)
+#  max <- ggcyto:::.fixInf(max)
+	if(!is.null(min)&&is.infinite(min))
+		min <- NULL
+	if(!is.null(max)&&is.infinite(max))
+		max <- NULL
+	xmlNode("dimension"
           , namespace = "gating"
           , attrs = c("gating:min" = format_float(min), "gating:max" = format_float(max))
           , xmlNode("fcs-dimension"

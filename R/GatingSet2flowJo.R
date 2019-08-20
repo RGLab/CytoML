@@ -135,15 +135,16 @@ SampleListNode <- function(gs, sampleIds, outputdir, ...){
                     #so that it doesn't need to be processed second time
                     env.nodes <- new.env(parent = emptyenv())
                     env.nodes[["DerivedParameters"]] <- new.env(parent = emptyenv())
+                    dp <- DerivedParametersNode(gh, env.nodes, outputdir = outputdir, ...)
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
                             , spilloverMatrixNode(matInfo)
                             , transformationNode(gh, matInfo)
-                            , DerivedParametersNode(gh, env.nodes, outputdir = outputdir, ...)
                             , keywordNode(gh)
                             , sampleNode(gh, sampleId = sampleId
                                          , matInfo = matInfo
                                          , env.nodes = env.nodes, ...)
+                            , dp
                     )
                   })
         )

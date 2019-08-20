@@ -182,7 +182,7 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
           , xmlNode("Transform"
                     ,xmlNode("transforms:linear"
                              , attrs = c("transforms:minRange" = "0"
-                                        , "transforms:maxRange" = format_float(rg[2] + 1)
+                                        , "transforms:maxRange" = as.character(format_float(rg[2] + 1))
                                         , gain="1")
                              , xmlNode("parameter"
                                        , namespace = "data-type"
@@ -284,7 +284,7 @@ spilloverNodes <- function(mat){
             , .children = lapply(names(coefVec), function(chnl){
                 xmlNode("transforms:coefficient",
                         attrs = c("data-type:parameter" = chnl
-                                  , "transforms:value" = format_float(coefVec[chnl])
+                                  , "transforms:value" = as.character(format_float(coefVec[chnl]))
                                 )
                         )
                 })
@@ -743,7 +743,7 @@ xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 		max <- NULL
 	xmlNode("dimension"
           , namespace = "gating"
-          , attrs = c("gating:min" = format_float(min), "gating:max" = format_float(max))
+          , attrs = c("gating:min" = as.character(format_float(min)), "gating:max" = as.character(format_float(max)))
           , xmlNode("fcs-dimension"
                     , namespace = "data-type"
                     , attrs = c("data-type:name" = parameter)

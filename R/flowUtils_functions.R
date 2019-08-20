@@ -56,7 +56,7 @@ xmlVertexNode <- function (xy)
 {
   xmlTag("vertex", namespace = "gating", children = lapply(xy, 
                                                            function(x) xmlTag("coordinate", namespace = "gating", 
-                                                                              attrs = list(`data-type:value` = format_float(x)))))
+                                                                              attrs = list(`data-type:value` = as.character(format_float(x))))))
 }
 
 # internals copied from flowUtils to avoid :::

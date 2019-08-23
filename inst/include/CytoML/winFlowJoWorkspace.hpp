@@ -345,9 +345,8 @@ public:
 	  }
 
 	  /*
-	   * ellipsoidGate is a specialized ellipGate that will do a special scaling
-	   * to the gate coordinates due to the historical storage of gate points in 256 * 256 scale
-	   * in windows version of flowJo
+	   * ellipsoidGate is a specialized ellipGate that is stored as transformed scale and
+	   * scaled in 256 * 256 scale
 	   */
 	  gatePtr getGate(wsEllipseGateNode & node){
 	  	/*

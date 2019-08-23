@@ -133,6 +133,7 @@ setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
 #' @importFrom utils menu
 #' @export
 #' @importFrom flowCore colnames<-
+#' @importFrom flowWorkspace pop_add
 diva_to_gatingset<- function(obj, name = NULL
                                     , subset = NULL
                                     , path = obj@path

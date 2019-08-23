@@ -1,0 +1,6 @@
+context("Internal test suites ..")
+skip_if_not(dir.exists("~/rglab/workspace/flowWorkspace/wsTestSuite"))
+source("flowjo2gs_internalTestSuite.R")
+source("Cytobank2GatingSet-InternalTestSuite.R")
+source("GatingSet2flowJo-InternalTestSuite.R")
+source("diva2gs-InternalTestSuite.R")

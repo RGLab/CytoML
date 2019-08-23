@@ -12,7 +12,7 @@ License_restricts_use: yes
 LazyData: TRUE
 Imports:
     flowCore (>= 1.43.10),
-    flowWorkspace (>= 4.0.7),
+    flowWorkspace (>= 4.0.8),
     openCyto (>= 1.11.3),
     XML,
     data.table,

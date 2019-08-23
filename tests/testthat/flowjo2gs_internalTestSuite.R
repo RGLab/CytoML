@@ -1,7 +1,17 @@
 context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
-
+test_that("flog-- offset and decades that expose the previous logGml2-based flog was wrong",{
+  
+  wsFile <- file.path(path, "flog/log.wsp")
+  
+  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  gs <- flowjo_to_gatingset(ws, name = 1, path = file.path(path,"Cytotrol/NHLBI/Tcell/"))
+  res <- gh_pop_compare_stats(gs[[1]])
+  expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.01)
+  
+  
+})
 test_that("which.lines",{
   
   wsFile <- file.path(path, "flog_PnE/Liver.wsp")

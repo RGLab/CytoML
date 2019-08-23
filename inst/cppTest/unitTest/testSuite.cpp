@@ -108,6 +108,23 @@ BOOST_AUTO_TEST_CASE(ManuallyIncludedSamples)
 	BOOST_CHECK_EQUAL(gs->size(), 10);
 
 }
+BOOST_AUTO_TEST_CASE(flog)
+{
+	myTest.filename="../wsTestSuite/flog/log.wsp";
+	//myTest.wsType = WS_TYPE::WS_MAC;
+	myTest.config.sample_filters["name"]={"CytoTrol_CytoTrol_1.fcs"};
+	myTest.config.data_dir = "../wsTestSuite/Cytotrol/NHLBI/Tcell";
+	myTest.config.keywords_for_uid={};
+	myTest.group_id = 0;
+	myTest.archive="../output/flog/gs";
+//	g_loglevel = GATE_LEVEL;
+
+	parser_test(myTest);
+
+	vector<bool> isTrue(myTest.isEqual.size(), true);
+	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
+
+}
 BOOST_AUTO_TEST_CASE(flog_PnE)
 {
 

@@ -11,8 +11,10 @@ string append_subpopulation_node(XPtr<GatingSet> gs, string sn, vector<string> p
 	flowjo_xml_node node(ws_node);//wrap into flowjo node as the starting point
 	flowjo_xml_node::gh = gs->getGatingHierarchy(sn);
 	flowjo_xml_node::show_hidden = show_hidden;
+	flowjo_xml_node::derived_params = DERIVED_PARAM();//must reset it since it is static and persistent across invocations
 	try{
-	  flowjo_xml_node res = node.append_subpopulation_node(pops);
+		vector<pair<string, gatePtr>> children_gates;
+	  flowjo_xml_node res = node.append_subpopulation_node(pops, children_gates);
 	}
 	catch(const std::exception &e)
 	{

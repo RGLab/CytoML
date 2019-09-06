@@ -7,17 +7,17 @@
 
 using namespace Rcpp;
 
-// append_subpopulation_node
-string append_subpopulation_node(XPtr<GatingSet> gs, string sn, vector<string> pops, bool show_hidden);
-RcppExport SEXP _cytoml2_append_subpopulation_node(SEXP gsSEXP, SEXP snSEXP, SEXP popsSEXP, SEXP show_hiddenSEXP) {
+// append_sample_node
+string append_sample_node(XPtr<GatingSet> gs, string sn, int sampleId, bool show_hidden);
+RcppExport SEXP _cytoml2_append_sample_node(SEXP gsSEXP, SEXP snSEXP, SEXP sampleIdSEXP, SEXP show_hiddenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< XPtr<GatingSet> >::type gs(gsSEXP);
     Rcpp::traits::input_parameter< string >::type sn(snSEXP);
-    Rcpp::traits::input_parameter< vector<string> >::type pops(popsSEXP);
+    Rcpp::traits::input_parameter< int >::type sampleId(sampleIdSEXP);
     Rcpp::traits::input_parameter< bool >::type show_hidden(show_hiddenSEXP);
-    rcpp_result_gen = Rcpp::wrap(append_subpopulation_node(gs, sn, pops, show_hidden));
+    rcpp_result_gen = Rcpp::wrap(append_sample_node(gs, sn, sampleId, show_hidden));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -124,7 +124,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_cytoml2_append_subpopulation_node", (DL_FUNC) &_cytoml2_append_subpopulation_node, 4},
+    {"_cytoml2_append_sample_node", (DL_FUNC) &_cytoml2_append_sample_node, 4},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

@@ -447,9 +447,13 @@ fixChnlName <- function(chnl, matInfo){
   chnl
 
 }
-
-#' @importFrom flowWorkspace gh_pop_get_stats
 sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...){
+	res <- append_sample_node(gh@pointer, sampleNames(gh), sampleId, showHidden)
+	xmlTreeParse(res)[[1]][[1]][[1]]
+	
+}
+#' @importFrom flowWorkspace gh_pop_get_stats
+sampleNode_old <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...){
 
   sn <- pData(gh)[["name"]]
   stat <- gh_pop_get_stats(gh, "root", xml = FALSE)[[2]]
@@ -562,11 +566,11 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
   }
 }
 
-subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.nodes){
-	res <- append_subpopulation_node(gh@pointer, sampleNames(gh), pops, showHidden)
-	xmlTreeParse(res)[[1]][[1]][[1]]
-	
-}
+#subPopulationNode <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.nodes){
+#	res <- append_subpopulation_node(gh@pointer, sampleNames(gh), pops, showHidden)
+#	xmlTreeParse(res)[[1]][[1]][[1]]
+#	
+#}
 subPopulationNode_old <- function(gh, pops, trans, matInfo, showHidden = FALSE, env.nodes){
   #reconstruct quadgate when needed
   groups <- ggcyto:::merge.quad.gates(gh, pops)

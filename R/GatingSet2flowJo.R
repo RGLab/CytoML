@@ -135,15 +135,16 @@ SampleListNode <- function(gs, sampleIds, outputdir, ...){
                     #so that it doesn't need to be processed second time
                     env.nodes <- new.env(parent = emptyenv())
                     env.nodes[["DerivedParameters"]] <- new.env(parent = emptyenv())
+					snode <- sampleNode(gh, sampleId = sampleId
+							, matInfo = matInfo
+							, env.nodes = env.nodes, ...)
                     dp <- DerivedParametersNode(gh, env.nodes, outputdir = outputdir, ...)
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
                             , spilloverMatrixNode(matInfo)
                             , transformationNode(gh, matInfo)
                             , keywordNode(gh)
-                            , sampleNode(gh, sampleId = sampleId
-                                         , matInfo = matInfo
-                                         , env.nodes = env.nodes, ...)
+                            , snode
                             , dp
                     )
                   })
@@ -414,8 +415,12 @@ paramerterNode <- function(params){
           )
 
 }
-#' @importFrom flowWorkspace keyword
 keywordNode <- function(gh){
+	res <- append_keywords_node()
+	xmlTreeParse(res)[[1]][[1]][[1]]
+}
+#' @importFrom flowWorkspace keyword
+keywordNode_old <- function(gh){
   kw <- keyword(gh)
   kns <- names(kw)
   kns <- kns[!grepl("flowCore", kns)]

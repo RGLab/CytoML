@@ -21,6 +21,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// append_keywords_node
+string append_keywords_node();
+RcppExport SEXP _cytoml2_append_keywords_node() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(append_keywords_node());
+    return rcpp_result_gen;
+END_RCPP
+}
 // open_workspace
 XPtr<flowJoWorkspace> open_workspace(string filename, int sample_name_location, int xmlParserOption);
 RcppExport SEXP _cytoml2_open_workspace(SEXP filenameSEXP, SEXP sample_name_locationSEXP, SEXP xmlParserOptionSEXP) {
@@ -125,6 +135,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_cytoml2_append_sample_node", (DL_FUNC) &_cytoml2_append_sample_node, 4},
+    {"_cytoml2_append_keywords_node", (DL_FUNC) &_cytoml2_append_keywords_node, 0},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

@@ -5,6 +5,10 @@ append_sample_node <- function(gs, sn, sampleId, show_hidden) {
     .Call(`_cytoml2_append_sample_node`, gs, sn, sampleId, show_hidden)
 }
 
+append_keywords_node <- function() {
+    .Call(`_cytoml2_append_keywords_node`)
+}
+
 open_workspace <- function(filename, sample_name_location, xmlParserOption) {
     .Call(`_cytoml2_open_workspace`, filename, sample_name_location, xmlParserOption)
 }

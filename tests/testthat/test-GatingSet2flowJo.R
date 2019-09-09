@@ -111,7 +111,7 @@ test_that("gatingset_to_flowjo: export clustering results as derived parameters 
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   # outFile <- "~/test.wsp"
-  expect_message(gatingset_to_flowjo(gs, outFile), "DerivedParameter")
+  gatingset_to_flowjo(gs, outFile)
   
   #cross validatation test
   cross_validate(gs, outFile)

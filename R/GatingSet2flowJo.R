@@ -193,9 +193,13 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
                     )
           )
 }
-
-#' @importFrom flowWorkspace gh_pop_get_cluster_name gh_get_cluster_labels
 DerivedParametersNode <- function(gh, ...){
+	res <- append_derived_params_node()
+	xmlTreeParse(res)[[1]][[1]][[1]]
+	
+}
+#' @importFrom flowWorkspace gh_pop_get_cluster_name gh_get_cluster_labels
+DerivedParametersNode_old <- function(gh, ...){
   sn <- sampleNames(gh)
   dpnodes <- lapply(gs_get_pop_paths(gh, path = "auto"), function(parent){
                     childnodes <- gs_pop_get_children(gh, parent, path = "auto")

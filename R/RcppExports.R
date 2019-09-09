@@ -9,6 +9,10 @@ append_keywords_node <- function() {
     .Call(`_cytoml2_append_keywords_node`)
 }
 
+append_derived_params_node <- function() {
+    .Call(`_cytoml2_append_derived_params_node`)
+}
+
 open_workspace <- function(filename, sample_name_location, xmlParserOption) {
     .Call(`_cytoml2_open_workspace`, filename, sample_name_location, xmlParserOption)
 }

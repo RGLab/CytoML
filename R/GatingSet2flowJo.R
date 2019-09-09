@@ -193,8 +193,8 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
                     )
           )
 }
-DerivedParametersNode <- function(gh, ...){
-	res <- append_derived_params_node()
+DerivedParametersNode <- function(gh, outputdir,...){
+	res <- append_derived_params_node(outputdir)
 	xmlTreeParse(res)[[1]][[1]][[1]]
 	
 }

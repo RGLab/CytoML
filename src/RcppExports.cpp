@@ -32,12 +32,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // append_derived_params_node
-string append_derived_params_node();
-RcppExport SEXP _cytoml2_append_derived_params_node() {
+string append_derived_params_node(string outputdir);
+RcppExport SEXP _cytoml2_append_derived_params_node(SEXP outputdirSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(append_derived_params_node());
+    Rcpp::traits::input_parameter< string >::type outputdir(outputdirSEXP);
+    rcpp_result_gen = Rcpp::wrap(append_derived_params_node(outputdir));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -146,7 +147,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_cytoml2_append_sample_node", (DL_FUNC) &_cytoml2_append_sample_node, 4},
     {"_cytoml2_append_keywords_node", (DL_FUNC) &_cytoml2_append_keywords_node, 0},
-    {"_cytoml2_append_derived_params_node", (DL_FUNC) &_cytoml2_append_derived_params_node, 0},
+    {"_cytoml2_append_derived_params_node", (DL_FUNC) &_cytoml2_append_derived_params_node, 1},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

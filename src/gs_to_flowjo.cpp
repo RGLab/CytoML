@@ -50,7 +50,7 @@ string append_keywords_node(){
 	return node.to_string();
 }
 //[[Rcpp::export]]
-string append_derived_params_node(){
+string append_derived_params_node(string outputdir){
 	xml_document doc;//create empty doc
 	xml_node ws_node = doc.append_child();//add first dummy node
 	ws_node.set_name("dummy");
@@ -59,7 +59,7 @@ string append_derived_params_node(){
 //	flowjo_xml_node::show_hidden = show_hidden;
 //	flowjo_xml_node::derived_params = DERIVED_PARAM();//must reset it since it is static and persistent across invocations
 	try{
-	  flowjo_xml_node res = node.append_derived_params_node();
+	  flowjo_xml_node res = node.append_derived_params_node(outputdir);
 	}
 	catch(const std::exception &e)
 	{

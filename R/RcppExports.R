@@ -13,6 +13,10 @@ append_derived_params_node <- function() {
     .Call(`_cytoml2_append_derived_params_node`)
 }
 
+append_spillover_matrix_node <- function(gs, sn) {
+    .Call(`_cytoml2_append_spillover_matrix_node`, gs, sn)
+}
+
 open_workspace <- function(filename, sample_name_location, xmlParserOption) {
     .Call(`_cytoml2_open_workspace`, filename, sample_name_location, xmlParserOption)
 }

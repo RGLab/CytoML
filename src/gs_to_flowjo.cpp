@@ -94,3 +94,23 @@ string append_transformation_node(){
 	return node.to_string();
 }
 
+//[[Rcpp::export]]
+string append_spillover_matrix_node(XPtr<GatingSet> gs, string sn){
+  xml_document doc;//create empty doc
+  xml_node ws_node = doc.append_child();//add first dummy node
+  ws_node.set_name("dummy");
+  flowjo_xml_node node(ws_node);//wrap into flowjo node as the starting point
+  flowjo_xml_node::gh = gs->getGatingHierarchy(sn);
+  try{
+    flowjo_xml_node res = node.append_spillover_matrix_node();
+  }
+  catch(const std::exception &e)
+  {
+    stop(e.what());
+  }
+  catch(const char * c)
+  {
+    stop(c);
+  }
+  return node.to_string();
+}

@@ -141,7 +141,7 @@ SampleListNode <- function(gs, sampleIds, outputdir, ...){
                     dp <- DerivedParametersNode(gh, env.nodes, outputdir = outputdir, ...)
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
-                            , spilloverMatrixNode(matInfo)
+                            , spilloverMatrixNode(gh)
                             , transformationNode(gh, matInfo)
                             , keywordNode(gh)
                             , snode
@@ -256,7 +256,13 @@ getSpilloverMat <- function(gh){
   list(mat = mat, prefix = prefix,  suffix = suffix, cid = 1)
 
 }
-spilloverMatrixNode <- function(matInfo){
+
+spilloverMatrixNode <- function(gh){
+  res <- append_spillover_matrix_node(gh@pointer, sampleNames(gh))
+  xmlTreeParse(res)[[1]][[1]][[1]]
+}
+
+spilloverMatrixNode_old <- function(matInfo){
   mat <- matInfo[["mat"]]
   prefix <- "Comp-" #hardcode the prefix for vX
   suffix <- ""

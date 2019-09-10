@@ -52,7 +52,7 @@ gatingset_to_flowjo <- function(gs, outFile, ...){
     cs_lock(cs)
   }
 
-  ws <- workspaceNode(gs, outputdir = dirname(outFile))
+  ws <- workspaceNode(gs, outputdir = dirname(outFile),...)
   
   #restore meta from disk to prevent the change to be permanant
   cs_load_meta(gs_pop_get_data(gs))
@@ -65,28 +65,12 @@ gatingset_to_flowjo <- function(gs, outFile, ...){
                    )
 }
 
-# overwrite XML:::saveXML.XMLNode
-#saveXML ignores encoding argument thus we are not sure what is used by the underlying textConnection Call
-#which causes trouble to read it back later on when the encoding info is assumed to be UTF-8
-# .saveXML <- function (doc, file = NULL, compression = 0, indent = TRUE, prefix = "<?xml version=\"1.0\"?>\n", 
-#           doctype = NULL, encoding = "UTF-8", ...) 
-# {
-#   cn = file(file, "w"
-#             # , encoding = encoding
-#             )
-#   sink(cn)
-#   on.exit(sink())
-#   on.exit(close(cn), add = TRUE)
-#   
-#   
-#   if (!is.null(prefix)) 
-#     cat(as.character(prefix))
-#   if (!is.null(doctype)) 
-#     cat(as(doctype, "character"), "\n")
-#   print(doc)
-#   file
-# }
-workspaceNode <- function(gs, ...){
+workspaceNode <- function(gs, outputdir, showHidden = FALSE){
+	res <- workspace_node(gs@pointer, outputdir, showHidden)
+	xmlTreeParse(res)[[1]][[1]]
+}
+
+workspaceNode_old <- function(gs, ...){
   guids <- sampleNames(gs)
   sampleIds <- seq_along(guids)
   xmlNode("Workspace"

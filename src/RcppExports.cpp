@@ -7,60 +7,16 @@
 
 using namespace Rcpp;
 
-// append_sample_node
-string append_sample_node(XPtr<GatingSet> gs, string sn, int sampleId, bool show_hidden);
-RcppExport SEXP _cytoml2_append_sample_node(SEXP gsSEXP, SEXP snSEXP, SEXP sampleIdSEXP, SEXP show_hiddenSEXP) {
+// workspace_node
+string workspace_node(XPtr<GatingSet> gs, string outputdir, bool show_hidden);
+RcppExport SEXP _cytoml2_workspace_node(SEXP gsSEXP, SEXP outputdirSEXP, SEXP show_hiddenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< XPtr<GatingSet> >::type gs(gsSEXP);
-    Rcpp::traits::input_parameter< string >::type sn(snSEXP);
-    Rcpp::traits::input_parameter< int >::type sampleId(sampleIdSEXP);
-    Rcpp::traits::input_parameter< bool >::type show_hidden(show_hiddenSEXP);
-    rcpp_result_gen = Rcpp::wrap(append_sample_node(gs, sn, sampleId, show_hidden));
-    return rcpp_result_gen;
-END_RCPP
-}
-// append_keywords_node
-string append_keywords_node();
-RcppExport SEXP _cytoml2_append_keywords_node() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(append_keywords_node());
-    return rcpp_result_gen;
-END_RCPP
-}
-// append_derived_params_node
-string append_derived_params_node(string outputdir);
-RcppExport SEXP _cytoml2_append_derived_params_node(SEXP outputdirSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< string >::type outputdir(outputdirSEXP);
-    rcpp_result_gen = Rcpp::wrap(append_derived_params_node(outputdir));
-    return rcpp_result_gen;
-END_RCPP
-}
-// append_transformation_node
-string append_transformation_node();
-RcppExport SEXP _cytoml2_append_transformation_node() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(append_transformation_node());
-    return rcpp_result_gen;
-END_RCPP
-}
-// append_spillover_matrix_node
-string append_spillover_matrix_node(XPtr<GatingSet> gs, string sn);
-RcppExport SEXP _cytoml2_append_spillover_matrix_node(SEXP gsSEXP, SEXP snSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<GatingSet> >::type gs(gsSEXP);
-    Rcpp::traits::input_parameter< string >::type sn(snSEXP);
-    rcpp_result_gen = Rcpp::wrap(append_spillover_matrix_node(gs, sn));
+    Rcpp::traits::input_parameter< bool >::type show_hidden(show_hiddenSEXP);
+    rcpp_result_gen = Rcpp::wrap(workspace_node(gs, outputdir, show_hidden));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -167,11 +123,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_cytoml2_append_sample_node", (DL_FUNC) &_cytoml2_append_sample_node, 4},
-    {"_cytoml2_append_keywords_node", (DL_FUNC) &_cytoml2_append_keywords_node, 0},
-    {"_cytoml2_append_derived_params_node", (DL_FUNC) &_cytoml2_append_derived_params_node, 1},
-    {"_cytoml2_append_transformation_node", (DL_FUNC) &_cytoml2_append_transformation_node, 0},
-    {"_cytoml2_append_spillover_matrix_node", (DL_FUNC) &_cytoml2_append_spillover_matrix_node, 2},
+    {"_cytoml2_workspace_node", (DL_FUNC) &_cytoml2_workspace_node, 3},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

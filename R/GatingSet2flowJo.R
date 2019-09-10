@@ -259,7 +259,12 @@ getSpilloverMat <- function(gh){
 
 spilloverMatrixNode <- function(gh){
   res <- append_spillover_matrix_node(gh@pointer, sampleNames(gh))
-  xmlTreeParse(res)[[1]][[1]][[1]]
+  res <- xmlTreeParse(res)[[1]][[1]]
+  if(length(res) > 0)
+   res[[1]]
+  else
+    NULL
+  
 }
 
 spilloverMatrixNode_old <- function(matInfo){

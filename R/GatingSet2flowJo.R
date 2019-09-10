@@ -324,8 +324,8 @@ transformationNode <- function(gh, matInfo){
                                       , attrs = c("transforms:length" = param[["channelRange"]]
                                                   , "transforms:maxRange" = param[["maxValue"]]
                                                   , "transforms:neg" = param[["neg"]]
-                                                  , "transforms:width" = param[["widthBasis"]]
-                                                  , "transforms:pos" = param[["pos"]]
+                                                  , "transforms:width" = format_float(param[["widthBasis"]])
+                                                  , "transforms:pos" = format_float(param[["pos"]])
                                                   )
                                       )
                 }else if(trans.type == "flowJo_caltbl"){
@@ -377,8 +377,8 @@ transformationNode <- function(gh, matInfo){
                   maxRange <- rg[2]
                   transNode <- xmlNode("linear"
                                        , namespace = "transforms"
-                                       , attrs = c("transforms:minRange" = minRange
-                                                   , "transforms:maxRange" = maxRange
+                                       , attrs = c("transforms:minRange" = format_float(minRange)
+                                                   , "transforms:maxRange" = format_float(maxRange)
                                                    , "gain" = gain
                                        )
                   )
@@ -391,8 +391,8 @@ transformationNode <- function(gh, matInfo){
                                        , attrs = c("transforms:length" = 4096
                                                    , "transforms:maxRange" = param[["t"]]
                                                    , "transforms:neg" = param[["a"]]
-                                                   , "transforms:width" = withBasis
-                                                   , "transforms:pos" = param[["m"]]
+                                                   , "transforms:width" = format_float(withBasis)
+                                                   , "transforms:pos" = format_float(param[["m"]])
                                        )
                   )
 

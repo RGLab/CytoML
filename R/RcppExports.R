@@ -13,6 +13,10 @@ append_derived_params_node <- function(outputdir) {
     .Call(`_cytoml2_append_derived_params_node`, outputdir)
 }
 
+append_transformation_node <- function() {
+    .Call(`_cytoml2_append_transformation_node`)
+}
+
 open_workspace <- function(filename, sample_name_location, xmlParserOption) {
     .Call(`_cytoml2_open_workspace`, filename, sample_name_location, xmlParserOption)
 }

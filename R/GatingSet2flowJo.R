@@ -298,9 +298,13 @@ spilloverNodes <- function(mat){
   })
 
 }
+transformationNode <- function(gh, matInfo){
+	res <- append_transformation_node()
+	xmlTreeParse(res)[[1]][[1]][[1]]
+}
 
 #' @importFrom flowCore exprs
-transformationNode <- function(gh, matInfo){
+transformationNode_old <- function(gh, matInfo){
 
   trans.objs <- gh_get_transformations(gh, only.function = FALSE)
   if(length(trans.objs) == 0)

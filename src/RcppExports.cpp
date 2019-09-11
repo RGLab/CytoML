@@ -7,17 +7,16 @@
 
 using namespace Rcpp;
 
-// workspace_node
-string workspace_node(XPtr<GatingSet> gs, string outputdir, bool show_hidden);
-RcppExport SEXP _cytoml2_workspace_node(SEXP gsSEXP, SEXP outputdirSEXP, SEXP show_hiddenSEXP) {
+// gs_to_flowjo
+void gs_to_flowjo(XPtr<GatingSet> gs, string outputfile, bool show_hidden);
+RcppExport SEXP _cytoml2_gs_to_flowjo(SEXP gsSEXP, SEXP outputfileSEXP, SEXP show_hiddenSEXP) {
 BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< XPtr<GatingSet> >::type gs(gsSEXP);
-    Rcpp::traits::input_parameter< string >::type outputdir(outputdirSEXP);
+    Rcpp::traits::input_parameter< string >::type outputfile(outputfileSEXP);
     Rcpp::traits::input_parameter< bool >::type show_hidden(show_hiddenSEXP);
-    rcpp_result_gen = Rcpp::wrap(workspace_node(gs, outputdir, show_hidden));
-    return rcpp_result_gen;
+    gs_to_flowjo(gs, outputfile, show_hidden);
+    return R_NilValue;
 END_RCPP
 }
 // open_workspace
@@ -123,7 +122,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_cytoml2_workspace_node", (DL_FUNC) &_cytoml2_workspace_node, 3},
+    {"_cytoml2_gs_to_flowjo", (DL_FUNC) &_cytoml2_gs_to_flowjo, 3},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

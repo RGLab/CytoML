@@ -4,14 +4,12 @@ using namespace Rcpp;
 using namespace cytolib;
 INIT_CYTOLIB_ML();
 //[[Rcpp::export]]
-string workspace_node(XPtr<GatingSet> gs, string outputdir, bool show_hidden){
+void gs_to_flowjo(XPtr<GatingSet> gs, string outputfile, bool show_hidden){
 	string res;
 	try{
 		flowjo_xml_node::show_hidden = show_hidden;
 
-		auto doc = workspace_node(*gs, outputdir);
-		auto node = flowjo_xml_node(*(doc.children().begin()));
-		res = node.to_string();
+		gs_to_flowjo(*gs, outputfile);
 	}
 	catch(const std::exception &e)
 	{
@@ -21,5 +19,4 @@ string workspace_node(XPtr<GatingSet> gs, string outputdir, bool show_hidden){
 	{
 	stop(c);
 	  }
-	return res;
 }

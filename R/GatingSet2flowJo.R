@@ -25,7 +25,7 @@ GatingSet2flowJo <- function(...){
   }
 #' @export
 #' @rdname gatingset_to_flowjo
-gatingset_to_flowjo <- function(gs, outFile, ...){
+gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE){
   encoding <- localeToCharset()[1]
   if(encoding == "ISO8859-1")
     encoding <- "ISO-8859-1"
@@ -52,7 +52,7 @@ gatingset_to_flowjo <- function(gs, outFile, ...){
     cs_lock(cs)
   }
 
-  ws <- workspaceNode(gs, outputdir = dirname(outFile),...)
+  gs_to_flowjo(gs@pointer, outFile, showHidden)
   
   #restore meta from disk to prevent the change to be permanant
   cs_load_meta(gs_pop_get_data(gs))
@@ -60,15 +60,16 @@ gatingset_to_flowjo <- function(gs, outFile, ...){
   if(encoding == "ISO8859-1")
   encoding <- "ISO-8859-1"
   ## Write out to an XML file (suppress the warning due to the usage of deprecated structure call in saveXML)
-  suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", encoding)
-                           )
-                   )
+#  suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", encoding)
+#                           )
+#                   )
+	
 }
 
-workspaceNode <- function(gs, outputdir, showHidden = FALSE){
-	res <- workspace_node(gs@pointer, outputdir, showHidden)
-	xmlTreeParse(res)[[1]][[1]]
-}
+#workspaceNode <- function(gs, outputdir, showHidden = FALSE){
+#	res <- workspace_node(gs@pointer, outputdir, showHidden)
+#	xmlTreeParse(res)[[1]][[1]]
+#}
 
 workspaceNode_old <- function(gs, ...){
   guids <- sampleNames(gs)

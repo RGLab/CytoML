@@ -161,7 +161,7 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   
   nodeID<-gs_pop_add(gs, rg,parent="Clean_0")#it is added to root node by default if parent is not specified
   recompute(gs)
-  autoplot(gs, "rectangle")
+  # autoplot(gs, "rectangle")
   
   #add a quadGate
   qg <- quadGate("FL1-H"=1e3, "FL2-H"=1.5e3)

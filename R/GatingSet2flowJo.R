@@ -155,6 +155,7 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
   pname <- paste(cluster_name, gsub("/", ".", parent), sep = ".")
   #create hash map for pop vs derived parameter info
   pops <- levels(vec)  
+  npop <- length(pops)
   for(pop_path in childnodes)
   {
     pop <- extract_cluster_pop_name_from_node(pop_path, cluster_name)
@@ -177,13 +178,13 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
           , attrs = c(name = pname
                     , type = "importCsv"
                     , importFile = csvfile
-                    , range = as.character(rg[2] + 1)
+                    , range = as.character(npop + 1)
                     , columnIndex="1"
                     )
           , xmlNode("Transform"
                     ,xmlNode("transforms:linear"
                              , attrs = c("transforms:minRange" = "0"
-                                        , "transforms:maxRange" = as.character(format_float(rg[2] + 1))
+                                        , "transforms:maxRange" = as.character(format_float(npop + 1))
                                         , gain="1")
                              , xmlNode("parameter"
                                        , namespace = "data-type"

@@ -379,7 +379,7 @@ transformationNode <- function(gh, matInfo){
                                        , namespace = "transforms"
                                        , attrs = c("transforms:minRange" = format_float(minRange)
                                                    , "transforms:maxRange" = format_float(maxRange)
-                                                   , "gain" = gain
+                                                   , "gain" = format_float(gain)
                                        )
                   )
 

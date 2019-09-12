@@ -730,8 +730,10 @@ gateAttr <- function(eventsInside){
 }
 #customize precision for double to match up to pugixml behavior
 format_float <- function(x){
+options(scipen=999)#disable scientific notation
   if(!is.null(x))
-    x <- format(x, digits = 10)
+	  x <- as.character(round(x,digits = 5))
+  options(scipen=0)
   x
 }
 #modified based on xmlDimensionNode

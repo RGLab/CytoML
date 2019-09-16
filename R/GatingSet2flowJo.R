@@ -322,8 +322,8 @@ transformationNode <- function(gh, matInfo){
                   param <-  attr(func,"parameters")
                   transNode <- xmlNode("biex"
                                       , namespace = "transforms"
-                                      , attrs = c("transforms:length" = param[["channelRange"]]
-                                                  , "transforms:maxRange" = param[["maxValue"]]
+                                      , attrs = c("transforms:length" = format_float(param[["channelRange"]])
+                                                  , "transforms:maxRange" = format_float(param[["maxValue"]])
                                                   , "transforms:neg" = param[["neg"]]
                                                   , "transforms:width" = format_float(param[["widthBasis"]])
                                                   , "transforms:pos" = format_float(param[["pos"]])
@@ -346,11 +346,11 @@ transformationNode <- function(gh, matInfo){
 
                     transNode <- xmlNode("fasinh"
                                          , namespace = "transforms"
-                                         , attrs = c("transforms:length" = param[["length"]]
-                                                     , "transforms:maxRange" = param[["t"]]
-                                                     , "transforms:T" = param[["t"]]
+                                         , attrs = c("transforms:length" = format_float(param[["length"]])
+                                                     , "transforms:maxRange" = format_float(param[["t"]])
+                                                     , "transforms:T" = format_float(param[["t"]])
                                                      , "transforms:A" = param[["a"]]
-                                                     , "transforms:M" = param[["m"]]
+                                                     , "transforms:M" = format_float(param[["m"]])
                                          )
                     )
 
@@ -358,8 +358,8 @@ transformationNode <- function(gh, matInfo){
                   param <- as.list(environment(func))
                   transNode <- xmlNode("log"
                                        , namespace = "transforms"
-                                       , attrs = c("transforms:offset" = param[["offset"]]
-                                                   , "transforms:decades" = param[["decade"]]
+                                       , attrs = c("transforms:offset" = format_float(param[["offset"]])
+                                                   , "transforms:decades" = format_float(param[["decade"]])
                                                    )
                   )
 
@@ -390,7 +390,7 @@ transformationNode <- function(gh, matInfo){
                   transNode <- xmlNode("biex"
                                        , namespace = "transforms"
                                        , attrs = c("transforms:length" = 4096
-                                                   , "transforms:maxRange" = param[["t"]]
+                                                   , "transforms:maxRange" = format_float(param[["t"]])
                                                    , "transforms:neg" = param[["a"]]
                                                    , "transforms:width" = format_float(withBasis)
                                                    , "transforms:pos" = format_float(param[["m"]])
@@ -465,7 +465,7 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...
   
   env.nodes[["NotNode"]] <- character(0)
   xmlNode("SampleNode", attrs = c(name = sn
-                                  , count = stat
+                                  , count = format_float(stat)
                                   , sampleID = sampleId
                                   )
                       , graphNode(param)
@@ -551,7 +551,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
     }else{
 
       list(xmlNode("Population"
-                   , attrs = c(name = basename(pop), count = count)
+                   , attrs = c(name = basename(pop), count = format_float(count))
                    , graphNode(param)
                    , xmlNode("Gate"
                              , gateNode(gate, eventsInside, matInfo = matInfo)
@@ -681,7 +681,7 @@ booleanNode <- function(gate, pop, count, env.nodes, ...){
 
 boolXmlNode <- function(nodeName, pop, count, refs, param, subNode){
   xmlNode(nodeName
-        , attrs = c(name = basename(pop), count = count)
+        , attrs = c(name = basename(pop), count = format_float(count))
         , graphNode(param)
         , xmlNode("Dependents", .children = lapply(refs
                                                    , function(ref){

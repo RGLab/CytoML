@@ -16,7 +16,7 @@ test_that("gatingset_to_flowjo: forward slash ",{
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
   stats.new <- gh_pop_compare_stats(gs1[[1]])
-  expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq])
+  expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq], tol = 6e-5)
 })
 
 test_that("OrNode ",{

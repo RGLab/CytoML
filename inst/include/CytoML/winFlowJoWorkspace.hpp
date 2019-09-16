@@ -518,10 +518,10 @@ public:
 	  				 * instead of negative,so we have to use -max()
 	  				 */
 	  				string sMin=curPNode.getProperty("min");
-	  				thisR.setMin(sMin.empty()?-numeric_limits<double>::max():atof(sMin.c_str()));
+	  				thisR.setMin(sMin.empty()?-numeric_limits<double>::infinity():atof(sMin.c_str()));
 
 	  				string sMax=curPNode.getProperty("max");
-	  				thisR.setMax(sMax.empty()?numeric_limits<double>::max():atof(sMax.c_str()));
+	  				thisR.setMax(sMax.empty()?numeric_limits<double>::infinity():atof(sMax.c_str()));
 
 	  				//get parameter name from the children node
 	  				xmlXPathObjectPtr resPName=curPNode.xpathInNode(nodePath.gateParam);

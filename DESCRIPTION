@@ -37,7 +37,7 @@ Imports:
     corpcor,
     RUnit
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
-LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.9), cytolib(>= 2.2.17),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
+LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.9), cytolib(>= 2.2.18),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:
     testthat,
     flowWorkspaceData (>= 2.11.1),

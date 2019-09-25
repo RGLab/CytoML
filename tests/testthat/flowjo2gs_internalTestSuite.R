@@ -249,7 +249,7 @@ test_that("Inverse function of flog ",{
       
       trans <- gh_get_transformations(gh)
       inverse <- gh_get_transformations(gh, inverse = T)
-      raw <- c(1, 1e2, 1e3,1e5)
+      raw <- c(1e2, 1e3,1e5)
       log <- trans[[1]](raw)
       expect_equal(inverse[[1]](log), raw)
       
@@ -327,7 +327,7 @@ test_that("v 10.0.7 - vX 20.0 (missing_namespace and flin)",{
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
       trans <- gh_get_transformations(gh, only = F, channel = "all")
-      expect_equal(trans[[2]][["name"]], "flowJo_flog")
+      expect_equal(trans[[2]][["name"]], "flowJo_log")
     })
 
 # invalid xml with Namespace prefix defintion missing #TODO: try to be robust on this kind of xml error

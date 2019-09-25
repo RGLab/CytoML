@@ -354,7 +354,7 @@ transformationNode <- function(gh, matInfo){
                                          )
                     )
 
-                }else if(trans.type == "flowJo_flog"){
+                }else if(trans.type == "flowJo_log"){
                   param <- as.list(environment(func))
                   transNode <- xmlNode("log"
                                        , namespace = "transforms"

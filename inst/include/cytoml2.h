@@ -3,7 +3,6 @@
 #define __CYTOML_H__
 #include "flowWorkspace.h"
 #include "CytoML/openWorkspace.hpp"
-#include "cytolib-ml/flowjo_xml_node.hpp"
 
 using namespace CytoML;
 using namespace cytolib;

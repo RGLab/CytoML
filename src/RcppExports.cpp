@@ -7,18 +7,6 @@
 
 using namespace Rcpp;
 
-// gs_to_flowjo
-void gs_to_flowjo(XPtr<GatingSet> gs, string outputfile, bool show_hidden);
-RcppExport SEXP _cytoml2_gs_to_flowjo(SEXP gsSEXP, SEXP outputfileSEXP, SEXP show_hiddenSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< XPtr<GatingSet> >::type gs(gsSEXP);
-    Rcpp::traits::input_parameter< string >::type outputfile(outputfileSEXP);
-    Rcpp::traits::input_parameter< bool >::type show_hidden(show_hiddenSEXP);
-    gs_to_flowjo(gs, outputfile, show_hidden);
-    return R_NilValue;
-END_RCPP
-}
 // open_workspace
 XPtr<flowJoWorkspace> open_workspace(string filename, int sample_name_location, int xmlParserOption);
 RcppExport SEXP _cytoml2_open_workspace(SEXP filenameSEXP, SEXP sample_name_locationSEXP, SEXP xmlParserOptionSEXP) {
@@ -122,7 +110,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_cytoml2_gs_to_flowjo", (DL_FUNC) &_cytoml2_gs_to_flowjo, 3},
     {"_cytoml2_open_workspace", (DL_FUNC) &_cytoml2_open_workspace, 3},
     {"_cytoml2_parse_workspace", (DL_FUNC) &_cytoml2_parse_workspace, 21},
     {"_cytoml2_get_keywords_by_id", (DL_FUNC) &_cytoml2_get_keywords_by_id, 2},

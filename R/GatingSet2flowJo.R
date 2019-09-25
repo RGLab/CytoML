@@ -26,25 +26,9 @@ GatingSet2flowJo <- function(...){
 #' @export
 #' @rdname gatingset_to_flowjo
 gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE){
-#  encoding <- localeToCharset()[1]
-#  if(encoding == "ISO8859-1")
-#    encoding <- "ISO-8859-1"
-#  #have a dry run of saveXML served as a validity check on outFile to throw error at early stage instead of the end of long process
-#  suppressWarnings(saveXML(xmlNode("Workspace"), file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", encoding)))
-# 
-  
-  #NOTE we call a lot of flowWorkspace accessors, they need to be imported explicitly. Otherwise the user needs to load flowWorkspace explicitly before using CytoML.
-  # see all the NOTES in R CMD check that have to do with "no visible global function / binding / variable". 
-  
-
-  gs_to_flowjo(gs@pointer, outFile, showHidden)
-  
-#  encoding <- localeToCharset()[1]
-#  if(encoding == "ISO8859-1")
-#  encoding <- "ISO-8859-1"
-  ## Write out to an XML file (suppress the warning due to the usage of deprecated structure call in saveXML)
-#  suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", encoding)
-#                           )
-#                   )
-	
+  if(!file.exists(CYTOLIBML_BIN))
+    stop("cytolib-ml commandline tool is not found in ", CYTOLIBML_BIN)
+  tmp <- tempfile()
+  save_gs(gs, tmp, cdf = "symlink")
+  system(paste0(CYTOLIBML_BIN, " --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden))
 }

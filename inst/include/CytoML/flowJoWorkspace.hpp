@@ -374,7 +374,7 @@ public:
 				{
 					GsMutexType::scoped_lock lock(h5Mutex);
 					frptr->write_h5(h5_filename);
-					gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename, H5F_ACC_RDWR))));
+					gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename, false))));
 				}
 			}
 			else

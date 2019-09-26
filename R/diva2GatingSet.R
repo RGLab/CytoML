@@ -697,7 +697,7 @@ normalize_gate_path <- function(path){
 generate_trans <- function(maxValue = 262144, pos = 4.5, r)
 {
   if(r == 0)
-    return (logtGml2_trans())# r <- maxValue/10^pos
+    return (flowjo_log_trans())# r <- maxValue/10^pos
   w <- (pos - log10(maxValue/r))/2
   if(w < 0)
     w <- 0

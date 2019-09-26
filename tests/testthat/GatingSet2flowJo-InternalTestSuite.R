@@ -15,7 +15,7 @@ test_that("gatingset_to_flowjo: forward slash ",{
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
   stats.new <- gh_pop_compare_stats(gs1[[1]])
-  expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq])
+  expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq], tol = 5e-05)
 })
 
 test_that("OrNode ",{
@@ -67,7 +67,7 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
   stats.new <- gh_pop_compare_stats(gs1[[1]])[, list(openCyto.count, node)]
-  expect_equal(stats.orig, stats.new, tol = 1.3e-5)
+  expect_equal(stats.orig, stats.new, tol = 4e-5)
 })
 test_that("EllipsoidGate defined on log-transformed channels ",{
   thisPath <- file.path(path, "ellipsoid_log")

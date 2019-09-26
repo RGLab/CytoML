@@ -31,12 +31,12 @@ test_that("diva--swap ",{
   expect_equal(gs_get_pop_paths(gs), c('root','/P1','/P1/P2','/P1/P2/P3','/P1/P2/P3/P4', '/P1/P2/P3/P4/P5'))
   fr <- gh_pop_get_data(gs[[1]])
   #ensure swap col properly for both range and data
-  expect_equal(range(fr, "data")[,c("SSC-H", "SSC-W")] , structure(list("SSC-H" = c(0.063, 0.83)
+  expect_equal(range(fr, "data")[,c("SSC-H", "SSC-W")] , structure(list("SSC-H" = c(0.2675822, 1.0369415)
                                                                         , "SSC-W" = c(0, 262143))
                                                                    , class = "data.frame"
                                                                    , row.names = c("min", "max")
   ), tol = 4e-3)
-  expect_equal(range(fr)[,c("SSC-H", "SSC-W")] , structure(list("SSC-H" = c(0, 1)
+  expect_equal(range(fr)[,c("SSC-H", "SSC-W")] , structure(list("SSC-H" = c(0, 1.20412)
                                                                         , "SSC-W" = c(0, 262143))
                                                                    , class = "data.frame"
                                                                    , row.names = c("min", "max")

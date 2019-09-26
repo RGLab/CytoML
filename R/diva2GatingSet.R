@@ -642,7 +642,12 @@ diva_to_gatingset<- function(obj, name = NULL
       #TODO: create and expose R wrapper 'set_transformation' in flowWorkspace
       for(sn in names(translist))
       {
-        transobjs <- sapply(translist[[sn]], flowWorkspace:::parse_transformer, simplify = FALSE)
+        transobjs <- sapply(translist[[sn]], function(trans){
+          transobj <- flowWorkspace:::parse_transformer(trans)
+          if(length(transobj)==0)
+            stop("unsupported trans: ", trans[["name"]])
+          transobj
+          }, simplify = FALSE)
         # browser()
         flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
         

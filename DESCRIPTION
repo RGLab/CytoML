@@ -56,6 +56,7 @@ Collate:
     'compensation.R'
     'cytobank2GatingSet.R'
     'cytobankExperiment.R'
+    'cytolibml_bin_path.R'
     'flowJoWorkspace_Methods.R'
     'diva2GatingSet.R'
     'flowUtils_functions.R'

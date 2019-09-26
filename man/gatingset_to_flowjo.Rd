@@ -7,7 +7,7 @@
 \usage{
 GatingSet2flowJo(...)
 
-gatingset_to_flowjo(gs, outFile, ...)
+gatingset_to_flowjo(gs, outFile, showHidden = FALSE)
 }
 \arguments{
 \item{...}{other arguments

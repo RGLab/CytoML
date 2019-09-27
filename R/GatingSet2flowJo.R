@@ -29,6 +29,8 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE){
   if(!file.exists(CYTOLIBML_BIN))
     stop("cytolib-ml commandline tool is not found in ", CYTOLIBML_BIN)
   tmp <- tempfile()
-  save_gs(gs, tmp, cdf = "symlink")
-  system(paste0(CYTOLIBML_BIN, " --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden))
+  suppressMessages(save_gs(gs, tmp, cdf = "symlink"))
+  res <- suppressWarnings(system2(CYTOLIBML_BIN, paste0(" --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden), stderr = TRUE))
+  if(length(res) > 0)
+    stop(res)
 }

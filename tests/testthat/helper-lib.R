@@ -7,7 +7,10 @@ library(data.table)
 resultDir <- "expect_result"
 
 cross_validate <- function(gs, outFile){
-  
+  #to be compatible with C version to avoid digits difference due to the pb archive
+  tmp <- tempfile()
+  save_gs(gs, tmp, cdf = "symlink")
+  gs <- load_gs(tmp)
   #cross validatation test
   outFile_old <- tempfile(fileext = ".wsp")
   CytoML::gatingset_to_flowjo(gs, outFile_old)

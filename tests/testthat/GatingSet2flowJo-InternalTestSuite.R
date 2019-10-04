@@ -130,15 +130,6 @@ test_that("gatingset_to_flowjo: no comp + fasinh ",{
   expect_equal(stats.orig, stats.new)
 })
 
-test_that("gatingset_to_flowjo: no transformation",{
-
-  gs <- load_gs("~/rglab/workspace/flowWorkspace/lyoplate_out/gated_data/manual/gslist-bcell/cgRoygodqg")
-  stats.orig <- gh_pop_compare_stats(gs[[1]])
-  #output to flowJo
-  outFile <- tempfile(fileext = ".wsp")
-  expect_error(gatingset_to_flowjo(gs, outFile), "No transformation is found in GatingSet!")
-
-})
 
 test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean gate",{
   thisPath <- file.path(path, "gatingML/ics")

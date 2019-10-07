@@ -28,6 +28,10 @@ GatingSet2flowJo <- function(...){
 gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE){
   if(!file.exists(CYTOLIBML_BIN))
     stop("cytolib-ml commandline tool is not found in ", CYTOLIBML_BIN)
+  v1 <- packageVersion("cytolib")
+  v2 <- system2(CYTOLIBML_BIN, " --cytolib-version", stdout = TRUE)
+  if(v1!=v2)
+    stop("CYTOLIBML_BIN is built with different cytolib version of from R package: ", v2, " vs ", v1)
   tmp <- tempfile()
   suppressMessages(save_gs(gs, tmp, cdf = "symlink"))
   res <- suppressWarnings(system2(CYTOLIBML_BIN, paste0(" --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden), stderr = TRUE))

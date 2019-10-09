@@ -508,6 +508,7 @@ public:
 	  			 * parse the parameters
 	  			 */
 	  			vector<paramRange> r;
+	  			string quad_pattern = "";
 	  			for(int i=0;i<nParam;i++)
 	  			{
 	  				wsNode curPNode(resPara->nodesetval->nodeTab[i]);
@@ -518,10 +519,22 @@ public:
 	  				 * instead of negative,so we have to use -max()
 	  				 */
 	  				string sMin=curPNode.getProperty("min");
-	  				thisR.setMin(sMin.empty()?-numeric_limits<double>::max():atof(sMin.c_str()));
+	  				if(sMin.empty())
+	  				{
+	  					thisR.setMin(-numeric_limits<double>::infinity());
+						quad_pattern += "-";
+	  				}
+	  				else
+	  					thisR.setMin(atof(sMin.c_str()));
 
 	  				string sMax=curPNode.getProperty("max");
-	  				thisR.setMax(sMax.empty()?numeric_limits<double>::max():atof(sMax.c_str()));
+	  				if(sMax.empty())
+	  				{
+	  					thisR.setMax(numeric_limits<double>::infinity());
+						quad_pattern += "+";
+	  				}
+	  				else
+	  					thisR.setMax(atof(sMax.c_str()));
 
 	  				//get parameter name from the children node
 	  				xmlXPathObjectPtr resPName=curPNode.xpathInNode(nodePath.gateParam);
@@ -543,11 +556,6 @@ public:
 	  				thisGate.reset(g.release());
 
 	  			}else if(nParam==2){
-	  				unique_ptr<rectGate> g(new rectGate());
-	  				if(g_loglevel>=GATE_LEVEL)
-	  					COUT<<"constructing rectGate.."<<endl;
-	  				//get the negate flag
-	  				g->setNegate(node.getProperty("eventsInside")=="0");
 
 	  				/*
 	  				 * convert pRanges to polygon data structure
@@ -558,34 +566,64 @@ public:
 	  				pn.push_back(r.at(0).getName());//x
 	  				pn.push_back(r.at(1).getName());//y
 
+	  				unique_ptr<polygonGate> g;
+	  				auto uid = generate_uid();
+	  				if(quad_pattern == "-+")
+					{
+						g.reset(new quadGate(p, uid, Q1));
+						v.push_back({r[0].getMax(), r[1].getMin()});
+						if(g_loglevel>=GATE_LEVEL)
+							COUT<<"constructing quadGate..Q1"<<endl;
+					}
+	  				else if(quad_pattern == "++")
+					{
+						g.reset(new quadGate(p, uid, Q2));
+						v.push_back({r[0].getMin(), r[1].getMin()});
+						if(g_loglevel>=GATE_LEVEL)
+							COUT<<"constructing quadGate..Q2"<<endl;
+					}
+	  				else if(quad_pattern == "+-")
+					{
+						g.reset(new quadGate(p, uid, Q3));
+						v.push_back({r[0].getMin(), r[1].getMax()});
+						if(g_loglevel>=GATE_LEVEL)
+							COUT<<"constructing quadGate..Q3"<<endl;
+					}
+	  				else if(quad_pattern == "--")
+					{
+						g.reset(new quadGate(p, uid, Q4));
+						v.push_back({r[0].getMax(), r[1].getMax()});
+						if(g_loglevel>=GATE_LEVEL)
+							COUT<<"constructing quadGate..Q4"<<endl;
+					}
+	  				else
+					{
+						g.reset(new rectGate());
+						if(g_loglevel>=GATE_LEVEL)
+							COUT<<"constructing rectGate.."<<endl;
+						/*
+						 * since rectangle gate in windows version defined differently from mac (simply as 4-point polygon)
+						 * so make sure the order of vertices is correct during the conversion to polygon here
+						 * lb->lt->rt->rb
+						 */
+						coordinate lb,lt,rb,rt;//left bottom,left top,right top,right top
+						lb.x=r.at(0).getMin();
+						lb.y=r.at(1).getMin();
 
-	  				coordinate lb,lt,rb,rt;//left bottom,left top,right top,right top
-	  				lb.x=r.at(0).getMin();
-	  				lb.y=r.at(1).getMin();
+						rt.x=r.at(0).getMax();
+						rt.y=r.at(1).getMax();
 
-	  //				lt.x=r.at(0).getMin();
-	  //				lt.y=r.at(1).getMax();
-
-	  //				rb.x=r.at(0).getMax();
-	  //				rb.y=r.at(1).getMin();
-
-	  				rt.x=r.at(0).getMax();
-	  				rt.y=r.at(1).getMax();
-
-	  				/*
-	  				 * since rectangle gate in windows version defined differently from mac (simply as 4-point polygon)
-	  				 * so make sure the order of vertices is correct during the conversion to polygon here
-	  				 * lb->lt->rt->rb
-	  				 */
-	  				v.push_back(lb);
-	  //				v.push_back(lt);
-	  				v.push_back(rt);
-	  //				v.push_back(rb);
+						v.push_back(lb);
+		  //				v.push_back(lt);
+						v.push_back(rt);
+		  //				v.push_back(rb);
+					}
 
 	  				p.setVertices(v);
 	  				p.setName(pn);
 	  				g->setParam(p);
-	  				thisGate.reset(g.release());
+	  				g->setNegate(node.getProperty("eventsInside")=="0");
+					thisGate.reset(g.release());
 
 	  			}else if(nParam!=2)
 	  			{

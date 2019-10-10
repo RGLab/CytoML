@@ -679,14 +679,10 @@ normalize_gate_path <- function(path){
 #' @importFrom flowWorkspace logicle_trans
 generate_trans <- function(maxValue = 262144, pos = 4.5, r)
 {
-  if(r == 0){
-    # recommended r <- maxValue/10^pos
-    # which collapses RHS for w below to 0
+  if(r == 0)
+    return (logtGml2_trans())# r <- maxValue/10^pos
+  w <- (pos - log10(maxValue/r))/2
+  if(w < 0)
     w <- 0
-  }else{
-    w <- (pos - log10(maxValue/r))/2
-    if(w < 0)
-      w <- 0
-  }
   logicle_trans(w=w, t = maxValue, m = pos) #
 }

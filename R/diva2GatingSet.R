@@ -364,7 +364,6 @@ diva_to_gatingset<- function(obj, name = NULL
         #so we parse it from the sample/tube-specific settings
         use_auto_biexp_scale <- as.logical(xmlValue(sampleNode.tube[["instrument_settings"]][["use_auto_biexp_scale"]]))
         biexp_scale_node <- ifelse(use_auto_biexp_scale, "comp_biexp_scale", "manual_biexp_scale")
-
         comp <- xpathApply(sampleNode.tube, "instrument_settings/parameter", function(paramNode, biexp_para){
 
           paramName <- xmlGetAttr(paramNode, "name")
@@ -453,7 +452,6 @@ diva_to_gatingset<- function(obj, name = NULL
         #assume the gates listed in xml follows the topological order
         rootNode.xml <- NULL
         gateNodes <- xpathApply(sampleNode, "gates/gate")
-        # browser()
         for(gateNode in gateNodes)
         {
           nodeName <- xmlGetAttr(gateNode, "fullname")
@@ -503,18 +501,14 @@ diva_to_gatingset<- function(obj, name = NULL
               {
                 #when channel is logicle scale
                 mat[1, ] <- mat[1, ] * 4.5 # restore it to te logicle scale
-                #rescale gate to data scale
-                if(scale_level=="gate")
-                {
-                  if(x_parameter_scale_value!=0)#non-log10 scale for gate
-                  {
-                    if(this_biexp[[xParam]]$name == "logtGml2")
-                      stop("Data was scaled by log10 but gate (", nodeName, ") is at biexp scale!Can't proceed the parsing")
-                  }
-                  trans.gate <- generate_trans(r = x_parameter_scale_value)
-                  mat[1, ] <- trans.gate$inverse(mat[1, ])
-                  mat[1, ] <- x_biexp(mat[1, ])
-                }
+                # rescale gate to data scale by:
+                # 1) inverting the gate logicle transform (based on the biexp_scale value from the gate node)
+                #    --This appears to always be a logicle transform: biexp_scale == 0 --> w == 0 in logicle
+                # 2) applying the tranformation applied to the data (based on the biexp_scale value from the tube node) 
+                #    --Here if biexp_scale == 0, the data gets scaled log10
+                trans.gate <- generate_trans(r = x_parameter_scale_value, force_logicle=TRUE)
+                mat[1, ] <- trans.gate$inverse(mat[1, ])
+                mat[1, ] <- x_biexp(mat[1, ])
               }
               else
                 mat[1, ] <- mat[1, ] * 262144
@@ -536,18 +530,10 @@ diva_to_gatingset<- function(obj, name = NULL
               {
                 #when channel is logicle scale
                 mat[2, ] <- mat[2, ] * 4.5
-                #rescale gate to data scale
-                if(scale_level=="gate")
-                {
-                  if(y_parameter_scale_value!=0)#non-log10 scale for gate
-                  {
-                    if(this_biexp[[yParam]]$name == "logtGml2")
-                      stop("Data was scaled by log10 but gate (", nodeName, ") is at biexp scale!Can't proceed the parsing")
-                  }
-                  trans.gate <- generate_trans(r = y_parameter_scale_value)
-                  mat[2, ] <- trans.gate$inverse(mat[2, ])
-                  mat[2, ] <- y_biexp(mat[2, ])
-                }
+                #rescale gate to data scale -- see note in is.x.scaled block above
+                trans.gate <- generate_trans(r = y_parameter_scale_value, force_logicle=TRUE)
+                mat[2, ] <- trans.gate$inverse(mat[2, ])
+                mat[2, ] <- y_biexp(mat[2, ])
               }
               else
                 mat[2, ] <- mat[2, ] * 262144
@@ -677,12 +663,17 @@ normalize_gate_path <- function(path){
 
 #use the equation suggested by BD engineer last year
 #' @importFrom flowWorkspace logicle_trans
-generate_trans <- function(maxValue = 262144, pos = 4.5, r)
+generate_trans <- function(maxValue = 262144, pos = 4.5, r, force_logicle=FALSE)
 {
-  if(r == 0)
-    return (logtGml2_trans())# r <- maxValue/10^pos
-  w <- (pos - log10(maxValue/r))/2
-  if(w < 0)
-    w <- 0
+  if(r == 0){
+    if(!force_logicle)
+      return (flowjo_log_trans())# r <- maxValue/10^pos
+    else
+      w <- 0
+  }else{
+    w <- (pos - log10(maxValue/r))/2
+    if(w < 0)
+      w <- 0
+  }
   logicle_trans(w=w, t = maxValue, m = pos) #
 }

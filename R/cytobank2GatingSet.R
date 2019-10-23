@@ -19,7 +19,7 @@
 #' @importFrom cytolib cytolib_LdFlags
 cytobank_to_gatingset.default <- function(x, FCS, ...){
   g <- read.gatingML.cytobank(x)
-  fs <- read.ncdfFlowSet(FCS)
+  fs <- read.ncdfFlowSet(FCS, ...)
   gs <- GatingSet(fs)
 
   ## Compensate the data with the compensation information stored in `graphGML` object

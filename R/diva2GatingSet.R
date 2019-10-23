@@ -361,13 +361,17 @@ diva_to_gatingset<- function(obj, name = NULL
         #global worksheet doesn't seem to have the valid default scale parameters sometime
         #so we parse it from the sample/tube-specific settings
         use_auto_biexp_scale <- as.logical(xmlValue(sampleNode.tube[["instrument_settings"]][["use_auto_biexp_scale"]]))
+        xml_compensation_enabled <- as.logical(xmlValue(sampleNode.tube[["instrument_settings"]][["compensation_enabled"]]))
         biexp_scale_node <- ifelse(use_auto_biexp_scale, "comp_biexp_scale", "manual_biexp_scale")
         comp <- xpathApply(sampleNode.tube, "instrument_settings/parameter", function(paramNode, biexp_para){
 
           paramName <- xmlGetAttr(paramNode, "name")
 
-          isComp <- as.logical(xmlValue(xmlElementsByTagName(paramNode, "is_log")[[1]]))
-          if(isComp){
+          # A param can have is_log == true without having a compensation node
+          # so we need to check these separately
+          isLog <- as.logical(xmlValue(xmlElementsByTagName(paramNode, "is_log")[[1]]))
+          isComp <- length(xmlElementsByTagName(paramNode, "compensation")) > 0
+          if(isLog){
 
             #get biexp para
 
@@ -375,17 +379,16 @@ diva_to_gatingset<- function(obj, name = NULL
                                           , max = as.numeric(xmlValue(xmlElementsByTagName(paramNode, "max")[[1]]))
                                           , biexp_scale = as.numeric(xmlValue(xmlElementsByTagName(paramNode, biexp_scale_node)[[1]]))
                                           )
+          }
+          if(isComp){
             #get comp
             coef <- as.numeric(xpathSApply(paramNode, "compensation/compensation_coefficient", xmlValue))
-            # browser()
             res <- list(coef)
             names(res) <- paramName
-
           }else
             res <- NULL
-            return(res)
+          return(res)
         }, biexp_para = biexp_para)
-        #comp stored in xml seems to be incorrect
 
         ##################################
         #parse comp
@@ -407,18 +410,32 @@ diva_to_gatingset<- function(obj, name = NULL
         data <- get_cytoframe_from_cs(fs, sampleName)
 
         message("Compensating")
-        #we use the spillover from FCS keyword
-        comp <- spillover(data)
-        
-        # comp <- compact(comp)
-        # if(length(comp) > 1)
-        #   stop("More than one spillover found in FCS!")
-        # else if(length(comp) == 0)
-        #   stop("No spillover found in FCS!")
-        # else
-          complist[[sampleName]] <- comp#[[1]]
-        
-        data <- compensate(data, comp)
+        if(xml_compensation_enabled){
+          # Use the spillover matrix obtained from the xml for this tube
+          comp <- unlist(comp, recur = F)
+          comp <- data.frame(comp, check.names = F)
+          # NOTE: The matrix of compensation coefficients in the xml
+          # is already inverted (it's a compensation matrix, not a spillover
+          # matrix), so we need to invert it before passing it to compensate
+          comp <- solve(comp)
+          colnames(comp) <- rownames(comp)
+          comp <- compensation(comp)
+          complist[[sampleName]] <- comp
+          
+          data <- compensate(data, comp)
+        }else{
+          #we use the spillover from FCS keyword
+          comp <- spillover(data)
+          comp <- compact(comp)
+          if(length(comp) > 1)
+            stop("More than one spillover found in FCS!")
+          else if(length(comp) == 0)
+            stop("No spillover found in FCS!")
+          else
+            complist[[sampleName]] <- comp[[1]]
+          
+          data <- compensate(data, comp[[1]])
+        }
 
         message("computing data range")
         data.ranges[[sampleName]] <- range(data, "data")

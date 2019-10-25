@@ -65,7 +65,7 @@ cytobank_to_gatingset <- function(x, ...)UseMethod("cytobank_to_gatingset")
 #' @method cytobank_to_gatingset cytobank_experiment
 #' @rdname cytobank_to_gatingset
 cytobank_to_gatingset.cytobank_experiment <- function(x, ...){
-  gs <- cytobank_to_gatingset(x$gatingML, list.files(x$fcsdir, full.names = TRUE))
+  gs <- cytobank_to_gatingset(x$gatingML, list.files(x$fcsdir, full.names = TRUE), ...)
   ce <- x
   pData(gs) <- pData(ce)
   #update markers 

@@ -12,7 +12,9 @@ NULL
 #' @importFrom graph nodeData
 #' @examples
 #' \dontrun{
-#' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
+#  acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+#  ce <- open_cytobank_experiment(acsfile)
+#  xmlfile <- ce$gatingML
 #' g <- read.gatingML.cytobank(xmlfile)
 #' getNodes(g)
 #' getNodes(g, only.names = FALSE)
@@ -69,7 +71,9 @@ setMethod("getNodes", signature = c("graphGML"),
 #' @return a graphNEL node
 #' @examples
 #' \dontrun{
-#' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
+#  acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+#  ce <- open_cytobank_experiment(acsfile)
+#  xmlfile <- ce$gatingML
 #' g <- read.gatingML.cytobank(xmlfile)
 #' getChildren(g, "GateSet_722326")
 #' getParent(g, "GateSet_722326")
@@ -135,7 +139,9 @@ setMethod("show", signature = c("graphGML"),
 #' @importFrom Rgraphviz renderGraph layoutGraph
 #' @examples
 #' \dontrun{
-#' xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
+#  acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+#  ce <- open_cytobank_experiment(acsfile)
+#  xmlfile <- ce$gatingML
 #' g <- read.gatingML.cytobank(xmlfile)
 #' plot(g)
 #'}

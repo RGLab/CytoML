@@ -57,7 +57,7 @@ gatingset_to_cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.defa
 
   tmp <- tempfile(fileext = ".xml")#ensure correct file extension for xmlTreeParse to work
   write.gatingML(flowEnv, tmp)
-  tree <- xmlTreeParse(tmp, trim = FALSE)
+  tree <- xmlTreeParse(tmp, trim = FALSE, fullNamespaceInfo = TRUE, addAttributeNamespaces = TRUE)
   root <- xmlRoot(tree)
   # browser()
 

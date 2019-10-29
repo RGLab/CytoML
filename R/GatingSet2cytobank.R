@@ -66,6 +66,11 @@ gatingset_to_cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.defa
   root <- addGateSets(root, gs, flowEnv[["guid_mapping"]], showHidden = showHidden)
   #add experiment info to custom node
   root <- addExperimentInfo(root)
+  # TODO: final edit required is to replace old GatingML XSD with a new one for CytobankML (once available)
+  # This involves replacing:
+  #     http://flowcyt.sourceforge.net/gating/2.0/xsd/Gating-ML.v2.0.xsd
+  # with something like:
+  #     http://address/of/new/xsd/Cytobank-ML.v2.0.xsd
   suppressWarnings(saveXML(root, file = outFile))#(suppress the warning due to the usage of deprecated structure call in saveXML)
 }
 
@@ -266,7 +271,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
   for(i in 1:length(root)){
 
     curNode <- root[[i]]
-    guid <- as.vector(xmlAttrs(curNode)[["id"]])
+    guid <- xmlGetAttr(curNode, "gating:id")
     if(!is.null(guid)&&grepl("gate_", guid)){
         #parse pop and fcs info from guid
         fields <- strsplit(guid, "_")[[1]]
@@ -376,7 +381,7 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
         #modify gate id so that cytobank can parse it
         #also must use id since tailored gates shared the same gate_id and can't be used in the final version of gatingML node
         guid.new <- paste("Gate", id, base64encode_cytobank(pop_name), sep = "_")
-        xmlAttrs(newNode)[["id"]] = guid.new
+        xmlAttrs(newNode)[["gating:id"]] = guid.new
 
 
 
@@ -391,15 +396,15 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
             subNode <- newNode[[j]]
             nodeName <- xmlName(subNode)
             if(nodeName == "divider"){#divider use the same id as parent quadgate node
-              old.id <- xmlAttrs(subNode)[["id"]]
+              old.id <- xmlAttrs(subNode)[["gating:id"]]
               div.id <- substr(old.id, nchar(old.id), nchar(old.id))
               div.guid.new <- paste0(guid.new, "divider_", div.id)
-              xmlAttrs(subNode)[["id"]] = div.guid.new
+              xmlAttrs(subNode)[["gating:id"]] = div.guid.new
             }else if(nodeName == "Quadrant")
             {
               #update id
               #extract and convert flowUtils quad pattern to +-
-              old.id <- xmlAttrs(subNode)[["id"]]
+              old.id <- xmlAttrs(subNode)[["gating:id"]]
               this.pattern <- substr(old.id, nchar(old.id)-1, nchar(old.id))
               this.pattern <- gsub("N", "-", gsub("P", "+", this.pattern))
               pat.ind <- match(this.pattern, quad.pattern)
@@ -408,10 +413,10 @@ addCustomInfo <- function(root, gs, flowEnv, cytobank.default.scale = TRUE, show
               nodePath <- attr(gate, "quad.pop.name")[pat.ind]
               pop_name <- basename(nodePath)
               quad.guid.new <- paste("Gate", quad_id, base64encode_cytobank(pop_name), sep = "_")
-              xmlAttrs(subNode)[["id"]] <- quad.guid.new
+              xmlAttrs(subNode)[["gating:id"]] <- quad.guid.new
               #update divider ref id
-              xmlAttrs(subNode[[2]])[["divider_ref"]] <- paste0(guid.new, "divider_1")
-              xmlAttrs(subNode[[4]])[["divider_ref"]] <- paste0(guid.new, "divider_2")
+              xmlAttrs(subNode[[2]])[["gating:divider_ref"]] <- paste0(guid.new, "divider_1")
+              xmlAttrs(subNode[[4]])[["gating:divider_ref"]] <- paste0(guid.new, "divider_2")
               if(fcs_id == 1)#record the mapping between gate_id and guid.new for the refs of GateSets
                 flowEnv[["guid_mapping"]][[nodePath]] <- quad.guid.new
             }

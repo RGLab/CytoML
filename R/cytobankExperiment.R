@@ -60,14 +60,21 @@ cytobank2GatingSet <- function(...)
 #' @export
 cytobank_to_gatingset <- function(x, ...)UseMethod("cytobank_to_gatingset")
 #' @importFrom flowWorkspace markernames<-
+#' @param panel_id select panel to parse
 #' @param ... other arguments
 #' @export
 #' @method cytobank_to_gatingset cytobank_experiment
+#' @importFrom dplyr filter
 #' @rdname cytobank_to_gatingset
-cytobank_to_gatingset.cytobank_experiment <- function(x, ...){
-  gs <- cytobank_to_gatingset(x$gatingML, list.files(x$fcsdir, full.names = TRUE), ...)
+cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
+  #filter by panel
+  panel <- ce_get_panels(ce)
+  pname <- panel[panel_id][["panel"]]
+  samples <- ce_get_samples(x) %>% filter(panel == pname)
+  samples <- samples[["sample"]]
+  gs <- cytobank_to_gatingset(x$gatingML, file.path(x$fcsdir, samples), ...)
   ce <- x
-  pData(gs) <- pData(ce)
+  pData(gs) <- pData(ce)[samples, ]
   #update markers 
   markers.ce <- markernames(ce)
   cols.ce <- colnames(ce)
@@ -97,10 +104,12 @@ print.cytobank_experiment <- function(x, ...){
   cat("cytobank Experiment: ", exp[["name"]],"\n");
   cat("gatingML File: ",x[["gatingML"]], "\n");
   
-  cat("compensations: ", length(exp$compensations), "\n")
-  cat("fcsFiles: ", length(exp$fcsFiles), "\n");
-  cat("panels: ", length(exp$panels), "\n");
-  cat("scales: ", length(exp$scales), "\n");
+  # cat("compensations: ", length(exp$compensations), "\n")
+  # cat("fcsFiles: ", length(exp$fcsFiles), "\n");
+  # cat("panels: ", length(exp$panels), "\n");
+  panels <- ce_get_panels(x)
+  # cat("scales: ", length(exp$scales), "\n");
+  print(as.data.frame(panels))
 }
 
 
@@ -119,6 +128,20 @@ ce_get_cmpensations <- function(x){
   res
 }
 
+#' @rdname cytobank_experiment
+#' @importFrom dplyr rename count %>%
+#' @export
+ce_get_panels <- function(x){
+  panels %>% count(panel) %>% rename(samples = n)
+}
+#' @rdname cytobank_experiment
+#' @importFrom tibble tibble
+#' @export
+ce_get_samples <- function(x){
+  x <- get_panel_per_file(x)
+  x <- unlist(sapply(x, function(i)i[["panel"]]))
+  tibble(panel = x, sample = names(x))
+}
 #' @rdname cytobank_experiment
 #' @importFrom flowWorkspace markernames
 #' @export
@@ -155,7 +178,8 @@ setMethod("colnames",
 get_panel_per_file <- function(ce){
   res <- lapply(ce$experiment$fcsFiles, function(sample){
                 pairs <- sample[["panel"]][["channels"]]
-                list(channels = unlist(lapply(pairs, `[[`, "shortName"))
+                list( panel = sample[["panel"]][["name"]]
+                    , channels = unlist(lapply(pairs, `[[`, "shortName"))
                      , markers = unlist(lapply(pairs, `[[`, "longName"))
                     )
       

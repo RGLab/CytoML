@@ -35,7 +35,8 @@ Imports:
     lattice,
     stats,
     corpcor,
-    RUnit
+    RUnit,
+    tibble
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.9), cytolib(>= 2.2.19),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:

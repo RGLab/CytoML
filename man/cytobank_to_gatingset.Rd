@@ -13,7 +13,7 @@ cytobank2GatingSet(...)
 
 cytobank_to_gatingset(x, ...)
 
-\method{cytobank_to_gatingset}{cytobank_experiment}(x, ...)
+\method{cytobank_to_gatingset}{cytobank_experiment}(x, panel_id = 1, ...)
 }
 \arguments{
 \item{x}{the cytobank_experiment object or the full path of gatingML file}
@@ -21,6 +21,8 @@ cytobank_to_gatingset(x, ...)
 \item{FCS}{FCS files to be loaded}
 
 \item{...}{other arguments}
+
+\item{panel_id}{select panel to parse}
 }
 \value{
 a GatingSet

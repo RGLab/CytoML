@@ -75,13 +75,13 @@ cytobank_to_gatingset.cytobank_experiment <- function(x, ...){
   for(sn in names(markers.ce))
   {
     #prepare chnl vs marker map for update
-    markers.ce <- markers.ce[[sn]]
-    names(markers.ce) <- cols.ce
+    marker.ce <- markers.ce[[sn]]
+    names(marker.ce) <- cols.ce
     #filter out NA markers
     gh <- gs[[sn]]
     cols.nonNA <- subset(pData(parameters(gh_pop_get_data(gh, use.exprs = FALSE))), !is.na(desc), "name", drop = TRUE)
     
-    markernames(gh) <- markers.ce[cols.nonNA]
+    markernames(gh) <- marker.ce[cols.nonNA]
   }
   gs
 }
@@ -128,6 +128,8 @@ setMethod("markernames",
             
             panels <- get_panel_per_file(object)
             res <- lapply(panels, `[[`, "markers")
+            res <- Filter(Negate(is.null), res)
+            
             if(length(unique(res)) > 1)
             {
               warning("markers are not consistent across samples!")
@@ -144,6 +146,7 @@ setMethod("colnames",
           definition=function(x, do.NULL="missing", prefix="missing"){
             panels <- get_panel_per_file(x)
             res <- lapply(panels, `[[`, "channels")
+            res <- Filter(Negate(is.null), res)
             if(length(unique(res)) > 1)
               stop("colnames are not consistent across samples!")
             res[[1]]

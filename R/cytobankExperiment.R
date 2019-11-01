@@ -115,7 +115,7 @@ print.cytobank_experiment <- function(x, ...){
 
 #' @rdname cytobank_experiment
 #' @export
-ce_get_cmpensations <- function(x){
+ce_get_compensations <- function(x){
   comps <- x[["experiment"]][["compensations"]]
   comp_names <- sapply(comps,`[[`, "name")
   res <- lapply(comps, function(comp.i){

@@ -132,7 +132,7 @@ ce_get_cmpensations <- function(x){
 #' @importFrom dplyr rename count %>%
 #' @export
 ce_get_panels <- function(x){
-  panels %>% count(panel) %>% rename(samples = n)
+  ce_get_samples(x) %>% count(panel) %>% rename(samples = n)
 }
 #' @rdname cytobank_experiment
 #' @importFrom tibble tibble

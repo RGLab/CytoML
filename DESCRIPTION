@@ -11,6 +11,7 @@ License: file LICENSE
 License_restricts_use: yes
 LazyData: TRUE
 Imports:
+    cytolib(>= 2.2.19),
     flowCore (>= 1.43.10),
     flowWorkspace (>= 4.0.8),
     openCyto (>= 1.11.3),
@@ -36,7 +37,8 @@ Imports:
     stats,
     corpcor,
     RUnit,
-    tibble
+    tibble,
+    RcppParallel
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.9), cytolib(>= 2.2.19),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:

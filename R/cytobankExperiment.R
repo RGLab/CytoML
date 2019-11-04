@@ -79,12 +79,12 @@ cytobank_to_gatingset <- function(x, ...)UseMethod("cytobank_to_gatingset")
 #' @export
 cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
   #filter by panel
+  ce <- x
   panel <- ce_get_panels(ce)
   pname <- panel[panel_id][["panel"]]
-  samples <- ce_get_samples(x) %>% filter(panel == pname)
+  samples <- ce_get_samples(ce) %>% filter(panel == pname)
   samples <- samples[["sample"]]
-  gs <- cytobank_to_gatingset(x$gatingML, file.path(x$fcsdir, samples), ...)
-  ce <- x
+  gs <- cytobank_to_gatingset(ce$gatingML, file.path(ce$fcsdir, samples), ...)
   pData(gs) <- pData(ce)[samples, ]
   #update markers 
   markers.ce <- markernames(ce)

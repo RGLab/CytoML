@@ -288,7 +288,9 @@ check_comp <- function(compensation){
 #' Get Keywords
 #'
 #' Retrieve keywords associated with a workspace
-#'
+#' 
+#' @name fj_ws_get_keywords
+#' @aliases getKeywords
 #' @param obj A \code{flowjo_workspace}
 #' @param y c\code{character} or \code{numeric} specifying the sample name or sample ID
 #' @param ... other arguments
@@ -299,14 +301,16 @@ check_comp <- function(compensation){
 #' @return A list of keyword - value pairs.
 #' @examples
 #'
+#' \dontrun{
 #'   d<-system.file("extdata",package="flowWorkspaceData")
 #'   wsfile<-list.files(d,pattern="manual.xml",full=TRUE)
-#'   ws <- flowjo_to_gatingset(wsfile);
+#'   ws <- open_flowjo_xml(wsfile)
 #'
 #'   fj_ws_get_samples(ws)
 #'   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
 #'   print(res[[1]])
 #'   fj_ws_get_keywords(ws, 1)
+#' }
 #' @export
 fj_ws_get_keywords <- function(obj,y, ...){
 	if(length(y) > 1)
@@ -321,15 +325,6 @@ fj_ws_get_keywords <- function(obj,y, ...){
       as.list(func(obj@doc, y))
     }
 
-
-#'   ws <- open_flowjo_xml(wsfile);
-#'   
-#'   fj_ws_get_samples(ws)
-#'   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
-#'   print(res[[1]])
-#'   fj_ws_get_keywords(ws, 1)
-#' @aliases fj_ws_get_keywords
-#' @rdname fj_ws_get_keywords
 #' @export 
 getKeywords <- function(...){
   .Deprecated("fj_ws_get_keywords")
@@ -340,6 +335,8 @@ getKeywords <- function(...){
 #' Get a list of samples from a flowJo workspace
 #'
 #' Return  a data frame of samples contained in a flowJo workspace
+#' @name fj_ws_get_samples
+#' @aliases getSamples
 #' @param x A \code{flowjo_workspace}
 #' @param group_id \code{integer} specifies the group from which samples are returned
 #' @details
@@ -373,7 +370,9 @@ getSamples <- function(...){
   }
 #' Get a table of sample groups from a flowJo workspace
 #'
-#'   Return a data frame of sample group information from a flowJo workspace
+#' Return a data frame of sample group information from a flowJo workspace
+#' @name fj_ws_get_sample_groups
+#' @aliases getSampleGroups
 #' @param x A \code{flowjo_workspace} object.
 #' @details 
 #' Note that the samples with 0 populations are also included (since count populations requires traversing xml for all samples thus can be expensive)
@@ -398,8 +397,7 @@ fj_ws_get_sample_groups <- function(x){
   colnames(df) <-  c("groupName", "groupID", "sampleID")
   df
 }
-#' @aliases fj_ws_get_sample_groups
-#' @rdname fj_ws_get_sample_groups
+
 #' @export 
 getSampleGroups <- function(...){
   .Deprecated("fj_ws_get_sample_groups")

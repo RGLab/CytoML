@@ -6,8 +6,6 @@
 \title{Get a table of sample groups from a flowJo workspace}
 \usage{
 fj_ws_get_sample_groups(x)
-
-getSampleGroups(...)
 }
 \arguments{
 \item{x}{A \code{flowjo_workspace} object.}

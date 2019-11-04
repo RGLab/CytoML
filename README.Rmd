@@ -101,8 +101,10 @@ To import data you need the xml workspace and the raw FCS files.
 
 ```{r, message = FALSE, warning = FALSE, error = FALSE}
 library(CytoML)
-xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full.names = T)
+acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+ce <- open_cytobank_experiment(acsfile)
+xmlfile <- ce$gatingML
+fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
 gs <- cytobank_to_gatingset(xmlfile, fcsFiles)
 ```
 
@@ -174,6 +176,7 @@ This returns a `flowFrame` with the cells in gate P3 (70% of the cells according
 The matrix of expression can be extracted from a `flowFrame` using the `exprs()` method:
 
 ```{r}
+library(flowCore)
 e <- exprs(gh_pop_get_data(gh,"P3"))
 class(e)
 dim(e)

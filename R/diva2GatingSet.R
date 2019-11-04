@@ -1,7 +1,26 @@
 #' @include flowJoWorkspace_Methods.R 
 NULL
-#' diva_workspace class
+#' An R representation of a BD FACSDiva workspace
+#' 
 #' Inherited from \link{flowjo_workspace-class}
+#' 
+#' @name diva_workspace-class
+#' @aliases show,diva_workspace-method
+#' 
+#' @section Slots: 
+#' \describe{
+#'   \item{\code{version}:}{Object of class \code{"character"}. The version of the XML workspace. }
+#'   \item{\code{file}:}{Object of class \code{"character"}. The file name. }
+#'   \item{\code{.cache}:}{Object of class \code{"environment"}. An environment for internal use.  }
+#' 	\item{\code{path}:}{Object of class \code{"character"}. The path to the file. }
+#'   \item{\code{doc}:}{Object of class \code{"XMLInternalDocument"}. The XML document object. }
+#'   \item{\code{options}:}{Object of class \code{"integer"}. The XML parsing options passed to \code{\link{xmlTreeParse}}. }
+#'   }
+#' 
+#' @seealso 
+#'   \code{\linkS4class{GatingSet}} 
+#'   \code{\linkS4class{GatingHierarchy}}
+#' 
 #' @exportClass diva_workspace
 setClass("diva_workspace" ,representation(version="character"
                                            , file="character"
@@ -11,8 +30,16 @@ setClass("diva_workspace" ,representation(version="character"
                                            , options="integer")
 )
 
+#' @export
+openDiva <- function(...){
+  .Deprecated("open_diva_xml")
+  open_diva_xml(...)
+}
+
 #' open Diva xml workspace
 #'
+#' @name open_diva_xml
+#' @aliases openDiva
 #' @param file xml file
 #' @param options argument passed to \link{xmlTreeParse}
 #' @param ... arguments passed to \link{xmlTreeParse}
@@ -32,13 +59,6 @@ setClass("diva_workspace" ,representation(version="character"
 #' @importFrom XML xmlTreeParse xpathApply xmlGetAttr
 #' @importFrom methods new
 #' @export
-#' @rdname open_diva_xml
-openDiva <- function(...){
-  .Deprecated("open_diva_xml")
-  open_diva_xml(...)
-}
-#' @export
-#' @rdname open_diva_xml
 open_diva_xml <- function(file,options = 0,...){
   #message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
   tmp<-tempfile(fileext=".xml")
@@ -65,9 +85,8 @@ open_diva_xml <- function(file,options = 0,...){
   return(x);
 }
 
-#' @rdname diva_workspace-class
+
 #' @export
-#' @importFrom plyr ldply
 diva_get_sample_groups <- function(x){
     ldply(
         xpathApply(x@doc, "/bdfacs/experiment/specimen",function(specimen){
@@ -85,9 +104,19 @@ diva_get_sample_groups <- function(x){
 
 }
 
-#' @rdname diva_workspace-class
-#' @param x diva_workspace
+#' Get a table of samples from a FACSDiva workspace
+#'
+#' Return a data.frame of sample group information from a FACSDiva workspace
+#' @name diva_get_samples
+#' @aliases diva_get_sample_groups
+#' @usage 
+#' diva_get_samples(x)
+#' diva_get_sample_groups(x)
+#' @param x A \code{diva_workspace}
+#' @return
+#' A \code{data.frame} with columns \code{tub}, \code{name}, and \code{specimen}
 #' @importFrom methods selectMethod
+#' @importFrom plyr ldply
 #' @export
 diva_get_samples <- diva_get_sample_groups
 
@@ -103,8 +132,6 @@ get_global_sheets<-function(x){
     unlist(res)
 }
 
-#' @rdname diva_workspace-class
-#' @param object diva_workspace
 #' @importFrom flowWorkspace show
 #' @export
 setMethod("show",c("diva_workspace"),function(object){
@@ -126,19 +153,22 @@ setMethod("show",c("diva_workspace"),function(object){
       }
     })
 
-#' @rdname diva_workspace-class
 #' @export
 setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
     .Deprecated("diva_to_gatingset")
     diva_to_gatingset(obj, ...)
     })
 
-#' @rdname diva_workspace-class
+#' Parse a FACSDiva Workspace
+#' 
+#' Function to parse a FACSDiva Workspace, generate a \code{GatingHierarchy} or \code{GatingSet} object, and associated flowCore gates.
+#' @name diva_to_gatingset
+#' @aliases parseWorkspace,diva_workspace-method 
 #' @param obj diva_workspace
 #' @param ... other arguments
 #' @importFrom utils menu
-#' @export
 #' @importFrom flowCore colnames<-
+#' @export
 diva_to_gatingset<- function(obj, name = NULL
                                     , subset = NULL
                                     , path = obj@path

@@ -1,12 +1,17 @@
+#' @export
+GatingSet2flowJo <- function(...){
+  .Deprecated("gatingset_to_flowjo")
+  gatingset_to_flowjo(...)
+}
+
 #' Convert a GatingSet to flowJo workspace
 #'
-#'
+#' @name gatingset_to_flowjo
+#' @aliases GatingSet2flowJo
 #' @param gs a GatingSet object
 #' @param outFile the workspace file path to write
 #' @param ... other arguments
 #'        showHidden whether to include the hidden population nodes in the output
-#' @export
-#' @importFrom flowWorkspace gs_clone gs_update_channels pData<- cs_unlock cs_lock gs_copy_tree_only cs_load_meta 
 #' @return nothing
 #' @examples
 #' library(flowWorkspace)
@@ -17,14 +22,9 @@
 #' #output to flowJo
 #' outFile <- tempfile(fileext = ".wsp")
 #' gatingset_to_flowjo(gs, outFile)
-#'
-#' @rdname gatingset_to_flowjo
-GatingSet2flowJo <- function(...){
-  .Deprecated("gatingset_to_flowjo")
-  gatingset_to_flowjo(...)
-  }
+#' 
+#' @importFrom flowWorkspace gs_clone gs_update_channels pData<- cs_unlock cs_lock gs_copy_tree_only cs_load_meta 
 #' @export
-#' @rdname gatingset_to_flowjo
 gatingset_to_flowjo <- function(gs, outFile, ...){
   encoding <- localeToCharset()[1]
   if(encoding == "ISO8859-1")

@@ -6,8 +6,6 @@
 \title{Get Keywords}
 \usage{
 fj_ws_get_keywords(obj, y, ...)
-
-getKeywords(...)
 }
 \arguments{
 \item{obj}{A \code{flowjo_workspace}}

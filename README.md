@@ -125,9 +125,10 @@ To import data you need the xml workspace and the raw FCS files.
 #### Import `gatingML` generated from [Cytobank](https://cytobank.org/).
 
 ``` r
-library(CytoML)
-xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full.names = T)
+acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+ce <- open_cytobank_experiment(acsfile)
+xmlfile <- ce$gatingML
+fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
 gs <- cytobank2GatingSet(xmlfile, fcsFiles)
 ```
 

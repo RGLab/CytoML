@@ -3,37 +3,24 @@
 \docType{class}
 \name{diva_workspace-class}
 \alias{diva_workspace-class}
-\alias{diva_get_sample_groups}
-\alias{diva_get_samples}
 \alias{show,diva_workspace-method}
-\alias{parseWorkspace,diva_workspace-method}
-\alias{diva_to_gatingset}
-\title{diva_workspace class
-Inherited from \link{flowjo_workspace-class}}
-\usage{
-diva_get_sample_groups(x)
-
-diva_get_samples(x)
-
-\S4method{show}{diva_workspace}(object)
-
-\S4method{parseWorkspace}{diva_workspace}(obj, ...)
-
-diva_to_gatingset(obj, name = NULL, subset = NULL, path = obj@path,
-  fast = TRUE, worksheet = c("normal", "global"),
-  swap_cols = list(`FSC-H` = "FSC-W", `SSC-H` = "SSC-W"),
-  verbose = FALSE, ...)
-}
-\arguments{
-\item{x}{diva_workspace}
-
-\item{object}{diva_workspace}
-
-\item{obj}{diva_workspace}
-
-\item{...}{other arguments}
-}
+\title{An R representation of a BD FACSDiva workspace}
 \description{
-diva_workspace class
 Inherited from \link{flowjo_workspace-class}
+}
+\section{Slots}{
+ 
+\describe{
+  \item{\code{version}:}{Object of class \code{"character"}. The version of the XML workspace. }
+  \item{\code{file}:}{Object of class \code{"character"}. The file name. }
+  \item{\code{.cache}:}{Object of class \code{"environment"}. An environment for internal use.  }
+	\item{\code{path}:}{Object of class \code{"character"}. The path to the file. }
+  \item{\code{doc}:}{Object of class \code{"XMLInternalDocument"}. The XML document object. }
+  \item{\code{options}:}{Object of class \code{"integer"}. The XML parsing options passed to \code{\link{xmlTreeParse}}. }
+  }
+}
+
+\seealso{
+\code{\linkS4class{GatingSet}} 
+  \code{\linkS4class{GatingHierarchy}}
 }

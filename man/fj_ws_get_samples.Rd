@@ -2,6 +2,7 @@
 % Please edit documentation in R/flowJoWorkspace_Methods.R
 \name{fj_ws_get_samples}
 \alias{fj_ws_get_samples}
+\alias{getSamples}
 \title{Get a list of samples from a flowJo workspace}
 \usage{
 fj_ws_get_samples(x, group_id = NULL)

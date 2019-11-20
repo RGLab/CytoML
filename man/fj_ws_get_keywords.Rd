@@ -26,12 +26,14 @@ Retrieve a list of keywords from a \code{flowjo_workspace}
 }
 \examples{
 
+\dontrun{
   d<-system.file("extdata",package="flowWorkspaceData")
   wsfile<-list.files(d,pattern="manual.xml",full=TRUE)
-  ws <- flowjo_to_gatingset(wsfile);
+  ws <- open_flowjo_xml(wsfile)
 
   fj_ws_get_samples(ws)
   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
   print(res[[1]])
   fj_ws_get_keywords(ws, 1)
+}
 }

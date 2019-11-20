@@ -34,7 +34,7 @@ cytobank_to_gatingset.default <- function(x, FCS, ...){
 
 
   ##Apply gates stored in `graphGML`
-  gating(g, gs)
+  gating_graphGML(g, gs)
   gs
 }
 

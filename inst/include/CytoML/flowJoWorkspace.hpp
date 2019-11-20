@@ -52,7 +52,7 @@ struct ParseWorkspaceParameters
 	 string data_dir = ""; //path for FCS directory
 	 bool is_h5 = true;;
 	 bool compute_leaf_bool_node = true;;
-	 string h5_dir = fs::temp_directory_path();// output path for generating the h5 files
+	 string h5_dir = fs::temp_directory_path().string();// output path for generating the h5 files
 	 FCS_READ_PARAM fcs_read_param;
 	 unordered_map<string, compensation> compensation_map;//optional customized sample-specific compensations
 	 compensation global_comp;

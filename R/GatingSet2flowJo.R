@@ -1,12 +1,17 @@
+#' @export
+GatingSet2flowJo <- function(...){
+  .Deprecated("gatingset_to_flowjo")
+  gatingset_to_flowjo(...)
+}
+
 #' Convert a GatingSet to flowJo workspace
 #'
-#'
+#' @name gatingset_to_flowjo
+#' @aliases GatingSet2flowJo
 #' @param gs a GatingSet object
 #' @param outFile the workspace file path to write
 #' @param ... other arguments
 #'        showHidden whether to include the hidden population nodes in the output
-#' @export
-#' @importFrom flowWorkspace gs_clone gs_update_channels pData<-
 #' @return nothing
 #' @examples
 #' library(flowWorkspace)
@@ -17,14 +22,9 @@
 #' #output to flowJo
 #' outFile <- tempfile(fileext = ".wsp")
 #' gatingset_to_flowjo(gs, outFile)
-#'
-#' @rdname gatingset_to_flowjo
-GatingSet2flowJo <- function(...){
-  .Deprecated("gatingset_to_flowjo")
-  gatingset_to_flowjo(...)
-  }
+#' 
+#' @importFrom flowWorkspace gs_clone gs_update_channels pData<- cs_unlock cs_lock gs_copy_tree_only cs_load_meta 
 #' @export
-#' @rdname gatingset_to_flowjo
 gatingset_to_flowjo <- function(gs, outFile, ...){
   encoding <- localeToCharset()[1]
   if(encoding == "ISO8859-1")
@@ -38,22 +38,27 @@ gatingset_to_flowjo <- function(gs, outFile, ...){
   #   if(grepl("/", chnl))
   #     stop("'/' is found in channel '", chnl, "'! Please update GatingSet by running 'gs <- fix_channel_slash(gs)'")
   # }
+  
   #NOTE we call a lot of flowWorkspace accessors, they need to be imported explicitly. Otherwise the user needs to load flowWorkspace explicitly before using CytoML.
   # see all the NOTES in R CMD check that have to do with "no visible global function / binding / variable". 
   chnls <- colnames(gs)
   slash_loc <- sapply(chnls, function(thisCol)as.integer(gregexpr("/", thisCol)[[1]]), simplify = FALSE)
   new_cnd <- fix_channel_slash(chnls, slash_loc)
   if(!all(new_cnd == chnls)){
-    gs <- gs_clone(gs, isNew = FALSE, isEmpty = FALSE) # ensure everything else is gs_cloned except hdf5
+    gs <- gs_copy_tree_only(gs) # ensure everything else is cloned except hdf5
+    cs <- gs_pop_get_data(gs)
+    cs_unlock(cs)#temporarily allow it to be writable
     gs <- gs_update_channels(gs, map = data.frame(old = chnls, new = new_cnd))
+    cs_lock(cs)
   }
-
-  pData(gs)[["name"]] <- as.character(pData(gs)[["name"]]) #coerce factor to character
 
   ws <- workspaceNode(gs, outputdir = dirname(outFile))
   
-  
-  
+  #restore meta from disk to prevent the change to be permanant
+  cs_load_meta(gs_pop_get_data(gs))
+  encoding <- localeToCharset()[1]
+  if(encoding == "ISO8859-1")
+  encoding <- "ISO-8859-1"
   ## Write out to an XML file (suppress the warning due to the usage of deprecated structure call in saveXML)
   suppressWarnings(saveXML(ws, file=outFile, prefix=sprintf("<?xml version=\"1.0\" encoding=\"%s\"?>", encoding)
                            )
@@ -130,15 +135,16 @@ SampleListNode <- function(gs, sampleIds, outputdir, ...){
                     #so that it doesn't need to be processed second time
                     env.nodes <- new.env(parent = emptyenv())
                     env.nodes[["DerivedParameters"]] <- new.env(parent = emptyenv())
+                    dp <- DerivedParametersNode(gh, env.nodes, outputdir = outputdir, ...)
                     xmlNode("Sample"
                             , datasetNode(gh, sampleId)
                             , spilloverMatrixNode(matInfo)
                             , transformationNode(gh, matInfo)
-                            , DerivedParametersNode(gh, env.nodes, outputdir = outputdir, ...)
                             , keywordNode(gh)
                             , sampleNode(gh, sampleId = sampleId
                                          , matInfo = matInfo
                                          , env.nodes = env.nodes, ...)
+                            , dp
                     )
                   })
         )
@@ -149,6 +155,7 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
   pname <- paste(cluster_name, gsub("/", ".", parent), sep = ".")
   #create hash map for pop vs derived parameter info
   pops <- levels(vec)  
+  npop <- length(pops)
   for(pop_path in childnodes)
   {
     pop <- extract_cluster_pop_name_from_node(pop_path, cluster_name)
@@ -171,13 +178,13 @@ DerivedParameterNode <- function(sn, parent, childnodes, vec, cluster_name, env.
           , attrs = c(name = pname
                     , type = "importCsv"
                     , importFile = csvfile
-                    , range = as.character(rg[2] + 1)
+                    , range = as.character(npop + 1)
                     , columnIndex="1"
                     )
           , xmlNode("Transform"
                     ,xmlNode("transforms:linear"
                              , attrs = c("transforms:minRange" = "0"
-                                        , "transforms:maxRange" = as.character(rg[2] + 1)
+                                        , "transforms:maxRange" = as.character(format_float(npop + 1))
                                         , gain="1")
                              , xmlNode("parameter"
                                        , namespace = "data-type"
@@ -222,8 +229,6 @@ datasetNode <- function(gh, sampleId){
 
 }
 getSpilloverMat <- function(gh){
-  compobj <- gh@compensation
-  if(is.null(compobj)){
     compobj <- gh_get_compensations(gh)
     if(!is.null(compobj)){
       comp <- gs_get_compensation_internal(gh@pointer,sampleNames(gh))
@@ -234,13 +239,7 @@ getSpilloverMat <- function(gh){
       prefix <- ""
       suffix <- ""
     }
-  }else{
-    sn <- sampleNames(gh)
-    compobj <- compobj[[sn]]
-    cid <- "1"
-    prefix <- ""
-    suffix <- ""
-  }
+
   
   if(is(compobj, "compensation")){
     mat <- compobj@spillover
@@ -287,7 +286,7 @@ spilloverNodes <- function(mat){
             , .children = lapply(names(coefVec), function(chnl){
                 xmlNode("transforms:coefficient",
                         attrs = c("data-type:parameter" = chnl
-                                  , "transforms:value" = as.character(coefVec[chnl])
+                                  , "transforms:value" = as.character(format_float(coefVec[chnl]))
                                 )
                         )
                 })
@@ -323,11 +322,11 @@ transformationNode <- function(gh, matInfo){
                   param <-  attr(func,"parameters")
                   transNode <- xmlNode("biex"
                                       , namespace = "transforms"
-                                      , attrs = c("transforms:length" = param[["channelRange"]]
-                                                  , "transforms:maxRange" = param[["maxValue"]]
+                                      , attrs = c("transforms:length" = format_float(param[["channelRange"]])
+                                                  , "transforms:maxRange" = format_float(param[["maxValue"]])
                                                   , "transforms:neg" = param[["neg"]]
-                                                  , "transforms:width" = param[["widthBasis"]]
-                                                  , "transforms:pos" = param[["pos"]]
+                                                  , "transforms:width" = format_float(param[["widthBasis"]])
+                                                  , "transforms:pos" = format_float(param[["pos"]])
                                                   )
                                       )
                 }else if(trans.type == "flowJo_caltbl"){
@@ -347,20 +346,20 @@ transformationNode <- function(gh, matInfo){
 
                     transNode <- xmlNode("fasinh"
                                          , namespace = "transforms"
-                                         , attrs = c("transforms:length" = param[["length"]]
-                                                     , "transforms:maxRange" = param[["t"]]
-                                                     , "transforms:T" = param[["t"]]
+                                         , attrs = c("transforms:length" = format_float(param[["length"]])
+                                                     , "transforms:maxRange" = format_float(param[["t"]])
+                                                     , "transforms:T" = format_float(param[["t"]])
                                                      , "transforms:A" = param[["a"]]
-                                                     , "transforms:M" = param[["m"]]
+                                                     , "transforms:M" = format_float(param[["m"]])
                                          )
                     )
 
-                }else if(trans.type == "flowJo_flog"){
+                }else if(trans.type == "flowJo_log"){
                   param <- as.list(environment(func))
                   transNode <- xmlNode("log"
                                        , namespace = "transforms"
-                                       , attrs = c("transforms:offset" = param[["offset"]]
-                                                   , "transforms:decades" = param[["decade"]]
+                                       , attrs = c("transforms:offset" = format_float(param[["offset"]])
+                                                   , "transforms:decades" = format_float(param[["decade"]])
                                                    )
                   )
 
@@ -379,22 +378,22 @@ transformationNode <- function(gh, matInfo){
                   maxRange <- rg[2]
                   transNode <- xmlNode("linear"
                                        , namespace = "transforms"
-                                       , attrs = c("transforms:minRange" = minRange
-                                                   , "transforms:maxRange" = maxRange
-                                                   , "gain" = gain
+                                       , attrs = c("transforms:minRange" = format_float(minRange)
+                                                   , "transforms:maxRange" = format_float(maxRange)
+                                                   , "gain" = format_float(gain)
                                        )
                   )
 
-                }else if(trans.type == "logicle"){
+                }else if(trans.type %in% c("logicle", "flowJo_logicle")){
                   param <- as.list(environment(func))
                   withBasis <- - 10 ^ (2 * as.vector(param[["w"]]))
                   transNode <- xmlNode("biex"
                                        , namespace = "transforms"
                                        , attrs = c("transforms:length" = 4096
-                                                   , "transforms:maxRange" = param[["t"]]
+                                                   , "transforms:maxRange" = format_float(param[["t"]])
                                                    , "transforms:neg" = param[["a"]]
-                                                   , "transforms:width" = withBasis
-                                                   , "transforms:pos" = param[["m"]]
+                                                   , "transforms:width" = format_float(withBasis)
+                                                   , "transforms:pos" = format_float(param[["m"]])
                                        )
                   )
 
@@ -466,7 +465,7 @@ sampleNode <- function(gh, sampleId, matInfo, showHidden = FALSE, env.nodes, ...
   
   env.nodes[["NotNode"]] <- character(0)
   xmlNode("SampleNode", attrs = c(name = sn
-                                  , count = stat
+                                  , count = format_float(stat)
                                   , sampleID = sampleId
                                   )
                       , graphNode(param)
@@ -552,7 +551,7 @@ constructPopNode <- function(gh, pop, trans, matInfo, showHidden = FALSE, env.no
     }else{
 
       list(xmlNode("Population"
-                   , attrs = c(name = basename(pop), count = count)
+                   , attrs = c(name = basename(pop), count = format_float(count))
                    , graphNode(param)
                    , xmlNode("Gate"
                              , gateNode(gate, eventsInside, matInfo = matInfo)
@@ -682,7 +681,7 @@ booleanNode <- function(gate, pop, count, env.nodes, ...){
 
 boolXmlNode <- function(nodeName, pop, count, refs, param, subNode){
   xmlNode(nodeName
-        , attrs = c(name = basename(pop), count = count)
+        , attrs = c(name = basename(pop), count = format_float(count))
         , graphNode(param)
         , xmlNode("Dependents", .children = lapply(refs
                                                    , function(ref){
@@ -729,15 +728,26 @@ gateAttr <- function(eventsInside){
     , percentY="0"
   )
 }
-
+#customize precision for double to match up to pugixml behavior
+format_float <- function(x){
+options(scipen=999)#disable scientific notation
+  if(!is.null(x))
+	  x <- as.character(round(x,digits = 5))
+  options(scipen=0)
+  x
+}
 #modified based on xmlDimensionNode
 xmlDimensionNode <- function(parameter, min = NULL, max = NULL)
 {
-  min <- ggcyto:::.fixInf(min)
-  max <- ggcyto:::.fixInf(max)
-  xmlNode("dimension"
+#  min <- ggcyto:::.fixInf(min)
+#  max <- ggcyto:::.fixInf(max)
+	if(!is.null(min)&&is.infinite(min))
+		min <- NULL
+	if(!is.null(max)&&is.infinite(max))
+		max <- NULL
+	xmlNode("dimension"
           , namespace = "gating"
-          , attrs = c("gating:min" = min, "gating:max" = max)
+          , attrs = c("gating:min" = as.character(format_float(min)), "gating:max" = as.character(format_float(max)))
           , xmlNode("fcs-dimension"
                     , namespace = "data-type"
                     , attrs = c("data-type:name" = parameter)

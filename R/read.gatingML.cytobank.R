@@ -23,7 +23,9 @@ setClass("graphGML", contains = "graphNEL")
 #' Compensation and transformations are stored in graphData.
 #' @examples
 #' \dontrun{
-#' xml <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
+#  acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+#  ce <- open_cytobank_experiment(acsfile)
+#  xmlfile <- ce$gatingML
 #' g <- read.gatingML.cytobank(xml) #parse the population tree
 #' #plot(g) #visualize it
 #' }

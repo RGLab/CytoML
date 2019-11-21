@@ -18,9 +18,9 @@ test_that("diva--global sheet ",{
   ws <- open_diva_xml(file.path(path, "181030_AD01_RN/181030_AD01_RN.xml"))
   set.seed(1)
   gs <- diva_to_gatingset(ws, name = 3, subset = "G00159008_V05_01_003.fcs", worksheet = "global"
-                        , which.lines = 7e3)#speed up this test case by subsetting data  due to the large data
+                        , which.lines = 1e3)#speed up this test case by subsetting data  due to the large data
   stats <- gh_pop_compare_stats(gs[[1]])[, openCyto.freq]
-  expect_equal(stats, c(1,0.67,0.99,0.27,0.86,0.18,0.53,1,0.18,0.18,0.72,0.7,0.04,0.99), tol = 1.6e-2)
+  expect_equal(stats, c(1,0.67,0.99,0.27,0.86,0.18,0.53,1,0.18,0.18,0.72,0.7,0.04,0.99), tol = 6e-2)
 })
 test_that("diva--swap ",{
   #This experiment exported by diva has the FCS swapped column for -W and -H

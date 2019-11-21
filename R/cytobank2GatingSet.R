@@ -1,9 +1,10 @@
-#' A wrapper that parse the gatingML and FCS files (or cytobank_experiment object) into GatingSet
+#' A wrapper that parses the gatingML and FCS files (or \code{cytobank_experiment} object) into GatingSet
+#' 
+#' @name cytobank_to_gatingset
+#' @aliases cytobank2GatingSet
 #' @param x the cytobank_experiment object or the full path of gatingML file
 #' @param FCS FCS files to be loaded
 #' @return a GatingSet
-#' @export
-#' @rdname cytobank_to_gatingset
 #' @examples
 #' \dontrun{
 #' acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
@@ -16,6 +17,8 @@
 #' }
 #' @importFrom flowWorkspace GatingSet transform
 #' @importFrom ncdfFlow read.ncdfFlowSet
+#' @importFrom cytolib cytolib_LdFlags
+#' @export
 cytobank_to_gatingset.default <- function(x, FCS, ...){
   g <- read.gatingML.cytobank(x)
   fs <- read.ncdfFlowSet(FCS, ...)
@@ -31,17 +34,18 @@ cytobank_to_gatingset.default <- function(x, FCS, ...){
 
 
   ##Apply gates stored in `graphGML`
-  gating(g, gs)
+  gating_graphGML(g, gs)
   gs
 }
 
 #' compare the counts to cytobank's exported csv so that the parsing result can be verified.
+#' 
+#' @name gs_compare_cytobank_counts
 #' @param gs parsed GatingSet
 #' @param file the stats file (contains the populatio counts) exported from cytobank.
 #' @param id.vars either "population" or "FCS filename" that tells whether the stats file format is one population per row or FCS file per row.
 #' @param ... arguments passed to data.table::fread function
 #' @return a data.table (in long format) that contains the counts from openCyto and Cytobank side by side.
-#' @export gs_compare_cytobank_counts
 #' @examples
 #'
 #' acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
@@ -53,6 +57,7 @@ cytobank_to_gatingset.default <- function(x, FCS, ...){
 #' all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-4)
 #'
 #' @importFrom flowWorkspace gh_pop_compare_stats gs_pop_get_count_fast
+#' @export
 gs_compare_cytobank_counts <- function(gs, file, id.vars = c("FCS Filename", "population"), ...){
   #load stats from cytobank
   id.vars <- match.arg(id.vars)

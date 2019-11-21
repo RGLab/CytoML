@@ -55,7 +55,7 @@ install_github("RGLab/openCyto", ref="trunk")
 ### Installing from [BioConductor](https://www.bioconductor.org).
 
   - [Current BioConductor
-    Release](https://doi.org/doi:10.18129/B9.bioc.CytoML)
+    Relase](https://doi.org/doi:10.18129/B9.bioc.CytoML)
 
 <!-- end list -->
 
@@ -83,7 +83,7 @@ BiocManager::install("CytoML", version = "devel")
 <!-- end list -->
 
 ``` r
-install.packages("devtools")
+install.packges("devtools")
 devtools::install_github("RGLab/CytoML", ref = "trunk")
 ```
 
@@ -92,7 +92,7 @@ devtools::install_github("RGLab/CytoML", ref = "trunk")
 <!-- end list -->
 
 ``` r
-install.packages("devtools")
+install.packges("devtools")
 devtools::install_github("RGLab/CytoML@*release")
 ```
 
@@ -126,18 +126,20 @@ To import data you need the xml workspace and the raw FCS files.
 
 ``` r
 library(CytoML)
-xmlfile <- system.file("extdata/cytotrol_tcell_cytobank.xml", package = "CytoML")
-fcsFiles <- list.files(pattern = "CytoTrol", system.file("extdata", package = "flowWorkspaceData"), full.names = T)
-gs <- cytobank2GatingSet(xmlfile, fcsFiles)
+acsfile <- system.file("extdata/cytobank_experiment.acs", package = "CytoML")
+ce <- open_cytobank_experiment(acsfile)
+xmlfile <- ce$gatingML
+fcsFiles <- list.files(ce$fcsdir, full.names = TRUE)
+gs <- cytobank_to_gatingset(xmlfile, fcsFiles)
 ```
 
 #### Import a [Diva](http://www.bdbiosciences.com/us/instruments/clinical/software/flow-cytometry-acquisition/bd-facsdiva-software/m/333333/overview) workspace.
 
 ``` r
-ws <- openDiva(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
+ws <- open_diva_xml(system.file('extdata/diva/PE_2.xml', package = "flowWorkspaceData"))
 # The path to the FCS files is stored in ws@path.
 # It can also be passed in to parseWorksapce via the `path` argument.
-gs <- parseWorkspace(ws, name = 2, subset = 1)
+gs <- diva_to_gatingset(ws, name = 2, subset = 1, swap_cols = FALSE)
 ```
 
 #### Interact with the gated data (`GatingSet`)
@@ -167,7 +169,7 @@ We can print all the cell populations defined in the gating tree.
 
 ``` r
 #show all the cell populations(/nodes)
-getNodes(gh)
+gs_get_pop_paths(gh)
 ```
 
     ## [1] "root"            "/P1"             "/P1/P2"          "/P1/P2/P3"      
@@ -177,7 +179,7 @@ We can extract the cell population statistics.
 
 ``` r
 #show the population statistics
-getPopStats(gh)
+gh_pop_compare_stats(gh)
 ```
 
     ##    openCyto.freq   xml.freq openCyto.count xml.count node
@@ -209,13 +211,13 @@ plotGate(gh)
 
 Because CytoML and flowWorkspace reproduce the entire analysis in a
 workspace in R, we have access to information about which cells are part
-of which cell populations.
+of which cell popualtions.
 
 flowWorkspace has convenience methods to extract the cells from specific
 cell populations:
 
 ``` r
-getData(gh,"P3")
+gh_pop_get_data(gh,"P3")
 ```
 
     ## flowFrame object '9a1897d7-ebc9-4077-aa34-6d9e1367fa67'
@@ -242,10 +244,11 @@ This returns a `flowFrame` with the cells in gate P3 (70% of the cells
 according to the plot).
 
 The matrix of expression can be extracted from a `flowFrame` using the
-`exprs()` method:
+`exprs()` method from the `flowCore` package:
 
 ``` r
-e <- exprs(getData(gh,"P3"))
+library(flowCore)
+e <- exprs(gh_pop_get_data(gh,"P3"))
 class(e)
 ```
 
@@ -273,9 +276,9 @@ colMeans(e[,8:15])
 ```
 
     ##            FITC-A              PE-A     PerCP-Cy5-5-A          PE-Cy7-A 
-    ##         0.8305544         1.3162145         0.7746655         0.8017132 
+    ##         0.8305630         1.3162132         0.7743459         0.8017827 
     ##             APC-A         APC-Cy7-A Bd Horizon V450-A  Pacific Orange-A 
-    ##         1.0482656         1.1636819         2.2960560         1.3684352
+    ##         1.0482663         1.1636818         2.2960554         1.3684453
 
 ### Export gated data to other platforms.
 
@@ -302,29 +305,30 @@ gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
 ``` r
 #Cytobank
 outFile <- tempfile(fileext = ".xml")
-GatingSet2cytobank(gs, outFile)
+gatingset_to_cytobank(gs, outFile)
 ```
 
-    ## Warning in GatingSet2cytobank(gs, outFile): With 'cytobank.default.scale'
-    ## set to 'TRUE', data and gates will be re-transformed with cytobank's
-    ## default scaling settings, which may affect how gates look like.
+    ## Warning in gatingset_to_cytobank(gs, outFile): With
+    ## 'cytobank.default.scale' set to 'TRUE', data and gates will be re-
+    ## transformed with cytobank's default scaling settings, which may affect how
+    ## gates look like.
 
-    ## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmpS4mDCu/file154f72419eb4f.xml"
+    ## [1] "/tmp/RtmpV1ZasG/file4b9f7e4e25c1.xml"
 
 ##### Export to FlowJo
 
 ``` r
 #flowJo
 outFile <- tempfile(fileext = ".wsp")
-GatingSet2flowJo(gs, outFile)
+gatingset_to_flowjo(gs, outFile)
 ```
 
-    ## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmpS4mDCu/file154f774d1c840.wsp"
+    ## [1] "/tmp/RtmpV1ZasG/file4b9f18da0869.wsp"
 
 ## Next Steps
 
 See the [flowWorskspace](http://www.github.com/RGLab/flowWorkspace) and
-[openCyto](http://www.github.com/RGLab/openCyto] packages to learn
+\[openCyto\](<http://www.github.com/RGLab/openCyto>\] packages to learn
 more about what can be done with `GatingSet` objects.
 
 ## Code of conduct

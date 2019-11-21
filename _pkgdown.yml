@@ -1,0 +1,36 @@
+destination: docs
+reference:
+  - title: "FlowJo Workspaces"
+    desc: >
+      Methods for converting between FlowJo workspaces and
+      cytoverse `GatingSet` objects
+    contents:
+      - flowjo_workspace-class
+      - open_flowjo_xml
+      - flowjo_to_gatingset
+      - gatingset_to_flowjo
+      - fj_ws_get_sample_groups
+      - fj_ws_get_samples
+      - fj_ws_get_keywords
+  - title: "Diva Workspaces"
+    desc: >
+      Methods for converting between BD FACSDiva workspaces and
+      cytoverse `GatingSet` objects
+    contents:
+      - diva_workspace-class
+      - open_diva_xml
+      - diva_to_gatingset
+      - diva_get_sample_groups
+      - diva_get_samples
+  - title: "Cytobank Experiments"
+    desc: >
+      Methods for converting between Cytobank experiments and
+      cytoverse `GatingSet` objects
+    contents:
+      - open_cytobank_experiment
+      - cytobank_to_gatingset
+      - gatingset_to_cytobank
+      - ce_get_samples
+      - ce_get_compensations
+      - ce_get_transformations
+      

@@ -195,26 +195,26 @@ setMethod("plot", signature = c(x = "graphGML", y = "missing"), definition = fun
 #' @importFrom RBGL tsort
 gating_graphGML <- function(x, y, ...) {
 
-  trans <- getTransformations(gt)
+  trans <- getTransformations(x)
 
-  gt_nodes <- tsort(gt)
+  gt_nodes <- tsort(x)
   for (nodeID in gt_nodes) {
 
     # get parent node to gate
-    gt_node <- getNodes(gt, nodeID, only.names = FALSE)
+    gt_node <- getNodes(x, nodeID, only.names = FALSE)
     popName <- gt_node[["popName"]]
 
 
-    parentID <- getParent(gt, nodeID)
+    parentID <- getParent(x, nodeID)
 
     if(length(parentID) == 0)
       parent <- "root"
     else{
-      parent <- .getPath(gt, parentID)
+      parent <- .getPath(x, parentID)
     }
 
 
-    gs_nodes <- basename(gs_pop_get_children(gs[[1]], parent))
+    gs_nodes <- basename(gs_pop_get_children(y[[1]], parent))
 
     if (length(gs_nodes) == 0)
       isGated <- FALSE
@@ -222,7 +222,7 @@ gating_graphGML <- function(x, y, ...) {
       isGated <- any(popName %in% gs_nodes)
 
     #TODO: rename the node name with path in order to match against gs
-#     parentInd <- match(parent, getNodes(gs[[1]], showHidden = TRUE))
+#     parentInd <- match(parent, getNodes(y[[1]], showHidden = TRUE))
 #     if (is.na(parentInd))
 #       stop("parent node '", parent, "' not gated yet!")
     if(isGated){
@@ -250,7 +250,7 @@ gating_graphGML <- function(x, y, ...) {
         #   browser()
     this_gate <- extend(this_gate,bound = bound)
 
-    sn <- sampleNames(gs)
+    sn <- sampleNames(y)
     this_gate <- sapply(sn, function(i)this_gate)
 
     #update gates that are tailored for specific samples
@@ -265,10 +265,10 @@ gating_graphGML <- function(x, y, ...) {
 
 
 
-    gs_pop_add(gs, this_gate, parent = parent, name = popName)
+    gs_pop_add(y, this_gate, parent = parent, name = popName)
 
   }
-  recompute(gs)
+  recompute(y)
 }
 
 #' Extract compensation from graphGML object.

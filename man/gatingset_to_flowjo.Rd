@@ -5,7 +5,7 @@
 \alias{GatingSet2flowJo}
 \title{Convert a GatingSet to flowJo workspace}
 \usage{
-gatingset_to_flowjo(gs, outFile, ...)
+gatingset_to_flowjo(gs, outFile, showHidden = FALSE)
 }
 \arguments{
 \item{gs}{a GatingSet object}

@@ -1,4 +1,4 @@
-Package: CytoML
+Package: cytoml2
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
 Version: 1.13.2
@@ -59,6 +59,7 @@ Collate:
     'compensation.R'
     'cytobank2GatingSet.R'
     'cytobankExperiment.R'
+    'cytolibml_bin_path.R'
     'flowJoWorkspace_Methods.R'
     'diva2GatingSet.R'
     'flowUtils_functions.R'
@@ -72,5 +73,5 @@ Collate:
     'utils.R'
     'writeGatingML.R'
     'zzz.R'
-SystemRequirements: xml2, GNU make, C++11    
+SystemRequirements: cytolib-ml, xml2, GNU make, C++11    
 Encoding: UTF-8

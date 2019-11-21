@@ -1,4 +1,4 @@
-#' @useDynLib cytoml2,.registration = TRUE
+#' @useDynLib CytoML,.registration = TRUE
 NULL
 
 #' An R representation of a flowJo workspace.

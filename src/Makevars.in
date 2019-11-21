@@ -7,27 +7,7 @@ This makefile requires GNU Make.
 endif
 	
 CXX_STD = CXX11
-PKG_CPPFLAGS =-DROUT -I../inst/include/ @PKG_CPPFLAGS@
-PKG_LIBS =`${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags();cat(' ');RcppParallel::RcppParallelLibs()"` @PKG_LIBS@ 
-
-USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
-PKGLIB = ${USERDIR}/libflowWorkspace.a
-
- 
-all:  $(SHLIB)
-	if [ `uname -s` = 'Darwin' ]; then install_name_tool -change /usr/local/clang4/lib/libc++.1.dylib /usr/lib/libc++.1.dylib $(SHLIB); fi
-
-$(SHLIB): $(PKGLIB)
+PKG_CPPFLAGS =-DROUT -I../inst/include/ @PKG_CPPFLAGS@ -DBOOST_NO_AUTO_PTR -Wno-unknown-pragmas -Wno-comment 
 
 
-#expose static lib for other package to link to 
-$(PKGLIB): $(OBJECTS)
-	mkdir -p "${USERDIR}"
-	$(AR) rs "${PKGLIB}" $(OBJECTS)
-
-
-.PHONY: 	all clean 
-
-clean:
-		rm -f $(OBJECTS) $(SHLIB)
- 
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) @PKG_LIBS@  

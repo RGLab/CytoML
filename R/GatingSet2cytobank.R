@@ -1,3 +1,9 @@
+#' @export
+GatingSet2cytobank <- function(...){
+  .Deprecated("gatingset_to_cytobank")
+  gatingset_to_cytobank(...)
+}
+
 #' Convert a GatingSet to a Cytobank-compatible gatingML
 #'
 #' this function retrieves the gates from GatingSet and writes a customed GatingML-2.0 file
@@ -8,7 +14,9 @@
 #' 2. Rescale gate boundaries with flowjo_biexp() so gates can be displayed properly in Cytobank
 #' 3. Save gates and hierarchy structure to R environment
 #' 4. Write environment out to gatingML using write.GatingML()
-#'
+#' 
+#' @name gatingset_to_cytobank
+#' @aliases GatingSet2cytobank
 #' @importFrom XML saveXML xmlTreeParse xmlRoot
 #' @importFrom utils localeToCharset packageVersion
 #' @export
@@ -35,13 +43,7 @@
 #' outFile <- tempfile(fileext = ".xml")
 #' gatingset_to_cytobank(gs, outFile) #type by default is 'cytobank'
 #'
-#' @rdname gatingset_to_cytobank
-GatingSet2cytobank <- function(...){
-  .Deprecated("gatingset_to_cytobank")
-  gatingset_to_cytobank(...)
-}
 #' @export
-#' @rdname gatingset_to_cytobank
 gatingset_to_cytobank <- function(gs, outFile, showHidden = FALSE, cytobank.default.scale = TRUE, ...){
   #have a dry run of saveXML served as a validity check on outFile to throw error at early stage instead of the end of long process
   suppressWarnings(saveXML(xmlNode("Workspace"), file=outFile))

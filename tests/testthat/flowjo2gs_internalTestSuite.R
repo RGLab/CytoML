@@ -1,8 +1,31 @@
 context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
+test_that("flog-- offset and decades that expose the previous logGml2-based flog was wrong",{
+  
+  wsFile <- file.path(path, "flog/log.wsp")
+  
+  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  gs <- flowjo_to_gatingset(ws, name = 1, path = file.path(path,"Cytotrol/NHLBI/Tcell/"))
+  res <- gh_pop_compare_stats(gs[[1]])
+  expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.01)
+  
+  
+})
+test_that("which.lines",{
+  
+  wsFile <- file.path(path, "flog_PnE/Liver.wsp")
+  
+  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  set.seed(1)
+  gs <- flowjo_to_gatingset(ws, name = 2, which.lines = 5e4)
+  expect_equal(nrow(getData(gs[[1]])), 5e4)
+  res <- gh_pop_compare_stats(gs[[1]])
+  expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.04)
+  
+  
+})
 
-sink("/dev/null")
 
 test_that("derived parameters",{
   
@@ -22,9 +45,9 @@ test_that("set T value properly through PnE instead of PnR for flog transform wh
   
   wsFile <- file.path(path, "flog_PnE/Liver.wsp")
   
-  ws <- open_flowjo_xml(wsFile)
-  gs <- flowjo_to_gatingset(ws, name = 2, sampNloc = 'sampleNode')
-  
+  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  gs <- flowjo_to_gatingset(ws, name = 2)
+ 
   res <- gh_pop_compare_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.015)
   
@@ -50,8 +73,8 @@ test_that("skip ManuallyIncludedSamples",{
   wsFile <- file.path(path, "logicle.wsp")
   
   ws <- open_flowjo_xml(wsFile)
-  gs <- flowjo_to_gatingset(ws, name = 1, path = system.file("extdata", package = "flowCore"))
-  
+  gs <- flowjo_to_gatingset(ws, name = 1, path = system.file("extdata", package = "flowCore"), fcs_file_extension = ".B08")
+ 
   res <- gh_pop_compare_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.009)
   
@@ -69,6 +92,14 @@ test_that("skip ManuallyIncludedSamples",{
       expect_is(gs, "GatingSet")
       
     })
+
+test_that("Handle duplicate sample names",{
+  wsFile <- file.path(path, "duplicatedSampleID", "Ustekin_G26_sas_IMMPORT2.495809.xml")
+  ws <- open_flowjo_xml(wsFile)
+  expect_error(flowjo_to_gatingset(ws, name = 1, subset = 429:440), "Duplicated")
+  gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, subset = 429:440, additional.sampleID = TRUE))
+  expect_is(gs, "GatingSet")
+})
 
 test_that("search reference node for boolean gate ",{
   thisPath <- file.path(path, "searchRefNode")
@@ -104,8 +135,8 @@ test_that("skip gains from FCS for vX ",{
   thisPath <- file.path(path, "no_gains_vX")
   wsFile <- file.path(thisPath, "10-Apr-2017.wsp")
   ws <- open_flowjo_xml(wsFile)
-  gs <- suppressWarnings(flowjo_to_gatingset(ws, name=2))
-  
+ capture.output( gs <- flowjo_to_gatingset(ws, name=2))
+ 
   res <- gh_pop_compare_stats(gs[[1]])
   
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 1e-3)
@@ -116,7 +147,8 @@ test_that("gate extension ",{
       thisPath <- file.path(path, "gate_extension")
       wsFile <- file.path(thisPath, "02-15-2013 ICS.xml")
       ws <- open_flowjo_xml(wsFile)
-      gs <- suppressWarnings(flowjo_to_gatingset(ws, name=3))
+      set.seed(1)
+      capture.output(gs <- flowjo_to_gatingset(ws, name=3, which.lines = 5e4))
       
       res <- gh_pop_compare_stats(gs[[1]])[xml.count != -1, ]
       
@@ -128,7 +160,7 @@ test_that("curlyQuad gate1 ",{
       thisPath <- file.path(path, "gate_extension")
       wsFile <- file.path(thisPath, "VSVG OGH 14OCT15.wsp")
       ws <- open_flowjo_xml(wsFile)
-      gs <- suppressWarnings(flowjo_to_gatingset(ws, name=2))
+      capture.output(gs <- flowjo_to_gatingset(ws, name=3))
       
       res <- gh_pop_compare_stats(gs[[1]])
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 2e-3)
@@ -138,8 +170,8 @@ test_that("curlyQuad gate1 ",{
       thisPath <- file.path(path, "curlyQuad/example1")
       wsFile <- file.path(thisPath, "20151208_TBNK_DS.xml")
       ws <- open_flowjo_xml(wsFile)
-      gs <- suppressWarnings(flowjo_to_gatingset(ws, name=2))
-      
+      capture.output(gs <- flowjo_to_gatingset(ws, name=2))
+     
       res <- gh_pop_compare_stats(gs[[1]])
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 7e-3)
     })
@@ -157,9 +189,9 @@ test_that("curlyQuad gate ",{
 test_that("EllipsoidGate defined on log-transformed channels ",{
       thisPath <- file.path(path, "ellipsoid_log")
       wsFile <- file.path(thisPath, "xml_spillover2.xml")
-      ws <- open_flowjo_xml(wsFile)
-      gs <- flowjo_to_gatingset(ws, name=1, execute = T, sampNloc = "sampleNode", subset = "spillover_B2.fcs")
-        
+      ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
+      capture.output(gs <- flowjo_to_gatingset(ws, name=1, execute = T, subset = "spillover_B2.fcs"))
+       
       res <- gh_pop_compare_stats(gs[[1]])
       expect_equal(res[, xml.count], res[, openCyto.count], tol = 4e-3)
 })
@@ -177,6 +209,14 @@ test_that("No gate extension ",{
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 4e-3)
     })
 
+test_that("FCS searching path with symlink ",{
+  thisPath <- file.path(path, "flin_symlink")
+  wsFile <- file.path(thisPath, "A01.wsp")
+  ws <- open_flowjo_xml(wsFile)
+  gs <- flowjo_to_gatingset(ws, name = 1, subset = 1)
+  res <- gh_pop_compare_stats(gs[[1]])
+  expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 9e-4)
+})
 
 test_that("Time gate ",{
   thisPath <- file.path(path, "flin")
@@ -190,7 +230,7 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
       thisPath <- file.path(path, "timegate")
       wsFile <- file.path(thisPath, "MX1 Analysis VISC.xml")
       ws <- open_flowjo_xml(wsFile)
-      gs <- flowjo_to_gatingset(ws,name="Group 1",subset=11)
+      gs <- flowjo_to_gatingset(ws,name="Group 1",subset=1)
       res <- gh_pop_compare_stats(gs[[1]])[xml.count!=-1,]
       expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 8e-3)
     })
@@ -199,16 +239,17 @@ test_that("Inverse function of flog ",{
       wsFile <- file.path(thisPath, "Small.xml")
       ws <- open_flowjo_xml(wsFile)
       
-      gs <- flowjo_to_gatingset(ws, name=1, emptyValue=FALSE)
+      capture.output(gs <- flowjo_to_gatingset(ws, name=1, emptyValue=FALSE))
       
       gh <- gs[[1]]
-      res <- gh_pop_compare_stats(gs[[1]])
-      expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 2e-3)
-      
+      thisCounts <- gs_pop_get_count_fast(gs, path = "auto")
+      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
+      expect_equal(thisCounts, expectCounts)
+    
       
       trans <- gh_get_transformations(gh)
       inverse <- gh_get_transformations(gh, inverse = T)
-      raw <- c(1, 1e2, 1e3,1e5)
+      raw <- c(1e2, 1e3,1e5)
       log <- trans[[1]](raw)
       expect_equal(inverse[[1]](log), raw)
       
@@ -223,7 +264,7 @@ test_that("v 10.0.6 - vX 1.8",{
       gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, execute = FALSE)
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, isNcdf = TRUE)
+      gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1)
       
       gh <- gs[[1]]
             
@@ -236,20 +277,18 @@ test_that("v 10.0.6 - vX 1.8",{
       tmp <- tempdir()
       suppressWarnings(write.FCS(fr, filename = file.path(tmp, fcsname), delimiter = "/"))
       
-      expect_error(gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, isNcdf = F, path = tmp)
-                  , "Empty keyword name") #flowSet
-      expect_error(gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, isNcdf = T, path = tmp)
+      expect_error(gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, path = tmp, emptyValue = T)
           , "Empty keyword name")#ncdfFlowSet
               
-      gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, isNcdf = T, path = tmp, emptyValue = F)#ncdf
+      gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, path = tmp, emptyValue = F)#ncdf
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)            
       expect_equal(thisCounts[-1, xml.count], thisCounts[-1, openCyto.count], tol = 3.7e-3)
       
-      gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, isNcdf = F, path = tmp, emptyValue = F)#flowSet
-      gh <- gs[[1]]
-      thisCounts <- gh_pop_compare_stats(gh)            
-      expect_equal(thisCounts[-1, xml.count], thisCounts[-1, openCyto.count], tol = 3.7e-3)
+      # gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, isNcdf = F, path = tmp, emptyValue = F)#flowSet
+      # gh <- gs[[1]]
+      # thisCounts <- gh_pop_compare_stats(gh)            
+      # expect_equal(thisCounts[-1, xml.count], thisCounts[-1, openCyto.count], tol = 3.7e-3)
     })
 
 
@@ -262,20 +301,21 @@ test_that("v 10.0.7 - vX 20.0 (ellipsoidGate)",{
       gs <- flowjo_to_gatingset(ws, name = "Matrice", subset = 1, execute = FALSE)
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = "Matrice", subset = 1, isNcdf = TRUE)
-      
+      gs <- flowjo_to_gatingset(ws, name = "Matrice", subset = 1)
+     
       gh <- gs[[1]]
      
       thisCounts <- gh_pop_compare_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
     })
 
+
+
 test_that("v 10.0.7 - vX 20.0 (missing_namespace and flin)",{
       
       thisPath <- file.path(path, "missing_namespace")
       wsFile <- file.path(thisPath, "BM_data.xml")
-      
-      ws <- open_flowjo_xml(wsFile)
+      ws <- open_flowjo_xml(wsFile, options = 32)#set option to suppress xml error
       expect_error(gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, execute = FALSE)
                     , "*: unknown tranformation type!transforms:linear")
       
@@ -287,7 +327,7 @@ test_that("v 10.0.7 - vX 20.0 (missing_namespace and flin)",{
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
       trans <- gh_get_transformations(gh, only = F, channel = "all")
-      expect_equal(trans[[2]][["name"]], "flowJo_flog")
+      expect_equal(trans[[2]][["name"]], "flowJo_log")
     })
 
 # invalid xml with Namespace prefix defintion missing #TODO: try to be robust on this kind of xml error
@@ -299,7 +339,7 @@ test_that("v 10.0.7 - vX 20.0 (missing_namespace and flin)",{
 #      ws <- open_flowjo_xml(wsFile)
 #      gs <- flowjo_to_gatingset(ws, name = 3, subset = 1, execute = FALSE)
 #      expect_is(gs, "GatingSet")
-#      gs <- flowjo_to_gatingset(ws, name = 3, subset = 1, isNcdf = TRUE)
+#      gs <- flowjo_to_gatingset(ws, name = 3, subset = 1)
 #      
 #      gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
@@ -342,18 +382,18 @@ test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
       thisPath <- file.path(path, "PROVIDE")
       wsFile <- file.path(thisPath, "batch1 local and week 53.wsp")
       
-      ws <- open_flowjo_xml(wsFile)
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, execute = FALSE, sampNloc = "sampleNode")
+      ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
+      gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, execute = FALSE)
       expect_is(gs, "GatingSet")
       
       #won't find the file if $TOT is taken into account(most likely the data provided was wrong)
-      expect_warning(expect_error(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, sampNloc = "sampleNode")
-                   , "no sample to be added to GatingSet!")
-               , "Can't find the FCS")
+      expect_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3)
+                                  , "No samples")
+               , "FCS")
       
       #relax the rules (shouldn't be doing this, just for the sake of testing)
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, sampNloc = "sampleNode", additional.keys = NULL)
-      
+      capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL))
+    
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
       expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
@@ -419,7 +459,7 @@ test_that("v 10.0.8r1 - vX 20.0 (OrNode)",{
   
   ws <- open_flowjo_xml(wsFile)
   
-  gs <- flowjo_to_gatingset(ws, name = 1, path = file.path(path))
+  gs <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
   
   expect_is(gs, "GatingSet")
   gh <- gs[[1]]
@@ -439,14 +479,14 @@ test_that("v 10.0.8 - vX 20.0 (slash_issue_vX)",{
       wsFile <- file.path(thisPath, "IFEP004.wsp")
       
       ws <- open_flowjo_xml(wsFile)
-      
-      gs <- flowjo_to_gatingset(ws, name = 5, path = file.path(thisPath), execute = T)
+      set.seed(1)
+      gs <- flowjo_to_gatingset(ws, name = 5, path = file.path(thisPath), which.lines = 1e5)
       
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       thisCounts <- gh_pop_compare_stats(gh)
-      expect_equal(thisCounts[, xml.count], thisCounts[, openCyto.count], tol = 0.038)
+      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 0.025)
       
       
     })
@@ -456,14 +496,14 @@ test_that("v 10.2 - vX 20.0 (EllipsoidGate)",{
       wsFile <- file.path(thisPath, "mA J21 for HT.wsp")
       
       ws <- open_flowjo_xml(wsFile)
-      
-      gs <- flowjo_to_gatingset(ws, name = 2, path = file.path(thisPath), execute = T)
+      set.seed(1)
+      gs <- flowjo_to_gatingset(ws, name = 2, path = file.path(thisPath), which.lines = 1e5)
       
       expect_is(gs, "GatingSet")
       gh <- gs[[1]]
 #      expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       thisCounts <- gh_pop_compare_stats(gh)
-      expect_equal(thisCounts[, xml.count], thisCounts[, openCyto.count], tol = 0.03)
+      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 0.03)
       
       
     })
@@ -476,12 +516,12 @@ test_that("v 7.6.1- win 1.6 (use default biexp trans when channel-specific trans
       
       gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, path = thisPath,  execute = FALSE)
       expect_is(gs, "GatingSet")
-      
-      expect_warning(gs <- flowjo_to_gatingset(ws, name = 2, path = thisPath), "Can't find the FCS")
+      set.seed(1)
+      expect_output(gs <- flowjo_to_gatingset(ws, name = 2, path = thisPath, which.lines = 1e5), "FCS")
       gh <- gs[[1]]
       
       thisCounts <- gh_pop_compare_stats(gh)
-      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
+      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 0.015)
     })
 
 test_that("v 7.6.5 - win 1.61 (PBMC)",{
@@ -510,7 +550,7 @@ test_that("v 7.6.5 - win 1.61 (sampNloc = 'sampleNode')",{
       gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sampNloc = "sampleNode", execute = FALSE)
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sampNloc = "sampleNode", isNcdf = TRUE)
+      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sampNloc = "sampleNode")
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-4)
@@ -528,7 +568,7 @@ test_that("v 7.6.5 - win 1.61 (sampNloc = 'sampleNode')",{
 #       gs <- flowjo_to_gatingset(ws, name = 4, subset = 1, execute = FALSE)
 #       expect_is(gs, "GatingSet")
 #       
-#       gs <- flowjo_to_gatingset(ws, name = 4, subset = 1, isNcdf = TRUE)
+#       gs <- flowjo_to_gatingset(ws, name = 4, subset = 1)
 #       gh <- gs[[1]]
 #       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
 #       thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
@@ -544,11 +584,11 @@ test_that("v 9.0.1 - mac 2.0 (HVTN 080-0880)",{
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = 4, subset = 1, execute = FALSE)
       expect_is(gs, "GatingSet")
-      
-      gs <- flowjo_to_gatingset(ws, name = 4, subset = 1, isNcdf = TRUE)
+      set.seed(1)
+      gs <- flowjo_to_gatingset(ws, name = 4, subset = "431321.fcs", which.lines = 1e5)
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)
-      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-3)
+      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 4e-3)
       
     })
 
@@ -559,10 +599,10 @@ test_that("v 9.2 - mac 2.0 (ITN029)",{
       wsFile <- file.path(thisPath, "QA_template.xml")
 
       ws <- open_flowjo_xml(wsFile)
-      gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, execute = FALSE)
+      expect_output(gs <- flowjo_to_gatingset(ws, name = 2, subset = 1,execute = FALSE), "no calibration")
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, isNcdf = TRUE)
+      expect_output(gs <- flowjo_to_gatingset(ws, name = 2, subset = 1), "no calibration")
       gh <- gs[[1]]
       # expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       # thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
@@ -580,7 +620,7 @@ test_that("v 9.4.2 - mac 2.0",{
       gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, execute = FALSE)
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, isNcdf = TRUE)
+      gs <- flowjo_to_gatingset(ws, name = 2, subset = 1)
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
@@ -598,8 +638,8 @@ test_that("v 9.4.4 - mac 2.0 ",{
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = "Test", subset = 1, execute = FALSE)
       expect_is(gs, "GatingSet")
-      
-      gs <- flowjo_to_gatingset(ws, name = "Test", subset = 1)
+      set.seed(1)
+      gs <- flowjo_to_gatingset(ws, name = "Test", subset = 1, which.lines = 1e5)
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
@@ -616,7 +656,7 @@ test_that("v 9.5.2 - mac 2.0",{
       gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, path = file.path(thisPath,"Bcell"), execute = FALSE)
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, path = file.path(thisPath,"Bcell"), isNcdf = TRUE)
+      gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, path = file.path(thisPath,"Bcell"))
       gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       thisCounts <- gh_pop_compare_stats(gh)
@@ -645,8 +685,8 @@ test_that("v 9.6.3 - mac 2.0 (ignore highValue for FSC/SSC)",{
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = 1, subset = "Specimen_001_Tube_024.fcs", execute = FALSE)
       expect_is(gs, "GatingSet")
-      
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = "Specimen_001_Tube_024.fcs", isNcdf = TRUE)
+      set.seed(1)
+      gs <- flowjo_to_gatingset(ws, name = 1, subset = "Specimen_001_Tube_024.fcs")
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 7e-3)
@@ -660,8 +700,8 @@ test_that("v 9.7.4 - mac 3.0",{
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002 PBMC control_101211.fcs", execute = FALSE)
       expect_is(gs, "GatingSet")
-      
-      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002 PBMC control_101211.fcs", isNcdf = TRUE)
+      set.seed(1)
+      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002 PBMC control_101211.fcs")
       gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       thisCounts <- gh_pop_compare_stats(gh, path = "full")[, list(xml.count,openCyto.count, node)]
@@ -677,8 +717,8 @@ test_that("v 9.7.5 - mac 3.0 (no compensation and using calibrationIndex)",{
       gs <- flowjo_to_gatingset(ws, name = 5, subset = "477889_env_cct_norm_concatenated.txt", execute = FALSE)
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = 5, subset = "477889_env_cct_norm_concatenated.txt", isNcdf = TRUE)
-      gh <- gs[[1]]
+      gs <- flowjo_to_gatingset(ws, name = 5, subset = "477889_env_cct_norm_concatenated.txt", fcs_file_extension = ".txt")
+	  gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
       expectCounts[flowJo.count ==0, flowJo.count := -1] #fix the legacy counts
@@ -692,13 +732,10 @@ test_that("v 9.7.5 - mac 3.0 (boolGate that refers to the non-sibling nodes)",{
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = 2, subset = "434713.fcs", execute = FALSE)
       expect_is(gs, "GatingSet")
-      
-      gs <- flowjo_to_gatingset(ws, name = 2, subset = "434713.fcs", isNcdf = TRUE)
+      set.seed(1)
+      gs <- flowjo_to_gatingset(ws, name = 2, subset = "434713.fcs", which.lines = 1e5)
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)
-      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-3)
+      expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
     })
 
-
-
-sink()

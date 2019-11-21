@@ -2,20 +2,14 @@
 % Please edit documentation in R/flowJoWorkspace_Methods.R
 \name{open_flowjo_xml}
 \alias{open_flowjo_xml}
-\alias{closeWorkspace}
-\alias{flowjo_ws_close}
 \title{Open/Close a flowJo workspace}
 \usage{
-open_flowjo_xml(file, options = 0, ...)
-
-closeWorkspace(workspace)
-
-flowjo_ws_close(workspace)
+open_flowjo_xml(file, options = 0, sampNloc = "keyword")
 }
 \arguments{
 \item{file}{Full path to the XML flowJo workspace file.}
 
-\item{options}{xml parsing options passed to \code{\link{xmlTreeParse}}}
+\item{options}{xml parsing options passed to \code{\link{xmlTreeParse}}. See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption for details.}
 
 \item{...}{other arguments passed to \code{\link{xmlTreeParse}}}
 
@@ -36,8 +30,7 @@ Open an XML flowJo workspace file and return a \code{flowjo_workspace} object. T
 \dontrun{
 	file<-"myworkspace.xml"
 	ws<-open_flowjo_xml(file);
-	class(ws); #flowjo_workspace
-	flowjo_ws_close(ws);
+	ws
 }
 
 }

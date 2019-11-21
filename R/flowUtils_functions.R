@@ -46,7 +46,7 @@ xmlTag <- function(tag, attrs=NULL, children=NULL, system="win", ...)
   mf <- list(...)
   tn <- if("namespace" %in% names(mf)) 
     paste(mf$namespace, tag, sep=":") else tag
-  if(!is.list(children) || is(children, "XMLNode"))
+  if((!is.list(children) || is(children, "XMLNode"))&&!is.null(children))
     children <- list(children)
   xmlNode(name=tag, attrs=targs(tn, attrs=attrs, system=system), 
           .children=children, ...) 
@@ -56,7 +56,7 @@ xmlVertexNode <- function (xy)
 {
   xmlTag("vertex", namespace = "gating", children = lapply(xy, 
                                                            function(x) xmlTag("coordinate", namespace = "gating", 
-                                                                              attrs = list(`data-type:value` = x))))
+                                                                              attrs = list(`data-type:value` = as.character(format_float(x))))))
 }
 
 # internals copied from flowUtils to avoid :::

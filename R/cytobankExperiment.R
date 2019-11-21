@@ -1,15 +1,26 @@
-#' Construct cytobank_experiment object from ACS file
-#' @param acs ACS file exported from Cytobank
-#' @param exdir he directory to extract files to
-#' @return cytobank_experiment object
-#' @importFrom yaml read_yaml
-#' @rdname open_cytobank_experiment
+#' Methods for interacting with cytobank_experiment objects
+#' 
+#' These methods mirror similar accessor methods for the \code{GatingSet}
+#' class.
+#' 
+#' @name cytobank_experiment-methods
+#' @aliases print.cytobank_experiment
+NULL
+
+
 #' @export
 cytobankExperiment <- function(...){
   .Deprecated("open_cytobank_experiment")
   open_cytobank_experiment(...)
 }
-#' @rdname open_cytobank_experiment
+#' Construct a \code{cytobank_experiment} object from ACS file
+#' 
+#' @name open_cytobank_experiment
+#' @aliases cytobankExperiment
+#' @param acs ACS file exported from Cytobank
+#' @param exdir he directory to extract files to
+#' @return cytobank_experiment object
+#' @importFrom yaml read_yaml
 #' @export
 open_cytobank_experiment <- function(acs, exdir = tempfile()){
   message("Unpacking ACS file...")
@@ -49,31 +60,33 @@ open_cytobank_experiment <- function(acs, exdir = tempfile()){
                         )
                    , class = "cytobank_experiment")
 }
-#' @rdname cytobank_to_gatingset
+
 #' @export
 cytobank2GatingSet <- function(...)
 {
   .Deprecated("cytobank_to_gatingset")
   cytobank_to_gatingset(...)
 }
-#' @rdname cytobank_to_gatingset
+
 #' @export
 cytobank_to_gatingset <- function(x, ...)UseMethod("cytobank_to_gatingset")
-#' @importFrom flowWorkspace markernames<-
+
+
+#' @name cytobank_to_gatingset
 #' @param panel_id select panel to parse
 #' @param ... other arguments
-#' @export
 #' @method cytobank_to_gatingset cytobank_experiment
 #' @importFrom dplyr filter
-#' @rdname cytobank_to_gatingset
+#' @importFrom flowWorkspace markernames<-
+#' @export
 cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
   #filter by panel
+  ce <- x
   panel <- ce_get_panels(ce)
   pname <- panel[panel_id][["panel"]]
-  samples <- ce_get_samples(x) %>% filter(panel == pname)
+  samples <- ce_get_samples(ce) %>% filter(panel == pname)
   samples <- samples[["sample"]]
-  gs <- cytobank_to_gatingset(x$gatingML, file.path(x$fcsdir, samples), ...)
-  ce <- x
+  gs <- cytobank_to_gatingset(ce$gatingML, file.path(ce$fcsdir, samples), ...)
   pData(gs) <- pData(ce)[samples, ]
   #update markers 
   markers.ce <- markernames(ce)
@@ -94,9 +107,6 @@ cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
 }
 setOldClass("cytobank_experiment")
 
-#' @param x cytobank_experiment object
-#' @rdname cytobank_experiment
-#' @param ... not used
 #' @export
 #' @method print cytobank_experiment
 print.cytobank_experiment <- function(x, ...){
@@ -112,8 +122,11 @@ print.cytobank_experiment <- function(x, ...){
   print(as.data.frame(panels))
 }
 
-
-#' @rdname cytobank_experiment
+#' Obtain the spillover matrices for the samples in a Cytobank experiment
+#' 
+#' @name ce_get_compensations
+#' @param x A cytobank_experiment object
+#' @return A named list of spillover matrices
 #' @export
 ce_get_compensations <- function(x){
   comps <- x[["experiment"]][["compensations"]]
@@ -128,13 +141,25 @@ ce_get_compensations <- function(x){
   res
 }
 
-#' @rdname cytobank_experiment
+#' Obtain counts of the number of samples associated with each marker panel
+#' in a Cytobank experiment
+#' 
+#' @name ce_get_panels
+#' @param x \code{cytobank_experiment} object
+#' @return A \code{tibble} of panels with sample counts
 #' @importFrom dplyr rename count %>%
 #' @export
 ce_get_panels <- function(x){
   ce_get_samples(x) %>% count(panel) %>% rename(samples = n)
 }
-#' @rdname cytobank_experiment
+
+#' Obtain a mapping between the samples and marker panels in a Cytobank
+#' experiment
+#' 
+#' @name ce_get_samples
+#' @param x A \code{cytobank_experiment} object
+#' @return A \code{tibble} with rows containing sample names and their associated
+#' panel names
 #' @importFrom tibble tibble
 #' @export
 ce_get_samples <- function(x){
@@ -142,7 +167,9 @@ ce_get_samples <- function(x){
   x <- unlist(sapply(x, function(i)i[["panel"]]))
   tibble(panel = x, sample = names(x))
 }
-#' @rdname cytobank_experiment
+#' @rdname cytobank_experiment-methods
+#' @usage markernames(object)
+#' @param object A \code{cytobank_experiment} object
 #' @importFrom flowWorkspace markernames
 #' @export
 setMethod("markernames",
@@ -161,8 +188,8 @@ setMethod("markernames",
             
           })
 
-#' @rdname cytobank_experiment
-#' @param do.NULL,prefix not used
+#' @rdname cytobank_experiment-methods
+#' @usage colnames(object)
 #' @export
 setMethod("colnames",
           signature=signature(x="cytobank_experiment"),
@@ -187,7 +214,13 @@ get_panel_per_file <- function(ce){
   names(res) <- sampleNames(ce)
   res
 }
-#' @rdname cytobank_experiment
+
+#' Obtain the transformations associated with each channel in a Cytobank experiment
+#' 
+#' @name ce_get_transformations
+#' @param x A \code{cytobank_experiment} object
+#' @return A \code{transformerList} object containing \code{transformation} objects for each
+#' transformed channel
 #' @export
 ce_get_transformations <- function(x, ...){
   chnls <- colnames(x)
@@ -217,14 +250,15 @@ ce_get_transformations <- function(x, ...){
   transformerList(names(res), res)
 }
 
-#' @rdname cytobank_experiment
+#' @rdname cytobank_experiment-methods
+#' @usage sampleNames(object)
 #' @export
 setMethod("sampleNames","cytobank_experiment",function(object){
   rownames(pData(object))
 })
 
-#' @param object cytobank_experiment object
-#' @rdname cytobank_experiment
+#' @rdname cytobank_experiment-methods
+#' @usage pData(object)
 #' @export
 setMethod("pData","cytobank_experiment",function(object){
   get_pd(object)

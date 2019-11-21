@@ -1,7 +1,5 @@
 #' @useDynLib CytoML,.registration = TRUE
 NULL
-#' @importClassesFrom XML XMLInternalDocument
-setOldClass("XMLInternalDocument")
 
 #' An R representation of a flowJo workspace.
 #' 
@@ -34,14 +32,8 @@ setOldClass("XMLInternalDocument")
 #' @exportClass flowjo_workspace
 #' @aliases 
 #' show,flowjo_workspace-method
-setClass("flowjo_workspace"
-		,representation(version="character"
-				, file="character"
-				, .cache="environment"
-				, path="character"
-				, doc="XMLInternalDocument"
-				, options="integer")
-)
+setClass("flowjo_workspace",representation(doc="externalptr"))
+
 
 #' Open/Close a flowJo workspace
 #' 
@@ -49,7 +41,7 @@ setClass("flowjo_workspace"
 #' Close a flowjo_workspace, destroying the internal representation of the XML document, and freeing the associated memory.
 #' 
 #' @param file Full path to the XML flowJo workspace file.
-#' @param options xml parsing options passed to \code{\link{xmlTreeParse}}
+#' @param options xml parsing options passed to \code{\link{xmlTreeParse}}. See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption for details.
 #' @param ... other arguments passed to \code{\link{xmlTreeParse}}
 #' @param workspace A \code{flowjo_workspace}
 #' @details
@@ -60,85 +52,39 @@ setClass("flowjo_workspace"
 #' \dontrun{
 #' 	file<-"myworkspace.xml"
 #' 	ws<-open_flowjo_xml(file);
-#' 	class(ws); #flowjo_workspace
-#' 	flowjo_ws_close(ws);
+#' 	ws
 #' }
-#' 
+#'
 #' @importFrom XML xmlTreeParse xmlAttrs xmlGetAttr xmlTreeParse xmlRoot xmlValue xpathApply
-#' @aliases open_flowjo_xml
-#' @rdname open_flowjo_xml
+#' @import flowCore ncdfFlow
 #' @export 
-#' @export open_flowjo_xml
-open_flowjo_xml <- function(file,options = 0,...){
- 	#message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
-	tmp<-tempfile(fileext=".xml")
-    if(!file.exists(file))
-      stop(file, " not found!")
-	if(!file.copy(file,tmp))
-      stop("Can't copy ", file, " to ", tmp)
-    
-	if(inherits(file,"character")){
-		x<-xmlTreeParse(tmp,useInternalNodes=TRUE,options = options, ...);
-	}else{
-		stop("Require a filename of a workspace, but received ",class(x)[1]);
-	}
-	ver <- xpathApply(x,"/Workspace",function(x)xmlGetAttr(x,"version"))[[1]]
-	x<-new("flowjo_workspace",version=ver,.cache=new.env(parent=emptyenv()),file=basename(file),path=dirname(file),doc=x, options = as.integer(options))
-	x@.cache$flag=TRUE;
-	return(x);
+open_flowjo_xml <- function(file,options = 0, sampNloc = "keyword"){
+  valid_values <- c("keyword", "sampleNode")
+  sampNloc <- match.arg(sampNloc, valid_values)
+  file <- path.expand(file)
+  new("flowjo_workspace", doc = open_workspace(file, sample_name_location = match(sampNloc,valid_values), xmlParserOption = options))
+  
 }
 
 setMethod("show",c("flowjo_workspace"),function(object){
-	cat("FlowJo Workspace Version ",object@version,"\n");
-	cat("File location: ",object@path,"\n");
-	cat("File name: ",object@file,"\n");
-	if(object@.cache$flag){
-		cat("Workspace is open.","\n");
-		cat("\nGroups in Workspace\n");
-        
-    sg <- fj_ws_get_sample_groups(object)
-    sg <- data.table(sg)
-    sg <- sg[, .(Num.Samples = .N), by = groupName]
-		setnames(sg, "groupName", "Name")
-	  print(data.frame(sg))
-	}else{	
-		cat("Workspace is closed.","\n")
-	}
-})
-#' @importFrom XML free
-#' @rdname open_flowjo_xml
-#' @export
-closeWorkspace <- function(workspace){
-  .Deprecated("flowjo_ws_close")
-  flowjo_ws_close(workspace)
-}
-#' @rdname open_flowjo_xml
-#' @export
-flowjo_ws_close <- function(workspace){
-  free(workspace@doc);
-	workspace@.cache$flag<-FALSE;
-}
-
-
-#' match version string to the support list
-#' 
-#' @param wsversion version string to match
-#' 
-#' @return the macthed workspace type
-#' @noRd 
-.getWorkspaceType <- function(wsversion){
-  curSupport <- unlist(CytoML.par.get("flowJo_versions"))
-  ver_ind <- match(wsversion, curSupport)
-  if(is.na(ver_ind))
-    stop("Unsupported version: ", wsversion)
-  else{
-    wsType <- names(curSupport[ver_ind])  
-  }
-  gsub("[0-9]", "", wsType)
-}
-
+#	cat("FlowJo Workspace Version ",get_version(object),"\n");
+      cat("File location: ",get_xml_file_path(object@doc),"\n");
+      cat("\nGroups in Workspace\n");
+      
+      sg <- fj_ws_get_sample_groups(object)
+      tbl<-table(Name=sg$groupName,GroupID=sg$groupID)
+      print(data.frame(Name=rownames(tbl),"Num.Samples"=diag(tbl)))
+      
+    })
 #' @export
 setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
+
+#' @importFrom flowWorkspace openWorkspace
+setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
+			.Deprecated("flowjo_to_gatingset")
+			flowjo_to_gatingset(obj, ...)
+			
+		})
 
 #' Parse a flowJo Workspace
 #' 
@@ -148,7 +94,6 @@ setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 #'      \itemize{
 #'      	\item name \code{numeric} or \code{character}. The name or index of the group of samples to be imported. If \code{NULL}, the groups are printed to the screen and one can be selected interactively. Usually, multiple groups are defined in the flowJo workspace file.
 #'      	\item execute \code{TRUE|FALSE} a logical specifying if the gates, transformations, and compensation should be immediately calculated after the flowJo workspace have been imported. TRUE by default. 
-#'      	\item isNcdf \code{TRUE|FALSE} logical specifying if you would like to use netcdf to store the data, or if you would like to keep all the flowFrames in memory. For a small data set, you can safely set this to FALSE, but for larger data, we suggest using netcdf. You will need the netcdf C library installed.
 #'      	\item subset \code{numeric} vector specifying the subset of samples in a group to import.
 #'                        Or a \code{character} specifying the FCS filenames to be imported.
 #'                        Or an \code{expression} to be passed to 'subset' function to filter samples by 'pData' (Note that the columns referred by the expression must also be explicitly specified in 'keywords' argument)  
@@ -158,7 +103,9 @@ setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 #'                                                          When it is a \code{data.frame}, it is expected to contain two columns:'sampleID' and 'file', which is used as the mapping between 'sampleID' and FCS file (absolute) path. When such mapping is provided, the file system searching is avoided.
 #'      	\item sampNloc a \code{character} scalar indicating where to get sampleName(or FCS filename) within xml workspace. It is either from "keyword" or "sampleNode". 
 
-#'      	\item compensation=NULL: a \code{compensation} or a list of \code{compensation}s that allow the customized compensation matrix to be used instead of the one specified in flowJo workspace.    
+#'      	\item compensation=NULL: a \code{compensation} object, matrix or data.frame or a list of these objects that allow the customized compensation () to be used instead of the one specified in flowJo workspace or FCS file.    
+#'                                 When it is a list, its names is supposed to be matched to sample guids (Default is the fcs filename suffixed by $TOT. See "additional.keys" arguments for details of guids)
+#'                                 When some of the samples don't have the external compensations matched, it will fall back to the flowJo xml or FCS looking for the compensation matrix.
 #'      	\item options=0: a \code{integer} option passed to \code{\link{xmlTreeParse}}
 #'          \item channel.ignore.case a \code{logical} flag indicates whether the colnames(channel names) matching needs to be case sensitive (e.g. compensation, gating..)
 #'          \item extend_val \code{numeric} the threshold that determine wether the gates need to be extended. default is 0. It is triggered when gate coordinates are below this value.
@@ -173,6 +120,7 @@ setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 #'          \item keywords \code{character} vector specifying the keywords to be extracted as pData of GatingSet
 #'          \item keywords.source \code{character} the place where the keywords are extracted from, can be either "XML" or "FCS"
 #'          \item keyword.ignore.case a \code{logical} flag indicates whether the keywords matching needs to be case sensitive.    
+#' 			\item transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
 #'      	\item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
 #'      	}
 #' @details
@@ -191,8 +139,7 @@ setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 #'  
 #'  gs <- flowjo_to_gatingset(ws, name = 4
 #'                         , path = dataDir     #specify the FCS path 
-#'                         , subset = "CytoTrol_CytoTrol_1.fcs"     #subset the parsing by FCS filename
-#'                         , isNcdf = FALSE)#turn off cdf storage mode (normally you don't want to do this for parsing large dataset)
+#'                         , subset = "CytoTrol_CytoTrol_1.fcs")     #subset the parsing by FCS filename
 #' 
 #'  
 #' 
@@ -215,797 +162,247 @@ setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 #' @rdname flowjo_to_gatingset
 #' @export 
 #' @importFrom utils menu
-setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
-  .Deprecated("flowjo_to_gatingset")
-  flowjo_to_gatingset(obj, ...)
-  
-    })
-#' @importFrom dplyr group_by do %>%
-#' @rdname flowjo_to_gatingset
-#' @export 
-flowjo_to_gatingset <- function(obj, name = NULL
-                              , subset = NULL
-                              , requiregates = TRUE
-                              , sampNloc = "keyword"
-                              , additional.keys = "$TOT"
-                              , additional.sampleID = FALSE
-                              , keywords = NULL, keywords.source = "XML"
-                              , execute = TRUE
-                              , path = obj@path
-                              , keyword.ignore.case = FALSE
-                              , ...)
-{	
-    
-    
-    
-    sampNloc <- match.arg(sampNloc, c("keyword", "sampleNode"))	
-	
-    if(is.element("ignore.case", names(list(...)))) 
-      stop("ignore.case is deprecated by channel.ignore.case!")
-  	x<-obj@doc;
-  	
-  	wsversion <- obj@version
-    
-    wsType <- .getWorkspaceType(wsversion)
-    wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
-    
-    #sample info  
-    allSamples <- .getSamples(x, wsType, sampNloc = sampNloc)
-    #some time the sample name is stored as full file path in xml
-    allSamples[["name"]] <- gsub("\\\\", "/", allSamples[["name"]]) #convert the potential windowns path
-    allSamples[["name"]] <- basename(allSamples[["name"]]) #strip the potential dir path
-    # group Info
-    g <- .getSampleGroups(x, wsType)
-    # merge two
-  	sg <- merge(allSamples, g, by="sampleID");
-  	
-      #requiregates - exclude samples where there are no gates? if(requiregates==TRUE)
-  	if(requiregates){
-  		sg <- sg[sg$pop.counts>0,]
-  	}
-  	
-    # filter by group name
-  	sg$groupName<-factor(sg$groupName)
-  	groups<-levels(sg$groupName)
-      
-  	if(is.null(name)){
-  	message("Choose which group of samples to import:\n");
-      groupInd <- menu(groups,graphics=FALSE);
-  	}else if(is.numeric(name)){
-  		if(length(groups)<name)
-  			stop("Invalid sample group index.")
-  		groupInd <- name
-  	}else if(is.character(name)){
-  		if(is.na(match(name,groups)))
-  			stop("Invalid sample group name.")
-            groupInd <- match(name,groups)
-  	}
-    group.name <- groups[groupInd]
-    
-    subset <- substitute(subset)
-    sg <- subset(sg, groupName == group.name)
-    
-    #parse the pData and apply the filter (subset)
-    pd <- .parse.pData(obj = obj, keywords = keywords, sg = sg
-                      , keywords.source = keywords.source
-                      , execute = execute
-                      , additional.keys = additional.keys
-                      , additional.sampleID = additional.sampleID
-                      , path = path
-                      , keyword.ignore.case = keyword.ignore.case
-                      , subset = subset
-                      , ... #arguments for read.FCSheader
-                      )
-    
-	.parseWorkspace(xmlFileName=file.path(obj@path,obj@file)
-                    , pd = pd 
-                    ,xmlParserOption = obj@options
-                    ,wsType=wsType
-                    ,ws = obj
-                    , sampNloc = sampNloc
-                    , execute = execute
-                    ,...)
-		
-}
-#' @importFrom flowCore read.FCSheader
-.parse.pData <- function(obj, keywords, sg, keywords.source, execute, additional.keys, additional.sampleID
-                          , path, keyword.ignore.case, subset, emptyValue = TRUE
-                          , ... #other arguments ignored
-                         )
+#' @importFrom RcppParallel RcppParallelLibs
+flowjo_to_gatingset <- function(ws, name = NULL
+    , subset = list()
+    , execute = TRUE
+    , path = ""
+    , h5_dir = tempdir()
+    , includeGates = TRUE
+    , additional.keys = "$TOT"
+    , additional.sampleID = FALSE
+    , keywords = character()
+    , keywords.source = "XML"
+    , keyword.ignore.case = FALSE
+    , extend_val = 0
+    , extend_to = -4000
+    , channel.ignore.case = FALSE
+    , leaf.bool = TRUE
+    , compensation = NULL
+    , transform = TRUE
+	, fcs_file_extension = ".fcs"
+	, mc.cores = 1
+    , ...)
 {
   
-  #handle the non-expression 'subset' (e.g. character, numerical or logical index)
-  subset_evaluated <- try(eval(subset,  parent.frame(n = 2)), silent = TRUE) #eval it outside of pd first
-  if(class(subset_evaluated) != "try-error" && !is.null(subset_evaluated)){
-    # when factor convert it to character
-    if(is.factor(subset_evaluated)){
-      subset_evaluated <- as.character(subset_evaluated)
-    }
-    # when character, evaluate it as sample names
-    # and convert it to logical vector
-    if(is.character(subset_evaluated)){
-      subset_evaluated <- eval(substitute(name %in% s, list(s = subset_evaluated)), sg)
-    }
-    #do the filtering
-    if(is.numeric(subset_evaluated)||is.logical(subset_evaluated))
-      sg <- sg[subset_evaluated, ,drop = FALSE]
-    else
-      stop("Unsupported 'subset' type!")
-    
-    #set it to NULL to avoid repeatedly evaluating later
-    subset_evaluated <- NULL
+  # determine the group
+  g <- fj_ws_get_sample_groups(ws)
+  groups<-levels(g$groupName)
+  
+  if(is.null(name)){
+    groupInd <- menu(groups,graphics=FALSE, "Choose which group of samples to import:");
+  }else if(is.numeric(name)){
+    if(length(groups)<name)
+      stop("Invalid sample group index.")
+    groupInd <- name
+  }else if(is.character(name)){
+    if(is.na(match(name,groups)))
+      stop("Invalid sample group name.")
+    groupInd <- match(name,groups)
   }
-  nSample <- nrow(sg)
-  if(nSample == 0)
-    stop("No samples in this workspace to parse!")  
   
-  isDup <- duplicated(sg[["sampleID"]])
-  if(any(isDup))
-    stop("duplicated samples ID within group: ", paste(sg[["sampleID"]][isDup], collapse = " "))
-  
-  
-  searchByKeyword <- TRUE #a deprecated argument
-  
-  #use other keywords in addition to name to uniquely identify samples 
-  if(!is.null(additional.keys)){
-    sg[["guid"]] <- as.vector(apply(sg, 1, function(row){
-              sampleID <- as.numeric(row[["sampleID"]])
-              sn <- row[["name"]]
-              kw <- unlist(fj_ws_get_keywords(obj, sampleID)[additional.keys])
-              ifelse(additional.sampleID,  paste(c(sn,sampleID,kw), collapse = "_"), paste(c(sn,kw), collapse = "_"))
-            }))  
-  }else{
-    if(additional.sampleID){
-      sg[["guid"]] <- as.vector(paste(c(sg[["name"]]), sg[["sampleID"]], collapse = "_"))
-    }else{
-      sg[["guid"]] <- sg[["name"]]
-    }
-  }
-
-  #check duplicated sample keys
-  isDup <- duplicated(sg[["guid"]])
-  if(any(isDup))
-    stop("Duplicated GUIDs detected within group: ", paste(sg[["guid"]][isDup], collapse = " "), 
-         '"\n Consider adding additional keywords to the GUID with argument "additional.keys"
-         or setting argument "additional.sampleID = TRUE" to disambiguate samples further.' )
-  
-  # Warn user about duplicate analyses of same FCS filename with same event counts
-  isDup <- duplicated(paste(sg[["name"]], sg[["count"]], sep = "_"))
-  if(any(isDup))
-    warning("Duplicated FCS filenames with duplicated event counts detected within group: \n",
-            paste(sg[["name"]][isDup], sg[["count"]][isDup], sep = "_", collapse = "\n"), 
-            "\n Duplicate analyses of same FCS file will be parsed.")
-  
-  samples <- sg[,c("name", "sampleID", "guid")]
-  
-  keywords.source <- match.arg(keywords.source, c("XML", "FCS"))
-  
-  #matching FCS files to the samples of xml
-  if(execute)
+  #parse the filter
+  subset <- try(eval(substitute(subset)), silent = TRUE)
+  if(class(subset) == "try-error")
+    stop("invalid 'subset' argument!")
+  if(is(subset, "numeric"))#convert numeric index to sample names
   {
-    
-    
-    if(is.data.frame(path)){
-      #use the file path provided by mapping
-      
-      #validity check for path
-      mapCols <- c("sampleID", "file")
-      if(!setequal(colnames(path), c("sampleID", "file")))
-        stop("When 'path' is a data.frame, it must contain columns: ", paste(dQuote(mapCols), collapse = ","))
-      if(class(path[["sampleID"]])!="numeric")
-        stop("'sampleID' column in 'path' argument must be numeric!")
-      
-      path[["file"]] <- as.character(path[["file"]])
-      
-      samples <- merge(samples, path, by = "sampleID")
-      if(nrow(samples) > 0)
-        samples[["nFound"]] <- 1
-      else
-        stop("No samples in this workspace to parse!")
-      
-    }else{
-      
-      #search file system to resolve the file path
-      key.env <- new.env(parent = emptyenv())
-      samples <- samples %>%
-          group_by(guid) %>%
-          do({
-                
-                filename <- .[["name"]]
-                guid <- .[["guid"]]
-                sampleID <- .[["sampleID"]]
-                
-                #########################################################
-                #get full path for each fcs
-                #########################################################
-#                                  browser()
-                ##escape "special" characters
-                charToEsc <- c("?","]","-","+",")","(") %>% 
-                    paste0("\\", .) %>%  #prepend \\
-                    paste(collapse = "|") %>%# concatenate them
-                    paste0("(", . , ")") #construct pattern 
-                
-                
-                
-                #try to search by file name first
-                filename.pattern <- gsub(charToEsc, "\\\\\\1", filename)
-                absPath <- list.files(pattern=paste("^",filename.pattern,"$",sep=""),path=path,recursive=TRUE,full.names=TRUE)
-                nFound <- length(absPath)
-                isFileNameSearchFailed <- nFound == 0
-                #searching file by keyword $FIL when it is enabled
-                if(isFileNameSearchFailed && searchByKeyword){
-                  
-                  #read FCS headers if key.fils  has not been filled yet
-                  if(is.null(key.env[["key.fils"]])){
-                    all.files <- list.files(pattern= ".fcs$",path=path,recursive=TRUE,full.names=TRUE)  
-                    if(length(all.files) > 0)
-                      key.env[["key.fils"]] <- read.FCSheader(all.files, keyword = "$FIL", emptyValue = emptyValue)
-                  }
-                  key.fils <- key.env[["key.fils"]]
-                  #$FIL is optional keyword according to FCS3.1 standard
-                  #so some FCS may not have this thus need to remove NA entries
-                  key.fils <- key.fils[!is.na(key.fils)] 
-#                                    message(filename," not found in directory: ",path,". Try the FCS keyword '$FIL' ...")  
-                  absPath <- names(key.fils[key.fils == filename])
-                  nFound <- length(absPath)
-                  
-                }
-                
-                if(nFound >= 1){
-                  #try to use additional keywords to further prune the matching results
-                  if(!is.null(additional.keys))
-                  {
-                    guids.fcs <-  sapply(absPath, function(thisPath){
-                          # get keyword from FCS header
-                          kws <- as.list(read.FCSheader(thisPath, emptyValue = emptyValue)[[1]])
-                          kw <- trimws(unlist(kws[additional.keys]))
-                          # construct guids
-                          thisFile <- ifelse(isFileNameSearchFailed, kws["$FIL"], basename(thisPath))
-                          ifelse(additional.sampleID, paste(c(thisFile, sampleID, as.vector(kw)), collapse = "_"),
-                                 paste(c(thisFile, as.vector(kw)), collapse = "_"))
-                        }, USE.NAMES = F)  
-                    matchInd <- which(guid == guids.fcs) #do strict matching instead grep due to the special characters
-                    nFound <- length(matchInd)
-                    if(nFound == 1)
-                      absPath <- absPath[matchInd]
-                  }
-                }
-                
-                if(nFound != 1)
-                  absPath <- ""
-                
-                cbind(., data.frame(file = absPath, nFound = nFound, stringsAsFactors = FALSE))
-              })
-    }
-    
-  }else{
-    samples[["file"]] <- ""
-    samples[["nFound"]] <- 1
+    subset <- as.character(fj_ws_get_samples(ws, groupInd)[subset, "name"])
+ }
+  
+  if(is(subset, "character"))
+  {
+    subset <- list(name = subset)
   }
   
-  
-  
-  if(!is.null(keywords)){
-    #somehow dplyr doesn't like rownames and dplyr::select won't drop the first column(which might be on purpose since it could be used as index internally)
-    #and these should be fine since we need to preserve guid column and convert it to rownames later on anyway (deu to the legacy code) 
-    pd <- samples %>% 
-        group_by(guid) %>% 
-        do({
-              # Error if sample match is not unique
-              if(length(.[["nFound"]]) > 1){
-                stop("Duplicated FCS filename within workspace group: ", .[["name"]][[1]], collapse = " ")
-              }
-              if(keywords.source == "XML")
-              {  #parse pData from workspace
-                kws <- fj_ws_get_keywords(obj, .[["sampleID"]]) #whitespace is already removed
-              }else{
-                if(execute){
-                  # Allows for file not found
-                  if(.[["nFound"]] == 1){
-                    #parse pData by reading the fcs headers 
-                    kws <- read.FCSheader(.[["file"]], emptyValue = emptyValue)[[1]] %>% trimws %>% as.list 
-                  }else
-                    kws <- NULL
-                }else
-                  stop("Please set 'execute' to TRUE in order to parse pData from FCS file!")
-              }
-              if(is.null(kws))
-                data.frame()
-              else{
-                keynames <- names(kws)
-                if(keyword.ignore.case)
-                  keyInd <- match(tolower(keywords), tolower(keynames))
-                else
-                  keyInd <- match(keywords, keynames)
-                key.na <- is.na(keyInd)
-                if(any(key.na))
-                  warning("keyword not found in ", .[["guid"]], ": ", paste(sQuote(keywords[key.na]), collapse = ","))
-                
-                
-                
-                kw <- kws[keyInd] %>% as.list %>% `names<-`(value = keywords) %>% 
-                    lapply(function(i)ifelse(is.null(i), NA, i)) %>% #replace NULL with NA
-                    data.frame(check.names = F, stringsAsFactors = F)
-                cbind(., kw)
-              }
-              
-              
-            })
-    
-  }else{
-    pd <- samples
+  if(!is(subset, "list"))
+  {
+    stop("invalid 'subset' argument!")
   }
-  
-  #handle 'subset' as an expression
-  if(!is.null(subset_evaluated)){ #check if it is already evaluated
-    if(class(subset_evaluated) == "try-error"){#if fails, then try it as an expression to be evaluated within pData
-      message("filter samples by pData...")
-      subset_evaluated <- eval(subset,  pd)  
-      pd <- pd[subset_evaluated, ]
-    }  
-  }  
-  
-  #check if there are samples to parse
-  missingInd <- pd[["nFound"]] == 0
-  nMissing <- sum(missingInd)
-  if(nMissing > 0){
-    warning("Can't find the FCS files for the following samples:\n", pd[missingInd, ][["guid"]] %>% paste(collapse = "\n"))
+  if(is.null(additional.keys))
+    additional.keys <- character(0)
+  if(is.null(path))
+    path <- ""
+  args <- list(...)
+  if(!is.null(args[["isNcdf"]]))
+  {
+    warning("'isNcdf' argument is deprecated!Data is always stored in h5 format by default!")
+    args[["isNcdf"]] <- NULL
   }
-  
-  dupInd <- pd[["nFound"]] > 1
-  nDup <- sum(dupInd)
-  if(nDup > 0){
-    warning("Multiple FCS files are matched to these samples:\n", pd[nDup, ][["guid"]] %>% paste(collapse = "\n"))
+  if(is.null(compensation))
+  {
+    compensation <- list()
+  }else
+  {
+    if(is.list(compensation)&&!is.data.frame(compensation))
+    {
+      compensation <- sapply(compensation, check_comp, simplify = FALSE)
+    }else
+      compensation <- check_comp(compensation)
+      
   }
-  
-  pd <- pd[!(missingInd|dupInd),]
-  
-  
-  pd <- droplevels(pd)
-  nSample <- nrow(pd)
-  
-  
-  
-  message("Parsing ", nSample," samples");
-  
-  return(pd)
-}
-.parseWorkspace <- function(xmlFileName, execute, isNcdf = TRUE, includeGates = TRUE
-                            ,sampNloc="keyword",xmlParserOption, wsType, ws, pd, ...){
-  
-  
-#	message("calling c++ parser...")
-  
-  
-  gs <- GatingSet(x = xmlFileName
-      , y = as.character(pd[["sampleID"]])
-      , guids = pd[["guid"]]
-      , includeGates = includeGates
-      , sampNloc = sampNloc
-      , xmlParserOption = xmlParserOption
-      , wsType = wsType
-  )
-  
-#	message("c++ parsing done!")
-  
-  #gating
-  gs <- flowWorkspace:::.addGatingHierarchies(gs,pd,execute,isNcdf, wsType = wsType, sampNloc = sampNloc, ws = ws, ...)
-  
-
-  #attach pData
-  pd <- as.data.frame(pd)
-  rownames(pd) <- pd[["guid"]] 
-  pd[["guid"]] <- NULL
-  #remove temporary columns
-  pd[["sampleID"]] <- NULL
-  pd[["nFound"]] <- NULL
-  pd[["file"]] <- NULL
-  
-  pData(gs) <- pd
-    
-  message("done!")
-
-    #we don't want to return the splitted gs since they share the same cdf and externalptr
-  #thus should be handled differently(more efficiently) from the regular gslist
-  
-#    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed                
+  args <- list(ws = ws@doc
+                 , group_id = groupInd - 1
+                 , subset = subset
+                 , execute = execute
+                 , path = suppressWarnings(normalizePath(path))
+                 , h5_dir = suppressWarnings(normalizePath(h5_dir))
+                 , includeGates = includeGates
+                 , additional_keys = additional.keys
+                 , additional_sampleID = additional.sampleID
+                 , keywords = keywords
+                 , is_pheno_data_from_FCS = keywords.source == "FCS"
+                 , keyword_ignore_case = keyword.ignore.case
+                 , extend_val = extend_val
+                 , extend_to = extend_to
+                 , channel_ignore_case = channel.ignore.case
+                 , leaf_bool = leaf.bool
+                 , comps = compensation
+                , transform = transform
+		 		 , fcs_file_extension = fcs_file_extension
+				 , fcs_parse_arg = args
+		 		 , num_threads = mc.cores
+              )
+  p <- do.call(parse_workspace, args)
+  gs <- new("GatingSet", pointer = p)
+  #    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed                
   gslist <- suppressMessages(gs_split_by_tree(gs))
   if(length(gslist) > 1)
-    warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
-#    if(length(gslist) == 1){
-#      return (gslist[[1]])      
-#    }else
-  {
-#      warning("Due to the different gating tree structures, a list of GatingSets is returned instead!")
-#      return (gslist)
-  }
+	  warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
   gs
 }
 
-#' constructors for GatingSet 
-#' 
-#' construct object from xml workspace file and a list of sampleIDs (not intended to be called by user.)
-#' 
-#' @param x \code{character} or \code{flowSet} or \code{GatingHierarchy}
-#' @param y \code{character} or\code{missing}
-#' @param guids \code{character} vectors to uniquely identify each sample (Sometime FCS file names alone may not be unique)
-#' @param includeGates \code{logical} whether to parse the gates or just simply extract the flowJo stats
-#' @param sampNloc \code{character} scalar indicating where to get sampleName(or FCS filename) within xml workspace. It is either from "keyword" or "sampleNode".
-#' @param xmlParserOption \code{integer} option passed to \code{\link{xmlTreeParse}} 
-#' @param wsType \code{character} workspace type, can be value of "win", "macII", "vX", "macIII".
-#'  
-#' @rdname GatingSet-methods
-#' @aliases GatingSet
-#' @export 
-setMethod("GatingSet",c("character","character"),function(x,y, guids, includeGates=FALSE, sampNloc="keyword",xmlParserOption, wsType){
-			
-			xmlFileName<-x
-			sampleIDs<-y
-#			browser()
-			sampNloc<-match(sampNloc,c("keyword","sampleNode"))
-			if(is.na(sampNloc))
-				sampNloc<-0
-			stopifnot(!missing(xmlFileName))
-			
-			wsType <- match(wsType, c("win", "macII", "vX", "macIII"))
-			if(is.na(wsType))
-				stop("unrecognized workspace type: ", wsType)
-			
-			if(!file.exists(xmlFileName))
-				stop(xmlFileName," not found!")
-			Object<-new("GatingSet")
-			Object@pointer<-.cpp_parseWorkspace(xmlFileName,sampleIDs,guids,includeGates,as.integer(sampNloc),as.integer(xmlParserOption),as.integer(wsType))
-			identifier(Object) <- flowWorkspace:::.uuid_gen()
-			Object@flag <- FALSE
-			
-			return(Object)
-		})
 
-getFileNames <- function(ws){
-  if(class(ws)!="flowjo_workspace"){
-    stop("ws should be a flowjo_workspace")
-  }else{
-    x <- ws@doc
-    wsversion <- ws@version
-    wsType <- .getWorkspaceType(wsversion)
-    .getFileNames(x, wsType)
-  }
-}
-.getFileNames <- function(x, wsType){
-  wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
-  unlist(xpathApply(x, file.path(wsNodePath[["sample"]], "Keywords/Keyword[@name='$FIL']")
-                    , function(x)xmlGetAttr(x,"value")
-                    )
-        ,use.names=FALSE
-        )
-
+check_comp <- function(compensation){
+	if(is(compensation, "compensation")){
+		compensation <- compensation@spillover
+	}else if(is.data.frame(compensation)){
+		compensation <- as.matrix(compensation)
+	}
+	if(!is.matrix(compensation))
+		stop("'compensation' should be a compensation object, matrix or data.frame!")
+	compensation
 }
 
 
 #' Get Keywords
-#' 
+#'
 #' Retrieve keywords associated with a workspace
 #' 
+#' @name fj_ws_get_keywords
+#' @aliases getKeywords
 #' @param obj A \code{flowjo_workspace}
 #' @param y c\code{character} or \code{numeric} specifying the sample name or sample ID
 #' @param ... other arguments
-#'      sampNloc a \code{character} the location where the sample name is specified. See \code{flowjo_to_gatingset} for more details.
-#' 
+#'      sampNloc a \code{character} the location where the sample name is specified. See \code{parseWorkspace} for more details.
+#'
 #' @details
-#'   Retrieve a list of keywords from a \code{flowjo_workspace}  
-#' @return A list of keyword - value pairs. 
+#'   Retrieve a list of keywords from a \code{flowjo_workspace}
+#' @return A list of keyword - value pairs.
 #' @examples
-#'   require(flowWorkspaceData)
+#'
+#' \dontrun{
 #'   d<-system.file("extdata",package="flowWorkspaceData")
 #'   wsfile<-list.files(d,pattern="manual.xml",full=TRUE)
-#'   ws <- open_flowjo_xml(wsfile);
-#'   
+#'   ws <- open_flowjo_xml(wsfile)
+#'
 #'   fj_ws_get_samples(ws)
 #'   res <- try(fj_ws_get_keywords(ws,"CytoTrol_CytoTrol_1.fcs"), silent = TRUE)
 #'   print(res[[1]])
 #'   fj_ws_get_keywords(ws, 1)
-#' @aliases fj_ws_get_keywords
-#' @rdname fj_ws_get_keywords
+#' }
+#' @export
+fj_ws_get_keywords <- function(obj,y, ...){
+	if(length(y) > 1)
+        stop("getKeywords can only work with one sample at a time!")
+	if(is.character(y))
+		func <- get_keywords_by_name
+	else
+	{
+		y <- as.integer(y)
+		func <- get_keywords_by_id
+	}
+      as.list(func(obj@doc, y))
+    }
+
 #' @export 
 getKeywords <- function(...){
   .Deprecated("fj_ws_get_keywords")
   fj_ws_get_keywords(...)
   }
-#' @rdname fj_ws_get_keywords
-#' @export 
-fj_ws_get_keywords <- function(obj,y, ...){
-      if(length(y) > 1)
-        stop("fj_ws_get_keywords can only work with one sample at a time!")
-      x <- obj@doc
-      wsversion <- obj@version
-      wsType <- .getWorkspaceType(wsversion)
-      wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
-      if(is(y, "character"))
-        .getKeywordsBySampleName(obj@doc,y, wsNodePath[["sample"]], ...)
-      else if(is(y, "numeric"))
-        .getKeywordsBySampleID(obj@doc,y, wsNodePath[["sampleID"]],...)
-    }
 
-.getKeywordsBySampleID <- function(obj, sid, sampleIDPath = "/Workspace/SampleList/Sample"){
-  
-  xpath <- sprintf(paste0(sampleIDPath,"[@sampleID='%s']"),sid)
-  
-  if(basename(sampleIDPath)!= "Sample")
-    xpath <- file.path(xpath, "..")
-  
-  sampleNode <- xpathApply(obj, xpath)
-  if(length(sampleNode) == 0)
-    stop("sampleID ", sid, " not found!")
-  
-  kw <- xpathApply(sampleNode[[1]], "Keywords/Keyword", function(i){
-                                      attr <- xmlAttrs(i)
-                                      attrValue <- attr[["value"]]
-                                      names(attrValue) <- attr[["name"]]
-                                      trimws(attrValue)
-                                    })
-  as.list(unlist(kw))
-  
-}
-.getKeywordsBySampleName <- function(doc, y, samplePath = "/Workspace/SampleList/Sample", sampNloc = "keyword"){
-  sampNloc <- match.arg(sampNloc, c("keyword", "sampleNode"))  
-  
-  if(sampNloc == "keyword"){
-    w <- which(xpathApply(doc, file.path(samplePath, "Keywords/Keyword[@name='$FIL']"),function(x)xmlGetAttr(x,"value"))%in%y)
-    if(length(w)==0)
-      warning("Sample name ", y," not found in Keywords of workspace")
-  }else{
-    w <- which(xpathApply(doc, file.path(samplePath,"SampleNode") ,function(x)xmlGetAttr(x,"name"))%in%y)
-    if(length(w)==0)
-      warning("Sample name ", y," not found in SampleNode of workspace")
-  }
-  
-  if(length(w)==0){
-    ##Use the DataSet tag to locate the sample
-    w <- which(xpathApply(doc, file.path(samplePath,"DataSet") ,function(x)xmlGetAttr(x,"uri"))%in%y)
-    if(length(w)==0)
-      stop("failed to locate Sample ",y," within workspace")      
-  }
-  
-  if(length(w) > 1)
-    stop("Character '", y, "' can't uniquely identify sample within the workspace!Try to set 'y' to a numeric sampleID instead.")
-  l <- xpathApply(doc,paste(samplePath,"[",w,"]/Keywords/node()",sep=""),xmlAttrs)
-  names(l) <- lapply(l,function(x)x[["name"]])
-  l <- lapply(l,function(x)x[["value"]])
-  return(l)
-}
 
-.getKeyword <- function(ws,x, samplePath = "/Workspace/SampleList/Sample"){
-	if(inherits(ws,"flowjo_workspace")&class(x)=="character"){
-		 unlist(xpathApply(ws@doc,paste(file.path(samplePath, "Keywords/Keyword[@name='"), x, "']",sep=""),function(x)xmlGetAttr(x,"value")),use.names=FALSE)
-	}else{
-		stop("No such keyword")
-	}
-	
-}
-
-#' Fetch the indices for a subset of samples in a flowJo workspace, based on a keyword value pair
-#'
-#' Returns an index vector into the samples in a flowJo workspace for use with flowjo_to_gatingset(subset=), based on a keyword/value filter in a specific group of samples.
-#'
-#' @description 
-#' This function will calculate the indices of a subset of samples in a flowjo_workspace, based on a keyword/value filter. It is applied to a specific group of samples in the workspace. The output is meant to be passed to the subset= argument of flowjo_to_gatingset.
-#' 
-#' @param ws \code{flowjo_workspace} object
-#' @param key \code{character} The name of the keyword. 
-#' @param value \code{character} The value of the keyword.
-#' @param group \code{numeric} The group of samples to subset. 
-#' @param requiregates \code{TRUE} or \code{FALSE}, specifying whether we include only samples that have gates attached or whether we include any sample in the workspace.
-#' 
-#' @return A numeric vector of indices.
-#' @seealso \code{\link{flowjo_to_gatingset}}
-#' @export 
-getFJWSubsetIndices<-function(ws,key=NULL,value=NULL,group,requiregates=TRUE){
-	if(!is.numeric(group)){
-		stop("group must be numeric")
-	}
-	if(!is.character(key)&!is.null(key)){
-		stop("keyword must be character")
-	}
-	if(!is.character(value)&!is.null(value)){
-		stop("value must be character")
-	}
-	if(!class(ws)=="flowjo_workspace"){
-		stop("ws must be a flowjo_workspace object")
-	}
-    x <- ws@doc
-    wsversion <- ws@version
-    wsType <- .getWorkspaceType(wsversion)
-    wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
-    
-	s<- .getSamples(x, wsType);
-	#TODO Use the actual value of key to name the column
-	if(!is.null(key)){
-	s$key <- .getKeyword(ws,key, wsNodePath[["sample"]])
-	}
-	g<- .getSampleGroups(x, wsType)
-	sg<-merge(s,g,by="sampleID")
-	if(requiregates){
-	sg<-sg[sg$pop.counts>0,]
-	}
-	sg$groupName<-factor(sg$groupName)
-	groups<-levels(sg$groupName)
-	if(group>length(groups)){
-		stop("group is invalid, out of range")
-	}
-	sg<-sg[sg$groupName%in%groups[group],]
-	if(!is.null(key)&!is.null(value)){
-	return(which(sg$key%in%value))
-	}
-	return(sg)
-}
 #' Get a list of samples from a flowJo workspace
-#' 
+#'
 #' Return  a data frame of samples contained in a flowJo workspace
+#' @name fj_ws_get_samples
+#' @aliases getSamples
 #' @param x A \code{flowjo_workspace}
-#' @param sampNloc \code{character} either "keyword" or "sampleNode". see \link{flowjo_to_gatingset}
+#' @param group_id \code{integer} specifies the group from which samples are returned
 #' @details
-#' Returns a \code{data.frame} of samples in the \code{flowjo_workspace}, including their 
-#' \code{sampleID}, \code{name}, and \code{compID} (compensation matrix ID). 
-#' 
-#' @return 
-#' A \code{data.frame} with columns \code{sampleID}, \code{name}, and \code{compID} if \code{x} is a \code{flowjo_workspace}.
-#' 
+#' The samples with 0 populations are excluded.
+#' Returns a \code{data.frame} of samples in the \code{flowjo_workspace}, including their
+#' \code{sampleID}, \code{name}
+#'
+#' @return
+#' A \code{data.frame} with columns \code{sampleID}, \code{name}
+#'
 #' @examples
 #'       \dontrun{
 #'         #ws is a flowjo_workspace
 #'         fj_ws_get_samples(ws);
 #'       }
-#' @aliases getSamples
-#' @rdname getSamples
+#' @export
+fj_ws_get_samples <- function(x, group_id = NULL)
+{
+  res <- get_samples(x@doc)
+  if(!is.null(group_id))
+    res <- res[group_id]
+  res <- unlist(res, recursive = FALSE)
+  res <- lapply(res, as.data.frame, stringsAsFactors = FALSE)
+  res <- do.call(rbind, res)
+  unique(res)
+}
 #' @export  
 getSamples <- function(...){
   .Deprecated("fj_ws_get_samples")
   fj_ws_get_samples(...)
   }
-#' @rdname getSamples
-#' @export  
-fj_ws_get_samples <- function(x, sampNloc="keyword"){
-      sampNloc <- match.arg(sampNloc, c("keyword", "sampleNode"))
-      
-      wsversion <- x@version
-      wsType <- .getWorkspaceType(wsversion)
-      x <- x@doc
-      .getSamples(x, wsType = wsType, sampNloc = sampNloc)
-}
-
 #' Get a table of sample groups from a flowJo workspace
-#' 
-#'   Return a data frame of sample group information from a flowJo workspace
+#'
+#' Return a data frame of sample group information from a flowJo workspace
+#' @name fj_ws_get_sample_groups
+#' @aliases getSampleGroups
 #' @param x A \code{flowjo_workspace} object.
-#' @details Returns a table of samples and groups defined in the flowJo workspace
-#' @return  
+#' @details 
+#' Note that the samples with 0 populations are also included (since count populations requires traversing xml for all samples thus can be expensive)
+#' Returns a table of samples and groups defined in the flowJo workspace
+#' @return
 #'   A \code{data.frame} containing the \code{groupName}, \code{groupID}, and \code{sampleID} for each sample in the workspace. Each sample may be associated with multiple groups.
-#' @seealso \code{\link{flowjo_workspace-class}} \code{\link{open_flowjo_xml}}
-#' 
+#' @seealso \code{\link{flowjo_workspace-class}} \code{\link{flowjo_to_gatingset}}
+#'
 #' @examples
 #'   \dontrun{
 #'     #ws is a flowjo_workspace
 #'     fj_ws_get_sample_groups(ws);
 #'   }
-#' @aliases fj_ws_get_sample_groups
-#' @rdname fj_ws_get_sample_groups
+#' @export
+fj_ws_get_sample_groups <- function(x){
+  res <- get_sample_groups(x@doc)
+  df <- mapply(res[["groupName"]], res[["groupID"]], res[["sampleID"]]
+               , FUN = function(x, y, z){
+                  data.frame(x,y,z)                            
+               }, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+  df <- do.call(rbind, df)
+  colnames(df) <-  c("groupName", "groupID", "sampleID")
+  df
+}
+
 #' @export 
 getSampleGroups <- function(...){
   .Deprecated("fj_ws_get_sample_groups")
   fj_ws_get_sample_groups(...)
 }
-#' @rdname fj_ws_get_sample_groups
-#' @export 
-fj_ws_get_sample_groups <- function(x){
-            wsversion <- x@version      
-            x <- x@doc
-            wsType <- .getWorkspaceType(wsversion)
-			.getSampleGroups(x, wsType = wsType)
-		}
-
-#' @importFrom stats na.omit
-.getSampleGroups<-function(x, wsType){
-  
-  wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
-  
-	if(grepl("mac", wsType)){
-		do.call(rbind,xpathApply(x, wsNodePath[["group"]],function(x){
-  
-							gid <- c(xmlGetAttr(x, wsNodePath[["attrName"]])
-                                  ,xmlGetAttr(x,"groupID")
-                                  )
-							sid <- do.call(c,xpathApply(x, wsNodePath[["sampleRef"]],function(x){
-												as.numeric(xmlGetAttr(x,"sampleID"))
-											}))
-							if(is.null(sid)){
-								sid<-NA;
-							}
-
-							groups<-na.omit(data.frame(groupName=gid[[1]]
-                                                      ,groupID=as.numeric(gid[2])
-                                                      ,sampleID=as.numeric(sid)
-                                                      )
-                                            );
-						}))
-	}else{
-		#Note that groupID is from order of groupNode instead of from xml attribute 
-		counter <- 1
-		do.call(rbind,xpathApply(x, wsNodePath[["group"]],function(x){
-
-							gid <- c(xmlGetAttr(x, wsNodePath[["attrName"]])
-                                  , xmlGetAttr(x,"groupID")
-                                  )
-							sid <- do.call(c,xpathApply(x, wsNodePath[["sampleRef"]],function(x){
-												as.numeric(xmlGetAttr(x,"sampleID",default=NA))
-											}))
-							if(is.null(sid)){
-								sid<-NA;
-							}
-
-							groups<-na.omit(data.frame(groupName=gid[[1]]
-                                                      ,groupID=counter
-                                                      ,sampleID=as.numeric(sid)
-                                                      )
-                                              )
-							counter <- counter+1
-							groups
-						}))
-	}
-}
-
-
-
-.getSamples<-function(x, wsType, sampNloc="keyword"){
-    
-    wsNodePath <- CytoML.par.get("nodePath")[[wsType]]
-	lastwarn<-options("warn")[[1]]
-	options("warn"=-1)
-	top <- xmlRoot(x)
-    
-    
-	s <- do.call(rbind,xpathApply(top, file.path(wsNodePath[["sample"]],wsNodePath[["sampleNode"]]),function(x){
-        		    attrs <- xmlAttrs(x);
-        	        data.frame(tryCatch(as.numeric(attrs[["sampleID"]]), error=function(x)NA)
-                                ,tryCatch(attrs[[wsNodePath[["attrName"]]]], error=function(x)NA)
-                                 ,tryCatch(as.numeric(attrs[["count"]]), error=function(x)NA)
-                                )
-		    }))
-    
-	pop.counts <- as.numeric(unlist(lapply(xpathApply(top,wsNodePath[["sample"]])
-                                            ,function(x)xpathApply(x,"count(descendant::Population)")
-                                          )
-                                      ,use.names=FALSE
-                                      )
-                                )
-	if(grepl("mac", wsType)){
-		cid<-as.numeric(paste(xpathApply(top, wsNodePath[["sample"]], function(x)xmlGetAttr(x,"compensationID"))))
-		s<-data.frame(s,cid,pop.counts)
-		colnames(s)<-c("sampleID","name","count","compID","pop.counts");
-	}else{
-		##Code for flowJo windows 1.6 xml
-		#No compensation ID for windows. Use name
-		s<-data.frame(s,pop.counts)
-		colnames(s)<-c("sampleID","name","count","pop.counts");
-	}
-	s[,2]<-as.character(s[,2])
-    #update sample name when it is supposed to be fetched from keyword
-    if(sampNloc == "keyword"){
-      sn <- xpathApply(top, file.path(wsNodePath[["sample"]], "Keywords/Keyword[@name='$FIL']"), function(x){
-            xmlAttrs(x)[["value"]]
-          })
-      
-      if(length(sn) == 0)
-        stop("sample name is not found in 'keyword' node!Please try 'sampleName' node by setting sampNloc = 'sampleNode'")
-      s[, "name"] <- unlist(sn)   
-    }
-    
-	options("warn"=lastwarn);
-	s
-}
-
-
-
-
 
 
 

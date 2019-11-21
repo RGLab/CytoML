@@ -1,17 +1,19 @@
 Package: CytoML
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
-Version: 1.13.0
+Version: 1.13.1
 Date: 2016-04-15
 Author: Mike Jiang, J. Spidlen., N. Gopalakrishnan, F. Hahne, B. Ellis, R. Gentleman, M. Dalphin, N. Le Meur, B. Purcell
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
 Description: Uses platform-specific implemenations of the GatingML2.0 standard 
     to exchange gated cytometry data with other software platforms.
-License: Artistic-2.0
+License: file LICENSE
+License_restricts_use: yes
 LazyData: TRUE
 Imports:
+    cytolib(>= 1.9.4),
     flowCore (>= 1.43.10),
-    flowWorkspace (>= 3.33.10),
+    flowWorkspace (>= 3.35.2),
     openCyto (>= 1.11.3),
     XML,
     data.table,
@@ -35,12 +37,13 @@ Imports:
     stats,
     corpcor,
     RUnit,
-    tibble
+    tibble,
+    RcppParallel
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
-LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 1.3.7), cytolib(>= 1.3.3), RcppParallel
+LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib, cytolib,Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:
     testthat,
-    flowWorkspaceData (>= 2.11.1),
+    flowWorkspaceData ,
     knitr,
     parallel
 VignetteBuilder: knitr

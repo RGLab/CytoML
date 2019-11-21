@@ -1,12 +1,45 @@
 #' @include flowJoWorkspace_Methods.R 
 NULL
-#' diva_workspace class
+#' An R representation of a BD FACSDiva workspace
+#' 
 #' Inherited from \link{flowjo_workspace-class}
+#' 
+#' @name diva_workspace-class
+#' @aliases show,diva_workspace-method
+#' 
+#' @section Slots: 
+#' \describe{
+#'   \item{\code{version}:}{Object of class \code{"character"}. The version of the XML workspace. }
+#'   \item{\code{file}:}{Object of class \code{"character"}. The file name. }
+#'   \item{\code{.cache}:}{Object of class \code{"environment"}. An environment for internal use.  }
+#' 	\item{\code{path}:}{Object of class \code{"character"}. The path to the file. }
+#'   \item{\code{doc}:}{Object of class \code{"XMLInternalDocument"}. The XML document object. }
+#'   \item{\code{options}:}{Object of class \code{"integer"}. The XML parsing options passed to \code{\link{xmlTreeParse}}. }
+#'   }
+#' 
+#' @seealso 
+#'   \code{\linkS4class{GatingSet}} 
+#'   \code{\linkS4class{GatingHierarchy}}
+#' 
 #' @exportClass diva_workspace
-setClass("diva_workspace", contains = "flowjo_workspace")
+setClass("diva_workspace" ,representation(version="character"
+                                           , file="character"
+                                           , .cache="environment"
+                                           , path="character"
+                                           , doc="XMLInternalDocument"
+                                           , options="integer")
+)
+
+#' @export
+openDiva <- function(...){
+  .Deprecated("open_diva_xml")
+  open_diva_xml(...)
+}
 
 #' open Diva xml workspace
 #'
+#' @name open_diva_xml
+#' @aliases openDiva
 #' @param file xml file
 #' @param options argument passed to \link{xmlTreeParse}
 #' @param ... arguments passed to \link{xmlTreeParse}
@@ -26,13 +59,6 @@ setClass("diva_workspace", contains = "flowjo_workspace")
 #' @importFrom XML xmlTreeParse xpathApply xmlGetAttr
 #' @importFrom methods new
 #' @export
-#' @rdname open_diva_xml
-openDiva <- function(...){
-  .Deprecated("open_diva_xml")
-  open_diva_xml(...)
-}
-#' @export
-#' @rdname open_diva_xml
 open_diva_xml <- function(file,options = 0,...){
   #message("We do not fully support all features found in a flowJo workspace, nor do we fully support all flowJo workspaces at this time.")
   tmp<-tempfile(fileext=".xml")
@@ -59,9 +85,8 @@ open_diva_xml <- function(file,options = 0,...){
   return(x);
 }
 
-#' @rdname diva_workspace-class
+
 #' @export
-#' @importFrom plyr ldply
 diva_get_sample_groups <- function(x){
     ldply(
         xpathApply(x@doc, "/bdfacs/experiment/specimen",function(specimen){
@@ -79,9 +104,19 @@ diva_get_sample_groups <- function(x){
 
 }
 
-#' @rdname diva_workspace-class
-#' @param x diva_workspace
+#' Get a table of samples from a FACSDiva workspace
+#'
+#' Return a data.frame of sample group information from a FACSDiva workspace
+#' @name diva_get_samples
+#' @aliases diva_get_sample_groups
+#' @usage 
+#' diva_get_samples(x)
+#' diva_get_sample_groups(x)
+#' @param x A \code{diva_workspace}
+#' @return
+#' A \code{data.frame} with columns \code{tub}, \code{name}, and \code{specimen}
 #' @importFrom methods selectMethod
+#' @importFrom plyr ldply
 #' @export
 diva_get_samples <- diva_get_sample_groups
 
@@ -97,8 +132,6 @@ get_global_sheets<-function(x){
     unlist(res)
 }
 
-#' @rdname diva_workspace-class
-#' @param object diva_workspace
 #' @importFrom flowWorkspace show
 #' @export
 setMethod("show",c("diva_workspace"),function(object){
@@ -120,20 +153,23 @@ setMethod("show",c("diva_workspace"),function(object){
       }
     })
 
-#' @rdname diva_workspace-class
 #' @export
 setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
     .Deprecated("diva_to_gatingset")
     diva_to_gatingset(obj, ...)
     })
 
-#' @rdname diva_workspace-class
+#' Parse a FACSDiva Workspace
+#' 
+#' Function to parse a FACSDiva Workspace, generate a \code{GatingHierarchy} or \code{GatingSet} object, and associated flowCore gates.
+#' @name diva_to_gatingset
+#' @aliases parseWorkspace,diva_workspace-method 
 #' @param obj diva_workspace
 #' @param ... other arguments
 #' @importFrom utils menu
-#' @export
 #' @importFrom flowCore colnames<-
 #' @importFrom flowWorkspace pop_add
+#' @export
 diva_to_gatingset<- function(obj, name = NULL
                                     , subset = NULL
                                     , path = obj@path
@@ -250,7 +286,7 @@ diva_to_gatingset<- function(obj, name = NULL
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace gh_pop_set_xml_count GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols
+#' @importFrom flowWorkspace gh_pop_set_xml_count GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5 gslist_to_gs
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -328,15 +364,8 @@ diva_to_gatingset<- function(obj, name = NULL
   thisCall <- quote(lapply(names(file.group), function(grpid){
 
       files <- file.group[[grpid]]
-      #load the raw data from FCS
-      fs <- read.ncdfFlowSet(files,isWriteSlice=FALSE, ...)
-
-      gs <- GatingSet(fs)
-
-      cnd <- colnames(fs)
-
       # parse compp & trans
-      translist <- complist <- data.ranges <- list()
+      gslist <- translist <- complist <- data.ranges <- list()
       for(file in files)
       {
 
@@ -398,13 +427,19 @@ diva_to_gatingset<- function(obj, name = NULL
 
 
         message("loading data: ",file);
-        data <- read.FCS(file, ...)#has to load data regardless of execute flag because data range is needed for gate extension
-      
-        cols <- swap_data_cols(colnames(data), swap_cols)
-        if(!all(cols==colnames(data)))
-          colnames(data) <- cols
-        data <- data[, cnd]#keep it ordered the same as h5 so that it can be written successfully
+        #load single sample into cs so that gs can be constructed from it
+        fs <- load_cytoset_from_fcs(file, ...)#has to load data regardless of execute flag because data range is needed for gate extension
+        cols <- swap_data_cols(colnames(fs), swap_cols)
+        if(!all(cols==colnames(fs)))
+          for(c1 in names(swap_cols))
+          {
+            c2 <- swap_cols[[c1]]
+            cs_swap_colnames(fs, c1, c2)					
+          }
         
+        gs <- GatingSet(fs)
+        data <- get_cytoframe_from_cs(fs, sampleName)
+
         message("Compensating")
         if(xml_compensation_enabled){
           # Use the spillover matrix obtained from the xml for this tube
@@ -432,7 +467,6 @@ diva_to_gatingset<- function(obj, name = NULL
           
           data <- compensate(data, comp[[1]])
         }
-
 
         message("computing data range")
         data.ranges[[sampleName]] <- range(data, "data")
@@ -626,16 +660,33 @@ diva_to_gatingset<- function(obj, name = NULL
           }
         }#end of gate adding
         if(execute)
-          fs[[sampleName]] <- data
-
+        {
+          tmp <- tempfile()
+          cf_write_h5(data, tmp)
+          fs[[sampleName]] <- load_cytoframe_from_h5(tmp)
+          
+        }
+        gslist[[sampleName]] <- gs
       }
-      if(execute)
-        flowWorkspace::gs_cyto_data(gs) <- fs
-
-      gs@compensation <- complist
-
-      gs@transformation <- translist
-      if(execute)
+      #merge samples into a single gs
+      gs <- gslist_to_gs(GatingSetList(gslist))
+      #TODO: create and expose R wrapper 'set_compensation' in flowWorkspace
+      complist <- sapply(complist, flowWorkspace:::check_comp, simplify = FALSE)
+      flowWorkspace:::cs_set_compensation(gs@pointer, complist, FALSE)
+      #TODO: create and expose R wrapper 'set_transformation' in flowWorkspace
+      for(sn in names(translist))
+      {
+        transobjs <- sapply(translist[[sn]], function(trans){
+          transobj <- flowWorkspace:::parse_transformer(trans)
+          if(length(transobj)==0)
+            stop("unsupported trans: ", trans[["name"]])
+          transobj
+          }, simplify = FALSE)
+        # browser()
+        flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
+        
+      }
+     if(execute)
         suppressMessages(recompute(gs))
 
       message("done!")

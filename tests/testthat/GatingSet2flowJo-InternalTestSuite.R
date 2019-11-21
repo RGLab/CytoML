@@ -10,12 +10,13 @@ test_that("gatingset_to_flowjo: forward slash ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
   stats.new <- gh_pop_compare_stats(gs1[[1]])
-  expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq], tol = 5e-05)
+  expect_equal(stats.orig[,openCyto.freq], stats.new[,openCyto.freq], tol = 6e-5)
 })
 
 test_that("OrNode ",{
@@ -27,7 +28,8 @@ test_that("OrNode ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -45,7 +47,8 @@ test_that("Time gate ",{
  #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -62,7 +65,8 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -79,7 +83,8 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
@@ -95,7 +100,8 @@ test_that("GatingSet2flowJo: rectangleGate + boolgate",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #load it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
@@ -115,7 +121,8 @@ test_that("gatingset_to_flowjo: no comp + fasinh ",{
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
-
+  # cross_validate(gs, outFile)#can't cross validate due to the order change from ggcyto:::merge.quad.gates call and it is not worth to implement the same ordering logic as c++
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
@@ -123,15 +130,6 @@ test_that("gatingset_to_flowjo: no comp + fasinh ",{
   expect_equal(stats.orig, stats.new)
 })
 
-test_that("gatingset_to_flowjo: no transformation",{
-
-  gs <- load_gs("~/rglab/workspace/flowWorkspace/lyoplate_out/gated_data/manual/gslist-bcell/cgRoygodqg")
-  stats.orig <- gh_pop_compare_stats(gs[[1]])
-  #output to flowJo
-  outFile <- tempfile(fileext = ".wsp")
-  expect_error(gatingset_to_flowjo(gs, outFile), "No transformation is found in GatingSet!")
-
-})
 
 test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean gate",{
   thisPath <- file.path(path, "gatingML/ics")
@@ -165,12 +163,13 @@ test_that("gatingset_to_flowjo: automated gates+hidden gate + Infinity + boolean
   gs_pop_remove(gs, "bool6")
 
   # autoplot(gs[[1]], getChildren(gs[[1]], "cd4"))
-  getTotal(gs[[1]], "bool5")
+  # getTotal(gs[[1]], "bool5")
   # plotGate(gs, "bool4", bool = T)
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   gatingset_to_flowjo(gs, outFile)
-
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)

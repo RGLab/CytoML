@@ -150,6 +150,8 @@ parse.gateInfo <- function(file, ...)
 
                 name <- getCustomNodeInfo(node, "name")
                 fcs_file_filename <- getCustomNodeInfo(node, "fcs_file_filename")
+                fcs_file_id <- getCustomNodeInfo(node, "fcs_file_id")
+                
                 gate_id <- getCustomNodeInfo(node, "gate_id")#used to find tailored gate
                 if(nodeName %in% c("BooleanGate"))
                 {
@@ -181,7 +183,7 @@ parse.gateInfo <- function(file, ...)
                 }
                 # message(name)
                 # browser()
-                data.table(id = id, name = name, gate_id = gate_id, fcs = fcs_file_filename
+                data.table(id = id, name = name, gate_id = gate_id, fcs = fcs_file_filename, fcs_file_id = fcs_file_id
                   , comp_ref = comp_ref, trans_ref = trans_ref, params = params, gate_def = gate_def
                   )
 
@@ -370,11 +372,15 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
   #try to find the tailored gate
   tg_sb <- gateInfo[gate_id == sb[, gate_id] & fcs != "", ]
 
-
-  tg <- sapply(tg_sb[, id], function(gateID){
+  tg_gateid <- tg_sb[, id]
+  tg <- sapply(tg_gateid, function(gateID){
     flowEnv[[gateID]]
   }, simplify = FALSE)
-  names(tg) <- tg_sb[, fcs]
+  #create index by both fcs name and fcs file id in case the input file is named by either 
+  fcs_vs_gateid <- tg_gateid
+  names(fcs_vs_gateid) <- tg_sb[, fcs]
+  fileid_vs_gateid <- tg_gateid
+  names(fileid_vs_gateid) <- tg_sb[, fcs_file_id]
   #     message(popName)
   gate <- flowEnv[[gateID]]
   #parse bounding info
@@ -397,8 +403,9 @@ addGate <- function(gateInfo,flowEnv, g, popId, gateID){
   rownames(bound) <- as.vector(parameters(gate))
   nodeData(g, popId, "gateInfo") <- list(list(gate = gate
                                               , gateName = sb[, name]
-                                              , fcs = sb[, fcs]
-                                              , tailored_gate = tg
+                                              , tailored_gate = list(gateid_vs_gate = tg
+                                                                     , file_vs_gateid = c(fcs_vs_gateid, fileid_vs_gateid)
+                                                                    )
                                               , bound = bound
   )
   )

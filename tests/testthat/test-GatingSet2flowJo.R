@@ -33,6 +33,9 @@ test_that("autogating--tcell", {
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
 
+  #cross validatation test
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
@@ -53,6 +56,8 @@ test_that("autogating--tcell", {
   #output to flowJo
 
   gatingset_to_flowjo(gs, outFile)
+  #cross validatation test
+  cross_validate(gs, outFile)
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
@@ -67,6 +72,9 @@ test_that("gatingset_to_flowjo: manual gates with calibration table parsed and s
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   gatingset_to_flowjo(gs, outFile)
+  
+  #cross validatation test
+  cross_validate(gs, outFile)
 
   #parse it back in
   ws <- open_flowjo_xml(outFile)
@@ -103,8 +111,11 @@ test_that("gatingset_to_flowjo: export clustering results as derived parameters 
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
   # outFile <- "~/test.wsp"
-  expect_message(gatingset_to_flowjo(gs, outFile), "DerivedParameter")
-
+  gatingset_to_flowjo(gs, outFile)
+  
+  #cross validatation test
+  cross_validate(gs, outFile)
+  
   #parse it back in
   ws <- open_flowjo_xml(outFile)
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
@@ -150,7 +161,7 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   
   nodeID<-gs_pop_add(gs, rg,parent="Clean_0")#it is added to root node by default if parent is not specified
   recompute(gs)
-  autoplot(gs, "rectangle")
+  # autoplot(gs, "rectangle")
   
   #add a quadGate
   qg <- quadGate("FL1-H"=1e3, "FL2-H"=1.5e3)
@@ -160,6 +171,10 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   outFile <- tempfile(fileext = ".wsp")
   outDir <- dirname(outFile)
   gatingset_to_flowjo(gs, outFile)
+  
+  #cross validatation test
+  cross_validate(gs, outFile)
+  
   write.flowSet(fs, outDir)
   ws <- open_flowjo_xml(outFile)
   gs2 <- flowjo_to_gatingset(ws, name = 1)

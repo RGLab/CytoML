@@ -10,6 +10,11 @@ AC_ARG_WITH(xml2,
                            [root directory of xml2 installation (defaults to /usr/local)])],
            [XML2_DIR="${with_xml2}"],
 	   [XML2_DIR="yes"])
+AC_ARG_WITH(cytolib-ml,
+           [AS_HELP_STRING([--with-cytolib-ml=DIR],
+                           [directory of cytolib-ml commandline tool installation (defaults to /usr/local/bin)])],
+           [CYTOLIBML_DIR="${with_cytolib-ml}"],
+	   [CYTOLIBML_DIR="yes"])
 
 
 # Checks for libraries.
@@ -65,13 +70,22 @@ else
         XML2_LIBS="-L${XML2_DIR}/lib -lxml2"
 fi
 
+AC_MSG_NOTICE([setting cytolib-ml commandline tool path...])
 
+if test  "${CYTOLIBML_DIR}" = "yes" ; then
+		CYTOLIBML_BIN="/usr/local/bin"        
+else
+        AC_MSG_NOTICE([Using cytolib-ml dir '${CYTOLIBML_DIR}'])
+
+        CYTOLIBML_BIN="${CYTOLIBML_DIR}/bin"
+fi
 PKG_CPPFLAGS="$XML2_CFLAGS"
+
 if grep -q "^clang" <<< "${CC}" ; then
   PKG_CPPFLAGS+=" -ftemplate-depth=900"
 fi
 
-PKG_LIBS="$XML2_LIBS"
+PKG_LIBS="$XML2_LIBS $CYTOLIBML_LIBS"
 
 # Checks for library functions.
 AC_MSG_NOTICE([Using the following compilation and linking flags])
@@ -80,4 +94,8 @@ AC_SUBST(PKG_CPPFLAGS)
 AC_MSG_NOTICE([   PKG_LIBS=${PKG_LIBS}])
 AC_SUBST(PKG_LIBS)
 AC_CONFIG_FILES([src/Makevars])
+
+AC_MSG_NOTICE([   CYTOLIBML_BIN=${CYTOLIBML_BIN}])
+AC_SUBST(CYTOLIBML_BIN)
+AC_CONFIG_FILES([R/cytolibml_bin_path.R])
 AC_OUTPUT

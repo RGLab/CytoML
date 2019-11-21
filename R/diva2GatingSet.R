@@ -745,5 +745,6 @@ generate_trans <- function(maxValue = 262144, pos = 4.5, r, force_logicle=FALSE)
     if(w < 0)
       w <- 0
   }
+
   logicle_trans(w=w, t = maxValue, m = pos) #
 }

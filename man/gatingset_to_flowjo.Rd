@@ -3,9 +3,9 @@
 \name{gatingset_to_flowjo}
 \alias{gatingset_to_flowjo}
 \alias{GatingSet2flowJo}
-\title{Convert a GatingSet to flowJo workspace}
+\title{Convert a GatingSet to flowJo workspace (Deprecated by https://hub.docker.com/r/wjiang2/gs-to-flowjo)}
 \usage{
-gatingset_to_flowjo(gs, outFile, ...)
+gatingset_to_flowjo(gs, outFile, showHidden = FALSE)
 }
 \arguments{
 \item{gs}{a GatingSet object}
@@ -19,7 +19,7 @@ showHidden whether to include the hidden population nodes in the output}
 nothing
 }
 \description{
-Convert a GatingSet to flowJo workspace
+Convert a GatingSet to flowJo workspace (Deprecated by https://hub.docker.com/r/wjiang2/gs-to-flowjo)
 }
 \examples{
 library(flowWorkspace)

@@ -1,5 +1,23 @@
 context("gatingset_to_cytobank ..")
 
+test_that("tailored gate -- lookup by file_id",{
+  path <- "wsTestSuite/gatingML/tailor_gate"
+  skip_if_not(dir.exists(path))
+  xmlfile <- file.path(path, "cytobank_gate_ml2_v10.xml")
+  
+  #input as file id
+  fcsFiles <- file.path(path, "652774")
+  gs <- cytobank_to_gatingset(xmlfile, fcsFiles)
+  stats1 <- gh_pop_get_proportion(gs[[1]], "Singlets (Cells)")
+  expect_equal(stats1, 0.830202)
+  
+  #input as fcs name
+  fcsFiles <- file.path(path, "c01_ObserveHBP0002_20190704_HELIOS1_RUN1 _02_0_BE904259 0010.fcs")
+  gs <- cytobank_to_gatingset(xmlfile, fcsFiles)
+  stats2 <- gh_pop_get_proportion(gs[[1]], "Singlets (Cells)")
+  expect_equal(stats2, 0.830202)
+})
+
 test_that("flowJo to cytobank",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))

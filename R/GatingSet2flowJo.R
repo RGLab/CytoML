@@ -4,7 +4,7 @@ GatingSet2flowJo <- function(...){
   gatingset_to_flowjo(...)
 }
 
-#' Convert a GatingSet to flowJo workspace
+#' Convert a GatingSet to flowJo workspace (Deprecated by https://hub.docker.com/r/wjiang2/gs-to-flowjo)
 #'
 #' @name gatingset_to_flowjo
 #' @aliases GatingSet2flowJo
@@ -27,15 +27,37 @@ GatingSet2flowJo <- function(...){
 #' @export
 #' @rdname gatingset_to_flowjo
 gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE){
-  if(!file.exists(CYTOLIBML_BIN))
-    stop("cytolib-ml commandline tool is not found in ", CYTOLIBML_BIN)
+  "docker run wjiang2/gs-to-flowjo"
+  errcode <- system2("command", " -v docker", stdout = FALSE)
+  if(errcode!=0)
+    stop("'docker' command is not found! ")
+  
+  errcode <- system2("docker", " info", stdout = FALSE, stderr = FALSE)
+  if(errcode!=0)
+    stop("'docker' is not running properly! ")
+  
+  img <- "wjiang2/gs-to-flowjo"
+  errcode <- system2("docker", paste0("  image inspect ", img), stdout = FALSE, stderr = FALSE)
+  if(errcode!=0)
+    stop("docker image '", img, "' is present! ")
+  
   v1 <- packageVersion("cytolib")
-  v2 <- system2(CYTOLIBML_BIN, " --cytolib-version", stdout = TRUE)
+  v2 <- system2("docker", paste0("run ", img, " --cytolib-version"), stdout = TRUE)
   if(v1!=v2)
-    stop("CYTOLIBML_BIN is built with different cytolib version of from R package: ", v2, " vs ", v1)
+    warning("docker image '", img, "' is built with different cytolib version of from R package: ", v2, " vs ", v1)
+  
   tmp <- tempfile()
-  suppressMessages(save_gs(gs, tmp, cdf = "symlink"))
-  res <- suppressWarnings(system2(CYTOLIBML_BIN, paste0(" --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden), stderr = TRUE))
+  suppressMessages(save_gs(gs, tmp))#todo:fix link="cdf"
+  
+  res <- suppressWarnings(system2("docker"
+                                  , paste0("run"
+                                           , " -v ", tmp, ":/gs"
+                                           , " -v ", normalizePath(dirname(outFile)), ":/out "
+                                           , img
+                                           , " --src=/gs --dest=/out/", basename(outFile)
+                                           , " --showHidden=", showHidden)
+                                  , stderr = TRUE)
+                          )
   if(length(res) > 0)
     stop(res)
 }

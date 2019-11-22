@@ -4,13 +4,29 @@
 \alias{flowjo_to_gatingset}
 \title{Parse a flowJo Workspace}
 \usage{
-flowjo_to_gatingset(ws, name = NULL, subset = list(), execute = TRUE,
-  path = "", h5_dir = tempdir(), includeGates = TRUE,
-  additional.keys = "$TOT", additional.sampleID = FALSE,
-  keywords = character(), keywords.source = "XML",
-  keyword.ignore.case = FALSE, extend_val = 0, extend_to = -4000,
-  channel.ignore.case = FALSE, leaf.bool = TRUE, compensation = NULL,
-  transform = TRUE, fcs_file_extension = ".fcs", mc.cores = 1, ...)
+flowjo_to_gatingset(
+  ws,
+  name = NULL,
+  subset = list(),
+  execute = TRUE,
+  path = "",
+  h5_dir = tempdir(),
+  includeGates = TRUE,
+  additional.keys = "$TOT",
+  additional.sampleID = FALSE,
+  keywords = character(),
+  keywords.source = "XML",
+  keyword.ignore.case = FALSE,
+  extend_val = 0,
+  extend_to = -4000,
+  channel.ignore.case = FALSE,
+  leaf.bool = TRUE,
+  compensation = NULL,
+  transform = TRUE,
+  fcs_file_extension = ".fcs",
+  mc.cores = 1,
+  ...
+)
 }
 \arguments{
 \item{...}{\itemize{
@@ -79,7 +95,7 @@ The \code{subset} argument allows one to select a set of files from the chosen s
 
 #subset by pData (extracted from keywords)
 gs <- flowjo_to_gatingset(ws, path = dataDir, name = 4
-                         , subset = `TUBE NAME` \%in\% c("CytoTrol_1", "CytoTrol_2")
+                         , subset = `TUBE NAME` %in% c("CytoTrol_1", "CytoTrol_2")
                          , keywords = "TUBE NAME")
 
 

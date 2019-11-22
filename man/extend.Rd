@@ -7,11 +7,21 @@
 \alias{extend.ellipsoidGate}
 \title{extend the gate to the minimum and maximum limit of both dimensions based on the bounding information.}
 \usage{
-extend(gate, bound, data.range = NULL, plot = FALSE,
-  limits = c("original", "extended"))
+extend(
+  gate,
+  bound,
+  data.range = NULL,
+  plot = FALSE,
+  limits = c("original", "extended")
+)
 
-\method{extend}{polygonGate}(gate, bound, data.range = NULL,
-  plot = FALSE, limits = c("original", "extended"))
+\method{extend}{polygonGate}(
+  gate,
+  bound,
+  data.range = NULL,
+  plot = FALSE,
+  limits = c("original", "extended")
+)
 
 \method{extend}{rectangleGate}(gate, ...)
 

@@ -1,3 +1,8 @@
+#' @templateVar old GatingSet2cytobank
+#' @templateVar new gatingset_to_cytobank
+#' @template template-depr_pkg
+NULL
+
 #' @export
 GatingSet2cytobank <- function(...){
   .Deprecated("gatingset_to_cytobank")

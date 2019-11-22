@@ -79,6 +79,11 @@ setMethod("show",c("flowjo_workspace"),function(object){
 #' @export
 setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 
+#' @templateVar old parseWorkspace
+#' @templateVar new flowjo_to_gatingset
+#' @template template-depr_pkg
+NULL
+
 #' @importFrom flowWorkspace openWorkspace
 setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 			.Deprecated("flowjo_to_gatingset")
@@ -325,6 +330,11 @@ fj_ws_get_keywords <- function(obj,y, ...){
       as.list(func(obj@doc, y))
     }
 
+#' @templateVar old getKeywords
+#' @templateVar new fj_ws_get_keywords
+#' @template template-depr_pkg
+NULL
+
 #' @export 
 getKeywords <- function(...){
   .Deprecated("fj_ws_get_keywords")
@@ -363,6 +373,12 @@ fj_ws_get_samples <- function(x, group_id = NULL)
   res <- do.call(rbind, res)
   unique(res)
 }
+
+#' @templateVar old getSamples
+#' @templateVar new fj_ws_get_samples
+#' @template template-depr_pkg
+NULL
+
 #' @export  
 getSamples <- function(...){
   .Deprecated("fj_ws_get_samples")
@@ -397,6 +413,11 @@ fj_ws_get_sample_groups <- function(x){
   colnames(df) <-  c("groupName", "groupID", "sampleID")
   df
 }
+
+#' @templateVar old getSampleGroups
+#' @templateVar new fj_ws_get_sample_groups
+#' @template template-depr_pkg
+NULL
 
 #' @export 
 getSampleGroups <- function(...){

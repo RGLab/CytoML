@@ -4,8 +4,7 @@
 \alias{addCustomInfo}
 \title{add customInfo nodes to each gate node and add BooleanAndGates}
 \usage{
-addCustomInfo(root, gs, flowEnv, cytobank.default.scale = TRUE,
-  showHidden)
+addCustomInfo(root, gs, flowEnv, cytobank.default.scale = TRUE, showHidden)
 }
 \arguments{
 \item{root}{the root node of the XML}

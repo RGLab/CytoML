@@ -30,6 +30,11 @@ setClass("diva_workspace" ,representation(version="character"
                                            , options="integer")
 )
 
+#' @templateVar old openDiva
+#' @templateVar new open_diva_xml
+#' @template template-depr_pkg
+NULL
+
 #' @export
 openDiva <- function(...){
   .Deprecated("open_diva_xml")
@@ -152,6 +157,11 @@ setMethod("show",c("diva_workspace"),function(object){
         cat("Workspace is closed.","\n")
       }
     })
+
+#' @templateVar old parseWorkspace
+#' @templateVar new diva_to_gatingset
+#' @template template-depr_pkg
+NULL
 
 #' @export
 setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){

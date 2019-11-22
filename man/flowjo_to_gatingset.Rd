@@ -95,7 +95,7 @@ The \code{subset} argument allows one to select a set of files from the chosen s
 
 #subset by pData (extracted from keywords)
 gs <- flowjo_to_gatingset(ws, path = dataDir, name = 4
-                         , subset = `TUBE NAME` %in% c("CytoTrol_1", "CytoTrol_2")
+                         , subset = `TUBE NAME` \%in\% c("CytoTrol_1", "CytoTrol_2")
                          , keywords = "TUBE NAME")
 
 

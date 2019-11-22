@@ -47,7 +47,7 @@ Suggests:
     knitr,
     parallel
 VignetteBuilder: knitr
-RoxygenNote: 7.0.0
+RoxygenNote: 7.0.1
 BugReports: https://github.com/RGLab/CytoML/issues
 URL: https://github.com/RGLab/CytoML
 Collate: 

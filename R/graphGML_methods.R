@@ -179,6 +179,10 @@ setMethod("plot", signature = c(x = "graphGML", y = "missing"), definition = fun
 
 })
 
+#' @templateVar old gating
+#' @templateVar new gating_graphGML
+#' @template template-depr_pkg
+NULL
 
 #' Apply the gatingML graph to a GatingSet
 #'

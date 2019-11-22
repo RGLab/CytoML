@@ -5,8 +5,13 @@
 \alias{GatingSet2cytobank}
 \title{Convert a GatingSet to a Cytobank-compatible gatingML}
 \usage{
-gatingset_to_cytobank(gs, outFile, showHidden = FALSE,
-  cytobank.default.scale = TRUE, ...)
+gatingset_to_cytobank(
+  gs,
+  outFile,
+  showHidden = FALSE,
+  cytobank.default.scale = TRUE,
+  ...
+)
 }
 \arguments{
 \item{gs}{a GatingSet object}

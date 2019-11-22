@@ -1,6 +1,7 @@
 context("gatingset_to_flowjo ..")
-
+skip_if_not(check_docker_status()=="ok")
 test_that("autogating--tcell", {
+  
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   #load raw FCS
   fs <- read.flowSet(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))

@@ -1,3 +1,8 @@
+#' @templateVar old GatingSet2flowJo
+#' @templateVar new gatingset_to_flowjo
+#' @template template-depr_pkg
+NULL
+
 #' @export
 GatingSet2flowJo <- function(...){
   .Deprecated("gatingset_to_flowjo")

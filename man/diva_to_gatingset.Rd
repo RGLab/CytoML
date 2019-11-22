@@ -5,10 +5,17 @@
 \alias{parseWorkspace,diva_workspace-method}
 \title{Parse a FACSDiva Workspace}
 \usage{
-diva_to_gatingset(obj, name = NULL, subset = NULL, path = obj@path,
-  fast = TRUE, worksheet = c("normal", "global"),
+diva_to_gatingset(
+  obj,
+  name = NULL,
+  subset = NULL,
+  path = obj@path,
+  fast = TRUE,
+  worksheet = c("normal", "global"),
   swap_cols = list(`FSC-H` = "FSC-W", `SSC-H` = "SSC-W"),
-  verbose = FALSE, ...)
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{obj}{diva_workspace}

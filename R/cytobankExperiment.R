@@ -7,6 +7,10 @@
 #' @aliases print.cytobank_experiment
 NULL
 
+#' @templateVar old cytobankExperiment
+#' @templateVar new open_cytobank_experiment
+#' @template template-depr_pkg
+NULL
 
 #' @export
 cytobankExperiment <- function(...){
@@ -60,6 +64,11 @@ open_cytobank_experiment <- function(acs, exdir = tempfile()){
                         )
                    , class = "cytobank_experiment")
 }
+
+#' @templateVar old cytobank2GatingSet
+#' @templateVar new cytobank_to_gatingset
+#' @template template-depr_pkg
+NULL
 
 #' @export
 cytobank2GatingSet <- function(...)

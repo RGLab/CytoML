@@ -16,6 +16,16 @@
 #include <boost/tokenizer.hpp>
 
 #define TBB_PREVIEW_SERIAL_SUBSET 1
+
+//solve windows build issues
+#ifdef Free
+#undef Free
+#endif
+#ifdef Realloc
+#undef Realloc
+#endif
+
+
 #include <tbb/tbb.h>
 #include "tbb/task_scheduler_init.h"
 #include <tbb/spin_mutex.h>

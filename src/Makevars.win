@@ -2,7 +2,10 @@
 CXX_STD = CXX11
 PKG_CPPFLAGS =-DROUT -I../inst/include/ -I$(LIB_XML2)/$(R_ARCH)/include/libxml2 -DLIBXML_STATIC -fpermissive -DRCPP_PARALLEL_USE_TBB=1
 
-PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(LIB_XML2)/$(R_ARCH)/lib/libxml2.a `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags();cat(' ');RcppParallel::RcppParallelLibs()"` -lws2_32
+RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
+    "${R_HOME}/bin/R" --vanilla --slave)
+
+PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(LIB_XML2)/$(R_ARCH)/lib/libxml2.a `${R_HOME}/bin/Rscript -e "cytolib:::cytolib_LdFlags();cat(' ');RProtoBufLib:::LdFlags();cat(' ');RcppParallel::RcppParallelLibs()"` ${RHDF5_LIBS} -lws2_32
 
 USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
 PKGLIB = ${USERDIR}/libflowWorkspace.a

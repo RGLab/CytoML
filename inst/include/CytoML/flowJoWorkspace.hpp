@@ -24,9 +24,7 @@
 #ifdef Realloc
 #undef Realloc
 #endif
-#ifdef POINT
-#undef POINT
-#endif
+
 
 #include <tbb/tbb.h>
 #include "tbb/task_scheduler_init.h"

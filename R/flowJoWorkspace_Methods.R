@@ -125,6 +125,7 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #'          \item keywords \code{character} vector specifying the keywords to be extracted as pData of GatingSet
 #'          \item keywords.source \code{character} the place where the keywords are extracted from, can be either "XML" or "FCS"
 #'          \item keyword.ignore.case a \code{logical} flag indicates whether the keywords matching needs to be case sensitive.    
+#'          \item include_empty_tree a \code{logical} whether to include samples that don't have gates.
 #' 			\item transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
 #'      	\item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
 #'      	}
@@ -183,6 +184,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
     , extend_to = -4000
     , channel.ignore.case = FALSE
     , leaf.bool = TRUE
+    , include_empty_tree = FALSE
     , compensation = NULL
     , transform = TRUE
 	, fcs_file_extension = ".fcs"
@@ -262,6 +264,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
                  , extend_to = extend_to
                  , channel_ignore_case = channel.ignore.case
                  , leaf_bool = leaf.bool
+                , include_empty_tree = include_empty_tree
                  , comps = compensation
                 , transform = transform
 		 		 , fcs_file_extension = fcs_file_extension

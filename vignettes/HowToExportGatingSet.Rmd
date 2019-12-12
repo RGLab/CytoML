@@ -29,7 +29,7 @@ library(flowWorkspace)
 library(CytoML)
 dataDir <- system.file("extdata",package="flowWorkspaceData")
 #load raw FCS
-fs <- read.ncdfFlowSet(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
+fs <- load_cytoset_from_fcs(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
 gs <- GatingSet(fs)
 ```
 
@@ -80,7 +80,7 @@ Note that the resulted `xml` file is a standard `GatingML2.0` file with some add
 
 
 ## Export to FlowJo 
-```{r}
+```{r eval=FALSE}
 outFile <- tempfile(fileext = ".wsp")
 gatingset_to_flowjo(gs, outFile)
 ```

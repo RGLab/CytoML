@@ -38,7 +38,7 @@ test_that("getSamples&getSampleGroups workspace",
       #record the rows to be removed
       excludeIds <- as.integer(rownames(subset(thisExpect, pop.counts <=0)))
       thisExpect <- thisExpect[-excludeIds,-4]
-      expect_equivalent(thisRes, thisExpect)
+      expect_equivalent(subset(thisRes, count > 0), thisExpect)
       
       
       thisRes <- fj_ws_get_sample_groups(ws)

@@ -1,6 +1,19 @@
 context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
+test_that("no gate",{
+  
+  wsFile <- file.path(path, "no-gate.wsp")
+  
+  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  expect_equal(nrow(fj_ws_get_samples(ws)), 1)
+  gs <- flowjo_to_gatingset(ws, name = 1, path = file.path(path,"Cytotrol/NHLBI/Tcell/"), include_empty_tree = TRUE)
+  expect_equal(range(gh_pop_get_data(gs[[1]]))[,5], c(50.70029, 256.91464), tol = 1e-6)
+  
+  expect_equal(length(gs_get_pop_paths(gs)), 1)
+  
+  
+})
 test_that("flog-- offset and decades that expose the previous logGml2-based flog was wrong",{
   
   wsFile <- file.path(path, "flog/log.wsp")
@@ -96,8 +109,10 @@ test_that("skip ManuallyIncludedSamples",{
 test_that("Handle duplicate sample names",{
   wsFile <- file.path(path, "duplicatedSampleID", "Ustekin_G26_sas_IMMPORT2.495809.xml")
   ws <- open_flowjo_xml(wsFile)
-  expect_error(flowjo_to_gatingset(ws, name = 1, subset = 429:440), "Duplicated")
-  gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, subset = 429:440, additional.sampleID = TRUE))
+  sink(tempfile())
+  expect_error(flowjo_to_gatingset(ws, name = 1), "Duplicated")
+  gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, additional.sampleID = TRUE))
+  sink()
   expect_is(gs, "GatingSet")
 })
 

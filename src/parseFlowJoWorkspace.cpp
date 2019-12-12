@@ -53,6 +53,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , float extend_to
                                   , bool channel_ignore_case
                                   , bool leaf_bool
+								  , bool include_empty_tree
 								  , List comps
                   , bool transform
 								  , string fcs_file_extension
@@ -75,6 +76,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   config.gate_extend_to = extend_to;
   config.channel_ignore_case = channel_ignore_case;
   config.compute_leaf_bool_node = leaf_bool;
+  config.include_empty_tree = include_empty_tree;
   config.fcs_file_extension = fcs_file_extension;
   config.transform = transform;
   
@@ -153,9 +155,11 @@ List get_samples(XPtr<flowJoWorkspace> ws)
   vector<SampleGroup> groups = ws->get_sample_groups();
   unsigned nGroup = groups.size();
   List grouplist(nGroup);
+  ParseWorkspaceParameters config;
+  config.include_empty_tree = true;
   for(unsigned i = 0; i < nGroup; i++)
   {
-    const vector<SampleInfo> & sample_info_vec = ws->get_sample_info(groups[i].sample_ids, ParseWorkspaceParameters());
+    const vector<SampleInfo> & sample_info_vec = ws->get_sample_info(groups[i].sample_ids, config);
     unsigned nSample = sample_info_vec.size();
     List samples(nSample);
 

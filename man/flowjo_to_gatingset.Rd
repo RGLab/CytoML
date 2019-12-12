@@ -21,6 +21,7 @@ flowjo_to_gatingset(
   extend_to = -4000,
   channel.ignore.case = FALSE,
   leaf.bool = TRUE,
+  include_empty_tree = FALSE,
   compensation = NULL,
   transform = TRUE,
   fcs_file_extension = ".fcs",
@@ -57,6 +58,7 @@ flowjo_to_gatingset(
 \item keywords \code{character} vector specifying the keywords to be extracted as pData of GatingSet
 \item keywords.source \code{character} the place where the keywords are extracted from, can be either "XML" or "FCS"
 \item keyword.ignore.case a \code{logical} flag indicates whether the keywords matching needs to be case sensitive.    
+\item include_empty_tree a \code{logical} whether to include samples that don't have gates.
    \item transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
 \item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
 }}

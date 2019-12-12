@@ -61,7 +61,8 @@ struct ParseWorkspaceParameters
 	 unordered_map<string, vector<string>> sample_filters;
 	 string data_dir = ""; //path for FCS directory
 	 bool is_h5 = true;;
-	 bool compute_leaf_bool_node = true;;
+	 bool compute_leaf_bool_node = true;
+	 bool include_empty_tree = false;
 	 string h5_dir = fs::temp_directory_path().string();// output path for generating the h5 files
 	 FCS_READ_PARAM fcs_read_param;
 	 unordered_map<string, compensation> compensation_map;//optional customized sample-specific compensations
@@ -575,7 +576,7 @@ public:
 				sample_info.population_count = get_population_count(sample_info.sample_node);
 
 				// filter sample by pop.count
-				if(sample_info.population_count == 0)
+				if(sample_info.population_count == 0&&!config.include_empty_tree)
 					continue;
 
 				sample_info.total_event_count = get_event_count(getRoot(sample_info.sample_node));

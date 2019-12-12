@@ -98,6 +98,23 @@ struct parseWorkspaceFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(parseWorkspace,parseWorkspaceFixture)
+BOOST_AUTO_TEST_CASE(nogate)
+{
+	myTest.filename="../wsTestSuite/no-gate.wsp";
+	//myTest.wsType = WS_TYPE::WS_MAC;
+	myTest.config.sample_filters["name"]={"CytoTrol_CytoTrol_1.fcs"};
+	myTest.config.include_empty_tree = true;
+	myTest.config.data_dir = "../wsTestSuite/Cytotrol/NHLBI/Tcell";
+	myTest.config.keywords_for_uid={};
+	myTest.group_id = 0;
+	myTest.archive="../output/no-gate/gs";
+//	g_loglevel = GATE_LEVEL;
+
+	parser_test(myTest);
+
+//	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
+
+}
 BOOST_AUTO_TEST_CASE(ManuallyIncludedSamples)
 {
 

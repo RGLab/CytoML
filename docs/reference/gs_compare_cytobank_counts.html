@@ -8,16 +8,25 @@
 
 <title>compare the counts to cytobank's exported csv so that the parsing result can be verified. — gs_compare_cytobank_counts • CytoML</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
@@ -32,10 +41,12 @@
 
 
 
-<meta property="og:title" content="compare the counts to cytobank's exported csv so that the parsing result can be verified. — gs_compare_cytobank_counts" />
 
+<meta property="og:title" content="compare the counts to cytobank's exported csv so that the parsing result can be verified. — gs_compare_cytobank_counts" />
 <meta property="og:description" content="compare the counts to cytobank's exported csv so that the parsing result can be verified." />
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -66,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.13.6</span>
       </span>
     </div>
 
@@ -97,7 +108,6 @@
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/RGLab/CytoML">
@@ -124,14 +134,16 @@
     </div>
 
     <div class="ref-description">
-    
     <p>compare the counts to cytobank's exported csv so that the parsing result can be verified.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>gs_compare_cytobank_counts</span>(<span class='no'>gs</span>, <span class='no'>file</span>, <span class='kw'>id.vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"FCS Filename"</span>,
-  <span class='st'>"population"</span>), <span class='no'>...</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>gs_compare_cytobank_counts</span>(
+  <span class='no'>gs</span>,
+  <span class='no'>file</span>,
+  <span class='kw'>id.vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"FCS Filename"</span>, <span class='st'>"population"</span>),
+  <span class='no'>...</span>
+)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -152,27 +164,37 @@
       <td><p>arguments passed to data.table::fread function</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a data.table (in long format) that contains the counts from openCyto and Cytobank side by side.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='no'>acsfile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/cytobank_experiment.acs"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"CytoML"</span>)
-<span class='no'>ce</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='open_cytobank_experiment.html'>open_cytobank_experiment</a></span>(<span class='no'>acsfile</span>)</div><div class='output co'>#&gt; <span class='message'>Unpacking ACS file...</span></div><div class='input'><span class='no'>gs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cytobank_to_gatingset.html'>cytobank_to_gatingset</a></span>(<span class='no'>ce</span>)</div><div class='output co'>#&gt; <span class='error'>Error in ce_get_panels(ce): object 'ce' not found</span></div><div class='input'><span class='co'>## verify the stats are correct</span>
+<span class='no'>ce</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='open_cytobank_experiment.html'>open_cytobank_experiment</a></span>(<span class='no'>acsfile</span>)</div><div class='output co'>#&gt; <span class='message'>Unpacking ACS file...</span></div><div class='input'><span class='no'>gs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cytobank_to_gatingset.html'>cytobank_to_gatingset</a></span>(<span class='no'>ce</span>)</div><div class='output co'>#&gt; <span class='message'>not debris</span></div><div class='output co'>#&gt; <span class='message'>singlets</span></div><div class='output co'>#&gt; <span class='message'>CD3</span></div><div class='output co'>#&gt; <span class='message'>CD4</span></div><div class='output co'>#&gt; <span class='message'>CD8</span></div><div class='output co'>#&gt; <span class='message'>CD8_Q2</span></div><div class='output co'>#&gt; <span class='message'>Q3</span></div><div class='output co'>#&gt; <span class='message'>Q4</span></div><div class='output co'>#&gt; <span class='message'>Q2</span></div><div class='output co'>#&gt; <span class='message'>Q1</span></div><div class='output co'>#&gt; <span class='message'>HLA range</span></div><div class='output co'>#&gt; <span class='message'>CD38 range</span></div><div class='output co'>#&gt; <span class='message'>All FCS files have the same following channels:</span>
+#&gt; <span class='message'>FSC-A</span>
+#&gt; <span class='message'>FSC-H</span>
+#&gt; <span class='message'>FSC-W</span>
+#&gt; <span class='message'>SSC-A</span>
+#&gt; <span class='message'>B710-A</span>
+#&gt; <span class='message'>R660-A</span>
+#&gt; <span class='message'>R780-A</span>
+#&gt; <span class='message'>V450-A</span>
+#&gt; <span class='message'>V545-A</span>
+#&gt; <span class='message'>G560-A</span>
+#&gt; <span class='message'>G780-A</span>
+#&gt; <span class='message'>Time</span></div><div class='output co'>#&gt; <span class='message'>write CytoTrol_CytoTrol_1.fcs to empty cdf slot...</span></div><div class='output co'>#&gt; <span class='message'>done!</span></div><div class='output co'>#&gt; <span class='message'>not debris</span></div><div class='output co'>#&gt; <span class='message'>singlets</span></div><div class='output co'>#&gt; <span class='message'>CD3</span></div><div class='output co'>#&gt; <span class='message'>CD8</span></div><div class='output co'>#&gt; <span class='message'>CD8_Q2</span></div><div class='output co'>#&gt; <span class='message'>CD4</span></div><div class='output co'>#&gt; <span class='message'>Q1</span></div><div class='output co'>#&gt; <span class='message'>Q2</span></div><div class='output co'>#&gt; <span class='message'>Q4</span></div><div class='output co'>#&gt; <span class='message'>Q3</span></div><div class='output co'>#&gt; <span class='message'>CD38 range</span></div><div class='output co'>#&gt; <span class='message'>HLA range</span></div><div class='output co'>#&gt; <span class='message'>done!</span></div><div class='input'><span class='co'>## verify the stats are correct</span>
 <span class='no'>statsfile</span> <span class='kw'>&lt;-</span> <span class='no'>ce</span>$<span class='no'>attachments</span>[<span class='fl'>1</span>]
-<span class='no'>dt_merged</span> <span class='kw'>&lt;-</span> <span class='fu'>gs_compare_cytobank_counts</span>(<span class='no'>gs</span>, <span class='no'>statsfile</span>, <span class='kw'>id.vars</span> <span class='kw'>=</span> <span class='st'>"population"</span>, <span class='kw'>skip</span> <span class='kw'>=</span> <span class='st'>"FCS Filename"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is(x, "GatingSetList"): object 'gs' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span>(<span class='no'>dt_merged</span>[, <span class='no'>count.x</span>], <span class='no'>dt_merged</span>[, <span class='no'>count.y</span>], <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>5e-4</span>)</div><div class='output co'>#&gt; <span class='error'>Error in all.equal(dt_merged[, count.x], dt_merged[, count.y], tol = 5e-04): object 'dt_merged' not found</span></div><div class='input'>
+<span class='no'>dt_merged</span> <span class='kw'>&lt;-</span> <span class='fu'>gs_compare_cytobank_counts</span>(<span class='no'>gs</span>, <span class='no'>statsfile</span>, <span class='kw'>id.vars</span> <span class='kw'>=</span> <span class='st'>"population"</span>, <span class='kw'>skip</span> <span class='kw'>=</span> <span class='st'>"FCS Filename"</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span>(<span class='no'>dt_merged</span>[, <span class='no'>count.x</span>], <span class='no'>dt_merged</span>[, <span class='no'>count.y</span>], <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>5e-4</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 </div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

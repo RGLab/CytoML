@@ -1,3 +1,4 @@
+# <img src="logo_mid.png" align="right" />
 
 # CytoML: Cross-Platform Cytometry Data Sharing.
 

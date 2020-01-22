@@ -296,7 +296,7 @@ diva_to_gatingset<- function(obj, name = NULL
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace gh_pop_set_xml_count GatingSetList save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5 gslist_to_gs
+#' @importFrom flowWorkspace gh_pop_set_xml_count save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -679,7 +679,7 @@ diva_to_gatingset<- function(obj, name = NULL
         gslist[[sampleName]] <- gs
       }
       #merge samples into a single gs
-      gs <- gslist_to_gs(GatingSetList(gslist))
+      gs <- merge_list_to_gs(gslist)
       #TODO: create and expose R wrapper 'set_compensation' in flowWorkspace
       complist <- sapply(complist, flowWorkspace:::check_comp, simplify = FALSE)
       flowWorkspace:::cs_set_compensation(gs@pointer, complist, FALSE)
@@ -718,7 +718,7 @@ diva_to_gatingset<- function(obj, name = NULL
   gsfiles <- list.files(tmp.dir, full.names = TRUE)
   if(num_threads >1)
   {
-    res <- try(suppressMessages(GatingSetList(lapply(gsfiles, load_gs))))
+    res <- try(suppressMessages(lapply(gsfiles, load_gs)))
     if(is(res, "try-error"))
       stop("he parsed GatingSets are cached in: ", tmp.dir, "\n Please use load_gs to load and clean/merge them!")
     res

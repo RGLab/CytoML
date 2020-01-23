@@ -437,10 +437,8 @@ public:
 			}
 
 
-		}
-		else
-		{//further verify/pruning the matched files by looking at the keywords
-
+		}else if(file_paths.size() > 1){
+		  //resolve ambiguity by further verifying/pruning the matched files by looking at the keywords
 			for(const string & file_path : file_paths)
 			{
 				fr.reset(new MemCytoFrame(file_path, fcs_read_param));
@@ -455,7 +453,11 @@ public:
 						isfound = true;
 				}
 			}
-
+		}else{
+		  // already an unambiguous match -- keyword check unnecessary
+		  fr.reset(new MemCytoFrame(file_paths[0], fcs_read_param));
+		  fr->read_fcs_header();
+		  isfound = true;
 		}
 		return isfound;
 

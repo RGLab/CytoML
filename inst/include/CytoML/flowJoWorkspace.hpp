@@ -255,15 +255,18 @@ public:
 			COUT<<endl<<"... start parsing sample: "<< sample_info.sample_name <<"... "<<endl;
 		//generate uid
 		string ws_key_seq = concatenate_keywords(sample_info.keywords, config_const.keywords_for_uid, config_const.keywords_for_uid_sampleID, sample_info.sample_id);
+		// Even if FCS for sample not found, need a unique, non-empty default uid for the case of !config_const.is_gating
+		// string uid = sample_info.sample_name;
 		string uid = sample_info.sample_name + ws_key_seq;
 		shared_ptr<MemCytoFrame> frptr;
 		bool isfound = false;
 		if(config_const.is_gating)
 		{
 			//match FCS
-			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, ws_key_seq, config_const, frptr);
-			if(!isfound)
-				PRINT("FCS not found for sample " + uid + " from searching the file extension: " + config_const.fcs_file_extension + "\n");
+			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, uid, sample_info.total_event_count, ws_key_seq, config_const, frptr);
+			if(!isfound){
+			  PRINT("FCS not found for sample " + uid + " from searching the file extension: " + config_const.fcs_file_extension + "\n");
+			}
 
 		}
 		else
@@ -403,63 +406,96 @@ public:
 	 * First try to search by file name, if failed, use FCS keyword $FIL + additional keywords + sampleID for further searching and pruning
 	 * cytoframe is preloaded with header-only.
 	 */
-	bool search_for_fcs(const string & data_dir, const int sample_id, const string & sample_name, const string & ws_key_seq, const ParseWorkspaceParameters & config, shared_ptr<MemCytoFrame> &fr)
+	bool search_for_fcs(const string & data_dir, const int sample_id, const string & sample_name, string & uid, const int & total_event_count, const string & ws_key_seq, const ParseWorkspaceParameters & config, shared_ptr<MemCytoFrame> &fr)
 	{
 		FCS_READ_PARAM fcs_read_param = config.fcs_read_param;
 		fcs_read_param.header.is_fix_slash_in_channel_name = is_fix_slash_in_channel_name();
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"searching for FCS for sample: " + sample_name <<endl;
+			COUT<<endl<<"Searching for FCS for sample: " + sample_name <<endl;
 		//try to search by file name first
 		vector<string> all_file_paths = list_files(data_dir, config.fcs_file_extension);
 		vector<string> file_paths;
-		for(auto i : all_file_paths)
-		{
+		vector<string> file_paths_clipped;
+		bool isfound = false;
+		
+		// Gather files that match sample_name
+		for(auto i : all_file_paths){
 			if(path_base_name(i) == sample_name)
 				file_paths.push_back(i);
 		}
-		bool isfound = false;
-		if(file_paths.size() == 0)
-		{
-			//search by keyword by traversing the data dir recursively until the target is found
-			for(const string & file_path : all_file_paths)
-			{
-
+		
+		// No matches found from simple filename check. Check $FIL keyword for prospective match.
+		if(file_paths.size() == 0){
+			PRINT("No FCS file found with filename matching sample name " + sample_name + ". Checking for files with $FIL keyword matching sample name.");
+			for(const string & file_path : all_file_paths){
 				fr.reset(new MemCytoFrame(file_path, fcs_read_param));
 				fr->read_fcs_header();
-				if(fr->get_keyword("$FIL") == sample_name &&
-						ws_key_seq == concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id))
-				{
-
-					isfound = true;
-					break;//to avoid scanning entire folder, terminate the search immediately on the first hit assuming the uid is unique
-
-				}
+				// Just gather those with $FIL matching sample name. If necessary, keyword check will occur in subsequent logic.
+				if(fr->get_keyword("$FIL") == sample_name)
+					file_paths.push_back(file_path);
 			}
-
-
 		}
-		else
-		{//further verify/pruning the matched files by looking at the keywords
-
-			for(const string & file_path : file_paths)
-			{
+		
+		if(file_paths.size() == 0){
+			PRINT("No FCS file found for sample name " + sample_name + ".");
+		}else if( file_paths.size() == 1 ){ // Unambiguous match
+			fr.reset(new MemCytoFrame(file_paths[0], fcs_read_param));
+			fr->read_fcs_header();
+			if(std::stoi(fr->get_keyword("$TOT")) != total_event_count){
+				PRINT("FCS file found for sample " + sample_name + " has incorrect total number of events and will be excluded." + "\n");
+			}else{
+				// sample name is enough to disambiguate for uid
+				uid = sample_name;
+				isfound = true;
+			}
+		}else{ // Match is ambiguous. Need to check $TOT and maybe keywords
+			PRINT("Multiple FCS files found for sample " + sample_name + ". Attempting to use total number of events to resolve ambiguity" + "\n" );
+		  
+			// Clip out those files with incorrect $TOT
+			for(const string & file_path : file_paths){
 				fr.reset(new MemCytoFrame(file_path, fcs_read_param));
 				fr->read_fcs_header();
-				string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
-
-				if(fcs_key_seq == ws_key_seq)//found matched one
-				{
-					if(isfound)
-						throw(domain_error("Duplicated FCS found for sample " + sample_name + ws_key_seq));
-					else
-						isfound = true;
+				if(std::stoi(fr->get_keyword("$TOT")) == total_event_count)
+					file_paths_clipped.push_back(file_path);
+			}
+			file_paths = file_paths_clipped;
+			file_paths_clipped.clear();
+			if( file_paths.size() == 0){
+				PRINT("No FCS files found for sample " + sample_name + " have correct total number of events. Sample will be excluded." + "\n");
+			}else if(file_paths.size() == 1 ){
+				// $TOT was required to resolve ambiguity, so append it to uid
+				uid = sample_name + std::to_string(total_event_count);
+				isfound = true;
+			}else{
+				// Ambiguity remains. Check keywords + sampleID and clip out those that do not match
+				PRINT("Multiple FCS files remain for sample " + sample_name + ". Attempting to use additional keywords and sampleID to resolve ambiguity." + "\n" );
+				for(const string & file_path : file_paths){
+					COUT << "file_path: " << file_path << endl;
+					fr.reset(new MemCytoFrame(file_path, fcs_read_param));
+					fr->read_fcs_header();
+					string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
+					//found matched one
+					if(fcs_key_seq == ws_key_seq)
+						file_paths_clipped.push_back(file_path);
+				}
+	      
+				if(file_paths_clipped.size() == 0){
+					PRINT("No FCS files for sample " + sample_name + " match specified keywords. Sample will be excluded.");
+				}else if(file_paths_clipped.size() == 1){
+					// Needed $TOT plus other keywords to resolve ambiguity, so append them
+					uid = sample_name + std::to_string(total_event_count) + ws_key_seq;
+					isfound = true;
+				}else{
+					string candidates;
+					for (const auto &cd : file_paths_clipped)
+						candidates += cd + "\n";
+					throw(domain_error("Multiple FCS files match sample " + sample_name + " by filename, event count, and keywords.\n"
+									   "Candidates are: \n" + candidates +
+									   "Please move incorrect files out of this directory or its subdirectories or this sample will be excluded."));
 				}
 			}
-
 		}
 		return isfound;
-
-
 	}
 	/**
 	 * Generate the uniquely identifiable id for each sample

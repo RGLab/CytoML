@@ -415,85 +415,136 @@ public:
 		//try to search by file name first
 		vector<string> all_file_paths = list_files(data_dir, config.fcs_file_extension);
 		vector<string> file_paths;
-		vector<string> file_paths_clipped;
+		vector<bool> matches_total;
+		vector<bool> matches_keys;
+		vector<bool> matches_full;
 		bool isfound = false;
 		
 		// Gather files that match sample_name
 		for(auto i : all_file_paths){
-			if(path_base_name(i) == sample_name)
+			if(path_base_name(i) == sample_name){
 				file_paths.push_back(i);
-		}
-		
-		// No matches found from simple filename check. Check $FIL keyword for prospective match.
-		if(file_paths.size() == 0){
-			PRINT("No FCS file found with filename matching sample name " + sample_name + ". Checking for files with $FIL keyword matching sample name.");
-			for(const string & file_path : all_file_paths){
-				fr.reset(new MemCytoFrame(file_path, fcs_read_param));
+				fr.reset(new MemCytoFrame(i, fcs_read_param));
 				fr->read_fcs_header();
-				// Just gather those with $FIL matching sample name. If necessary, keyword check will occur in subsequent logic.
-				if(fr->get_keyword("$FIL") == sample_name)
-					file_paths.push_back(file_path);
+				bool match_total;
+				bool match_keys;
+
+				// Check if total # events matches
+				match_total = (std::stoi(fr->get_keyword("$TOT")) == total_event_count);
+
+				// Check if keywords match
+				string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
+				match_keys = (fcs_key_seq == ws_key_seq);
+
+				matches_total.push_back(match_total);
+				matches_keys.push_back(match_keys);
+				matches_full.push_back(match_total && match_keys);
 			}
 		}
 		
+		// No matches found from simple filename check. Check $FIL keyword for prospective matches
 		if(file_paths.size() == 0){
-			PRINT("No FCS file found for sample name " + sample_name + ".");
-		}else if( file_paths.size() == 1 ){ // Unambiguous match
-			fr.reset(new MemCytoFrame(file_paths[0], fcs_read_param));
-			fr->read_fcs_header();
-			if(std::stoi(fr->get_keyword("$TOT")) != total_event_count){
-				PRINT("FCS file found for sample " + sample_name + " has incorrect total number of events and will be excluded." + "\n");
-			}else{
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				COUT << "No FCS file found with filename matching sample name " << sample_name << ". Checking for files with $FIL keyword matching sample name." << endl;
+			for(const string & file_path : all_file_paths){
+				fr.reset(new MemCytoFrame(file_path, fcs_read_param));
+				fr->read_fcs_header();
+				// Just gather those with $FIL matching sample name
+				if(fr->get_keyword("$FIL") == sample_name){
+					file_paths.push_back(file_path);
+					bool match_total;
+					bool match_keys;
+
+					// Check if total # events matches
+					match_total = (std::stoi(fr->get_keyword("$TOT")) == total_event_count);
+
+					// Check if keywords match
+					string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
+					match_keys = (fcs_key_seq == ws_key_seq);
+
+					matches_total.push_back(match_total);
+					matches_keys.push_back(match_keys);
+					matches_full.push_back(match_total && match_keys);
+				}
+			}
+		}
+		
+		// If there are multiple matching files from prior gathering steps
+		// attempt to resolve ambiguity by first trying $TOT, then sampleID+keywords
+		switch(file_paths.size()){
+		case 0: // No filename match
+		{
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				COUT << "No FCS file found for sample name " << sample_name << "." << endl;
+			break;
+		}
+		case 1: // Unambiguous match
+		{
+			if(!matches_total[0])
+				PRINT("FCS file found for sample " + sample_name + " has incorrect total number of events. Sample will be excluded.\n");
+			else{
+				fr.reset(new MemCytoFrame(file_paths[0], fcs_read_param));
+				fr->read_fcs_header();
 				// sample name is enough to disambiguate for uid
 				uid = sample_name;
 				isfound = true;
 			}
-		}else{ // Match is ambiguous. Need to check $TOT and maybe keywords
-			PRINT("Multiple FCS files found for sample " + sample_name + ". Attempting to use total number of events to resolve ambiguity" + "\n" );
-		  
-			// Clip out those files with incorrect $TOT
-			for(const string & file_path : file_paths){
-				fr.reset(new MemCytoFrame(file_path, fcs_read_param));
-				fr->read_fcs_header();
-				if(std::stoi(fr->get_keyword("$TOT")) == total_event_count)
-					file_paths_clipped.push_back(file_path);
+			break;
+		}
+		default: // Ambiguous match. Need to check $TOT and maybe keywords
+		{
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				COUT << "Multiple FCS files found for sample " << sample_name << ". Attempting to use total number of events to resolve ambiguity." << endl;
+			switch(std::count(matches_total.begin(), matches_total.end(), true)){ // number that match $TOT
+			case 0: // None matching total number of events
+			{
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("No FCS files found for sample " + sample_name + " have correct total number of events. Sample will be excluded.\n");
+				break;
 			}
-			file_paths = file_paths_clipped;
-			file_paths_clipped.clear();
-			if( file_paths.size() == 0){
-				PRINT("No FCS files found for sample " + sample_name + " have correct total number of events. Sample will be excluded." + "\n");
-			}else if(file_paths.size() == 1 ){
+			case 1:
+			{
+			  int match_final = std::distance(matches_total.begin(), std::find(matches_total.begin(), matches_total.end(), true));
+				fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
+				fr->read_fcs_header();
 				// $TOT was required to resolve ambiguity, so append it to uid
 				uid = sample_name + std::to_string(total_event_count);
 				isfound = true;
-			}else{
-				// Ambiguity remains. Check keywords + sampleID and clip out those that do not match
-				PRINT("Multiple FCS files remain for sample " + sample_name + ". Attempting to use additional keywords and sampleID to resolve ambiguity." + "\n" );
-				for(const string & file_path : file_paths){
-					COUT << "file_path: " << file_path << endl;
-					fr.reset(new MemCytoFrame(file_path, fcs_read_param));
-					fr->read_fcs_header();
-					string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
-					//found matched one
-					if(fcs_key_seq == ws_key_seq)
-						file_paths_clipped.push_back(file_path);
+				break;
+			}
+			default: // Ambiguity remains. Check keywords + sampleID and clip out those that do not match
+			{
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					COUT << "Multiple FCS files remain for sample " << sample_name << ". Attempting to use additional keywords and sampleID to resolve ambiguity." << endl;
+				switch(std::count(matches_full.begin(), matches_full.end(), true)){ // number that match $TOT AND sampleID + key sequence
+				case 0:
+				{
+					PRINT("No FCS files for sample " + sample_name + " match specified keywords. Sample will be excluded.\n");
+					break;
 				}
-	      
-				if(file_paths_clipped.size() == 0){
-					PRINT("No FCS files for sample " + sample_name + " match specified keywords. Sample will be excluded.");
-				}else if(file_paths_clipped.size() == 1){
+				case 1:
+				{
+					int match_final = std::distance(matches_full.begin(), std::find(matches_full.begin(), matches_full.end(), true));
+					fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
 					// Needed $TOT plus other keywords to resolve ambiguity, so append them
 					uid = sample_name + std::to_string(total_event_count) + ws_key_seq;
 					isfound = true;
-				}else{
+					break;
+				}
+				default: // Still ambiguous. Report the multiple possibilities.
+				{
 					string candidates;
-					for (const auto &cd : file_paths_clipped)
-						candidates += cd + "\n";
+					for (auto i = 0; i < file_paths.size(); i++)
+					  if(matches_full[i])
+					    candidates += file_paths[i] + "\n"; 
 					throw(domain_error("Multiple FCS files match sample " + sample_name + " by filename, event count, and keywords.\n"
 									   "Candidates are: \n" + candidates +
-									   "Please move incorrect files out of this directory or its subdirectories or this sample will be excluded."));
+									   "Please move incorrect files out of this directory or its subdirectories or this sample will be excluded.\n"));
+				}
 				}
 			}
+			}
+		}
 		}
 		return isfound;
 	}

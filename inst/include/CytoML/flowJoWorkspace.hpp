@@ -262,7 +262,14 @@ public:
 		if(config_const.is_gating)
 		{
 			//match FCS
-			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, sample_info.total_event_count, ws_key_seq, config_const, frptr);
+
+			// Note sample_info.total_event_count comes from root node population and so may not agree with $TOT key value for the sample
+			auto tot_it = sample_info.keywords.find("$TOT");
+			if(tot_it == sample_info.keywords.end())
+				throw(domain_error("Sample " + sample_info.sample_name + " does not have value for $TOT in workspace and will be excluded."));
+			int total_event_count = stoi(tot_it->second);
+
+			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, total_event_count, ws_key_seq, config_const, frptr);
 			if(!isfound){
 			  PRINT("FCS not found for sample " + uid + " from searching the file extension: " + config_const.fcs_file_extension + "\n");
 			}
@@ -667,6 +674,7 @@ public:
 				if(sample_info.population_count == 0&&!config.include_empty_tree)
 					continue;
 
+				// Note in rare cases this may not agree with $TOT key value for the sample
 				sample_info.total_event_count = get_event_count(getRoot(sample_info.sample_node));
 				//cache sample_name for the same reason
 				sample_info.sample_name = get_sample_name(sample_info.sample_node);

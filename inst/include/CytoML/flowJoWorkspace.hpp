@@ -68,6 +68,7 @@ struct ParseWorkspaceParameters
 	 unordered_map<string, compensation> compensation_map;//optional customized sample-specific compensations
 	 compensation global_comp;
 	 string fcs_file_extension = ".fcs";
+	 bool greedy_match = false;
 	 bool transform = true;
 	 int num_threads = 1;
 };
@@ -428,7 +429,7 @@ public:
 				bool match_keys;
 
 				// Check if total # events matches
-				match_total = (std::stoi(fr->get_keyword("$TOT")) == total_event_count);
+				match_total = (stoi(fr->get_keyword("$TOT")) == total_event_count);
 
 				// Check if keywords match
 				string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
@@ -437,6 +438,10 @@ public:
 				matches_total.push_back(match_total);
 				matches_keys.push_back(match_keys);
 				matches_full.push_back(match_total && match_keys);
+				// If greedy_match is set, jump out at first good match so
+				// sample still parses even with duplicates in directory or subdirectories
+				if(match_total && config.greedy_match)
+					break;
 			}
 		}
 		
@@ -454,7 +459,7 @@ public:
 					bool match_keys;
 
 					// Check if total # events matches
-					match_total = (std::stoi(fr->get_keyword("$TOT")) == total_event_count);
+					match_total = (stoi(fr->get_keyword("$TOT")) == total_event_count);
 
 					// Check if keywords match
 					string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
@@ -463,6 +468,10 @@ public:
 					matches_total.push_back(match_total);
 					matches_keys.push_back(match_keys);
 					matches_full.push_back(match_total && match_keys);
+					// If greedy_match is set, jump out at first good match so
+					// sample still parses even with duplicates in directory or subdirectories
+					if(match_total && config.greedy_match)
+						break;
 				}
 			}
 		}
@@ -491,7 +500,7 @@ public:
 		{
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				COUT << "Multiple FCS files found for sample " << sample_name << ". Attempting to use total number of events to resolve ambiguity." << endl;
-			switch(std::count(matches_total.begin(), matches_total.end(), true)){ // number that match $TOT
+			switch(count(matches_total.begin(), matches_total.end(), true)){ // number that match $TOT
 			case 0: // None matching total number of events
 			{
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -500,7 +509,7 @@ public:
 			}
 			case 1:
 			{
-			  int match_final = std::distance(matches_total.begin(), std::find(matches_total.begin(), matches_total.end(), true));
+			  int match_final = distance(matches_total.begin(), find(matches_total.begin(), matches_total.end(), true));
 				fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
 				fr->read_fcs_header();
 				isfound = true;
@@ -510,7 +519,7 @@ public:
 			{
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					COUT << "Multiple FCS files remain for sample " << sample_name << ". Attempting to use additional keywords and sampleID to resolve ambiguity." << endl;
-				switch(std::count(matches_full.begin(), matches_full.end(), true)){ // number that match $TOT AND sampleID + key sequence
+				switch(count(matches_full.begin(), matches_full.end(), true)){ // number that match $TOT AND sampleID + key sequence
 				case 0:
 				{
 					PRINT("No FCS files for sample " + sample_name + " match specified keywords. Sample will be excluded.\n");
@@ -518,7 +527,7 @@ public:
 				}
 				case 1:
 				{
-					int match_final = std::distance(matches_full.begin(), std::find(matches_full.begin(), matches_full.end(), true));
+					int match_final = distance(matches_full.begin(), find(matches_full.begin(), matches_full.end(), true));
 					fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
 					isfound = true;
 					break;

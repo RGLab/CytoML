@@ -188,6 +188,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
     , compensation = NULL
     , transform = TRUE
 	, fcs_file_extension = ".fcs"
+	, greedy_match = FALSE
 	, mc.cores = 1
     , ...)
 {
@@ -268,6 +269,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
                  , comps = compensation
                 , transform = transform
 		 		 , fcs_file_extension = fcs_file_extension
+		 		 , greedy_match = greedy_match
 				 , fcs_parse_arg = args
 		 		 , num_threads = mc.cores
               )

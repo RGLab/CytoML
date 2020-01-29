@@ -255,15 +255,13 @@ public:
 			COUT<<endl<<"... start parsing sample: "<< sample_info.sample_name <<"... "<<endl;
 		//generate uid
 		string ws_key_seq = concatenate_keywords(sample_info.keywords, config_const.keywords_for_uid, config_const.keywords_for_uid_sampleID, sample_info.sample_id);
-		// Even if FCS for sample not found, need a unique, non-empty default uid for the case of !config_const.is_gating
-		// string uid = sample_info.sample_name;
 		string uid = sample_info.sample_name + ws_key_seq;
 		shared_ptr<MemCytoFrame> frptr;
 		bool isfound = false;
 		if(config_const.is_gating)
 		{
 			//match FCS
-			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, uid, sample_info.total_event_count, ws_key_seq, config_const, frptr);
+			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, sample_info.total_event_count, ws_key_seq, config_const, frptr);
 			if(!isfound){
 			  PRINT("FCS not found for sample " + uid + " from searching the file extension: " + config_const.fcs_file_extension + "\n");
 			}
@@ -406,7 +404,7 @@ public:
 	 * First try to search by file name, if failed, use FCS keyword $FIL + additional keywords + sampleID for further searching and pruning
 	 * cytoframe is preloaded with header-only.
 	 */
-	bool search_for_fcs(const string & data_dir, const int sample_id, const string & sample_name, string & uid, const int & total_event_count, const string & ws_key_seq, const ParseWorkspaceParameters & config, shared_ptr<MemCytoFrame> &fr)
+	bool search_for_fcs(const string & data_dir, const int sample_id, const string & sample_name, const int & total_event_count, const string & ws_key_seq, const ParseWorkspaceParameters & config, shared_ptr<MemCytoFrame> &fr)
 	{
 		FCS_READ_PARAM fcs_read_param = config.fcs_read_param;
 		fcs_read_param.header.is_fix_slash_in_channel_name = is_fix_slash_in_channel_name();
@@ -485,8 +483,6 @@ public:
 			else{
 				fr.reset(new MemCytoFrame(file_paths[0], fcs_read_param));
 				fr->read_fcs_header();
-				// sample name is enough to disambiguate for uid
-				uid = sample_name;
 				isfound = true;
 			}
 			break;
@@ -507,8 +503,6 @@ public:
 			  int match_final = std::distance(matches_total.begin(), std::find(matches_total.begin(), matches_total.end(), true));
 				fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
 				fr->read_fcs_header();
-				// $TOT was required to resolve ambiguity, so append it to uid
-				uid = sample_name + std::to_string(total_event_count);
 				isfound = true;
 				break;
 			}
@@ -526,8 +520,6 @@ public:
 				{
 					int match_final = std::distance(matches_full.begin(), std::find(matches_full.begin(), matches_full.end(), true));
 					fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
-					// Needed $TOT plus other keywords to resolve ambiguity, so append them
-					uid = sample_name + std::to_string(total_event_count) + ws_key_seq;
 					isfound = true;
 					break;
 				}

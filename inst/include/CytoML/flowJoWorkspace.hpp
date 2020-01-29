@@ -266,7 +266,7 @@ public:
 			// Note sample_info.total_event_count comes from root node population and so may not agree with $TOT key value for the sample
 			auto tot_it = sample_info.keywords.find("$TOT");
 			if(tot_it == sample_info.keywords.end())
-				throw(domain_error("Sample " + sample_info.sample_name + " does not have value for $TOT in workspace and will be excluded."));
+				throw(domain_error("$TOT keyword not found in workspace for sample " + sample_info.sample_name));
 			int total_event_count = stoi(tot_it->second);
 
 			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, total_event_count, ws_key_seq, config_const, frptr);
@@ -529,13 +529,15 @@ public:
 				switch(count(matches_full.begin(), matches_full.end(), true)){ // number that match $TOT AND sampleID + key sequence
 				case 0:
 				{
-					PRINT("No FCS files for sample " + sample_name + " match specified keywords. Sample will be excluded.\n");
+					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+						PRINT("No FCS files for sample " + sample_name + " match specified keywords. Sample will be excluded.\n");
 					break;
 				}
 				case 1:
 				{
 					int match_final = distance(matches_full.begin(), find(matches_full.begin(), matches_full.end(), true));
 					fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
+					fr->read_fcs_header();
 					isfound = true;
 					break;
 				}
@@ -547,7 +549,7 @@ public:
 					    candidates += file_paths[i] + "\n"; 
 					throw(domain_error("Multiple FCS files match sample " + sample_name + " by filename, event count, and keywords.\n"
 									   "Candidates are: \n" + candidates +
-									   "Please move incorrect files out of this directory or its subdirectories or this sample will be excluded.\n"));
+									   "Please move incorrect files out of this directory or its subdirectories.\n"));
 				}
 				}
 			}

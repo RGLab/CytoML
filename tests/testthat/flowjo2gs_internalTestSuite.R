@@ -756,3 +756,52 @@ test_that("v 9.7.5 - mac 3.0 (boolGate that refers to the non-sibling nodes)",{
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 5e-3)
     })
 
+test_that("search_for_fcs logic", {
+  thisPath <- file.path(path, "file_search_tests")
+  wsFile <- file.path(thisPath, "manual.xml")
+  subset <- c("CytoTrol_CytoTrol_1.fcs", "CytoTrol_CytoTrol_2.fcs")
+  ws <- open_flowjo_xml(wsFile)
+  
+  # Simple case, no subdirs and filenames match sampleNames
+  fcs_path <- file.path(thisPath, "no_subdirs")
+  gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path)
+  expect_equal(length(gs), 2)
+  
+  # This one should reject CytoTrol_CytoTrol_1.fcs because $TOT doesn't match
+  fcs_path <- file.path(thisPath, "no_subdirs_wrong_TOT")
+  msgs <- capture.output(gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path))
+  expect_match(msgs[[1]], "incorrect total number of events",)
+  expect_equal(length(gs), 1)
+  
+  # One of the filenames doesn't match, go to $FIL
+  fcs_path <- file.path(thisPath, "needs_FIL")
+  gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path)
+  expect_equal(length(gs), 2)
+  
+  # Toplevel directory file has wrong $TOT, so it should grab the one
+  # from the subdirectory
+  fcs_path <- file.path(thisPath, "needs_TOT")
+  gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path)
+  expect_equal(length(gs), 2)
+  expect_match(keyword(gs[[1]], "FILENAME"), "subdir_with_correct_TOT/CytoTrol_CytoTrol_1.fcs")
+  
+  # In toplevel $TUBE NAME on CytoTrol_CytoTrol_1.fcs changed CytoTrol_2 -> Cytotrol_2
+  # If no subdirs, accept lone match (no need to check keys)
+  fcs_path <- file.path(thisPath, "needs_keys", "no_subdirs")
+  gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path)
+  expect_equal(length(gs), 2)
+  expect_match(keyword(gs[[2]], "FILENAME"), "no_subdirs/CytoTrol_CytoTrol_2.fcs")
+  # Now, with multiple $TOT matches, need to check keys and take the one from the subdir
+  fcs_path <- file.path(thisPath, "needs_keys", "w_subdirs")
+  # It should fail without specifying additional keys
+  expect_error(gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path), "Multiple FCS files")
+  gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path, additional.keys = c("TUBE NAME"))
+  expect_equal(length(gs), 2)
+  expect_match(keyword(gs[[2]], "FILENAME"), "subdir_with_correct_keys/CytoTrol_CytoTrol_2.fcs")
+  
+  # Just make sure it appropriately errors out for full duplicates
+  fcs_path <- file.path(thisPath, "full_duplicates")
+  expect_error(gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path, additional.keys = c("TUBE NAME")), "Multiple FCS files")
+  
+})
+

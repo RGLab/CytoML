@@ -407,11 +407,13 @@ test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
                , "FCS")
       
       #relax the rules (shouldn't be doing this, just for the sake of testing)
-      capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL))
+      # UPDATE: After changes to search_for_fcs, this kind of evasion of $TOT check is not possible
+      # so this test will be disabled
+      # capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL))
     
-      gh <- gs[[1]]
-      thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
-      expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
+      # gh <- gs[[1]]
+      # thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
+      # expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
       
     })
 

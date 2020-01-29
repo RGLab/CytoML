@@ -179,7 +179,7 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   write.flowSet(fs, outDir)
   ws <- open_flowjo_xml(outFile)
   # At this point, a subdirectory should exist with duplicate file
-  expect_error(flowjo_to_gatingset(ws, name = 1), "Duplicated")
+  expect_error(flowjo_to_gatingset(ws, name = 1), "Multiple FCS files match")
   # Use greedy_match to avoid the duplicate
   gs2 <- flowjo_to_gatingset(ws, name = 1, greedy_match = TRUE)
   # stats1 <- gh_pop_compare_stats(gs)

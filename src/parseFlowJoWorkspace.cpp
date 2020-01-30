@@ -55,8 +55,9 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , bool leaf_bool
 								  , bool include_empty_tree
 								  , List comps
-                  , bool transform
+								  , bool transform
 								  , string fcs_file_extension
+								  , bool greedy_match
 								 , FCS_READ_PARAM fcs_parse_arg
                                  , int num_threads = 1
 )
@@ -78,6 +79,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   config.compute_leaf_bool_node = leaf_bool;
   config.include_empty_tree = include_empty_tree;
   config.fcs_file_extension = fcs_file_extension;
+  config.greedy_match = greedy_match;
   config.transform = transform;
   
   SEXP nm = subset.names();

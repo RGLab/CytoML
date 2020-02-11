@@ -25,6 +25,7 @@ flowjo_to_gatingset(
   compensation = NULL,
   transform = TRUE,
   fcs_file_extension = ".fcs",
+  greedy_match = FALSE,
   mc.cores = 1,
   ...
 )
@@ -59,6 +60,8 @@ flowjo_to_gatingset(
 \item keywords.source \code{character} the place where the keywords are extracted from, can be either "XML" or "FCS"
 \item keyword.ignore.case a \code{logical} flag indicates whether the keywords matching needs to be case sensitive.    
 \item include_empty_tree a \code{logical} whether to include samples that don't have gates.
+\item greedy_match \code{logical}: By default, if flowjo_to_gatingset finds multiple FCS files matching a sample by total event count as well as sampleID and/or keywords specified by additional.keys and additional.sampleID, it will return an error listing the duplicate files.
+                                  If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.
    \item transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
 \item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
 }}

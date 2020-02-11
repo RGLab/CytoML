@@ -6,13 +6,20 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A GatingML Interface for Cross Platform Cytometry Data Sharing • CytoML</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="A GatingML Interface for Cross Platform Cytometry Data Sharing">
 <meta property="og:description" content="Uses platform-specific implemenations of the GatingML2.0 standard 
     to exchange gated cytometry data with other software platforms.">
+<meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -32,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.13.6</span>
       </span>
     </div>
 
@@ -82,9 +89,15 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="cytoml-cross-platform-cytometry-data-sharing-" class="section level1">
+
+<div id="section" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#cytoml-cross-platform-cytometry-data-sharing-" class="anchor"></a>CytoML: Cross-Platform Cytometry Data Sharing.</h1></div>
+<a href="#section" class="anchor"></a><img src="logo_mid.png" align="right">
+</h1></div>
+</div>
+<div id="cytoml-cross-platform-cytometry-data-sharing-" class="section level1">
+<h1 class="hasAnchor">
+<a href="#cytoml-cross-platform-cytometry-data-sharing-" class="anchor"></a>CytoML: Cross-Platform Cytometry Data Sharing.</h1>
 <p>This package is designed to import/export the hierarchical gated cytometry data to and from R (specifically the <a href="https://github.com/RGLab/openCyto">openCyto</a> framework) using the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4874733/"><code>gatingML2.0</code></a> and <a href="http://isac-net.org/Resources/Standards/FCS3-1.aspx"><code>FCS3.0</code></a> cytometry data standards. This package makes use of the <code>GatingSet</code> R object and data model so that imported data can easily be manipulated and visualized in R using tools like <a href="https://github.com/RGLab/openCyto">openCyto</a> and <a href="https://github.com/RGLab/ggcyto">ggCyto</a>.</p>
 <div id="what-problems-does-cytoml-solve" class="section level2">
 <h2 class="hasAnchor">
@@ -115,14 +128,14 @@ R.</li>
 <a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>) </a>
 <a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(devtools) <span class="co">#load it</span></a>
 <a class="sourceLine" id="cb1-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/flowWorkspace"</span>, <span class="dt">ref=</span><span class="st">"trunk"</span>)</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/openCyto"</span>, <span class="dt">ref=</span><span class="st">"trunk"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/flowWorkspace"</span>, <span class="dt">ref=</span><span class="st">"trunk"</span>)</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/openCyto"</span>, <span class="dt">ref=</span><span class="st">"trunk"</span>)</a></code></pre></div>
 </div>
 <div id="installing-from-bioconductor-" class="section level3">
 <h3 class="hasAnchor">
 <a href="#installing-from-bioconductor-" class="anchor"></a>Installing from <a href="https://www.bioconductor.org">BioConductor</a>.</h3>
 <ul>
-<li><a href="https://doi.org/doi:10.18129/B9.bioc.CytoML">Current BioConductor Release</a></li>
+<li><a href="https://doi.org/doi:10.18129/B9.bioc.CytoML">Current BioConductor Relase</a></li>
 </ul>
 <!-- end list --><div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(BiocManager)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#this should pull all dependencies.</span></a>
@@ -140,13 +153,13 @@ R.</li>
 <ul>
 <li><a href="https://github.com/RGLab/CytoML">Latest GitHub Version</a></li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/CytoML"</span>, <span class="dt">ref =</span> <span class="st">"trunk"</span>)</a></code></pre></div>
+<!-- end list --><div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">install.packges</span>(<span class="st">"devtools"</span>)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/CytoML"</span>, <span class="dt">ref =</span> <span class="st">"trunk"</span>)</a></code></pre></div>
 <ul>
 <li><a href="https://github.com/RGLab/CytoML/releases">Latest GitHub Release</a></li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/CytoML@*release"</span>)</a></code></pre></div>
+<!-- end list --><div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">install.packges</span>(<span class="st">"devtools"</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/CytoML@*release"</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="reproducible-examples-from-the-cytoml-paper" class="section level2">
@@ -156,13 +169,13 @@ R.</li>
 <li>A reproducible workflow can be found at the <a href="http://www.rglab.org/CytoML">RGLab site</a>, and was prepared with version 1.7.10 of CytoML, R v3.5.0, and dependencies that can be installed by:</li>
 </ul>
 <!-- end list --><div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># We recomend using R version 3.5.0</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/RProtoBufLib@v1.3.7"</span>)</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/cytolib@v1.3.2"</span>)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/flowCore@v1.47.7"</span>)</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/flowWorkspace@v3.29.7"</span>)</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/openCyto@v1.19.2"</span>)</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/CytoML@v1.7.10"</span>)</a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"RGLab/ggcyto@v1.9.12"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb6-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/RProtoBufLib@v1.3.7"</span>)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/cytolib@v1.3.2"</span>)</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/flowCore@v1.47.7"</span>)</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/flowWorkspace@v3.29.7"</span>)</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/openCyto@v1.19.2"</span>)</a>
+<a class="sourceLine" id="cb6-7" data-line-number="7">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/CytoML@v1.7.10"</span>)</a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"RGLab/ggcyto@v1.9.12"</span>)</a></code></pre></div>
 </div>
 <div id="examples" class="section level2">
 <h2 class="hasAnchor">
@@ -174,19 +187,20 @@ R.</li>
 <div id="import-gatingml-generated-from-cytobank-" class="section level4">
 <h4 class="hasAnchor">
 <a href="#import-gatingml-generated-from-cytobank-" class="anchor"></a>Import <code>gatingML</code> generated from <a href="https://cytobank.org/">Cytobank</a>.</h4>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">acsfile &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata/cytobank_experiment.acs"</span>, <span class="dt">package =</span> <span class="st">"CytoML"</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">ce &lt;-<span class="st"> </span><span class="kw"><a href="reference/open_cytobank_experiment.html">open_cytobank_experiment</a></span>(acsfile)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">xmlfile &lt;-<span class="st"> </span>ce<span class="op">$</span>gatingML</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">fcsFiles &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>(ce<span class="op">$</span>fcsdir, <span class="dt">full.names =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">gs &lt;-<span class="st"> </span><span class="kw"><a href="reference/cytobank_to_gatingset.html">cytobank2GatingSet</a></span>(xmlfile, fcsFiles)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(CytoML)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">acsfile &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata/cytobank_experiment.acs"</span>, <span class="dt">package =</span> <span class="st">"CytoML"</span>)</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">ce &lt;-<span class="st"> </span><span class="kw"><a href="reference/open_cytobank_experiment.html">open_cytobank_experiment</a></span>(acsfile)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">xmlfile &lt;-<span class="st"> </span>ce<span class="op">$</span>gatingML</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">fcsFiles &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>(ce<span class="op">$</span>fcsdir, <span class="dt">full.names =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">gs &lt;-<span class="st"> </span><span class="kw"><a href="reference/cytobank_to_gatingset.html">cytobank_to_gatingset</a></span>(xmlfile, fcsFiles)</a></code></pre></div>
 </div>
 <div id="import-a-diva-workspace-" class="section level4">
 <h4 class="hasAnchor">
 <a href="#import-a-diva-workspace-" class="anchor"></a>Import a <a href="http://www.bdbiosciences.com/us/instruments/clinical/software/flow-cytometry-acquisition/bd-facsdiva-software/m/333333/overview">Diva</a> workspace.</h4>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">ws &lt;-<span class="st"> </span><span class="kw"><a href="reference/open_diva_xml.html">openDiva</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">'extdata/diva/PE_2.xml'</span>, <span class="dt">package =</span> <span class="st">"flowWorkspaceData"</span>))</a>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">ws &lt;-<span class="st"> </span><span class="kw"><a href="reference/open_diva_xml.html">open_diva_xml</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">'extdata/diva/PE_2.xml'</span>, <span class="dt">package =</span> <span class="st">"flowWorkspaceData"</span>))</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># The path to the FCS files is stored in ws@path.</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co"># It can also be passed in to parseWorksapce via the `path` argument.</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">gs &lt;-<span class="st"> </span><span class="kw">parseWorkspace</span>(ws, <span class="dt">name =</span> <span class="dv">2</span>, <span class="dt">subset =</span> <span class="dv">1</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb8-4" data-line-number="4">gs &lt;-<span class="st"> </span><span class="kw"><a href="reference/diva_to_gatingset.html">diva_to_gatingset</a></span>(ws, <span class="dt">name =</span> <span class="dv">2</span>, <span class="dt">subset =</span> <span class="dv">1</span>, <span class="dt">swap_cols =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 </div>
 <div id="interact-with-the-gated-data-gatingset" class="section level4">
 <h4 class="hasAnchor">
@@ -203,12 +217,12 @@ R.</li>
 <p>For more information see the <a href="http://www.github.com/RGLab/flowWorkspace">flowWorkspace</a> package.</p>
 <p>We can print all the cell populations defined in the gating tree.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co">#show all the cell populations(/nodes)</span></a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gs_get_pop_paths.html">getNodes</a></span>(gh)</a></code></pre></div>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gs_get_pop_paths.html">gs_get_pop_paths</a></span>(gh)</a></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co">## [1] "root"            "/P1"             "/P1/P2"          "/P1/P2/P3"      </span></a>
 <a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">## [5] "/P1/P2/P3/P4"    "/P1/P2/P3/P4/P5"</span></a></code></pre></div>
 <p>We can extract the cell population statistics.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co">#show the population statistics</span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gh_pop_compare_stats.html">getPopStats</a></span>(gh)</a></code></pre></div>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gh_pop_compare_stats.html">gh_pop_compare_stats</a></span>(gh)</a></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co">##    openCyto.freq   xml.freq openCyto.count xml.count node</span></a>
 <a class="sourceLine" id="cb14-2" data-line-number="2"><span class="co">## 1:    1.00000000 1.00000000          19090     19090 root</span></a>
 <a class="sourceLine" id="cb14-3" data-line-number="3"><span class="co">## 2:    0.93609219 0.93776847          17870     17902   P1</span></a>
@@ -225,9 +239,9 @@ R.</li>
 <div id="access-information-about-cells-in-a-specific-population-" class="section level4">
 <h4 class="hasAnchor">
 <a href="#access-information-about-cells-in-a-specific-population-" class="anchor"></a>Access information about cells in a specific population.</h4>
-<p>Because CytoML and flowWorkspace reproduce the entire analysis in a workspace in R, we have access to information about which cells are part of which cell populations.</p>
+<p>Because CytoML and flowWorkspace reproduce the entire analysis in a workspace in R, we have access to information about which cells are part of which cell popualtions.</p>
 <p>flowWorkspace has convenience methods to extract the cells from specific cell populations:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gh_pop_get_data.html">getData</a></span>(gh,<span class="st">"P3"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gh_pop_get_data.html">gh_pop_get_data</a></span>(gh,<span class="st">"P3"</span>)</a></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co">## flowFrame object '9a1897d7-ebc9-4077-aa34-6d9e1367fa67'</span></a>
 <a class="sourceLine" id="cb17-2" data-line-number="2"><span class="co">## with 12315 cells and 15 observables:</span></a>
 <a class="sourceLine" id="cb17-3" data-line-number="3"><span class="co">##                   name desc  range  minRange maxRange</span></a>
@@ -248,11 +262,12 @@ R.</li>
 <a class="sourceLine" id="cb17-18" data-line-number="18"><span class="co">## $P15  Pacific Orange-A  CD8 262144 0.3376040      4.5</span></a>
 <a class="sourceLine" id="cb17-19" data-line-number="19"><span class="co">## 231 keywords are stored in the 'description' slot</span></a></code></pre></div>
 <p>This returns a <code>flowFrame</code> with the cells in gate P3 (70% of the cells according to the plot).</p>
-<p>The matrix of expression can be extracted from a <code>flowFrame</code> using the <code>exprs()</code> method:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">e &lt;-<span class="st"> </span><span class="kw">exprs</span>(<span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gh_pop_get_data.html">getData</a></span>(gh,<span class="st">"P3"</span>))</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/class.html">class</a></span>(e)</a></code></pre></div>
+<p>The matrix of expression can be extracted from a <code>flowFrame</code> using the <code><a href="https://rdrr.io/pkg/flowCore/man/flowFrame-class.html">exprs()</a></code> method from the <code>flowCore</code> package:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(flowCore)</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">e &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/flowCore/man/flowFrame-class.html">exprs</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/flowWorkspace/man/gh_pop_get_data.html">gh_pop_get_data</a></span>(gh,<span class="st">"P3"</span>))</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/class.html">class</a></span>(e)</a></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="co">## [1] "matrix"</span></a></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(e)</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/pkg/flowCore/man/flowFrame-class.html">dim</a></span>(e)</a></code></pre></div>
 <div class="sourceCode" id="cb21"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co">## [1] 12315    15</span></a></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(e)</a></code></pre></div>
 <div class="sourceCode" id="cb23"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="co">##  [1] "Time"              "FSC-A"             "FSC-H"            </span></a>
@@ -263,9 +278,9 @@ R.</li>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co">#compute the MFI of the fluorescence channels.</span></a>
 <a class="sourceLine" id="cb24-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/colSums.html">colMeans</a></span>(e[,<span class="dv">8</span><span class="op">:</span><span class="dv">15</span>])</a></code></pre></div>
 <div class="sourceCode" id="cb25"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="co">##            FITC-A              PE-A     PerCP-Cy5-5-A          PE-Cy7-A </span></a>
-<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="co">##         0.8305544         1.3162145         0.7746655         0.8017132 </span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="co">##         0.8305630         1.3162132         0.7743459         0.8017827 </span></a>
 <a class="sourceLine" id="cb25-3" data-line-number="3"><span class="co">##             APC-A         APC-Cy7-A Bd Horizon V450-A  Pacific Orange-A </span></a>
-<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="co">##         1.0482656         1.1636819         2.2960560         1.3684352</span></a></code></pre></div>
+<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="co">##         1.0482663         1.1636818         2.2960554         1.3684453</span></a></code></pre></div>
 </div>
 </div>
 <div id="export-gated-data-to-other-platforms-" class="section level3">
@@ -289,20 +304,21 @@ R.</li>
 <a href="#export-to-cytobank" class="anchor"></a>Export to Cytobank</h5>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="co">#Cytobank</span></a>
 <a class="sourceLine" id="cb28-2" data-line-number="2">outFile &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span>(<span class="dt">fileext =</span> <span class="st">".xml"</span>)</a>
-<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="kw"><a href="reference/gatingset_to_cytobank.html">GatingSet2cytobank</a></span>(gs, outFile)</a></code></pre></div>
-<div class="sourceCode" id="cb29"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co">## Warning in GatingSet2cytobank(gs, outFile): With 'cytobank.default.scale'</span></a>
-<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="co">## set to 'TRUE', data and gates will be re-transformed with cytobank's</span></a>
-<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="co">## default scaling settings, which may affect how gates look like.</span></a>
-<a class="sourceLine" id="cb29-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb29-5" data-line-number="5"><span class="co">## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmpS4mDCu/file154f72419eb4f.xml"</span></a></code></pre></div>
+<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="kw"><a href="reference/gatingset_to_cytobank.html">gatingset_to_cytobank</a></span>(gs, outFile)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co">## Warning in gatingset_to_cytobank(gs, outFile): With</span></a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="co">## 'cytobank.default.scale' set to 'TRUE', data and gates will be re-</span></a>
+<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="co">## transformed with cytobank's default scaling settings, which may affect how</span></a>
+<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="co">## gates look like.</span></a>
+<a class="sourceLine" id="cb29-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb29-6" data-line-number="6"><span class="co">## [1] "/tmp/RtmpV1ZasG/file4b9f7e4e25c1.xml"</span></a></code></pre></div>
 </div>
 <div id="export-to-flowjo" class="section level5">
 <h5 class="hasAnchor">
 <a href="#export-to-flowjo" class="anchor"></a>Export to FlowJo</h5>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="co">#flowJo</span></a>
 <a class="sourceLine" id="cb30-2" data-line-number="2">outFile &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span>(<span class="dt">fileext =</span> <span class="st">".wsp"</span>)</a>
-<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="kw"><a href="reference/gatingset_to_flowjo.html">GatingSet2flowJo</a></span>(gs, outFile)</a></code></pre></div>
-<div class="sourceCode" id="cb31"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="co">## [1] "/var/folders/jh/x0h3v3pd4dd497g3gtzsm8500000gn/T//RtmpS4mDCu/file154f774d1c840.wsp"</span></a></code></pre></div>
+<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="kw"><a href="reference/gatingset_to_flowjo.html">gatingset_to_flowjo</a></span>(gs, outFile)</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="co">## [1] "/tmp/RtmpV1ZasG/file4b9f18da0869.wsp"</span></a></code></pre></div>
 </div>
 </div>
 </div>
@@ -310,7 +326,7 @@ R.</li>
 <div id="next-steps" class="section level2">
 <h2 class="hasAnchor">
 <a href="#next-steps" class="anchor"></a>Next Steps</h2>
-<p>See the <a href="http://www.github.com/RGLab/flowWorkspace">flowWorskspace</a> and [openCyto](<a href="http://www.github.com/RGLab/openCyto" class="uri">http://www.github.com/RGLab/openCyto</a>] packages to learn more about what can be done with <code>GatingSet</code> objects.</p>
+<p>See the <a href="http://www.github.com/RGLab/flowWorkspace">flowWorskspace</a> and <br><span class="math display"><em>o</em><em>p</em><em>e</em><em>n</em><em>C</em><em>y</em><em>t</em><em>o</em></span><br>(<a href="http://www.github.com/RGLab/openCyto" class="uri">http://www.github.com/RGLab/openCyto</a>] packages to learn more about what can be done with <code>GatingSet</code> objects.</p>
 </div>
 <div id="code-of-conduct" class="section level2">
 <h2 class="hasAnchor">
@@ -318,9 +334,10 @@ R.</li>
 <p>Please note that this project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
 </div>
 </div>
+
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">

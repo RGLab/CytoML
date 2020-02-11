@@ -8,16 +8,25 @@
 
 <title>extend the gate to the minimum and maximum limit of both dimensions based on the bounding information. — extend • CytoML</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
@@ -32,11 +41,13 @@
 
 
 
-<meta property="og:title" content="extend the gate to the minimum and maximum limit of both dimensions based on the bounding information. — extend" />
 
+<meta property="og:title" content="extend the gate to the minimum and maximum limit of both dimensions based on the bounding information. — extend" />
 <meta property="og:description" content="It is equivalent to the behavior of shifting the off-scale boundary events into the gate boundary that is describled in
 bounding transformation section of gatingML standard." />
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -67,7 +78,7 @@ bounding transformation section of gatingML standard." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.13.6</span>
       </span>
     </div>
 
@@ -98,7 +109,6 @@ bounding transformation section of gatingML standard." />
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/RGLab/CytoML">
@@ -125,25 +135,33 @@ bounding transformation section of gatingML standard." />
     </div>
 
     <div class="ref-description">
-    
     <p>It is equivalent to the behavior of shifting the off-scale boundary events into the gate boundary that is describled in
 bounding transformation section of gatingML standard.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>extend</span>(<span class='no'>gate</span>, <span class='no'>bound</span>, <span class='kw'>data.range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>limits</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"extended"</span>))
+    <pre class="usage"><span class='fu'>extend</span>(
+  <span class='no'>gate</span>,
+  <span class='no'>bound</span>,
+  <span class='kw'>data.range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>limits</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"extended"</span>)
+)
 
 <span class='co'># S3 method for polygonGate</span>
-<span class='fu'>extend</span>(<span class='no'>gate</span>, <span class='no'>bound</span>, <span class='kw'>data.range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>limits</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"extended"</span>))
+<span class='fu'>extend</span>(
+  <span class='no'>gate</span>,
+  <span class='no'>bound</span>,
+  <span class='kw'>data.range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>limits</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"original"</span>, <span class='st'>"extended"</span>)
+)
 
 <span class='co'># S3 method for rectangleGate</span>
 <span class='fu'>extend</span>(<span class='no'>gate</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for ellipsoidGate</span>
 <span class='fu'>extend</span>(<span class='no'>gate</span>, <span class='no'>...</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -174,18 +192,16 @@ when it is not supplied, c(-.Machine$integer.max, - .Machine$integer.max) is use
       <td><p>other arguments</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a flowCore filter/gate</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The advantage of extending gates instead of shifting data are two folds:
 1. Avoid the extra computation each time applying or plotting the gates
 2. Avoid changing the data distribution caused by adding the gates</p>
 <p>Normally this function is not used directly by user but invoked when parsing GatingML file exported from Cytobank.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>flowCore</span>)
@@ -198,17 +214,14 @@ when it is not supplied, c(-.Machine$integer.max, - .Machine$integer.max) is use
      <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"min"</span>, <span class='st'>"max"</span>)))
 <span class='no'>bound</span></div><div class='output co'>#&gt;       min  max
 #&gt; FSC-H 100 3000
-#&gt; SSC-H 100 3000</div><div class='input'><span class='no'>pg.extened</span> <span class='kw'>&lt;-</span> <span class='fu'>extend</span>(<span class='no'>pg</span>, <span class='no'>bound</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: NAs introduced by coercion</span></div><div class='output co'>#&gt; <span class='warning'>Warning: NAs introduced by coercion</span></div><div class='img'><img src='extend-1.png' alt='' width='700' height='433' /></div></pre>
+#&gt; SSC-H 100 3000</div><div class='input'><span class='no'>pg.extened</span> <span class='kw'>&lt;-</span> <span class='fu'>extend</span>(<span class='no'>pg</span>, <span class='no'>bound</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='img'><img src='extend-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

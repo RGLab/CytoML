@@ -8,16 +8,25 @@
 
 <title>Parse a flowJo Workspace — flowjo_to_gatingset • CytoML</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
@@ -32,10 +41,12 @@
 
 
 
-<meta property="og:title" content="Parse a flowJo Workspace — flowjo_to_gatingset" />
 
+<meta property="og:title" content="Parse a flowJo Workspace — flowjo_to_gatingset" />
 <meta property="og:description" content="Function to parse a flowJo Workspace, generate a GatingHierarchy or GatingSet object, and associated flowCore gates. The data are not loaded or acted upon until an explicit call to recompute() is made on the GatingHierarchy objects in the GatingSet." />
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -66,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.13.6</span>
       </span>
     </div>
 
@@ -97,7 +108,6 @@
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/RGLab/CytoML">
@@ -124,19 +134,34 @@
     </div>
 
     <div class="ref-description">
-    
     <p>Function to parse a flowJo Workspace, generate a <code>GatingHierarchy</code> or <code>GatingSet</code> object, and associated flowCore gates. The data are not loaded or acted upon until an explicit call to <code>recompute()</code> is made on the <code>GatingHierarchy</code> objects in the <code>GatingSet</code>.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>flowjo_to_gatingset</span>(<span class='no'>ws</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>execute</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>h5_dir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='kw'>includeGates</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>additional.keys</span> <span class='kw'>=</span> <span class='st'>"$TOT"</span>, <span class='kw'>additional.sampleID</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>keywords.source</span> <span class='kw'>=</span> <span class='st'>"XML"</span>,
-  <span class='kw'>keyword.ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>extend_val</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>extend_to</span> <span class='kw'>=</span> -<span class='fl'>4000</span>,
-  <span class='kw'>channel.ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>leaf.bool</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compensation</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>transform</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>fcs_file_extension</span> <span class='kw'>=</span> <span class='st'>".fcs"</span>, <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='no'>...</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>flowjo_to_gatingset</span>(
+  <span class='no'>ws</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>execute</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>h5_dir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(),
+  <span class='kw'>includeGates</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>additional.keys</span> <span class='kw'>=</span> <span class='st'>"$TOT"</span>,
+  <span class='kw'>additional.sampleID</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>keywords</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>keywords.source</span> <span class='kw'>=</span> <span class='st'>"XML"</span>,
+  <span class='kw'>keyword.ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>extend_val</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>extend_to</span> <span class='kw'>=</span> -<span class='fl'>4000</span>,
+  <span class='kw'>channel.ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>leaf.bool</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>include_empty_tree</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>compensation</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>transform</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>fcs_file_extension</span> <span class='kw'>=</span> <span class='st'>".fcs"</span>,
+  <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='no'>...</span>
+)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -170,6 +195,7 @@
 <li><p>keywords <code>character</code> vector specifying the keywords to be extracted as pData of GatingSet</p></li>
 <li><p>keywords.source <code>character</code> the place where the keywords are extracted from, can be either "XML" or "FCS"</p></li>
 <li><p>keyword.ignore.case a <code>logical</code> flag indicates whether the keywords matching needs to be case sensitive.</p></li>
+<li><p>include_empty_tree a <code>logical</code> whether to include samples that don't have gates.</p></li>
 <li><p>transform <code>logical</code> to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.</p></li>
 <li><p>...: Additional arguments to be passed to read.ncdfFlowSet or read.flowSet.</p></li>
 </ul></td>
@@ -179,20 +205,17 @@
       <td><p>A <code>flowjo_workspace</code> to be parsed.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a <code>GatingSet</code>, which is a wrapper around a list of <code>GatingHierarchy</code> objects, each representing a single sample in the workspace. The <code>GatingHierarchy</code> objects contain <code>graphNEL</code> trees that  represent the gating hierarchy of each sample. Each node in the <code>GatingHierarchy</code> has associated data, including the population counts from flowJo, the parent population counts, the <code>flowCore</code> gates generated from the flowJo workspace gate definitions. Data are not yet loaded or acted upon at this stage. To execute the gating of each data file, a call to <code>execute()</code> must be made on each <code>GatingHierarchy</code> object in the <code>GatingSet</code>. This is done automatically by default, and there is no more reason to set this argument to FALSE.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>A flowjo_workspace is generated with a call to <code><a href='open_flowjo_xml.html'>open_flowjo_xml()</a></code>, passing the name of the xml workspace file. This returns a <code>flowjo_workspace</code>, which can be parsed using the <code>flowjo_to_gatingset()</code> method. The function can be called non-interactively by passing the index or name of the group of samples to be imported via <code>flowjo_to_gatingset(obj,name=x)</code>, where <code>x</code> is either the numeric index, or the name. 
 The <code>subset</code> argument allows one to select a set of files from the chosen sample group. The routine will take the intersection of the files in the sample group, the files specified in <code>subset</code> and the files available on disk, and import them.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='fj_ws_get_sample_groups.html'>fj_ws_get_sample_groups</a></code>,<code>GatingSet</code></p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -224,17 +247,13 @@ The <code>subset</code> argument allows one to select a set of files from the ch
 <span class='no'>gs</span> <span class='kw'>&lt;-</span> <span class='fu'>flowjo_to_gatingset</span>(<span class='no'>ws</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>compensation</span> <span class='kw'>=</span> <span class='no'>comps</span>); <span class='co'>#comp is either a compensation object or a list of compensation objects</span>
 }</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#see-also">See also</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

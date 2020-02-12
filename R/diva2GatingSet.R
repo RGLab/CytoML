@@ -696,12 +696,11 @@ diva_to_gatingset<- function(obj, name = NULL
         flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
         
       }
-     if(execute)
+      gs_cyto_data(gs) <- realize_view(gs_cyto_data(gs))
+      if(execute)
         suppressMessages(recompute(gs))
-
-      message("done!")
-
       suppressMessages(save_gs(gs, cdf = "link", path = file.path(tmp.dir, grpid)))
+      message("done!")
   })
   )
 

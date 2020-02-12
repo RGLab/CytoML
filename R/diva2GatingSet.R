@@ -699,7 +699,7 @@ diva_to_gatingset<- function(obj, name = NULL
       gs_cyto_data(gs) <- realize_view(gs_cyto_data(gs))
       if(execute)
         suppressMessages(recompute(gs))
-      suppressMessages(save_gs(gs, cdf = "link", path = file.path(tmp.dir, grpid)))
+      suppressMessages(save_gs(gs, cdf = "move", path = file.path(tmp.dir, grpid)))
       message("done!")
   })
   )

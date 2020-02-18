@@ -276,10 +276,13 @@ setMethod("pData","cytobank_experiment",function(object){
 #' @importFrom plyr name_rows
 get_pd <- function(ce){
   res <- ldply(ce$experiment$fcsFiles, function(sample){
-                                c(name = sample[["filename"]]
+                                data.frame(as.list(
+                                  c(name = sample[["filename"]]
                                       , unlist(sample[["tags"]])
                                       , .rownames = sample[["filename"]]#sample[["sampleName"]]
                                     )
+                                  )
+                                  , check.names = FALSE)
                       })
   res <- name_rows(res)
   res

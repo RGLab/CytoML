@@ -1,5 +1,22 @@
 context("gatingset_to_cytobank ..")
 
+test_that("transform ungated channel",{
+  acsfile <- "wsTestSuite/gatingML/experiment_34218_Feb-16-2020_08-33-PM.acs"
+  skip_if_not(file.exists(acsfile))
+  ce <- open_cytobank_experiment(acsfile)
+  gs <- cytobank_to_gatingset(ce)
+  #check the uneven tags info in yaml
+  dose <- pData(gs)[["Doses"]]
+  expect_true(is.na(dose[1]))
+  expect_false(is.na(dose[4]))
+  
+  #check the ungated channel is transformed properly by scales specified in yaml
+  #input as fcs name
+  expect_equivalent(unlist(range(gs_cyto_data(gs)[[1, "Alexa 647-A"]])), c(0, 6))
+  #gated channel is also at right scale
+  expect_equivalent(unlist(range(gs_cyto_data(gs)[[1, "Alexa Fluor 700-A"]])), c(-0.1107733, 6.2620411))
+  
+})
 test_that("tailored gate -- lookup by file_id",{
   path <- "wsTestSuite/gatingML/tailor_gate"
   skip_if_not(dir.exists(path))

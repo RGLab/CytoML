@@ -197,8 +197,8 @@ NULL
 #' @export 
 #' @importFrom flowWorkspace gs_pop_set_name gs_pop_get_children recompute sampleNames gs_pop_add
 #' @importFrom RBGL tsort
-gating_graphGML <- function(x, y, ...) {
-
+gating_graphGML <- function(x, y, trans = NULL, ...) {
+  if(is.null(trans))
   trans <- getTransformations(x)
 
   gt_nodes <- tsort(x)

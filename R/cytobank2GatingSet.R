@@ -4,6 +4,8 @@
 #' @aliases cytobank2GatingSet
 #' @param x the cytobank_experiment object or the full path of gatingML file
 #' @param FCS FCS files to be loaded
+#' @param trans a 'transfomerList' object to override the transformations from gatingML files.
+#'        it is typically used by 'cytobank_experiment' parser(i.e. 'cytobank_to_gatingset.cytobank_experiment')  to use the scales info recorded in yaml file.
 #' @return a GatingSet
 #' @examples
 #' \dontrun{
@@ -19,7 +21,7 @@
 #' @importFrom ncdfFlow read.ncdfFlowSet
 #' @importFrom cytolib cytolib_LdFlags
 #' @export
-cytobank_to_gatingset.default <- function(x, FCS, ...){
+cytobank_to_gatingset.default <- function(x, FCS, trans = NULL, ...){
   g <- read.gatingML.cytobank(x)
   fs <- read.ncdfFlowSet(FCS, ...)
   gs <- GatingSet(fs)
@@ -28,13 +30,14 @@ cytobank_to_gatingset.default <- function(x, FCS, ...){
   gs <- compensate(gs, g)
 
   ## Extract transformation functions from `graphGML` and transform the data
-  trans <- getTransformations(g)
+  if(is.null(trans))
+  	trans <- getTransformations(g)
   if(!is.null(trans))
     gs <- transform(gs, trans)
 
 
   ##Apply gates stored in `graphGML`
-  gating_graphGML(g, gs)
+  gating_graphGML(g, gs, trans)
   gs
 }
 

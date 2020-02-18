@@ -7,7 +7,7 @@
 \alias{cytobank_to_gatingset.cytobank_experiment}
 \title{A wrapper that parses the gatingML and FCS files (or \code{cytobank_experiment} object) into GatingSet}
 \usage{
-\method{cytobank_to_gatingset}{default}(x, FCS, ...)
+\method{cytobank_to_gatingset}{default}(x, FCS, trans = NULL, ...)
 
 \method{cytobank_to_gatingset}{cytobank_experiment}(x, panel_id = 1, ...)
 }
@@ -15,6 +15,9 @@
 \item{x}{the cytobank_experiment object or the full path of gatingML file}
 
 \item{FCS}{FCS files to be loaded}
+
+\item{trans}{a 'transfomerList' object to override the transformations from gatingML files.
+it is typically used by 'cytobank_experiment' parser(i.e. 'cytobank_to_gatingset.cytobank_experiment')  to use the scales info recorded in yaml file.}
 
 \item{...}{other arguments}
 

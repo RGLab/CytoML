@@ -252,7 +252,7 @@ ce_get_transformations <- function(x, ...){
       else if(stype == "Arcsinh")
       {
         T <- sinh(1) * cofactor
-        res[[pname]] <- asinhtGml2_trans(T = T)
+        res[[pname]] <- asinhtGml2_trans(T = T, M = 0.43429448190325176, A = 0)#seems that M and A values are constant in cytobank
       }else if(stype != "Linear")
         stop("Unknown scale type: ", stype)
       

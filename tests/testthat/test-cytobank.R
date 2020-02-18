@@ -13,11 +13,11 @@ test_that("transform ungated channel",{
   #check the ungated channel is transformed properly by scales specified in yaml
   #input as fcs name
 
-  expect_equivalent(unlist(range(gs_cyto_data(gs)[[1, "Alexa 647-A"]])), c(-0.77, 1.52), tol = 2e-3)
+  expect_equivalent(unlist(range(gs_cyto_data(gs)[[1, "Alexa 647-A"]])), c(-0.111, 6.262), tol = 2e-3)
   #gated channel is also at right scale
-  expect_equivalent(unlist(range(gs_cyto_data(gs)[[1, "Alexa Fluor 700-A"]])), c(-0.77, 1.52), tol = 2e-3)
-
-  gh_pop_get_stats(gs[[2]], "Live")
+  expect_equivalent(unlist(range(gs_cyto_data(gs)[[1, "Alexa Fluor 700-A"]])), c(-0.111, 6.262), tol = 2e-3)
+  #check gating result
+  expect_equal(gh_pop_get_stats(gs[[2]], "Live")[, count], 3203)
   })
 test_that("tailored gate -- lookup by file_id",{
   path <- "wsTestSuite/gatingML/tailor_gate"

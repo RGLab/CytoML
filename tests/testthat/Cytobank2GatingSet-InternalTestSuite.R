@@ -94,7 +94,7 @@ test_that("gatingML-cytobank parsing: no transformations",{
   xmlfile <- file.path(path, "no_trans.xml")
   g <- CytoML:::read.gatingML.cytobank(xmlfile)
   expect_is(g, "graphGML")
-  expect_null(getTransformations(g))
+  expect_null(CytoML:::getTransformations.graphGML(g))
 })
 
 

@@ -696,12 +696,10 @@ diva_to_gatingset<- function(obj, name = NULL
         flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
         
       }
-     if(execute)
+      if(execute)
         suppressMessages(recompute(gs))
-
+      suppressMessages(save_gs(gs, cdf = "move", path = file.path(tmp.dir, grpid)))
       message("done!")
-
-      suppressMessages(save_gs(gs, cdf = "link", path = file.path(tmp.dir, grpid)))
   })
   )
 

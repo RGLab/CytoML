@@ -95,7 +95,8 @@ cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
   pname <- panel[panel_id][["panel"]]
   samples <- ce_get_samples(ce) %>% filter(panel == pname)
   samples <- samples[["sample"]]
-  gs <- cytobank_to_gatingset(ce$gatingML, file.path(ce$fcsdir, samples), ...)
+  trans <- ce_get_transformations(ce)
+  gs <- cytobank_to_gatingset(ce$gatingML, file.path(ce$fcsdir, samples), trans, ...)
   pData(gs) <- pData(ce)[samples, ]
   #update markers 
   markers.ce <- markernames(ce)
@@ -251,7 +252,7 @@ ce_get_transformations <- function(x, ...){
       else if(stype == "Arcsinh")
       {
         T <- sinh(1) * cofactor
-        res[[pname]] <- asinhtGml2_trans(T = T)
+        res[[pname]] <- asinhtGml2_trans(T = T, M = 0.43429448190325176, A = 0)#seems that M and A values are constant in cytobank
       }else if(stype != "Linear")
         stop("Unknown scale type: ", stype)
       
@@ -276,10 +277,13 @@ setMethod("pData","cytobank_experiment",function(object){
 #' @importFrom plyr name_rows
 get_pd <- function(ce){
   res <- ldply(ce$experiment$fcsFiles, function(sample){
-                                c(name = sample[["filename"]]
+                                data.frame(as.list(
+                                  c(name = sample[["filename"]]
                                       , unlist(sample[["tags"]])
                                       , .rownames = sample[["filename"]]#sample[["sampleName"]]
                                     )
+                                  )
+                                  , check.names = FALSE)
                       })
   res <- name_rows(res)
   res

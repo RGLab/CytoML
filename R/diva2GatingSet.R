@@ -696,7 +696,6 @@ diva_to_gatingset<- function(obj, name = NULL
         flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
         
       }
-      gs_cyto_data(gs) <- realize_view(gs_cyto_data(gs))
       if(execute)
         suppressMessages(recompute(gs))
       suppressMessages(save_gs(gs, cdf = "move", path = file.path(tmp.dir, grpid)))

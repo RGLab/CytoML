@@ -59,6 +59,7 @@ public:
 	 xpath nodePath;
 	 unordered_set<string> derived_params;
 	 xmlDoc * doc;
+	 string filepath;
 	 wsNode doc_root;
 public:
 	 workspace(){doc=NULL;};

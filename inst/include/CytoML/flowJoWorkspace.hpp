@@ -99,7 +99,7 @@ public:
 	}
 
 	string get_xml_file_path(){
-		return (const char*)(doc->URL);
+		return filepath;
 	}
 	/*
 	  * Constructor that starts from a particular sampleNode from workspace to build a tree

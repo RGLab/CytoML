@@ -673,7 +673,7 @@ diva_to_gatingset<- function(obj, name = NULL
         {
           tmp <- tempfile()
           cf_write_h5(data, tmp)
-          fs[[sampleName]] <- load_cytoframe_from_h5(tmp)
+          cs_set_cytoframe(fs, sampleName, load_cytoframe_from_h5(tmp))
           
         }
         gslist[[sampleName]] <- gs

@@ -60,7 +60,7 @@ test_that("Time gate2--when computed timestep is very different from $TIMESTEP "
   thisPath <- file.path(path, "timegate")
   wsFile <- file.path(thisPath, "MX1 Analysis VISC.xml")
   ws <- open_flowjo_xml(wsFile)
-  gs <- flowjo_to_gatingset(ws,name=1)
+  capture.output(gs <- flowjo_to_gatingset(ws,name=1))
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -77,7 +77,7 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
   thisPath <- file.path(path, "ellipsoid_log")
   wsFile <- file.path(thisPath, "xml_spillover2.xml")
   ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
-  gs <- flowjo_to_gatingset(ws, name=1, execute = T, subset = "spillover_B2.fcs")
+  capture.output(gs <- flowjo_to_gatingset(ws, name=1, execute = T, subset = "spillover_B2.fcs"))
 
   stats.orig <- gh_pop_compare_stats(gs[[1]])[, list(openCyto.count, node)]
   #output to flowJo
@@ -87,7 +87,7 @@ test_that("EllipsoidGate defined on log-transformed channels ",{
   
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
-  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath)
+  capture.output(gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath))
   stats.new <- gh_pop_compare_stats(gs1[[1]])[, list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new)
 })
@@ -125,7 +125,7 @@ test_that("gatingset_to_flowjo: no comp + fasinh ",{
   
   #parse it back in
   ws <- open_flowjo_xml(outFile, sampNloc = "sampleNode")
-  gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL)
+  capture.output(gs1 <- flowjo_to_gatingset(ws, name = 1, path = thisPath, additional.keys = NULL))
   stats.new <- gh_pop_compare_stats(gs1[[1]])[order(node), list(node, openCyto.count)]
   expect_equal(stats.orig, stats.new)
 })

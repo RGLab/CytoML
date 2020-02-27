@@ -24,7 +24,7 @@ test_that("getKeywordsBySampleID workspace",
 
 test_that("fj_ws_get_keywords workspace",
     {
-      expect_error(fj_ws_get_keywords(ws, "CytoTrol_CytoTrol_1.fcs"), "Multiple sample nodes found")
+      expect_error(fj_ws_get_keywords(ws, "CytoTrol_CytoTrol_1.fcs"), "Multiple sample nodes found", class = "error")
       thisExpectRes <- lapply(fjRes[["getkw_ws"]], trimws)
       expect_equal(fj_ws_get_keywords(ws, 1), thisExpectRes)
     })

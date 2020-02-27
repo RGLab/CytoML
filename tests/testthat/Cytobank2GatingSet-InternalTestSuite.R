@@ -35,7 +35,7 @@ test_that("GatingSet2Cytobank--cytof ",{
   #mute the error message printed to stderr() by flowUtils
   con <- file("/dev/null", "r")
   sink(con, type = "message")
-  gs_parsed <- cytobank_to_gatingset(outFile, fcs)
+  capture.output(gs_parsed <- cytobank_to_gatingset(outFile, fcs))
   sink(NULL, type = "message")
   close(con)
 

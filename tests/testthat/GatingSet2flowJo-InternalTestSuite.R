@@ -112,10 +112,10 @@ test_that("GatingSet2flowJo: rectangleGate + boolgate",{
 
 test_that("gatingset_to_flowjo: no comp + fasinh ",{
   thisPath <- file.path(path, "PROVIDE")
-  wsFile <- file.path(thisPath, "batch1 local and week 53.wsp")
+  wsFile <- file.path(thisPath, "count_corrected.wsp")
 
   ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
-  gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL)
+  dd <- capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL))
   stats.orig <- gh_pop_compare_stats(gs[[1]])[order(node), list(node, openCyto.count)]
 
   #output to flowJo

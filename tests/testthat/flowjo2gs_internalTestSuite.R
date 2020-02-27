@@ -403,17 +403,20 @@ test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
       
       #won't find the file if $TOT is taken into account(most likely the data provided was wrong)
       expect_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3)
-                                  , "No samples")
+                                  , "No samples", class = "error")
                , "FCS")
       
-      #relax the rules (shouldn't be doing this, just for the sake of testing)
+      #relax the rules 
       # UPDATE: After changes to search_for_fcs, this kind of evasion of $TOT check is not possible
-      # so this test will be disabled
-      # capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL))
-    
-      # gh <- gs[[1]]
-      # thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
-      # expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
+      expect_error(capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL)), "No samples", class = "error")
+      #switch to the corrected wsp
+      wsFile <- file.path(thisPath, "count_corrected.wsp")
+      
+      ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
+      capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3))
+      gh <- gs[[1]]
+      thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
+      expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
       
     })
 

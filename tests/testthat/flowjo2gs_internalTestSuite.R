@@ -111,7 +111,7 @@ test_that("Handle duplicate sample names",{
   ws <- open_flowjo_xml(wsFile)
   sink(tempfile())
   expect_error(flowjo_to_gatingset(ws, name = 1), "Duplicated", class = "error")
-  gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, additional.sampleID = TRUE))
+  gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, additional.sampleID = TRUE, which.lines = 1))
   sink()
   expect_is(gs, "GatingSet")
 })

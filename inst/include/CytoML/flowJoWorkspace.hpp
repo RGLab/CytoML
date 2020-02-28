@@ -378,15 +378,6 @@ public:
 
 			}
 
-			{
-			  GsMutexType::scoped_lock lock(GsMutex);
-			  if(gs.find(uid) != gs.end()){
-			    throw(domain_error("Duplicated GUIDs detected within group: " + uid
-                            + "\n Consider adding additional keywords to the GUID with argument \"additional.keys\""
-                            + "or setting argument \"additional.sampleID = TRUE\" to disambiguate samples further."));
-			  }
-			  gs.add_GatingHierarchy(gh, uid);
-			}
 
 			if(config_const.is_gating&&config_const.is_h5)
 			{
@@ -400,6 +391,15 @@ public:
 			else
 			  gh->set_cytoframe_view(CytoFrameView(frptr));
 
+			{
+			  GsMutexType::scoped_lock lock(GsMutex);
+			  if(gs.find(uid) != gs.end()){
+			    throw(domain_error("Duplicated GUIDs detected within group: " + uid
+                            + "\n Consider adding additional keywords to the GUID with argument \"additional.keys\""
+                            + "or setting argument \"additional.sampleID = TRUE\" to disambiguate samples further."));
+			  }
+			  gs.add_GatingHierarchy(gh, uid, false);
+			}
 
 		}
 

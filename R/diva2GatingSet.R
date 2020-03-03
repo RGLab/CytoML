@@ -673,32 +673,32 @@ diva_to_gatingset<- function(obj, name = NULL
 
       if(execute)
         suppressMessages(recompute(gs))
-      suppressMessages(save_gs(gs, cdf = "move", path = file.path(tmp.dir, grpid)))
+      if(num_threads>1)
+        suppressMessages(save_gs(gs, cdf = "move", path = file.path(tmp.dir, grpid)))
       message("done!")
+      gs
   })
   )
 
   if(num_threads >1)
   {
+    require(parallel)
     thisCall[[1]] <- quote(mclapply)
 
     thisCall[["mc.cores"]] <- num_threads
-
-  }
+    eval(thisCall)
+    
+    gsfiles <- list.files(tmp.dir, full.names = TRUE)
+    
   
-  eval(thisCall)
-  
-  gsfiles <- list.files(tmp.dir, full.names = TRUE)
-  if(num_threads >1)
-  {
     res <- try(suppressMessages(lapply(gsfiles, load_gs)))
     if(is(res, "try-error"))
-      stop("he parsed GatingSets are cached in: ", tmp.dir, "\n Please use load_gs to load and clean/merge them!")
-    res
+      stop("the parsed GatingSets are cached in: ", tmp.dir, "\n Please use load_gs to load and clean/merge them!")
+    merge_list_to_gs(res)
   }else
   {
 
-    gs <- suppressMessages(load_gs(gsfiles))
+    gs <-  eval(thisCall)[[1]]
 
        # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed
     gslist <- suppressMessages(gs_split_by_tree(gs))

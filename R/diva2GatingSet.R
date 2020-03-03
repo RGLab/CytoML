@@ -77,6 +77,7 @@ open_diva_xml <- function(file,options = 0,...){
   }else{
     stop("Require a filename of a workspace, but received ",class(x)[1]);
   }
+  unlink(tmp)
   #    browser()
   rootNode <- names(xmlChildren(x))
 

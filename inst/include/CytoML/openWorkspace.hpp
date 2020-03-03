@@ -58,7 +58,7 @@ inline unique_ptr<flowJoWorkspace> openWorkspace(string xml_filename,SAMPLE_NAME
 		 		throw(invalid_argument("unsupported workspace Type!"));
 		 }
 
-
+		 wsPtr->filepath = xml_filename;//save the xml_filename since libxml will url encode it and may make it unusable for fs IO
 
 		 wsPtr->nodePath.sample_name_location=sample_name_location;
 

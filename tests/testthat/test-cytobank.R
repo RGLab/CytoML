@@ -1,7 +1,7 @@
 context("gatingset_to_cytobank ..")
 
 test_that("transform ungated channel",{
-  acsfile <- "wsTestSuite/gatingML/experiment_34218_Feb-16-2020_08-33-PM.acs"
+  acsfile <- "~/rglab/workspace/CytoML/wsTestSuite/gatingML/experiment_34218_Feb-16-2020_08-33-PM.acs"
   skip_if_not(file.exists(acsfile))
   ce <- open_cytobank_experiment(acsfile)
   gs <- cytobank_to_gatingset(ce)
@@ -19,8 +19,11 @@ test_that("transform ungated channel",{
   #check gating result
   expect_equal(gh_pop_get_stats(gs[[2]], "Live")[, count], 3203)
   })
+
+#this test case is somehow very slow which could be due to the big xml with complex gating schemes
+#profvis shows the bottleneck is xml parsing, which calls for the efficient xml operations at c++
 test_that("tailored gate -- lookup by file_id",{
-  path <- "wsTestSuite/gatingML/tailor_gate"
+  path <- "~/rglab/workspace/CytoML/wsTestSuite/gatingML/tailor_gate"
   skip_if_not(dir.exists(path))
   xmlfile <- file.path(path, "cytobank_gate_ml2_v10.xml")
   
@@ -124,7 +127,7 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
   expect_equal(stats[, Count.x/ParentCount.x], stats[, Count.y/ParentCount.y])
 
   #enable custom scale
-  gatingset_to_cytobank(gs, outFile, cytobank.default.scale =F)
+  suppressWarnings(gatingset_to_cytobank(gs, outFile, cytobank.default.scale =F))
 
   sink(con, type = "message")
   gs1 <- cytobank_to_gatingset(outFile, fcsFiles)
@@ -141,7 +144,7 @@ test_that("autogating to cytobank--tcell", {
   set.seed(1)
   dataDir <- system.file("extdata",package="flowWorkspaceData")
   #load raw FCS
-  fs <- read.flowSet(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
+  fs <- load_cytoset_from_fcs(file.path(dataDir,"CytoTrol_CytoTrol_1.fcs"))
   outFile <- tempfile(fileext = ".xml")
 
 
@@ -169,9 +172,9 @@ test_that("autogating to cytobank--tcell", {
   stats.orig <- gh_pop_compare_stats(gs[[1]])[order(node), list(openCyto.count, node)]
   #output to cytobank
 
-  gatingset_to_cytobank(gs, outFile, cytobank.default.scale = F)
+  suppressWarnings(gatingset_to_cytobank(gs, outFile, cytobank.default.scale = F))
   #parse it back in
-  gs1 <- cytobank_to_gatingset(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs"))
+  suppressWarnings(gs1 <- cytobank_to_gatingset(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs")))
   stats.new <- gh_pop_compare_stats(gs1[[1]])[order(node), list(openCyto.count, node)]
   expect_equal(stats.orig, stats.new, tol = 6e-4)
 

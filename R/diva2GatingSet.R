@@ -77,6 +77,7 @@ open_diva_xml <- function(file,options = 0,...){
   }else{
     stop("Require a filename of a workspace, but received ",class(x)[1]);
   }
+  unlink(tmp)
   #    browser()
   rootNode <- names(xmlChildren(x))
 
@@ -274,7 +275,7 @@ diva_to_gatingset<- function(obj, name = NULL
       else
         suppressMessages(gs <- eval(thisCall))
       #cp gates to the all files
-      gs <- GatingSet(gs[[1]], sn, path = path , swap_cols = swap_cols, ...)
+      gs <- gh_apply_to_new_fcs(gs[[1]], sn, path = path , swap_cols = swap_cols, ...)
     }else
       gs <- eval(thisCall)
     
@@ -375,7 +376,7 @@ diva_to_gatingset<- function(obj, name = NULL
 
       files <- file.group[[grpid]]
       # parse compp & trans
-      gslist <- translist <- complist <- data.ranges <- list()
+      gslist <- data.ranges <- list()
       for(file in files)
       {
 
@@ -438,17 +439,17 @@ diva_to_gatingset<- function(obj, name = NULL
 
         message("loading data: ",file);
         #load single sample into cs so that gs can be constructed from it
-        fs <- load_cytoset_from_fcs(file, ...)#has to load data regardless of execute flag because data range is needed for gate extension
-        cols <- swap_data_cols(colnames(fs), swap_cols)
-        if(!all(cols==colnames(fs)))
+        cs <- load_cytoset_from_fcs(file, ...)#has to load data regardless of execute flag because data range is needed for gate extension
+        cols <- swap_data_cols(colnames(cs), swap_cols)
+        if(!all(cols==colnames(cs)))
           for(c1 in names(swap_cols))
           {
             c2 <- swap_cols[[c1]]
-            cs_swap_colnames(fs, c1, c2)					
+            cs_swap_colnames(cs, c1, c2)					
           }
         
-        gs <- GatingSet(fs)
-        data <- get_cytoframe_from_cs(fs, sampleName)
+        gs <- GatingSet(cs)
+        cf <- get_cytoframe_from_cs(cs, sampleName)
 
         message("Compensating")
         if(xml_compensation_enabled){
@@ -461,25 +462,22 @@ diva_to_gatingset<- function(obj, name = NULL
           comp <- solve(comp)
           colnames(comp) <- rownames(comp)
           comp <- compensation(comp)
-          complist[[sampleName]] <- comp
-          
-          data <- compensate(data, comp)
+
+         compensate(gs, comp)
         }else{
           #we use the spillover from FCS keyword
-          comp <- spillover(data)
+          comp <- spillover(cf)
           comp <- compact(comp)
           if(length(comp) > 1)
             stop("More than one spillover found in FCS!")
           else if(length(comp) == 0)
             stop("No spillover found in FCS!")
-          else
-            complist[[sampleName]] <- comp[[1]]
-          
-          data <- compensate(data, comp[[1]])
+
+          compensate(gs, comp[[1]])
         }
 
         message("computing data range")
-        data.ranges[[sampleName]] <- range(data, "data")
+        data.ranges[[sampleName]] <- range(cf, "data")
 
 
         message(paste("transforming ..."))
@@ -496,18 +494,15 @@ diva_to_gatingset<- function(obj, name = NULL
           trans <- generate_trans(maxValue, pos, r)
                     }
           , simplify = FALSE)
-        translist[[sampleName]] <- transformerList(params, trans)
-
-        trans.funs <- sapply(trans, function(trans.obj)trans.obj[["transform"]])
-        data <- transform(data, transformList(params, trans.funs))
-
+        this_biexp <- transformerList(params, trans)
+        
+        gs <- transform(gs, this_biexp)
+        
 
         message("parsing gates ...")
 
         gh <- gs[[sampleName]]
 
-        this_biexp <- translist[[sampleName]]
-        # xpathSample <- paste0(xpathGroup, "/tube[data_filename='", sampleName, "']")
         if(worksheet == "normal")
           sampleNode <- sampleNode.tube#xpathApply(rootDoc, xpathSample)[[1]]
         else
@@ -654,12 +649,7 @@ diva_to_gatingset<- function(obj, name = NULL
             if(parent == "root")
               parent <- ""
             unique.path <- file.path(parent, nodeName)
-            #Can't do the gating in
-            # ind <- gh_pop_get_indices(gh, parent)
-            # ind <- as.logic(Subset(data[ind, ], gate))
-            # gh_pop_set_indices(gh, unique.path, ind)
-            # suppressMessages(recompute(gh, unique.path))
-            #save the xml counts
+          #save the xml counts
             gh_pop_set_xml_count(gh, unique.path, count)
           }else{
             rootNode.xml <- nodeName
@@ -671,31 +661,16 @@ diva_to_gatingset<- function(obj, name = NULL
         }#end of gate adding
         if(execute)
         {
+          #convert to on disk cs to prevent mem issue
           tmp <- tempfile()
-          cf_write_h5(data, tmp)
-          fs[[sampleName]] <- load_cytoframe_from_h5(tmp)
-          
+          cf_write_h5(cf, tmp)
+          cs_set_cytoframe(cs, sampleName, load_cytoframe_from_h5(tmp))
         }
         gslist[[sampleName]] <- gs
       }
       #merge samples into a single gs
       gs <- merge_list_to_gs(gslist)
-      #TODO: create and expose R wrapper 'set_compensation' in flowWorkspace
-      complist <- sapply(complist, flowWorkspace:::check_comp, simplify = FALSE)
-      flowWorkspace:::cs_set_compensation(gs@pointer, complist, FALSE)
-      #TODO: create and expose R wrapper 'set_transformation' in flowWorkspace
-      for(sn in names(translist))
-      {
-        transobjs <- sapply(translist[[sn]], function(trans){
-          transobj <- flowWorkspace:::parse_transformer(trans)
-          if(length(transobj)==0)
-            stop("unsupported trans: ", trans[["name"]])
-          transobj
-          }, simplify = FALSE)
-        # browser()
-        flowWorkspace:::set_transformations(gs@pointer, sn, transobjs)
-        
-      }
+
       if(execute)
         suppressMessages(recompute(gs))
       suppressMessages(save_gs(gs, cdf = "move", path = file.path(tmp.dir, grpid)))

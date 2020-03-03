@@ -98,6 +98,14 @@ struct parseWorkspaceFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(parseWorkspace,parseWorkspaceFixture)
+
+BOOST_AUTO_TEST_CASE(duplicatedSampleID)
+{
+	//test mem leaks
+	for(auto i : {1,2,3,4,5})
+		auto ws = openWorkspace("../wsTestSuite/duplicatedSampleID/Ustekin_G26_sas_IMMPORT2.495809.xml", myTest.sample_name_location,myTest.xmlParserOption);
+//	ws.reset();
+}
 BOOST_AUTO_TEST_CASE(nogate)
 {
 	myTest.filename="../wsTestSuite/no-gate.wsp";
@@ -135,6 +143,29 @@ BOOST_AUTO_TEST_CASE(flog)
 	myTest.group_id = 0;
 	myTest.archive="../output/flog/gs";
 //	g_loglevel = GATE_LEVEL;
+
+	parser_test(myTest);
+
+	vector<bool> isTrue(myTest.isEqual.size(), true);
+	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
+
+}
+BOOST_AUTO_TEST_CASE(flog_PnE_space)
+{
+
+	myTest.filename="../wsTestSuite/flog PnE/Liver.wsp";
+	myTest.sample_name_location = SAMPLE_NAME_LOCATION::SAMPLE_NODE;
+	myTest.config.sample_filters["name"]={"Tissues_Liver_001.fcs"};
+
+	myTest.config.fcs_read_param.data.which_lines = {1000};
+	unique_ptr<flowJoWorkspace> ws = openWorkspace(myTest.filename, myTest.sample_name_location,myTest.xmlParserOption);
+	unique_ptr<GatingSet> gs = ws->to_GatingSet(0, myTest.config);
+	BOOST_CHECK_EQUAL(gs->begin()->second->get_cytoframe_view().n_rows(), 1000);
+
+	myTest.archive="../output/flog_PnE/gs";
+	myTest.tolerance = 0.1;
+	myTest.skipPops = {18,19};
+	myTest.config.fcs_read_param.data.which_lines = {};
 
 	parser_test(myTest);
 

@@ -18,12 +18,11 @@
 #' autoplot(gs[[1]])
 #' }
 #' @importFrom flowWorkspace GatingSet transform
-#' @importFrom ncdfFlow read.ncdfFlowSet
 #' @importFrom cytolib cytolib_LdFlags
 #' @export
 cytobank_to_gatingset.default <- function(x, FCS, trans = NULL, ...){
   g <- read.gatingML.cytobank(x)
-  fs <- read.ncdfFlowSet(FCS, ...)
+  fs <- load_cytoset_from_fcs(FCS, ...)
   gs <- GatingSet(fs)
 
   ## Compensate the data with the compensation information stored in `graphGML` object

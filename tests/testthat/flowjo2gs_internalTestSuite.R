@@ -32,7 +32,7 @@ test_that("which.lines",{
   ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
   set.seed(1)
   gs <- flowjo_to_gatingset(ws, name = 2, which.lines = 5e4)
-  expect_equal(nrow(getData(gs[[1]])), 5e4)
+  expect_equal(nrow(gh_pop_get_data(gs[[1]])), 5e4)
   res <- gh_pop_compare_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.04)
   
@@ -110,8 +110,8 @@ test_that("Handle duplicate sample names",{
   wsFile <- file.path(path, "duplicatedSampleID", "Ustekin_G26_sas_IMMPORT2.495809.xml")
   ws <- open_flowjo_xml(wsFile)
   sink(tempfile())
-  expect_error(flowjo_to_gatingset(ws, name = 1), "Duplicated")
-  gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, additional.sampleID = TRUE))
+  expect_error(flowjo_to_gatingset(ws, name = 1), "Duplicated", class = "error")
+  gs <- suppressWarnings(flowjo_to_gatingset(ws, name = 1, additional.sampleID = TRUE, which.lines = 1))
   sink()
   expect_is(gs, "GatingSet")
 })
@@ -293,7 +293,7 @@ test_that("v 10.0.6 - vX 1.8",{
       suppressWarnings(write.FCS(fr, filename = file.path(tmp, fcsname), delimiter = "/"))
       
       expect_error(gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, path = tmp, emptyValue = T)
-          , "Empty keyword name")#ncdfFlowSet
+          , "Empty keyword name", class = "error")#ncdfFlowSet
               
       gs <- flowjo_to_gatingset(ws, name = "Bcell", subset = 1, path = tmp, emptyValue = F)#ncdf
       gh <- gs[[1]]
@@ -332,7 +332,7 @@ test_that("v 10.0.7 - vX 20.0 (missing_namespace and flin)",{
       wsFile <- file.path(thisPath, "BM_data.xml")
       ws <- open_flowjo_xml(wsFile, options = 32)#set option to suppress xml error
       expect_error(gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, execute = FALSE)
-                    , "*: unknown tranformation type!transforms:linear")
+                    , "*: unknown tranformation type!transforms:linear", class = "error")
       
       
       wsFile <- file.path(thisPath, "BM_data_corrected.xml")
@@ -403,17 +403,20 @@ test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
       
       #won't find the file if $TOT is taken into account(most likely the data provided was wrong)
       expect_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3)
-                                  , "No samples")
+                                  , "No samples", class = "error")
                , "FCS")
       
-      #relax the rules (shouldn't be doing this, just for the sake of testing)
+      #relax the rules 
       # UPDATE: After changes to search_for_fcs, this kind of evasion of $TOT check is not possible
-      # so this test will be disabled
-      # capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL))
-    
-      # gh <- gs[[1]]
-      # thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
-      # expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
+      expect_error(capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, additional.keys = NULL)), "No samples", class = "error")
+      #switch to the corrected wsp
+      wsFile <- file.path(thisPath, "count_corrected.wsp")
+      
+      ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
+      capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3))
+      gh <- gs[[1]]
+      thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
+      expect_equal(thisCounts[, openCyto.count], thisCounts[, xml.count], tol = 0.04)
       
     })
 
@@ -794,14 +797,14 @@ test_that("search_for_fcs logic", {
   # Now, with multiple $TOT matches, need to check keys and take the one from the subdir
   fcs_path <- file.path(thisPath, "needs_keys", "w_subdirs")
   # It should fail without specifying additional keys
-  expect_error(gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path), "Multiple FCS files")
+  expect_error(gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path), "Multiple FCS files", class = "error")
   gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path, additional.keys = c("TUBE NAME"))
   expect_equal(length(gs), 2)
   expect_match(keyword(gs[[2]], "FILENAME"), "subdir_with_correct_keys/CytoTrol_CytoTrol_2.fcs")
   
   # Just make sure it appropriately errors out for full duplicates
   fcs_path <- file.path(thisPath, "full_duplicates")
-  expect_error(gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path, additional.keys = c("TUBE NAME")), "Multiple FCS files")
+  expect_error(gs <- flowjo_to_gatingset(ws, name=4, subset=subset, path=fcs_path, additional.keys = c("TUBE NAME")), "Multiple FCS files", class = "error")
   
 })
 

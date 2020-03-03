@@ -35,7 +35,7 @@ test_that("GatingSet2Cytobank--cytof ",{
   #mute the error message printed to stderr() by flowUtils
   con <- file("/dev/null", "r")
   sink(con, type = "message")
-  gs_parsed <- cytobank_to_gatingset(outFile, fcs)
+  capture.output(gs_parsed <- cytobank_to_gatingset(outFile, fcs))
   sink(NULL, type = "message")
   close(con)
 
@@ -108,8 +108,7 @@ test_that("gatingML-cytobank parsing: Merck FirstExample",{
   statsfile <- file.path(thisPath,"population_counts.csv")
   dt_merged <- gs_compare_cytobank_counts(gs, statsfile, skip = "FCS Filename")
 
-  unequaled <- dt_merged[count.x != count.y]
-  expect_equal(nrow(unequaled), 0)
+  expect_equal(dt_merged[,count.y], dt_merged[,count.x], tol = 5e-5)
 })
 
 test_that("gatingML-cytobank parsing: Merck SecondExample",{
@@ -124,6 +123,5 @@ test_that("gatingML-cytobank parsing: Merck SecondExample",{
   dt_merged <- gs_compare_cytobank_counts(gs, statsfile, id.vars = "population", skip = "FCS Filename") #subset the files to speed up testing
 
 
-  unequaled <- dt_merged[count.x != count.y]
-  expect_equal(nrow(unequaled), 0)
+  expect_equal(dt_merged[,count.y], dt_merged[,count.x], tol = 5e-5)
 })

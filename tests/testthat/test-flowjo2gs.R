@@ -34,7 +34,7 @@ test_that("Can parse workspace",{
                                                                 , additional.keys = NULL
                                                                 )
                                                 )
-                                  , "No sample")
+                                  , "No sample", class = "error")
                        , "FCS not found")
                 
 	
@@ -131,7 +131,8 @@ test_that("use additional keywords for guid",{
 test_that("parse pData from keyword", {
     keys <- c("PATIENT ID", "SAMPLE ID", "$TOT", "EXPERIMENT NAME")
     #parse pData from xml
-    expect_error(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4, keywords = keys, execute = F, keywords.source="FCS"), "Can't parse phenodata")
+    expect_error(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4, keywords = keys, execute = F, keywords.source="FCS")
+                 , "Can't parse phenodata", class = "error")
     dd <- capture.output(suppressMessages(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4, keywords = keys, execute = F)))
     pd1 <- pData(gs1)
     expect_equal(nrow(pd1), 4)
@@ -146,7 +147,7 @@ test_that("parse pData from keyword", {
     #case insensitive
     keys <- tolower(keys)
     expect_error(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4, keywords = keys, execute = F)
-                   , regexp = "not found")
+                   , regexp = "not found", class = "error")
     # pd2 <- pData(gs1)
     # expect_true(all(is.na(pd2[[2]])))
   
@@ -184,7 +185,7 @@ test_that("subset", {
                                        , keywords = "TUBE NAME", execute = F
                                        , keywords.source = "FCS"
                                        )
-                , "Can't parse phenodata from FCS")
+                , "Can't parse phenodata from FCS", class = "error")
 
             
     })

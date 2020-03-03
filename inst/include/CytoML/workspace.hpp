@@ -16,6 +16,7 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
+//#include <malloc.h>
 
 
 namespace CytoML
@@ -67,7 +68,7 @@ public:
 	 {
 			if(doc!=NULL)
 			{
-				xmlFreeDoc(doc);
+				xmlFreeDoc(doc);//this doesn't actually return the free mem to os due to the small chunks of mem allocated by libxml
 				doc = NULL;
 
 				/*
@@ -77,6 +78,7 @@ public:
 				xmlCleanupParser();
 				if(g_loglevel>=GATING_SET_LEVEL)
 					COUT<<"xml freed!"<<endl;
+//				malloc_trim(0);//this can provide the remedy to return mem to os but not portable
 			}
 	 }
 	 virtual string xPathSample(string sampleID)=0;

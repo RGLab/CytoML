@@ -98,6 +98,14 @@ struct parseWorkspaceFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(parseWorkspace,parseWorkspaceFixture)
+
+BOOST_AUTO_TEST_CASE(duplicatedSampleID)
+{
+	//test mem leaks
+	for(auto i : {1,2,3,4,5})
+		auto ws = openWorkspace("../wsTestSuite/duplicatedSampleID/Ustekin_G26_sas_IMMPORT2.495809.xml", myTest.sample_name_location,myTest.xmlParserOption);
+//	ws.reset();
+}
 BOOST_AUTO_TEST_CASE(nogate)
 {
 	myTest.filename="../wsTestSuite/no-gate.wsp";

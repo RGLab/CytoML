@@ -68,7 +68,7 @@ test_that("diva--tcell ",{
 
 test_that("diva--2002-D-g001 ",{
   ws <- open_diva_xml(file.path(path, "2002-D-g001/2002-D-g001.xml"))
-  gs <- diva_to_gatingset(ws, name = 2, subset = "SO1_Naive Sort_003.fcs")
+  gs <- diva_to_gatingset(ws, name = 2, subset = "SO1_Naive Sort_003.fcs",which.lines = 1e4)
   parsedStats <- gh_pop_compare_stats(gs[[1]])
   expectRes <- fread(file.path(path, "2002-D-g001/2002-D-g001.csv"), skip = "Population")
   setnames(expectRes, c("Population", "%Parent"), c("node", "openCyto.freq"))

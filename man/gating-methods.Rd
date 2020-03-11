@@ -4,7 +4,7 @@
 \alias{gating_graphGML}
 \title{Apply the gatingML graph to a GatingSet}
 \usage{
-gating_graphGML(x, y, ...)
+gating_graphGML(x, y, trans = NULL, ...)
 }
 \arguments{
 \item{x}{graphGML}

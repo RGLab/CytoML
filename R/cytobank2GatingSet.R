@@ -17,7 +17,7 @@
 #' library(ggcyto)
 #' autoplot(gs[[1]])
 #' }
-#' @importFrom flowWorkspace GatingSet transform
+#' @importFrom flowWorkspace GatingSet transform load_cytoset_from_fcs
 #' @importFrom cytolib cytolib_LdFlags
 #' @export
 cytobank_to_gatingset.default <- function(x, FCS, trans = NULL, ...){

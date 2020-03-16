@@ -11,7 +11,7 @@ License: file LICENSE
 License_restricts_use: yes
 LazyData: TRUE
 Imports:
-    cytolib(>= 1.9.17),
+    cytolib(>= 1.9.21),
     flowCore (>= 1.43.10),
     flowWorkspace (>= 3.35.12),
     openCyto (>= 1.11.3),

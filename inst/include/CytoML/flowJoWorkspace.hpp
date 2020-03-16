@@ -360,8 +360,26 @@ public:
 
 				gh->compensate(fr);
 				gh->transform_gate();
+				// add the scaleTrans for the implicit time transformation based on $TIMESTEP in FCS
+				// This reproduces some of the logic of cytolib::CytoFrame::scale_time_channel
+				string time_channel = "time";
+				auto idx = frptr->get_col_idx(time_channel, ColType::channel);
+				if(idx >= 0){
+					EVENT_DATA_TYPE timestep = frptr->get_time_step(time_channel);
+					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("Adding transformation to multiply "+time_channel+" by :"+ to_string(timestep) + "\n");
+
+					shared_ptr<scaleTrans> timeTrans(new scaleTrans(timestep));
+
+					timeTrans->setGateOnlyFlag(false);
+					timeTrans->setName(time_channel);
+					timeTrans->setChannel(time_channel);
+
+					trans_local lTrans = gh->getLocalTrans();
+					lTrans.addTrans(time_channel, timeTrans);
+					gh->addTransMap(lTrans.getTransMap());
+				}
 				gh->transform_data(fr);
-				fr.scale_time_channel();
 				gh->extendGate(fr, config_const.gate_extend_trigger_value);
 				gh->gating(fr, 0,false, config_const.compute_leaf_bool_node);
 

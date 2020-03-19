@@ -374,6 +374,7 @@ public:
 					timeTrans->setGateOnlyFlag(false);
 					timeTrans->setName(time_channel);
 					timeTrans->setChannel(time_channel);
+					timeTrans->setType(SCALE);
 
 					trans_local lTrans = gh->getLocalTrans();
 					lTrans.addTrans(time_channel, timeTrans);

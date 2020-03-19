@@ -178,7 +178,12 @@ test_that("gatingset_to_flowjo: handle special encoding in keywords ",{
   
   write.flowSet(fs, outDir)
   ws <- open_flowjo_xml(outFile)
-  # At this point, a subdirectory should exist with duplicate file
+
+  # Make duplicate fcs directory below top directory to test file match cases
+  copy_dir <- file.path(outDir, "fcs_copies")
+  dir.create(copy_dir)
+  file.copy(file.path(outDir, paste0(sampleNames(fs), ".fcs")), copy_dir)
+  # The fcs files in copy_dir should interfere
   expect_error(flowjo_to_gatingset(ws, name = 1), "Multiple FCS files match", class = "error")
   # Use greedy_match to avoid the duplicate
   gs2 <- flowjo_to_gatingset(ws, name = 1, greedy_match = TRUE)

@@ -419,6 +419,8 @@ fj_ws_get_sample_groups <- function(x){
                }, SIMPLIFY = FALSE, USE.NAMES = FALSE)
   df <- do.call(rbind, df)
   colnames(df) <-  c("groupName", "groupID", "sampleID")
+  if(!is.factor(df$groupName))
+    df$groupName <- factor(df$groupName)
   df
 }
 

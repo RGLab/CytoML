@@ -42,7 +42,8 @@ setClass("flowjo_workspace",representation(doc="externalptr"))
 #' 
 #' @param file Full path to the XML flowJo workspace file.
 #' @param options xml parsing options passed to \code{\link{xmlTreeParse}}. See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption for details.
-#' @param ... other arguments passed to \code{\link{xmlTreeParse}}
+#' @param sampleNLoc character specifying where in the XML workspace file to obtain the sample names, either
+#' "keyword" for the included $FIL keyword for each sample, or "sampleNode" for the name of the sample node
 #' @param workspace A \code{flowjo_workspace}
 #' @details
 #' 	Open an XML flowJo workspace file and return a \code{flowjo_workspace} object. The workspace is represented using a \code{XMLInternalDocument} object.

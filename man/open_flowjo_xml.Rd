@@ -11,7 +11,8 @@ open_flowjo_xml(file, options = 0, sampNloc = "keyword")
 
 \item{options}{xml parsing options passed to \code{\link{xmlTreeParse}}. See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption for details.}
 
-\item{...}{other arguments passed to \code{\link{xmlTreeParse}}}
+\item{sampleNLoc}{character specifying where in the XML workspace file to obtain the sample names, either
+"keyword" for the included $FIL keyword for each sample, or "sampleNode" for the name of the sample node}
 
 \item{workspace}{A \code{flowjo_workspace}}
 }

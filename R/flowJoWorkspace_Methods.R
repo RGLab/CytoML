@@ -42,7 +42,7 @@ setClass("flowjo_workspace",representation(doc="externalptr"))
 #' 
 #' @param file Full path to the XML flowJo workspace file.
 #' @param options xml parsing options passed to \code{\link{xmlTreeParse}}. See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption for details.
-#' @param sampleNLoc character specifying where in the XML workspace file to obtain the sample names, either
+#' @param sample_names_from character specifying where in the XML workspace file to obtain the sample names, either
 #' "keyword" for the included $FIL keyword for each sample, or "sampleNode" for the name of the sample node
 #' @param workspace A \code{flowjo_workspace}
 #' @details
@@ -59,11 +59,15 @@ setClass("flowjo_workspace",representation(doc="externalptr"))
 #' @importFrom XML xmlTreeParse xmlAttrs xmlGetAttr xmlTreeParse xmlRoot xmlValue xpathApply
 #' @import flowCore ncdfFlow
 #' @export 
-open_flowjo_xml <- function(file,options = 0, sampNloc = "keyword"){
+open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...){
+  if("sampNloc" %in% names(list(...))){
+    warning("'sampNloc' argument deprecated and renamed 'sample_names_from'")
+    sample_names_from <- list(...)[["sampNloc"]]
+  }
   valid_values <- c("keyword", "sampleNode")
-  sampNloc <- match.arg(sampNloc, valid_values)
+  sample_names_from <- match.arg(sample_names_from, valid_values)
   file <- path.expand(file)
-  new("flowjo_workspace", doc = open_workspace(file, sample_name_location = match(sampNloc,valid_values), xmlParserOption = options))
+  new("flowjo_workspace", doc = open_workspace(file, sample_name_location = match(sample_names_from,valid_values), xmlParserOption = options))
   
 }
 

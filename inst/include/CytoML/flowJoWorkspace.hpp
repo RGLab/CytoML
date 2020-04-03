@@ -1235,14 +1235,14 @@ public:
 
 	}
 
-	EVENT_DATA_VEC getShift(wsNode & node) const{
+	vector<EVENT_DATA_TYPE> getShift(wsNode & node) const{
 		//get any necessary shifts (as in the case of magnetic gates)
 		string adjustX_str = node.getProperty("adjustX");
 		string adjustY_str = node.getProperty("adjustY");
 		EVENT_DATA_TYPE adjustX = adjustX_str.empty() ? 0.0 : atof(adjustX_str.c_str());
 		//adjustY appears to be negated but not sure where this is documented
 		EVENT_DATA_TYPE adjustY = adjustY_str.empty() ? 0.0 : -atof(adjustY_str.c_str());
-		return EVENT_DATA_VEC{adjustX, adjustY};
+		return vector<EVENT_DATA_TYPE>{adjustX, adjustY};
 	}
 };
 

@@ -578,6 +578,8 @@ public:
 		 */
 		unique_ptr<rangeGate> g(new rangeGate());
 
+		//shift gets lost in rangeGate constructor, so need to re-add it
+		g->setShift(getShift(node));
 
 		vector<coordinate> v=g1->getParam().getVertices();
 		if(v.size()!=2)
@@ -619,7 +621,12 @@ public:
 		 */
 		if(v.size()!=4)
 			throw(domain_error("invalid number of antipode pionts of ellipse gate!"));
-		return gatePtr(new ellipseGate(v, pg->getParam().getNameArray()));
+
+		unique_ptr<ellipseGate> gate(new ellipseGate(v, pg->getParam().getNameArray()));
+		//shift gets lost in ellipseGate constructor, so need to re-add it
+		gate->setShift(getShift(pGNode));
+
+		return gatePtr(gate.release());
 	}
 	/*
 	 * TODO:query gate node and param node by name instead of by positions
@@ -669,6 +676,7 @@ public:
 				p.setVertices(v);
 				p.setName(pn);
 				gate->setParam(p);
+				gate->setShift(getShift(gNode));
 				return gatePtr(gate.release());
 	}
 

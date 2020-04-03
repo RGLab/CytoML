@@ -363,7 +363,10 @@ public:
 	  	if(v.size()!=4)
 	  		throw(domain_error("invalid number of antipode pionts of ellipse gate!"));
 
-	  	return gatePtr(new ellipsoidGate(v, pg->getParam().getNameArray()));
+	  	unique_ptr<ellipsoidGate> gate(new ellipsoidGate(v, pg->getParam().getNameArray()));
+	  	//Shift gets lost in ellipsoidGate constructor, so need to add it back in
+	  	gate->setShift(getShift(node));
+	  	return gatePtr(gate.release());
 
 	  }
 
@@ -423,7 +426,10 @@ public:
 	  	vert.push_back(intersect);
 	  	pp.setVertices(vert);
 	  	pp.setName(dims);
-	  	return gatePtr(new CurlyQuadGate(pp, quad));
+	  	unique_ptr<CurlyQuadGate> gate(new CurlyQuadGate(pp, quad));
+	  	//shift gets lost in CurlyQuadGate constructor, so need to add it back in
+	  	gate->setShift(getShift(node));
+	  	return gatePtr(gate.release());
 
 	  }
 
@@ -496,6 +502,7 @@ public:
 	  			p.setName(pn);
 	  			p.setVertices(v);
 	  			gate->setParam(p);
+	  			gate->setShift(getShift(node));
 	  			return gatePtr(gate.release());
 	  }
 
@@ -635,6 +642,7 @@ public:
 	  			xmlXPathFreeObject(resPara);
 
 
+	  			thisGate->setShift(getShift(node));
 	  			return thisGate;
 	  }
 	  gatePtr getGate(wsPopNode & node){

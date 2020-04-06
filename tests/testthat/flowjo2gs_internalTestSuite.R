@@ -808,3 +808,12 @@ test_that("search_for_fcs logic", {
   
 })
 
+test_that("magnetic gates", {
+  thisPath <- file.path(path, "magnetic")
+  ws <- open_flowjo_xml(file.path(thisPath, "2020-03-11 CyTOF gating strategy_dummy.wsp"))
+  gs <- flowjo_to_gatingset(ws, name = 1)
+  thisCounts <- gh_pop_compare_stats(gs[[1]])
+  # Give a little cushion to frequency tolerance due to small subsample
+  expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
+})
+

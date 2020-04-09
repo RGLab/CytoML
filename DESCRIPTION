@@ -14,7 +14,7 @@ Imports:
     cytolib(>= 1.99.26),
     flowCore (>= 1.99.10),
     flowWorkspace (>= 3.99.15),
-    openCyto (>= 1.99.3),
+    openCyto (>= 1.99.2),
     XML,
     data.table,
     jsonlite,

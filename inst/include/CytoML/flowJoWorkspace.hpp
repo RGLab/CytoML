@@ -380,6 +380,7 @@ public:
 					lTrans.addTrans(time_channel, timeTrans);
 					gh->addTransMap(lTrans.getTransMap());
 				}
+				gh->shift_gate();
 				gh->transform_data(fr);
 				gh->extendGate(fr, config_const.gate_extend_trigger_value);
 				gh->gating(fr, 0,false, config_const.compute_leaf_bool_node);
@@ -391,6 +392,7 @@ public:
 				if(config_const.transform)
 				{
 					gh->transform_gate();
+					gh->shift_gate();
 					gh->extendGate(config_const.gate_extend_trigger_value, config_const.gate_extend_to);
 				}
 
@@ -1231,6 +1233,16 @@ public:
 		}
 		return res;
 
+	}
+
+	vector<EVENT_DATA_TYPE> getShift(wsNode & node) const{
+		//get any necessary shifts (as in the case of magnetic gates)
+		string adjustX_str = node.getProperty("adjustX");
+		string adjustY_str = node.getProperty("adjustY");
+		EVENT_DATA_TYPE adjustX = adjustX_str.empty() ? 0.0 : atof(adjustX_str.c_str());
+		//adjustY appears to be negated but not sure where this is documented
+		EVENT_DATA_TYPE adjustY = adjustY_str.empty() ? 0.0 : -atof(adjustY_str.c_str());
+		return vector<EVENT_DATA_TYPE>{adjustX, adjustY};
 	}
 };
 

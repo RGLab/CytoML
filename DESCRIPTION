@@ -11,10 +11,10 @@ License: file LICENSE
 License_restricts_use: yes
 LazyData: TRUE
 Imports:
-    cytolib(>= 1.99.22),
+    cytolib(>= 1.99.26),
     flowCore (>= 1.99.10),
     flowWorkspace (>= 3.99.15),
-    openCyto (>= 1.99.3),
+    openCyto (>= 1.99.2),
     XML,
     data.table,
     jsonlite,
@@ -40,7 +40,7 @@ Imports:
     tibble,
     RcppParallel
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
-LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib, cytolib,Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
+LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib, cytolib ( >= 1.99.26),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:
     testthat,
     flowWorkspaceData ,

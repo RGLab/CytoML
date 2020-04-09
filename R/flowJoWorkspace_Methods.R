@@ -203,7 +203,8 @@ flowjo_to_gatingset <- function(ws, name = NULL
   
   # determine the group
   g <- fj_ws_get_sample_groups(ws)
-  groups<-levels(g$groupName)
+  groups <- g[!duplicated(g$groupName),]
+  groups <- groups[order(groups$groupID),"groupName"]
   
   if(is.null(name)){
     groupInd <- menu(groups,graphics=FALSE, "Choose which group of samples to import:");
@@ -424,8 +425,7 @@ fj_ws_get_sample_groups <- function(x){
                }, SIMPLIFY = FALSE, USE.NAMES = FALSE)
   df <- do.call(rbind, df)
   colnames(df) <-  c("groupName", "groupID", "sampleID")
-  if(!is.factor(df$groupName))
-    df$groupName <- factor(df$groupName)
+  df$groupName <- as.character(df$groupName)
   df
 }
 

@@ -92,14 +92,14 @@ cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
   #filter by panel
   ce <- x
   panel <- ce_get_panels(ce)
-  pname <- panel[panel_id][["panel"]]
+  pname <- panel[panel_id,][["panel"]]
   samples <- ce_get_samples(ce) %>% filter(panel == pname)
   samples <- samples[["sample"]]
   trans <- ce_get_transformations(ce)
   gs <- cytobank_to_gatingset(ce$gatingML, file.path(ce$fcsdir, samples), trans, ...)
-  pData(gs) <- pData(ce)[samples, ]
+  pData(gs) <- pData(ce)[samples, , drop = FALSE]
   #update markers 
-  markers.ce <- markernames(ce)
+  markers.ce <- markernames(ce)[samples]
   cols.ce <- colnames(ce)
   
   for(sn in names(markers.ce))

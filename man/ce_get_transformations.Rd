@@ -4,7 +4,7 @@
 \alias{ce_get_transformations}
 \title{Obtain the transformations associated with each channel in a Cytobank experiment}
 \usage{
-ce_get_transformations(x, ...)
+ce_get_transformations(x)
 }
 \arguments{
 \item{x}{A \code{cytobank_experiment} object}

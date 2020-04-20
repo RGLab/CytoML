@@ -64,7 +64,7 @@ flowjo_to_gatingset(
                                   If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.
 \item mc.cores \code{numeric} the number of threads to pass to the C++ parser to run in parallel
    \item transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
-\item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
+\item ...: Additional arguments to be passed to FCS parser
 }}
 
 \item{obj}{A \code{flowjo_workspace} to be parsed.}

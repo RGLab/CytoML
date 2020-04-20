@@ -4,7 +4,7 @@
 \alias{open_flowjo_xml}
 \title{Open/Close a flowJo workspace}
 \usage{
-open_flowjo_xml(file, options = 0, sample_names_from = "keyword")
+open_flowjo_xml(file, options = 0, sample_names_from = "keyword", ...)
 }
 \arguments{
 \item{file}{Full path to the XML flowJo workspace file.}

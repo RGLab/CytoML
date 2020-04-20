@@ -10,7 +10,6 @@ diva_to_gatingset(
   name = NULL,
   subset = NULL,
   path = obj@path,
-  fast = TRUE,
   worksheet = c("normal", "global"),
   swap_cols = list(`FSC-H` = "FSC-W", `SSC-H` = "SSC-W"),
   verbose = FALSE,

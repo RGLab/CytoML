@@ -57,7 +57,7 @@ setClass("flowjo_workspace",representation(doc="externalptr"))
 #' }
 #'
 #' @importFrom XML xmlTreeParse xmlAttrs xmlGetAttr xmlTreeParse xmlRoot xmlValue xpathApply
-#' @import flowCore ncdfFlow
+#' @import flowCore 
 #' @export 
 open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...){
   if("sampNloc" %in% names(list(...))){
@@ -135,7 +135,7 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #'                                            If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.
 #'          \item mc.cores \code{numeric} the number of threads to pass to the C++ parser to run in parallel
 #' 			\item transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
-#'      	\item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
+#'      	\item ...: Additional arguments to be passed to FCS parser
 #'      	}
 #' @details
 #' A flowjo_workspace is generated with a call to \code{open_flowjo_xml()}, passing the name of the xml workspace file. This returns a \code{flowjo_workspace}, which can be parsed using the \code{flowjo_to_gatingset()} method. The function can be called non-interactively by passing the index or name of the group of samples to be imported via \code{flowjo_to_gatingset(obj,name=x)}, where \code{x} is either the numeric index, or the name. 

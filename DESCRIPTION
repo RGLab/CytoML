@@ -47,7 +47,7 @@ Suggests:
     knitr,
     parallel
 VignetteBuilder: knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 BugReports: https://github.com/RGLab/CytoML/issues
 URL: https://github.com/RGLab/CytoML
 Collate: 
@@ -68,7 +68,6 @@ Collate:
     'graphGML_methods.R'
     'helperFunctions.R'
     'parameter-methods.R'
-    'parseDivaWorkspace_old.R'
     'transforms.R'
     'utils.R'
     'writeGatingML.R'

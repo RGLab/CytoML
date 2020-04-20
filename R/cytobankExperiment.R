@@ -118,6 +118,7 @@ cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
 setOldClass("cytobank_experiment")
 
 #' @export
+#' @param ... unused
 #' @method print cytobank_experiment
 print.cytobank_experiment <- function(x, ...){
   exp <- x[["experiment"]]
@@ -178,7 +179,6 @@ ce_get_samples <- function(x){
   tibble(panel = x, sample = names(x))
 }
 #' @rdname cytobank_experiment-methods
-#' @usage markernames(object)
 #' @param object A \code{cytobank_experiment} object
 #' @importFrom flowWorkspace markernames
 #' @export
@@ -199,7 +199,8 @@ setMethod("markernames",
           })
 
 #' @rdname cytobank_experiment-methods
-#' @usage colnames(object)
+#' @param do.NULL,prefix not used
+#' @param x cytobank_experiment
 #' @export
 setMethod("colnames",
           signature=signature(x="cytobank_experiment"),
@@ -232,7 +233,7 @@ get_panel_per_file <- function(ce){
 #' @return A \code{transformerList} object containing \code{transformation} objects for each
 #' transformed channel
 #' @export
-ce_get_transformations <- function(x, ...){
+ce_get_transformations <- function(x){
   chnls <- colnames(x)
   low.chnls <- tolower(chnls)
   scales <- x$experiment$scales
@@ -261,14 +262,12 @@ ce_get_transformations <- function(x, ...){
 }
 
 #' @rdname cytobank_experiment-methods
-#' @usage sampleNames(object)
 #' @export
 setMethod("sampleNames","cytobank_experiment",function(object){
   rownames(pData(object))
 })
 
 #' @rdname cytobank_experiment-methods
-#' @usage pData(object)
 #' @export
 setMethod("pData","cytobank_experiment",function(object){
   get_pd(object)

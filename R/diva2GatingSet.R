@@ -176,6 +176,14 @@ setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
 #' @name diva_to_gatingset
 #' @aliases parseWorkspace,diva_workspace-method 
 #' @param obj diva_workspace
+#' @param name sample group to be parsed, either numeric index or the group name
+#' @param subset samples to be imported. either numeric index or the sample name. Default is NULL, which imports all samples.
+#' @param worksheet select worksheet to import. either "normal" or "global"
+#' @param path the FCS data path
+#' @param swap_cols diva seems to swap some data cols during importing fcs to experiments
+#' 					this argument provide a list to tell the parser which cols to be swapped
+#' 					default is list(`FSC-H` = 'FSC-W',`SSC-H` = 'SSC-W')
+#' @param verbose whether print more messages during the parsing
 #' @param ... other arguments
 #' @importFrom utils menu
 #' @importFrom flowCore colnames<-

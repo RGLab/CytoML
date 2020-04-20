@@ -19,6 +19,20 @@ diva_to_gatingset(
 \arguments{
 \item{obj}{diva_workspace}
 
+\item{name}{sample group to be parsed, either numeric index or the group name}
+
+\item{subset}{samples to be imported. either numeric index or the sample name. Default is NULL, which imports all samples.}
+
+\item{path}{the FCS data path}
+
+\item{worksheet}{select worksheet to import. either "normal" or "global"}
+
+\item{swap_cols}{diva seems to swap some data cols during importing fcs to experiments
+this argument provide a list to tell the parser which cols to be swapped
+default is list(`FSC-H` = 'FSC-W',`SSC-H` = 'SSC-W')}
+
+\item{verbose}{whether print more messages during the parsing}
+
 \item{...}{other arguments}
 }
 \description{

@@ -176,6 +176,14 @@ setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
 #' @name diva_to_gatingset
 #' @aliases parseWorkspace,diva_workspace-method 
 #' @param obj diva_workspace
+#' @param name sample group to be parsed, either numeric index or the group name
+#' @param subset samples to be imported. either numeric index or the sample name. Default is NULL, which imports all samples.
+#' @param worksheet select worksheet to import. either "normal" or "global"
+#' @param path the FCS data path
+#' @param swap_cols diva seems to swap some data cols during importing fcs to experiments
+#' 					this argument provide a list to tell the parser which cols to be swapped
+#' 					default is list(`FSC-H` = 'FSC-W',`SSC-H` = 'SSC-W')
+#' @param verbose whether print more messages during the parsing
 #' @param ... other arguments
 #' @importFrom utils menu
 #' @importFrom flowCore colnames<-
@@ -184,7 +192,6 @@ setMethod("parseWorkspace",signature("diva_workspace"),function(obj, ...){
 diva_to_gatingset<- function(obj, name = NULL
                                     , subset = NULL
                                     , path = obj@path
-                                    , fast = TRUE
                                     , worksheet = c("normal", "global")
                                     , swap_cols = list(`FSC-H` = 'FSC-W'
                                                 , `SSC-H` = 'SSC-W') #diva seems to swap these data cols during importing fcs to experiments
@@ -241,9 +248,6 @@ diva_to_gatingset<- function(obj, name = NULL
     stop("Duplicated sample names detected within group: ", paste(sampleSelected[isDup], collapse = " "), "\n Please check if the appropriate group is selected.")
 
 
-  if(fast)
-  {
-   
     if(worksheet == "global")
     {
       message("parse the global template ...")
@@ -281,19 +285,7 @@ diva_to_gatingset<- function(obj, name = NULL
     
     gs
     
-  }else
-  {
-    message("Parsing ", nSample," samples");
-    
-    .parseDivaWorkspace_old(xmlFileName=file.path(obj@path,obj@file)
-                        ,samples = sn
-                        , groupName = group.name
-                        ,path=path
-                        ,xmlParserOption = obj@options
-                        ,ws = obj
-                        ,...)
-    
-  }
+ 
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform

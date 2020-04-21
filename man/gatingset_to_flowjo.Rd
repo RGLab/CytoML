@@ -18,6 +18,8 @@ gatingset_to_flowjo(
 
 \item{outFile}{the workspace file path to write}
 
+\item{showHidden}{whether to export hidden gates. Default is FALSE}
+
 \item{docker_img}{the docker image that does the actual work}
 
 \item{...}{other arguments passed to \code{\link{save_gs}}}

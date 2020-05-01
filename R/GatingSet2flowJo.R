@@ -71,7 +71,11 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = "w
 }
 
 check_docker_status <- function(docker_img = "wjiang2/gs-to-flowjo"){
-  errcode <- system2("command", " -v docker", stdout = FALSE)
+  if(Sys.info()["sysname"] == "Windows")
+    errcode <- system2("WHERE", "docker", stdout = FALSE)
+  else
+    errcode <- system2("command", " -v docker", stdout = FALSE)
+  
   if(errcode!=0)
     return("'docker' command is not found! ")
   

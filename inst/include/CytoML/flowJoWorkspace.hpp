@@ -60,10 +60,10 @@ struct ParseWorkspaceParameters
 	 float gate_extend_to = -4000;// the value that gate coordinates are extended to. Default is -4000. Usually this value will be automatically detected according to the real data range.
 	 unordered_map<string, vector<string>> sample_filters;
 	 string data_dir = ""; //path for FCS directory
-	 bool is_h5 = true;;
-	 bool compute_leaf_bool_node = true;
+	 FileFormat fmt = FileFormat::H5;
+	bool compute_leaf_bool_node = true;
 	 bool include_empty_tree = false;
-	 string h5_dir = fs::temp_directory_path().string();// output path for generating the h5 files
+	 string cf_dir = fs::temp_directory_path().string();// output path for generating the cytoframe files
 	 FCS_READ_PARAM fcs_read_param;
 	 unordered_map<string, compensation> compensation_map;//optional customized sample-specific compensations
 	 compensation global_comp;
@@ -214,7 +214,7 @@ public:
 
 
 		 string data_dir = config.data_dir;
-		 fs::path h5_dir = fs::path(config.h5_dir);
+		 fs::path cf_dir = fs::path(config.cf_dir);
 		 if(config.is_gating)
 		 {
 
@@ -225,7 +225,7 @@ public:
 				data_dir = path_dir_name(xml_filepath);
 				data_dir = data_dir.empty() ? "." : data_dir; 
 			}
-			h5_dir = fs::path(gsPtr->generate_h5_folder(h5_dir.string()));
+			cf_dir = fs::path(gsPtr->generate_cytoframe_folder(cf_dir.string()));
 		 }
 
 		/*
@@ -237,11 +237,11 @@ public:
 
 		if(config.num_threads <=1)
 			tbb::serial::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-				this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs);
+				this->parse_sample(sample_infos[i], config, data_dir, cf_dir, gTrans, gs);
 			});
 		else
 			tbb::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-							this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs);
+							this->parse_sample(sample_infos[i], config, data_dir, cf_dir, gTrans, gs);
 						});
 		if(gsPtr->size() == 0)
 			throw(domain_error("No samples in this workspace to parse!"));
@@ -249,7 +249,7 @@ public:
 
 		return gsPtr;
 	}
-	void parse_sample(const SampleInfo &sample_info, const ParseWorkspaceParameters & config_const, const string &data_dir, const fs::path &h5_dir, const trans_global_vec&gTrans_const, GatingSet &gs)
+	void parse_sample(const SampleInfo &sample_info, const ParseWorkspaceParameters & config_const, const string &data_dir, const fs::path &cf_dir, const trans_global_vec&gTrans_const, GatingSet &gs)
 	{
 
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -400,14 +400,25 @@ public:
 			}
 
 
-			if(config_const.is_gating&&config_const.is_h5)
+			if(config_const.is_gating&&config_const.fmt != FileFormat::MEM)
 			{
-				string h5_filename = (h5_dir/uid).string() + ".h5";
+				string cf_filename = (cf_dir/uid).string();
+				CytoFramePtr ptr;
+				if(config_const.fmt == FileFormat::H5)
 				{
+					cf_filename +=  ".h5";
 					GsMutexType::scoped_lock lock(h5Mutex);
-					frptr->write_h5(h5_filename);
-					gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename, false))));
+					frptr->write_h5(cf_filename);
+					ptr.reset(new H5CytoFrame(cf_filename, false));
+
 				}
+				else
+				{
+					cf_filename +=  ".tile";
+					frptr->write_tile(cf_filename);
+					ptr.reset(new TileCytoFrame(cf_filename, false));
+				}
+				gh->set_cytoframe_view(CytoFrameView(ptr));
 			}
 			else
 			  gh->set_cytoframe_view(CytoFrameView(frptr));

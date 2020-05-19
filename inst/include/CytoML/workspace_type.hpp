@@ -4,8 +4,6 @@
 #include "wsNode.hpp"
 #include <cytolib/global.hpp>
 
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 using namespace cytolib;
 
 
@@ -64,7 +62,7 @@ namespace CytoML
 	{
 		vector<string> paths;
 
-        for(const fs::directory_entry & i: fs::recursive_directory_iterator(fs::path(data_dir), fs::symlink_option::recurse))
+        for(const fs::directory_entry & i: fs::recursive_directory_iterator(fs::path(data_dir), fs::directory_options::follow_directory_symlink))
         {
         	if(i.path().extension().string() == ext)
         		paths.push_back(i.path().string());

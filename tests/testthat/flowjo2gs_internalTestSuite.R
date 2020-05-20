@@ -1,6 +1,16 @@
 context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
+
+test_that("Attribute redefined",{
+			skip("only run interactively due to its lengthy output that can't be suppressed")
+			wsFile <- file.path(path, "attr_redefined_err.xml")
+			expect_error(ws <- open_flowjo_xml(wsFile), "not parsed", class = "error")
+			suppressMessages(ws <- open_flowjo_xml(wsFile, options = 1))
+			expect_is(ws, "flowjo_workspace")
+			
+		})
+
 test_that("no gate",{
   
   wsFile <- file.path(path, "no-gate.wsp")

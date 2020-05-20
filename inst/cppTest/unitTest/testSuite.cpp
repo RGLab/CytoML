@@ -99,6 +99,11 @@ struct parseWorkspaceFixture{
 
 BOOST_FIXTURE_TEST_SUITE(parseWorkspace,parseWorkspaceFixture)
 
+BOOST_AUTO_TEST_CASE(redefined_error)
+{
+	auto ws = openWorkspace("../wsTestSuite/attr_redefined_err.xml", SAMPLE_NAME_LOCATION::SAMPLE_NODE, 1);
+}
+
 BOOST_AUTO_TEST_CASE(duplicatedSampleID)
 {
 	//test mem leaks

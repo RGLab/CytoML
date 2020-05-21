@@ -123,6 +123,8 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @param  keywords.source \code{character} the place where the keywords are extracted from, can be either "XML" or "FCS"
 #' @param  keyword.ignore.case a \code{logical} flag indicates whether the keywords matching needs to be case sensitive.    
 #' @param  include_empty_tree a \code{logical} whether to include samples that don't have gates.
+#' @param  skip_faulty_gate a \code{logical} whether to skip the faulty gates so that the parser can still process the rest of gating tree.
+#' 
 #' @param  greedy_match \code{logical}: By default, if flowjo_to_gatingset finds multiple FCS files matching a sample by total event count as well as sampleID and/or keywords specified by additional.keys and additional.sampleID, it will return an error listing the duplicate files.
 #'                                            If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.
 #' @param  mc.cores \code{numeric} the number of threads to pass to the C++ parser to run in parallel
@@ -185,6 +187,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
     , channel.ignore.case = FALSE
     , leaf.bool = TRUE
     , include_empty_tree = FALSE
+    , skip_faulty_gate = FALSE
     , compensation = NULL
     , transform = TRUE
 	, fcs_file_extension = ".fcs"
@@ -267,6 +270,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
                  , channel_ignore_case = channel.ignore.case
                  , leaf_bool = leaf.bool
                 , include_empty_tree = include_empty_tree
+               , skip_faulty_gate = skip_faulty_gate
                  , comps = compensation
                 , transform = transform
 		 		 , fcs_file_extension = fcs_file_extension

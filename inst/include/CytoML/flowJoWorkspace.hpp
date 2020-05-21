@@ -63,7 +63,8 @@ struct ParseWorkspaceParameters
 	 FileFormat fmt = FileFormat::H5;
 	bool compute_leaf_bool_node = true;
 	 bool include_empty_tree = false;
-	 string cf_dir = fs::temp_directory_path().string();// output path for generating the cytoframe files
+	 bool skip_faulty_node = false;
+	 string cf_dir = fs::temp_directory_path().string();// output path for generating the h5 files
 	 FCS_READ_PARAM fcs_read_param;
 	 unordered_map<string, compensation> compensation_map;//optional customized sample-specific compensations
 	 compensation global_comp;
@@ -383,7 +384,7 @@ public:
 				gh->shift_gate();
 				gh->transform_data(fr);
 				gh->extendGate(fr, config_const.gate_extend_trigger_value);
-				gh->gating(fr, 0,false, config_const.compute_leaf_bool_node);
+				gh->gating(fr, 0,false, config_const.compute_leaf_bool_node, config_const.skip_faulty_node);
 
 
 			}

@@ -2,6 +2,21 @@ context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
 
+test_that("bypass faulty node",{
+  
+  wsFile <- file.path(path, "bypassfaultynode.xml")
+  
+  ws <- open_flowjo_xml(wsFile)
+  
+  expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = file.path(path,"Cytotrol/NHLBI/Tcell/"), subset = 1), "colname not", class = "error")
+  gs <- flowjo_to_gatingset(ws, name = 4, path = file.path(path,"Cytotrol/NHLBI/Tcell/"), subset = 1, skip_faulty_gate = TRUE)
+  
+  expect_equal(length(gs_get_pop_paths(gs)), 24)
+  expect_is(gh_pop_get_count(gs[[1]], "CD3+"), "numeric")
+  expect_true(is.na(gh_pop_get_count(gs[[1]], "CD4")))
+  
+  
+})
 test_that("Attribute redefined",{
 			skip("only run interactively due to its lengthy output that can't be suppressed")
 			wsFile <- file.path(path, "attr_redefined_err.xml")

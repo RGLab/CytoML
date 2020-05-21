@@ -276,6 +276,24 @@ BOOST_AUTO_TEST_CASE(Cytotrol_NHLBI)
 	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
 
 }
+BOOST_AUTO_TEST_CASE(bypassfaultynode)
+{
+	myTest.filename="../wsTestSuite/bypassfaultynode.xml";
+	//myTest.wsType = WS_TYPE::WS_MAC;
+	myTest.config.sample_filters["name"]={"CytoTrol_CytoTrol_1.fcs"};
+	myTest.config.data_dir = "../wsTestSuite/Cytotrol/NHLBI/Tcell";
+	myTest.config.skip_faulty_node = true;
+	myTest.config.keywords_for_uid={};
+	myTest.group_id = 3;
+	myTest.archive="../output/NHLBI/gs/gs";
+//	g_loglevel = GATE_LEVEL;
+
+	parser_test(myTest);
+
+	vector<bool> isTrue(myTest.isEqual.size(), true);
+	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
+
+}
 //BOOST_AUTO_TEST_CASE(HVTN080_batch_1057) //missing fcs
 //{
 //	myTest.filename="../fjWsExamples/080 Batch 1057 M.xml";

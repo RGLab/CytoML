@@ -54,6 +54,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , bool channel_ignore_case
                                   , bool leaf_bool
 								  , bool include_empty_tree
+								  , bool skip_faulty_gate
 								  , List comps
 								  , bool transform
 								  , string fcs_file_extension
@@ -78,6 +79,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   config.channel_ignore_case = channel_ignore_case;
   config.compute_leaf_bool_node = leaf_bool;
   config.include_empty_tree = include_empty_tree;
+  config.skip_faulty_node = skip_faulty_gate;
   config.fcs_file_extension = fcs_file_extension;
   config.greedy_match = greedy_match;
   config.transform = transform;

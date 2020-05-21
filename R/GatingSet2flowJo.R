@@ -40,14 +40,14 @@ GatingSet2flowJo <- function(...){
 #' @importFrom flowWorkspace gs_clone gs_update_channels pData<- cs_unlock cs_lock gs_copy_tree_only cs_load_meta 
 #' @export
 #' @rdname gatingset_to_flowjo
-gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = "wjiang2/gs-to-flowjo", ...){
-  res <- check_docker_status(docker_img)
-  if(res!="ok")
+gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = "rglab/gs-to-flowjo", ...){
+  res <- check_binary_status()
+  if(res!="binary_ok"){
+    res <- check_docker_status(docker_img)
+  }
+  
+  if(!(res %in% c("binary_ok", "docker_ok")))
     stop(res)
-  v1 <- packageVersion("cytolib")
-  v2 <- system2("docker", paste0("run ", docker_img, " --cytolib-version"), stdout = TRUE)
-  if(v1!=v2)
-    warning("docker image '", docker_img, "' is built with different cytolib version of from R package: ", v2, " vs ", v1)
   
   if(is(gs, "GatingSet"))
   {
@@ -57,20 +57,32 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = "w
   }else
     tmp <- gs
   
-  res <- suppressWarnings(system2("docker"
-                                  , paste0("run"
-                                           , " -v ", tmp, ":/gs"
-                                           , " -v ", normalizePath(dirname(outFile)), ":/out "
-                                           , docker_img
-                                           , " --src=/gs --dest=/out/", basename(outFile)
-                                           , " --showHidden=", showHidden)
-                                  , stderr = TRUE)
-                          )
+  if(res=="binary_ok"){
+    res <- suppressWarnings(system2("gs-to-flowjo", paste0(" --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden), stderr = TRUE))
+  }else{
+    v1 <- packageVersion("cytolib")
+    v2 <- system2("docker", paste0("run ", docker_img, " --cytolib-version"), stdout = TRUE)
+    if(v1!=v2)
+      warning("docker image '", docker_img, "' is built with different cytolib version of from R package: ", v2, " vs ", v1)
+    
+    
+    
+    res <- suppressWarnings(system2("docker"
+                                    , paste0("run"
+                                             , " -v ", tmp, ":/gs"
+                                             , " -v ", normalizePath(dirname(outFile)), ":/out "
+                                             , docker_img
+                                             , " --src=/gs --dest=/out/", basename(outFile)
+                                             , " --showHidden=", showHidden)
+                                    , stderr = TRUE)
+    )
+  }
+
   if(length(res) > 0)
     stop(res)
 }
 
-check_docker_status <- function(docker_img = "wjiang2/gs-to-flowjo"){
+check_docker_status <- function(docker_img = "rglab/gs-to-flowjo"){
   if(Sys.info()["sysname"] == "Windows")
     errcode <- system2("WHERE", "docker", stdout = FALSE)
   else
@@ -86,7 +98,18 @@ check_docker_status <- function(docker_img = "wjiang2/gs-to-flowjo"){
   
   errcode <- system2("docker", paste0("  image inspect ", docker_img), stdout = FALSE, stderr = FALSE)
   if(errcode!=0)
-    return(paste0("docker image '", docker_img, "' is present! "))
+    return(paste0("docker image '", docker_img, "' is not present! "))
   
-  return("ok")
+  return("docker_ok")
+}
+
+check_binary_status <- function(){
+  if(Sys.info()["sysname"] == "Windows")
+    errcode <- suppressWarnings(system2("WHERE", "gs-to-flowjo", stdout = FALSE))
+  else
+    errcode <- suppressWarnings(system2("command", " -v gs-to-flowjo", stdout = FALSE))
+  if(errcode!=0)
+    return(paste0("gs-to-flowjo binary is not present"))
+  
+  return("binary_ok")
 }

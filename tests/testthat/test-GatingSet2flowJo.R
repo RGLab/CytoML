@@ -1,5 +1,5 @@
 context("gatingset_to_flowjo ..")
-skip_if_not(check_docker_status()=="ok")
+skip_if_not((check_docker_status()=="docker_ok" || check_binary_status()=="binary_ok"))
 test_that("autogating--tcell", {
   
   dataDir <- system.file("extdata",package="flowWorkspaceData")

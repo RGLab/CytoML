@@ -99,6 +99,11 @@ struct parseWorkspaceFixture{
 
 BOOST_FIXTURE_TEST_SUITE(parseWorkspace,parseWorkspaceFixture)
 
+BOOST_AUTO_TEST_CASE(redefined_error)
+{
+	auto ws = openWorkspace("../wsTestSuite/attr_redefined_err.xml", SAMPLE_NAME_LOCATION::SAMPLE_NODE, 1);
+}
+
 BOOST_AUTO_TEST_CASE(duplicatedSampleID)
 {
 	//test mem leaks
@@ -260,6 +265,24 @@ BOOST_AUTO_TEST_CASE(Cytotrol_NHLBI)
 	//myTest.wsType = WS_TYPE::WS_MAC;
 	myTest.config.sample_filters["name"]={"CytoTrol_CytoTrol_1.fcs"};
 	myTest.config.data_dir = "../wsTestSuite/Cytotrol/NHLBI/Tcell";
+	myTest.config.keywords_for_uid={};
+	myTest.group_id = 3;
+	myTest.archive="../output/NHLBI/gs/gs";
+//	g_loglevel = GATE_LEVEL;
+
+	parser_test(myTest);
+
+	vector<bool> isTrue(myTest.isEqual.size(), true);
+	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
+
+}
+BOOST_AUTO_TEST_CASE(bypassfaultynode)
+{
+	myTest.filename="../wsTestSuite/bypassfaultynode.xml";
+	//myTest.wsType = WS_TYPE::WS_MAC;
+	myTest.config.sample_filters["name"]={"CytoTrol_CytoTrol_1.fcs"};
+	myTest.config.data_dir = "../wsTestSuite/Cytotrol/NHLBI/Tcell";
+	myTest.config.skip_faulty_node = true;
 	myTest.config.keywords_for_uid={};
 	myTest.group_id = 3;
 	myTest.archive="../output/NHLBI/gs/gs";

@@ -28,6 +28,7 @@ flowjo_to_gatingset(
   channel.ignore.case = FALSE,
   leaf.bool = TRUE,
   include_empty_tree = FALSE,
+  skip_faulty_gate = FALSE,
   compensation = NULL,
   transform = TRUE,
   fcs_file_extension = ".fcs",
@@ -81,6 +82,8 @@ But when the gates needs to be extended without loading the raw data (i.e. \code
 If needed, they can be calculated by calling \code{recompute} method at later stage.}
 
 \item{include_empty_tree}{a \code{logical} whether to include samples that don't have gates.}
+
+\item{skip_faulty_gate}{a \code{logical} whether to skip the faulty gates so that the parser can still process the rest of gating tree.}
 
 \item{compensation}{a \code{compensation} object, matrix or data.frame or a list of these objects that allow the customized compensation () to be used instead of the one specified in flowJo workspace or FCS file.
 When it is a list, its names is supposed to be matched to sample guids (Default is the fcs filename suffixed by $TOT. See "additional.keys" arguments for details of guids)

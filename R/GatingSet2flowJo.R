@@ -12,7 +12,7 @@ GatingSet2flowJo <- function(...){
 #' Convert a GatingSet to flowJo workspace 
 #' 
 #' It is a R wrapper for the docker app
-#' (https://hub.docker.com/r/wjiang2/gs-to-flowjo)
+#' (https://hub.docker.com/r/rglab/gs-to-flowjo)
 #'
 #' @name gatingset_to_flowjo
 #' @aliases GatingSet2flowJo

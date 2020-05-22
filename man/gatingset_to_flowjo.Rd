@@ -9,7 +9,7 @@ gatingset_to_flowjo(
   gs,
   outFile,
   showHidden = FALSE,
-  docker_img = "wjiang2/gs-to-flowjo",
+  docker_img = "rglab/gs-to-flowjo",
   ...
 )
 }
@@ -29,7 +29,7 @@ nothing
 }
 \description{
 It is a R wrapper for the docker app
-(https://hub.docker.com/r/wjiang2/gs-to-flowjo)
+(https://hub.docker.com/r/rglab/gs-to-flowjo)
 }
 \examples{
 \dontrun{

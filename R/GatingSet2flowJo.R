@@ -75,6 +75,9 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = NU
   }else
     tmp <- gs
   
+  # Handle spaces in file path by expanding to absolute path and escaping spaces
+  outFile <- gsub(" ", "\\\\ ", file.path(normalizePath(dirname(outFile)), basename(outFile)))
+  
   if(res[1]=="binary_ok"){
     message("Using local gs-to-flowjo binary to write FlowJo workspace...")
     res <- suppressWarnings(system2("gs-to-flowjo", paste0(" --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden), stderr = TRUE))

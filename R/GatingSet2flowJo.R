@@ -22,6 +22,24 @@ GatingSet2flowJo <- function(...){
 #' @param docker_img the docker image that does the actual work
 #' @param ... other arguments passed to \code{\link{save_gs}}
 #' @return nothing
+#' 
+#' @details 
+#' Docker images for \code{gatingset_to_flowjo} will be maintained at https://hub.docker.com/r/rglab/gs-to-flowjo for the \code{cytolib} 
+#' package version accompanying each Bioconductor release, as well as a "devel" tagged image for use with the current GitHub development 
+#' braches of the RGLab cytometry packages.
+#' 
+#' If you are using CytoML from a Bioconductor release, please pull docker image corresponding to the major and minor version returned from
+#' \code{packageVersion("cytolib")}, For example, if \code{packageVersion("cytolib")} returns \code{2.0.2}, you should use:
+#' 
+#' \code{docker pull rglab/gs-to-flowjo:2.0}
+#' 
+#' If you are using CytoML from the current GitHub development branch ("master" branch), please pull the "devel" tagged image. For example:
+#' 
+#' \code{docker pull rglab/gs-to-flowjo:devel}
+#' 
+#' You may also specify a particular docker image and tag via the \code{docker_img} argument. If not provided, \code{gatingset_to_flowjo} will
+#' search for the correct default image corresponding to your \code{cytolib} version.
+#' 
 #' @examples
 #' \dontrun{
 #' library(flowWorkspace)
@@ -40,13 +58,13 @@ GatingSet2flowJo <- function(...){
 #' @importFrom flowWorkspace gs_clone gs_update_channels pData<- cs_unlock cs_lock gs_copy_tree_only cs_load_meta 
 #' @export
 #' @rdname gatingset_to_flowjo
-gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = "rglab/gs-to-flowjo", ...){
+gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = NULL, ...){
   res <- check_binary_status()
   if(res!="binary_ok"){
     res <- check_docker_status(docker_img)
   }
   
-  if(!(res %in% c("binary_ok", "docker_ok")))
+  if(!(res[1] %in% c("binary_ok", "docker_ok")))
     stop(res)
   
   if(is(gs, "GatingSet"))
@@ -57,16 +75,18 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = "r
   }else
     tmp <- gs
   
-  if(res=="binary_ok"){
+  if(res[1]=="binary_ok"){
+    message("Using local gs-to-flowjo binary to write FlowJo workspace...")
     res <- suppressWarnings(system2("gs-to-flowjo", paste0(" --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden), stderr = TRUE))
   }else{
+    docker_img <- res[2] # The validated image name from check_docker_status()
     v1 <- packageVersion("cytolib")
     v2 <- system2("docker", paste0("run ", docker_img, " --cytolib-version"), stdout = TRUE)
     if(v1!=v2)
       warning("docker image '", docker_img, "' is built with different cytolib version of from R package: ", v2, " vs ", v1)
     
     
-    
+    message(paste0("Using docker image ", docker_img, " to write FlowJo workspace..."))
     res <- suppressWarnings(system2("docker"
                                     , paste0("run"
                                              , " -v ", tmp, ":/gs"
@@ -82,7 +102,7 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = "r
     stop(res)
 }
 
-check_docker_status <- function(docker_img = "rglab/gs-to-flowjo"){
+check_docker_status <- function(docker_img = NULL){
   if(Sys.info()["sysname"] == "Windows")
     errcode <- system2("WHERE", "docker", stdout = FALSE)
   else
@@ -95,12 +115,40 @@ check_docker_status <- function(docker_img = "rglab/gs-to-flowjo"){
   if(errcode!=0)
     return("'docker' is not running properly! ")
   
+  # Determine proper default image for this cytolib version
+  if(is.null(docker_img)){
+    base_img <- "rglab/gs-to-flowjo"
+    
+    # strip last patch numbers
+    cytolib_minor_version <- gsub("\\.[^.]*$", "", packageVersion("cytolib"))
+    
+    # First try to match cytolib minor version directly to image name
+    docker_version_match <- system2("docker", paste0("  image inspect ", paste0(base_img, ":", cytolib_minor_version)), stdout = FALSE, stderr = FALSE)
+    if(docker_version_match==0){
+      docker_img <- paste0(base_img, ":", cytolib_minor_version)
+    }else{
+    # Otherwise, check for devel tagged image and see if that minor version matches
+      devel_img <- paste0(base_img, ":devel")
+      if(system2("docker", paste0("  image inspect ", devel_img), stdout = FALSE, stderr = FALSE) == 0){
+        devel_img_version <- system2("docker", paste0("run ", devel_img, " --cytolib-version"), stdout = TRUE)
+        if(gsub("\\.[^.]*$", "", devel_img_version) == cytolib_minor_version)
+          docker_img <- devel_img
+      }
+    }
+  }
   
-  errcode <- system2("docker", paste0("  image inspect ", docker_img), stdout = FALSE, stderr = FALSE)
-  if(errcode!=0)
-    return(paste0("docker image '", docker_img, "' is not present! "))
+  if(is.null(docker_img)){
+    # Search for a valid default image failed
+    return(paste0("No default docker image found matching cytolib version ", packageVersion("cytolib"), ".\n",
+                  "Please see help(gatingset_to_flowjo) about pulling the appropriate docker image."))
+  }else{
+    # Try candidate image
+    errcode <- system2("docker", paste0("  image inspect ", docker_img), stdout = FALSE, stderr = FALSE)
+    if(errcode!=0)
+      return(paste0("docker image '", docker_img, "' is not present! "))
+  }
   
-  return("docker_ok")
+  return(c("docker_ok", docker_img))
 }
 
 check_binary_status <- function(){

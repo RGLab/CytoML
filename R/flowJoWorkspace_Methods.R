@@ -171,6 +171,7 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @export 
 #' @importFrom utils menu
 #' @importFrom RcppParallel RcppParallelLibs
+#' @importFrom dplyr enquo
 flowjo_to_gatingset <- function(ws, name = NULL
     , subset = list()
     , execute = TRUE
@@ -214,9 +215,26 @@ flowjo_to_gatingset <- function(ws, name = NULL
   }
   
   #parse the filter
-  subset <- try(eval(substitute(subset)), silent = TRUE)
-  if(class(subset) == "try-error")
+  subset_parsed <- try(eval(substitute(subset)), silent = TRUE)
+  if(class(subset_parsed) == "try-error"){
+    # Try evaluating the subset arg as an expression for filtering
+    # based on keywords
+    samples_in_group <- fj_ws_get_samples(ws, groupInd)
+    subset_parsed <- try({
+      keys <- lapply(samples_in_group$sampleID, function(sid){
+        unlist(fj_ws_get_keywords(ws, sid)[keywords])
+      })
+      keys <- data.frame(do.call(rbind, keys), check.names = FALSE)
+      keys <- cbind(samples_in_group[,c("sampleID", "name")], keys)
+      # Pull the sample names that pass the filter
+      filter(keys, !!enquo(subset))$name
+      })
+  }
+  if(class(subset_parsed) == "try-error")
     stop("invalid 'subset' argument!")
+  
+  subset <- subset_parsed
+
   if(is(subset, "numeric"))#convert numeric index to sample names
   {
     subset <- as.character(fj_ws_get_samples(ws, groupInd)[subset, "name"])

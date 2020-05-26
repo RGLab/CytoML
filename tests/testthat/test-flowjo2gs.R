@@ -161,11 +161,10 @@ test_that("parse pData from keyword", {
 
 
 test_that("subset", {
-
-    #TODO:subset by keyword  
-    expect_error(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4
-                                                                , subset = `TUBE NAME` %in% c("CytoTrol_1", "CytoTrol_2")
-                                                                , keywords = "TUBE NAME", execute = F), "invalid")
+  
+    dd <- capture.output(suppressMessages(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4
+                                          , subset = `TUBE NAME` %in% c("CytoTrol_1", "CytoTrol_2")
+                                          , keywords = "TUBE NAME", execute = F)))
     #subset by sample names
     dd <- capture.output(suppressMessages(gs2 <- flowjo_to_gatingset(ws, path = dataDir, name = 4
                                                                 , subset = c("CytoTrol_CytoTrol_1.fcs", "CytoTrol_CytoTrol_2.fcs")
@@ -178,6 +177,7 @@ test_that("subset", {
                                                                  , subset = 1:2
                                                                  , keywords = "TUBE NAME"
                                                                  , execute = F))))
+    expect_equivalent(pData(gs1), pData(gs2))
     expect_equivalent(pData(gs2), pData(gs3))
     
     expect_error(gs4 <- flowjo_to_gatingset(ws, path = dataDir, name = 4

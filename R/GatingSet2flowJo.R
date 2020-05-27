@@ -58,6 +58,7 @@ GatingSet2flowJo <- function(...){
 #' @importFrom flowWorkspace gs_clone gs_update_channels pData<- cs_unlock cs_lock gs_copy_tree_only cs_load_meta 
 #' @export
 #' @rdname gatingset_to_flowjo
+#' @importFrom xml2 read_xml write_xml
 gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = NULL, ...){
   res <- check_binary_status()
   if(res!="binary_ok"){
@@ -77,10 +78,10 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = NU
   
   # Handle spaces in file path by expanding to absolute path and escaping spaces
   outFile <- gsub(" ", "\\\\ ", file.path(normalizePath(dirname(outFile)), basename(outFile)))
-  
+  tmpfile <- tempfile()
   if(res[1]=="binary_ok"){
     message("Using local gs-to-flowjo binary to write FlowJo workspace...")
-    res <- suppressWarnings(system2("gs-to-flowjo", paste0(" --src=", tmp, " --dest=", outFile, " --showHidden=", showHidden), stderr = TRUE))
+    res <- suppressWarnings(system2("gs-to-flowjo", paste0(" --src=", tmp, " --dest=", tmpfile, " --showHidden=", showHidden), stderr = TRUE))
   }else{
     docker_img <- res[2] # The validated image name from check_docker_status()
     v1 <- packageVersion("cytolib")
@@ -93,9 +94,9 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = NU
     res <- suppressWarnings(system2("docker"
                                     , paste0("run"
                                              , " -v ", tmp, ":/gs"
-                                             , " -v ", normalizePath(dirname(outFile)), ":/out "
+                                             , " -v ", normalizePath(dirname(tmpfile)), ":/out "
                                              , docker_img
-                                             , " --src=/gs --dest=/out/", basename(outFile)
+                                             , " --src=/gs --dest=/out/", basename(tmpfile)
                                              , " --showHidden=", showHidden)
                                     , stderr = TRUE)
     )
@@ -103,8 +104,24 @@ gatingset_to_flowjo <- function(gs, outFile, showHidden = FALSE, docker_img = NU
 
   if(length(res) > 0)
     stop(res)
+  else
+  {
+    tree <- read_xml(tmpfile)
+    add_version_info(tree) 
+    invisible(write_xml(tree, file = outFile))
+    
+  }
+  
 }
 
+#' @importFrom xml2 xml_comment xml_add_sibling
+add_version_info <- function(tree)
+{
+  info <- Sys.info()
+  xml_add_sibling(tree, xml_comment(paste0("CytoML-version: ", packageVersion("CytoML"))), .where = "before")
+  xml_add_sibling(tree, xml_comment(paste0("hostname: ", info[["nodename"]])), .where = "before")
+  xml_add_sibling(tree,  xml_comment(paste0("user: ", info[["user"]])), .where = "before")
+}
 check_docker_status <- function(docker_img = NULL){
   if(Sys.info()["sysname"] == "Windows")
     errcode <- system2("WHERE", "docker", stdout = FALSE)

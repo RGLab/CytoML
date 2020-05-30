@@ -221,7 +221,7 @@ void parser_test(testCase & myTest){
 
 		unique_ptr<flowJoWorkspace> ws = openWorkspace(myTest.filename, myTest.sample_name_location,myTest.xmlParserOption);
 		double start = gettime();
-		gs = ws->to_GatingSet(myTest.group_id, myTest.config);
+		gs = ws->to_GatingSet(myTest.group_id, myTest.config, myTest.cytoset);
 
 		double runtime = (gettime() - start);
 		cout << "ws->to_GatingSet: " << runtime << endl;

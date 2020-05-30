@@ -21,8 +21,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // parse_workspace
-XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws, int group_id, List subset, bool execute, string path, string h5_dir, bool includeGates, vector<string> additional_keys, bool additional_sampleID, vector<string> keywords, bool is_pheno_data_from_FCS, bool keyword_ignore_case, float extend_val, float extend_to, bool channel_ignore_case, bool leaf_bool, bool include_empty_tree, bool skip_faulty_gate, List comps, bool transform, string fcs_file_extension, bool greedy_match, FCS_READ_PARAM fcs_parse_arg, int num_threads);
-RcppExport SEXP _CytoML_parse_workspace(SEXP wsSEXP, SEXP group_idSEXP, SEXP subsetSEXP, SEXP executeSEXP, SEXP pathSEXP, SEXP h5_dirSEXP, SEXP includeGatesSEXP, SEXP additional_keysSEXP, SEXP additional_sampleIDSEXP, SEXP keywordsSEXP, SEXP is_pheno_data_from_FCSSEXP, SEXP keyword_ignore_caseSEXP, SEXP extend_valSEXP, SEXP extend_toSEXP, SEXP channel_ignore_caseSEXP, SEXP leaf_boolSEXP, SEXP include_empty_treeSEXP, SEXP skip_faulty_gateSEXP, SEXP compsSEXP, SEXP transformSEXP, SEXP fcs_file_extensionSEXP, SEXP greedy_matchSEXP, SEXP fcs_parse_argSEXP, SEXP num_threadsSEXP) {
+XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws, int group_id, List subset, bool execute, string path, XPtr<GatingSet> cytoset, string h5_dir, bool includeGates, vector<string> additional_keys, bool additional_sampleID, vector<string> keywords, bool is_pheno_data_from_FCS, bool keyword_ignore_case, float extend_val, float extend_to, bool channel_ignore_case, bool leaf_bool, bool include_empty_tree, bool skip_faulty_gate, List comps, bool transform, string fcs_file_extension, bool greedy_match, FCS_READ_PARAM fcs_parse_arg, int num_threads);
+RcppExport SEXP _CytoML_parse_workspace(SEXP wsSEXP, SEXP group_idSEXP, SEXP subsetSEXP, SEXP executeSEXP, SEXP pathSEXP, SEXP cytosetSEXP, SEXP h5_dirSEXP, SEXP includeGatesSEXP, SEXP additional_keysSEXP, SEXP additional_sampleIDSEXP, SEXP keywordsSEXP, SEXP is_pheno_data_from_FCSSEXP, SEXP keyword_ignore_caseSEXP, SEXP extend_valSEXP, SEXP extend_toSEXP, SEXP channel_ignore_caseSEXP, SEXP leaf_boolSEXP, SEXP include_empty_treeSEXP, SEXP skip_faulty_gateSEXP, SEXP compsSEXP, SEXP transformSEXP, SEXP fcs_file_extensionSEXP, SEXP greedy_matchSEXP, SEXP fcs_parse_argSEXP, SEXP num_threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,6 +31,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type subset(subsetSEXP);
     Rcpp::traits::input_parameter< bool >::type execute(executeSEXP);
     Rcpp::traits::input_parameter< string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< XPtr<GatingSet> >::type cytoset(cytosetSEXP);
     Rcpp::traits::input_parameter< string >::type h5_dir(h5_dirSEXP);
     Rcpp::traits::input_parameter< bool >::type includeGates(includeGatesSEXP);
     Rcpp::traits::input_parameter< vector<string> >::type additional_keys(additional_keysSEXP);
@@ -50,7 +51,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type greedy_match(greedy_matchSEXP);
     Rcpp::traits::input_parameter< FCS_READ_PARAM >::type fcs_parse_arg(fcs_parse_argSEXP);
     Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(parse_workspace(ws, group_id, subset, execute, path, h5_dir, includeGates, additional_keys, additional_sampleID, keywords, is_pheno_data_from_FCS, keyword_ignore_case, extend_val, extend_to, channel_ignore_case, leaf_bool, include_empty_tree, skip_faulty_gate, comps, transform, fcs_file_extension, greedy_match, fcs_parse_arg, num_threads));
+    rcpp_result_gen = Rcpp::wrap(parse_workspace(ws, group_id, subset, execute, path, cytoset, h5_dir, includeGates, additional_keys, additional_sampleID, keywords, is_pheno_data_from_FCS, keyword_ignore_case, extend_val, extend_to, channel_ignore_case, leaf_bool, include_empty_tree, skip_faulty_gate, comps, transform, fcs_file_extension, greedy_match, fcs_parse_arg, num_threads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -114,7 +115,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_CytoML_open_workspace", (DL_FUNC) &_CytoML_open_workspace, 3},
-    {"_CytoML_parse_workspace", (DL_FUNC) &_CytoML_parse_workspace, 24},
+    {"_CytoML_parse_workspace", (DL_FUNC) &_CytoML_parse_workspace, 25},
     {"_CytoML_get_keywords_by_id", (DL_FUNC) &_CytoML_get_keywords_by_id, 2},
     {"_CytoML_get_keywords_by_name", (DL_FUNC) &_CytoML_get_keywords_by_name, 2},
     {"_CytoML_get_sample_groups", (DL_FUNC) &_CytoML_get_sample_groups, 1},

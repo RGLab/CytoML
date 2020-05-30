@@ -218,7 +218,7 @@ void parser_test(testCase & myTest){
 	else
 	{
 		unique_ptr<flowJoWorkspace> ws = openWorkspace(myTest.filename, myTest.sample_name_location,myTest.xmlParserOption);
-		gs = ws->to_GatingSet(myTest.group_id, myTest.config);
+		gs = ws->to_GatingSet(myTest.group_id, myTest.config, myTest.cytoset);
 	}
 
 

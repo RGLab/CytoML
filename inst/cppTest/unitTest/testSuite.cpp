@@ -99,10 +99,10 @@ struct parseWorkspaceFixture{
 
 BOOST_FIXTURE_TEST_SUITE(parseWorkspace,parseWorkspaceFixture)
 
-BOOST_AUTO_TEST_CASE(redefined_error)
-{
-	auto ws = openWorkspace("../wsTestSuite/attr_redefined_err.xml", SAMPLE_NAME_LOCATION::SAMPLE_NODE, 1);
-}
+//BOOST_AUTO_TEST_CASE(redefined_error)
+//{
+//	auto ws = openWorkspace("../wsTestSuite/attr_redefined_err.xml", SAMPLE_NAME_LOCATION::SAMPLE_NODE, 1);
+//}
 
 BOOST_AUTO_TEST_CASE(duplicatedSampleID)
 {
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(ManuallyIncludedSamples)
 	myTest.filename="../wsTestSuite/ManuallyIncludedSamples.wsp";
 	myTest.config.is_gating = false;
 	unique_ptr<flowJoWorkspace> ws = openWorkspace(myTest.filename, myTest.sample_name_location,myTest.xmlParserOption);
-	unique_ptr<GatingSet> gs = ws->to_GatingSet(2, myTest.config);
+	unique_ptr<GatingSet> gs = ws->to_GatingSet(2, myTest.config, myTest.cytoset);
 	BOOST_CHECK_EQUAL(gs->size(), 10);
 
 }
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(flog_PnE_space)
 
 	myTest.config.fcs_read_param.data.which_lines = {1000};
 	unique_ptr<flowJoWorkspace> ws = openWorkspace(myTest.filename, myTest.sample_name_location,myTest.xmlParserOption);
-	unique_ptr<GatingSet> gs = ws->to_GatingSet(0, myTest.config);
+	unique_ptr<GatingSet> gs = ws->to_GatingSet(0, myTest.config, myTest.cytoset);
 	BOOST_CHECK_EQUAL(gs->begin()->second->get_cytoframe_view().n_rows(), 1000);
 
 	myTest.archive="../output/flog_PnE/gs";
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(flog_PnE)
 
 	myTest.config.fcs_read_param.data.which_lines = {1000};
 	unique_ptr<flowJoWorkspace> ws = openWorkspace(myTest.filename, myTest.sample_name_location,myTest.xmlParserOption);
-	unique_ptr<GatingSet> gs = ws->to_GatingSet(0, myTest.config);
+	unique_ptr<GatingSet> gs = ws->to_GatingSet(0, myTest.config, myTest.cytoset);
 	BOOST_CHECK_EQUAL(gs->begin()->second->get_cytoframe_view().n_rows(), 1000);
 
 	myTest.archive="../output/flog_PnE/gs";
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(PBMC_Blomberg)
 }
 BOOST_AUTO_TEST_CASE(ITN029ST)
 {
-	myTest.filename="../fjWsExamples/QA_template.xml";
+	myTest.filename="../wsTestSuite/ITN029ST/QA_template.xml";
 	//myTest.wsType = WS_TYPE::WS_MAC;
 	myTest.config.sample_filters["name"]={"01107122_F11_I003.fcs", "01177007_F02_I016.fcs"};
 	myTest.archive="../output//ITN/gs";
@@ -263,13 +263,26 @@ BOOST_AUTO_TEST_CASE(Cytotrol_NHLBI)
 {
 	myTest.filename="../wsTestSuite/Cytotrol/NHLBI/flowJo/NHLBI.xml";
 	//myTest.wsType = WS_TYPE::WS_MAC;
-	myTest.config.sample_filters["name"]={"CytoTrol_CytoTrol_1.fcs"};
+	auto sn = "CytoTrol_CytoTrol_1.fcs";
+	myTest.config.sample_filters["name"]={sn};
 	myTest.config.data_dir = "../wsTestSuite/Cytotrol/NHLBI/Tcell";
 	myTest.config.keywords_for_uid={};
 	myTest.group_id = 3;
 	myTest.archive="../output/NHLBI/gs/gs";
 //	g_loglevel = GATE_LEVEL;
 
+//	myTest.cytoset = GatingSet(list_files("../wsTestSuite/flin/fcs", ".fcs"));
+	auto cs = GatingSet(list_files(myTest.config.data_dir, ".fcs"));
+	//creating view
+	auto channels = cs.get_channels();
+	//load file with redundant channel
+	auto cv = CytoFrameView(CytoFramePtr(
+			new H5CytoFrame("../wsTestSuite/Cytotrol/NHLBI/CytoTrol_CytoTrol_1_redudant.fcs"
+					, myTest.config.fcs_read_param, "/tmp/t.h5")));
+	cv.cols_(channels, ColType::channel);
+	cs.getGatingHierarchy(sn)->set_cytoframe_view(cv);
+
+	myTest.cytoset = cs;
 	parser_test(myTest);
 
 	vector<bool> isTrue(myTest.isEqual.size(), true);
@@ -460,7 +473,7 @@ BOOST_AUTO_TEST_CASE(treg)
  */
 BOOST_AUTO_TEST_CASE(provide)
 {
-	myTest.filename="../wsTestSuite/PROVIDE/batch1 local and week 53.wsp";
+	myTest.filename="../wsTestSuite/PROVIDE/count_corrected.wsp";
 	//myTest.wsType = WS_TYPE::WS_VX;
 	myTest.config.sample_filters["name"]= {"1097pi_cells_found_normalized.fcs"};
 	myTest.sample_name_location=SAMPLE_NAME_LOCATION::SAMPLE_NODE;

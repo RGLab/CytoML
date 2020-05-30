@@ -42,6 +42,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , List subset
                                   , bool execute
                                   , string path
+								  , XPtr<GatingSet> cytoset
                                   , string h5_dir
                                   , bool includeGates
                                   , vector<string> additional_keys
@@ -109,7 +110,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   else
 	  config.compensation_map = list_to_comps(comps);
 
-  unique_ptr<GatingSet> gs = ws->to_GatingSet(group_id, config);
+  unique_ptr<GatingSet> gs = ws->to_GatingSet(group_id, config, *cytoset);
   return XPtr<GatingSet>(gs.release());
 }
 

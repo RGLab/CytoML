@@ -14,7 +14,7 @@
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
-
+#include "search_sample.hpp"
 #define TBB_PREVIEW_SERIAL_SUBSET 1
 
 //solve windows build issues
@@ -33,46 +33,7 @@ using namespace tbb;
 namespace CytoML
 {
 
-struct SampleInfo{
-	int sample_id;
-	string sample_name;
-	int total_event_count;
-	int population_count;
-	compensation comp;
-	wsSampleNode sample_node;
-	KEY_WORDS keywords;
-};
-struct SampleGroup{
-	string group_name;
-	vector<int> sample_ids;
-};
-struct ParseWorkspaceParameters
-{
-	 bool is_gating = true;; // whether to load FCS data and perform gating
-	 bool is_parse_gate = true;; // whether to parse the gates, can be turned off for parsing pop stats only
-	 bool is_pheno_data_from_FCS = false;; // whether to extract keywords for pdata from FCS or workspace
-	 vector<string> keywords_for_pheno_data = {}; // the keywords to be extracted as pdata for cytoframe
-	 vector<string> keywords_for_uid= {"$TOT"};  // keywords to be used along with sample name for constructing sample uid
-	 bool keywords_for_uid_sampleID = false;
-	 bool keyword_ignore_case = false;; // whether to ignore letter case when extract keywords for pdata (can be turned off when the letter case are not consistent across samples)
-	 bool channel_ignore_case = false;; //  whether the colnames(channel names) matching needs to be case sensitive (e.g. compensation, gating..)
-	 float gate_extend_trigger_value = 0; //the threshold that determine wether the gates need to be extended. default is 0. It is triggered when gate coordinates are below this value.
-	 float gate_extend_to = -4000;// the value that gate coordinates are extended to. Default is -4000. Usually this value will be automatically detected according to the real data range.
-	 unordered_map<string, vector<string>> sample_filters;
-	 string data_dir = ""; //path for FCS directory
-	 bool is_h5 = true;;
-	 bool compute_leaf_bool_node = true;
-	 bool include_empty_tree = false;
-	 bool skip_faulty_node = false;
-	 string h5_dir = fs::temp_directory_path().string();// output path for generating the h5 files
-	 FCS_READ_PARAM fcs_read_param;
-	 unordered_map<string, compensation> compensation_map;//optional customized sample-specific compensations
-	 compensation global_comp;
-	 string fcs_file_extension = ".fcs";
-	 bool greedy_match = false;
-	 bool transform = true;
-	 int num_threads = 1;
-};
+
 typedef tbb::spin_mutex GsMutexType;
 
 class flowJoWorkspace:public workspace{
@@ -181,7 +142,7 @@ public:
 
 	 }
 
-	unique_ptr<GatingSet> to_GatingSet(unsigned group_id, ParseWorkspaceParameters config)
+	unique_ptr<GatingSet> to_GatingSet(unsigned group_id, ParseWorkspaceParameters config, GatingSet & cytoset)
 	{
 		if(config.is_gating)
 		{
@@ -212,12 +173,24 @@ public:
 			 gTrans=getGlobalTrans();
 
 		 }
-
+		 if(cytoset.size()>0)
+		 {
+			 if(cytoset.begin()->second->get_cytoframe_view_ref().get_h5_file_path()=="")
+				throw(domain_error("In-memory cytoset is not supported!"));
+		 }
 
 		 string data_dir = config.data_dir;
 		 fs::path h5_dir = fs::path(config.h5_dir);
 		 if(config.is_gating)
 		 {
+			 if(!config.is_h5)
+			 {
+				 if(cytoset.size()>0)
+				 {
+					 config.is_h5 = true;
+					 PRINT("GatingSet is set to disk-based backend because cytoset is supplied as data input! \n");
+				 }
+			 }
 
 			if(data_dir == "")
 			{
@@ -238,28 +211,46 @@ public:
 
 		if(config.num_threads <=1)
 			tbb::serial::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-				this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs);
+				this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs, cytoset);
 			});
 		else
 			tbb::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-							this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs);
+							this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs, cytoset);
 						});
 		if(gsPtr->size() == 0)
 			throw(domain_error("No samples in this workspace to parse!"));
+		//keep the cs in sync with backend file
+		if(cytoset.size()>0)
+		{
+			for(auto i : cytoset)
+			{
+				//reload to ensure the old view is purged
+				auto uri = i.second->get_cytoframe_view_ref().get_h5_file_path();
+				i.second->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(uri))));
+			}
 
+		}
 
 		return gsPtr;
 	}
-	void parse_sample(const SampleInfo &sample_info, const ParseWorkspaceParameters & config_const, const string &data_dir, const fs::path &h5_dir, const trans_global_vec&gTrans_const, GatingSet &gs)
+	void parse_sample(const SampleInfo &sample_info
+			, const ParseWorkspaceParameters & config_const
+			, const string &data_dir, const fs::path &h5_dir
+			, const trans_global_vec&gTrans_const
+			, GatingSet &gs
+			, GatingSet & cytoset)
 	{
 
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			COUT<<endl<<"... start parsing sample: "<< sample_info.sample_name <<"... "<<endl;
+		FlowJoSampleSearch fjsearch;
 		//generate uid
-		string ws_key_seq = concatenate_keywords(sample_info.keywords, config_const.keywords_for_uid, config_const.keywords_for_uid_sampleID, sample_info.sample_id);
+		string ws_key_seq = fjsearch.concatenate_keywords(sample_info.keywords
+				, config_const.keywords_for_uid, config_const.keywords_for_uid_sampleID, sample_info.sample_id);
 		string uid = sample_info.sample_name + ws_key_seq;
 		shared_ptr<MemCytoFrame> frptr;
-		bool isfound = false;
+		string h5_filename;
+
 		if(config_const.is_gating)
 		{
 			//match FCS
@@ -270,8 +261,23 @@ public:
 				throw(domain_error("$TOT keyword not found in workspace for sample " + sample_info.sample_name));
 			int total_event_count = stoi(tot_it->second);
 
-			isfound = search_for_fcs(data_dir, sample_info.sample_id, sample_info.sample_name, total_event_count, ws_key_seq, config_const, frptr);
-			if(!isfound){
+			auto cfg = config_const;
+			cfg.fcs_read_param.header.is_fix_slash_in_channel_name = is_fix_slash_in_channel_name();
+
+			if(cytoset.size() > 0)//search cytoset
+				frptr = fjsearch.search_for_data<GatingSet, GS_Item>(cytoset
+						,sample_info.sample_id, sample_info.sample_name, total_event_count, ws_key_seq
+						, cfg, h5_filename);
+			else
+			{//search fcs directory
+				vector<string> all_file_paths = list_files(data_dir, config_const.fcs_file_extension);
+
+				frptr = fjsearch.search_for_data<vector<string>, string>(all_file_paths
+						,sample_info.sample_id, sample_info.sample_name, total_event_count, ws_key_seq
+						, cfg, h5_filename);
+
+			}
+			if(!frptr){
 			  PRINT("FCS not found for sample " + uid + " from searching the file extension: " + config_const.fcs_file_extension + "\n");
 			}
 
@@ -283,7 +289,7 @@ public:
 
 
 		//proceed gate parsing when data is available or gate-parsing only
-		if(isfound || !config_const.is_gating)
+		if(frptr || !config_const.is_gating)
 		{
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -330,14 +336,17 @@ public:
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				COUT<<"Gating hierarchy created: "<<uid<<endl;
-
 			if(config_const.is_gating)
 			{
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					cout<<endl<<"Gating ..."<<endl;
+				if(h5_filename=="")
+				{
+					//load the data into the header-only version of cytoframe
+					frptr->read_fcs_data();
+
+				}
 				MemCytoFrame & fr = *frptr;
-				//load the data into the header-only version of cytoframe
-				fr.read_fcs_data();
 				//check if external comps are provided
 				compensation comp;
 				if(!config_const.global_comp.empty())
@@ -403,9 +412,14 @@ public:
 
 			if(config_const.is_gating&&config_const.is_h5)
 			{
-				string h5_filename = (h5_dir/uid).string() + ".h5";
+
 				{
 					GsMutexType::scoped_lock lock(h5Mutex);
+					if(h5_filename=="")//write to new h5 file when it is loaded from fcs
+					{
+						h5_filename = (h5_dir/uid).string() + ".h5";
+					}
+
 					frptr->write_h5(h5_filename);
 					gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename, false))));
 				}
@@ -429,180 +443,7 @@ public:
 
 	 }
 
-	/**
-	 * Search for the FCS file
-	 * First try to search by file name, if failed, use FCS keyword $FIL + additional keywords + sampleID for further searching and pruning
-	 * cytoframe is preloaded with header-only.
-	 */
-	bool search_for_fcs(const string & data_dir, const int sample_id, const string & sample_name, const int & total_event_count, const string & ws_key_seq, const ParseWorkspaceParameters & config, shared_ptr<MemCytoFrame> &fr)
-	{
-		FCS_READ_PARAM fcs_read_param = config.fcs_read_param;
-		fcs_read_param.header.is_fix_slash_in_channel_name = is_fix_slash_in_channel_name();
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"Searching for FCS for sample: " + sample_name <<endl;
-		//try to search by file name first
-		vector<string> all_file_paths = list_files(data_dir, config.fcs_file_extension);
-		vector<string> file_paths;
-		vector<bool> matches_total;
-		vector<bool> matches_keys;
-		vector<bool> matches_full;
-		bool isfound = false;
-		
-		// Gather files that match sample_name
-		for(auto i : all_file_paths){
-			if(path_base_name(i) == sample_name){
-				file_paths.push_back(i);
-				fr.reset(new MemCytoFrame(i, fcs_read_param));
-				fr->read_fcs_header();
-				bool match_total;
-				bool match_keys;
 
-				// Check if total # events matches
-				match_total = (stoi(fr->get_keyword("$TOT")) == total_event_count);
-
-				// Check if keywords match
-				string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
-				match_keys = (fcs_key_seq == ws_key_seq);
-
-				matches_total.push_back(match_total);
-				matches_keys.push_back(match_keys);
-				matches_full.push_back(match_total && match_keys);
-				// If greedy_match is set, jump out at first good match so
-				// sample still parses even with duplicates in directory or subdirectories
-				if(match_total && config.greedy_match)
-					break;
-			}
-		}
-		
-		// No matches found from simple filename check. Check $FIL keyword for prospective matches
-		if(file_paths.size() == 0){
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				COUT << "No FCS file found with filename matching sample name " << sample_name << ". Checking for files with $FIL keyword matching sample name." << endl;
-			for(const string & file_path : all_file_paths){
-				fr.reset(new MemCytoFrame(file_path, fcs_read_param));
-				fr->read_fcs_header();
-				// Just gather those with $FIL matching sample name
-				if(fr->get_keyword("$FIL") == sample_name){
-					file_paths.push_back(file_path);
-					bool match_total;
-					bool match_keys;
-
-					// Check if total # events matches
-					match_total = (stoi(fr->get_keyword("$TOT")) == total_event_count);
-
-					// Check if keywords match
-					string fcs_key_seq = concatenate_keywords(fr->get_keywords(), config.keywords_for_uid, config.keywords_for_uid_sampleID, sample_id);
-					match_keys = (fcs_key_seq == ws_key_seq);
-
-					matches_total.push_back(match_total);
-					matches_keys.push_back(match_keys);
-					matches_full.push_back(match_total && match_keys);
-					// If greedy_match is set, jump out at first good match so
-					// sample still parses even with duplicates in directory or subdirectories
-					if(match_total && config.greedy_match)
-						break;
-				}
-			}
-		}
-		
-		// If there are multiple matching files from prior gathering steps
-		// attempt to resolve ambiguity by first trying $TOT, then sampleID+keywords
-		switch(file_paths.size()){
-		case 0: // No filename match
-		{
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				COUT << "No FCS file found for sample name " << sample_name << "." << endl;
-			break;
-		}
-		case 1: // Unambiguous match
-		{
-			if(!matches_total[0])
-				PRINT("FCS file found for sample " + sample_name + " has incorrect total number of events. Sample will be excluded.\n");
-			else{
-				fr.reset(new MemCytoFrame(file_paths[0], fcs_read_param));
-				fr->read_fcs_header();
-				isfound = true;
-			}
-			break;
-		}
-		default: // Ambiguous match. Need to check $TOT and maybe keywords
-		{
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				COUT << "Multiple FCS files found for sample " << sample_name << ". Attempting to use total number of events to resolve ambiguity." << endl;
-			switch(count(matches_total.begin(), matches_total.end(), true)){ // number that match $TOT
-			case 0: // None matching total number of events
-			{
-				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-					PRINT("No FCS files found for sample " + sample_name + " have correct total number of events. Sample will be excluded.\n");
-				break;
-			}
-			case 1:
-			{
-			  int match_final = distance(matches_total.begin(), find(matches_total.begin(), matches_total.end(), true));
-				fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
-				fr->read_fcs_header();
-				isfound = true;
-				break;
-			}
-			default: // Ambiguity remains. Check keywords + sampleID and clip out those that do not match
-			{
-				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-					COUT << "Multiple FCS files remain for sample " << sample_name << ". Attempting to use additional keywords and sampleID to resolve ambiguity." << endl;
-				switch(count(matches_full.begin(), matches_full.end(), true)){ // number that match $TOT AND sampleID + key sequence
-				case 0:
-				{
-					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-						PRINT("No FCS files for sample " + sample_name + " match specified keywords. Sample will be excluded.\n");
-					break;
-				}
-				case 1:
-				{
-					int match_final = distance(matches_full.begin(), find(matches_full.begin(), matches_full.end(), true));
-					fr.reset(new MemCytoFrame(file_paths[match_final], fcs_read_param));
-					fr->read_fcs_header();
-					isfound = true;
-					break;
-				}
-				default: // Still ambiguous. Report the multiple possibilities.
-				{
-					string candidates;
-					for (auto i = 0; i < file_paths.size(); i++)
-					  if(matches_full[i])
-					    candidates += file_paths[i] + "\n"; 
-					throw(domain_error("Multiple FCS files match sample " + sample_name + " by filename, event count, and keywords.\n"
-									   "Candidates are: \n" + candidates +
-									   "Please move incorrect files out of this directory or its subdirectories.\n"));
-				}
-				}
-			}
-			}
-		}
-		}
-		return isfound;
-	}
-	/**
-	 * Generate the uniquely identifiable id for each sample
-	 * by concatenating sample name with some other keywords and
-	 * the sampleID if desired
-	 * @param node
-	 * @param keywords_for_uid
-	 * @param keywords_for_uid_sampleID Whether sampleID should be included in guid
-	 * @param sample_id The sampleID to be used if keywords_for_uid_sampleID is true 
-	 * @return 
-	 */
-	string concatenate_keywords(const KEY_WORDS & keywords, const vector<string> & keywords_for_uid, bool keywords_for_uid_sampleID, int sample_id)
-	{
-		string uid = "";
-		for(const string & key : keywords_for_uid)
-		{
-			auto it = keywords.find(key);
-			if(it == keywords.end())
-				throw(domain_error("Keyword not found in workspace: " + key + " for sample " + uid));
-			uid += "_" + it->second;
-		}
-		uid = keywords_for_uid_sampleID ? ("_" + std::to_string(sample_id) + uid) : uid; 
-		return uid;
-	}
 
 	vector<wsGroupNode> get_group_nodes()
 	{

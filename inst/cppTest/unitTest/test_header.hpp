@@ -35,6 +35,7 @@ struct testCase{
 	int xmlParserOption;
 	int group_id;
 	ParseWorkspaceParameters config;
+	GatingSet cytoset;
 	testCase()
 	{
 		tolerance = 0.08;

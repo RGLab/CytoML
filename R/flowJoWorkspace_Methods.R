@@ -105,6 +105,9 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @param  includeGates \code{logical} Should gates be imported, or just the data with compensation and transformation?
 #' @param  path either a \code{character} scalar or \code{data.frame}. When \code{character}, it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
 #'                                                          When it is a \code{data.frame}, it is expected to contain two columns:'sampleID' and 'file', which is used as the mapping between 'sampleID' and FCS file (absolute) path. When such mapping is provided, the file system searching is avoided.
+#' @param cytoset a \code{cytoset} object that provides the alternative data source other than FCS files. It is useful sometime to preprocess the raw fcs files
+#'                                   (e.g. standardize channels using \code{cytoqc} package) and then directly use them for flowJo parsing.
+#'                                   when cytoset is provided, \code{path} argument is ignored.
 #' @param h5_dir the path to write h5 data
 #' @param  compensation a \code{compensation} object, matrix or data.frame or a list of these objects that allow the customized compensation () to be used instead of the one specified in flowJo workspace or FCS file.    
 #'                                 When it is a list, its names is supposed to be matched to sample guids (Default is the fcs filename suffixed by $TOT. See "additional.keys" arguments for details of guids)
@@ -171,10 +174,13 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @export 
 #' @importFrom utils menu
 #' @importFrom RcppParallel RcppParallelLibs
+#' @importFrom dplyr enquo
+#' @importFrom flowWorkspace cytoset
 flowjo_to_gatingset <- function(ws, name = NULL
     , subset = list()
     , execute = TRUE
     , path = ""
+    , cytoset = NULL
     , h5_dir = tempdir()
     , includeGates = TRUE
     , additional.keys = "$TOT"
@@ -195,7 +201,8 @@ flowjo_to_gatingset <- function(ws, name = NULL
 	, mc.cores = 1
     , ...)
 {
-  
+  if(is.null(cytoset))
+    cytoset <- cytoset()
   # determine the group
   g <- fj_ws_get_sample_groups(ws)
   groups <- g[!duplicated(g$groupName),]
@@ -214,9 +221,26 @@ flowjo_to_gatingset <- function(ws, name = NULL
   }
   
   #parse the filter
-  subset <- try(eval(substitute(subset)), silent = TRUE)
-  if(class(subset) == "try-error")
+  subset_parsed <- try(eval(substitute(subset)), silent = TRUE)
+  if(class(subset_parsed) == "try-error"){
+    # Try evaluating the subset arg as an expression for filtering
+    # based on keywords
+    samples_in_group <- fj_ws_get_samples(ws, groupInd)
+    subset_parsed <- try({
+      keys <- lapply(samples_in_group$sampleID, function(sid){
+        unlist(fj_ws_get_keywords(ws, sid)[keywords])
+      })
+      keys <- data.frame(do.call(rbind, keys), check.names = FALSE)
+      keys <- cbind(samples_in_group[,c("sampleID", "name")], keys)
+      # Pull the sample names that pass the filter
+      filter(keys, !!enquo(subset))$name
+      })
+  }
+  if(class(subset_parsed) == "try-error")
     stop("invalid 'subset' argument!")
+  
+  subset <- subset_parsed
+
   if(is(subset, "numeric"))#convert numeric index to sample names
   {
     subset <- as.character(fj_ws_get_samples(ws, groupInd)[subset, "name"])
@@ -258,6 +282,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
                  , subset = subset
                  , execute = execute
                  , path = suppressWarnings(normalizePath(path))
+                  , cytoset = cytoset@pointer
                  , h5_dir = suppressWarnings(normalizePath(h5_dir))
                  , includeGates = includeGates
                  , additional_keys = additional.keys

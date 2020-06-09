@@ -22,13 +22,13 @@ test_that("parse workspace by loading data from cytoset",{
   invisible(capture_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp), "No samples", class = "error")))
   cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1])
   #supply in-memory cs
-  expect_equal(cs_get_h5_file_path(cs), "")
+  expect_equal(cs_get_uri(cs), "")
   expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "not supported", class = "error")
   #supply non-matched cs
-  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1], is_h5 = TRUE)
+  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1], backend = "h5")
   invisible(capture_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "No samples", class = "error")))
   #supply correct cs
-  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[3:4], is_h5 = TRUE)
+  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[3:4], backend = "h5")
   #create view
   cf <- get_cytoframe_from_cs(cs, 1)
   # colnames(cf)[5] <- "B710"
@@ -44,7 +44,7 @@ test_that("parse workspace by loading data from cytoset",{
   stats <- gh_pop_compare_stats(gs[[1]])  
   expect_equal(stats[, openCyto.freq], stats[, xml.freq], tol = 3e-3)
   #cs is shared with gs
-  expect_equal(cs_get_h5_file_path(cs), cs_get_h5_file_path(gs_cyto_data(gs)))
+  expect_equal(cs_get_uri(cs), cs_get_uri(gs_cyto_data(gs)))
   #cs meta is also modified in place
   expect_equal(colnames(cs), colnames(gs_cyto_data(gs)))
   

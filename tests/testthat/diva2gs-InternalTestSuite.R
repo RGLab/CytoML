@@ -56,7 +56,7 @@ test_that("diva--tcell ",{
   gs <- diva_to_gatingset(ws, name = 1)
   parsedStats <- gh_pop_compare_stats(gs[[1]])
   expect_equal(parsedStats[,openCyto.freq], parsedStats[,xml.freq], tol = 5e-3)
-  expect_equal(gs_get_pop_paths(gs), c('root','/L','/L/P2','/L/P2/cd3','/L/P2/cd3/cd8','/L/P2/cd3/cd4'))
+  expect_equal(gs_get_pop_paths(gs, path = "auto"), c('root','L','P2','cd3','cd8','cd4', 'P1', "cd4 & P1", "cd8 | cd4", "not cd4"))
   
   #parse global worksheet
   gs <- diva_to_gatingset(ws, name = 1, worksheet = "global")

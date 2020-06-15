@@ -15,7 +15,6 @@ source("flowJoWorkspace-testSuite.R", local = TRUE)
 gs <- NULL
 
 test_that("parse workspace by loading data from cytoset",{
-  
   #default search fcs 
   tmp <- tempfile()
   dir.create(tmp)
@@ -25,10 +24,10 @@ test_that("parse workspace by loading data from cytoset",{
   expect_equal(cs_get_h5_file_path(cs), "")
   expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "not supported", class = "error")
   #supply non-matched cs
-  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1], is_h5 = TRUE)
+  cs <- load_cytoset_from_fcs(list.files(dataDir, "a2004", full.names = TRUE)[1], is_h5 = TRUE)
   invisible(capture_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "No samples", class = "error")))
   #supply correct cs
-  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[3:4], is_h5 = TRUE)
+  cs <- load_cytoset_from_fcs(list.files(dataDir, "CytoTrol_CytoTrol_", full.names = TRUE), is_h5 = TRUE)
   #create view
   cf <- get_cytoframe_from_cs(cs, 1)
   # colnames(cf)[5] <- "B710"

@@ -842,3 +842,15 @@ test_that("magnetic gates", {
   expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
 })
 
+test_that("keep uncompensated channels", {
+  wsfile <- file.path(path, "comp_uncomp.wsp")
+  datapath <- system.file("extdata",package="flowWorkspaceData")
+  cf <- load_cytoframe_from_fcs(list.files(datapath, "CytoTrol_CytoTrol_1.fcs", full.names = TRUE))
+  ws <- open_flowjo_xml(wsfile);
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = datapath);
+  expect_equal(colnames(gs1),
+               c("FSC-A","FSC-H","FSC-W","SSC-A","Comp-B710-A","Comp-R660-A","Comp-R780-A","Comp-V450-A","Comp-V545-A","Comp-G560-A","Comp-G780-A","Time","B710-A"))
+  expected_dims <- dim(cf)
+  expected_dims["parameters"] <- expected_dims["parameters"] + 1
+  expect_equal(expected_dims, dim(gh_pop_get_data(gs1[[1]])))
+})

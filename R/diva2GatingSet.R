@@ -505,6 +505,7 @@ diva_to_gatingset<- function(obj, name = NULL
         for(gateNode in gateNodes)
         {
           nodeName <- xmlGetAttr(gateNode, "fullname")
+          gtype <- xmlGetAttr(gateNode, "type")
           nodeName <- normalize_gate_path(nodeName)
           nodeName <- basename(nodeName)
           if(verbose)
@@ -518,126 +519,135 @@ diva_to_gatingset<- function(obj, name = NULL
             parent <- xmlValue(parent[[1]])
             parent <- normalize_gate_path(parent)
             parent <- gsub(rootNode.xml, "root", parent)
-
-
-            regionNode <- xmlElementsByTagName(gateNode, "region")[[1]]
-            xParam <- xmlGetAttr(regionNode, "xparm")
-            yParam <- xmlGetAttr(regionNode, "yparm")
-            gType <- xmlGetAttr(regionNode, "type")
-
-            #parse the coodinates
-            mat <- xpathSApply(regionNode, "points/point", function(pointNode)as.numeric(xmlAttrs(pointNode)))
-            #rescale the gate if it is stored as unscaled value
-            is.x.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_x_parameter_scaled")[[1]]))
-            is.y.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_y_parameter_scaled")[[1]]))
-
-            x_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "x_parameter_scale_value")[[1]]))
-            y_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "y_parameter_scale_value")[[1]]))
-
-
-            x_biexp <- this_biexp[[xParam]][["transform"]]
-            y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]][["transform"]]
-            #the gate may be either stored as simple log or 4096 scale
-            #we need to rescale them to the data scale (i.e. 4.5 )
-            if(is.null(yParam))
-              bound <- matrix(c(-Inf,Inf), byrow = TRUE, nrow = 1, dimnames = list(c(xParam), c("min", "max")))
-            else
-              bound <- matrix(c(-Inf,Inf,-Inf,Inf), byrow = TRUE, nrow = 2, dimnames = list(c(xParam, yParam), c("min", "max")))
-            x.extend <- y.extend <- FALSE
-            if(is.x.scaled)#if the gate is scaled to 4096
+            
+            if(gtype == "Region_Classifier")
             {
-              mat[1, ] <- mat[1, ]/4096
-              if(!is.null(x_biexp))
-              {
-                #when channel is logicle scale
-                mat[1, ] <- mat[1, ] * 4.5 # restore it to te logicle scale
-                # rescale gate to data scale by:
-                # 1) inverting the gate logicle transform (based on the biexp_scale value from the gate node)
-                #    --This appears to always be a logicle transform: biexp_scale == 0 --> w == 0 in logicle
-                # 2) applying the tranformation applied to the data (based on the biexp_scale value from the tube node) 
-                #    --Here if biexp_scale == 0, the data gets scaled log10
-                trans.gate <- generate_trans(r = x_parameter_scale_value, force_logicle=TRUE)
-                mat[1, ] <- trans.gate$inverse(mat[1, ])
-                mat[1, ] <- x_biexp(mat[1, ])
-              }
+              
+              regionNode <- xmlElementsByTagName(gateNode, "region")[[1]]
+              
+              xParam <- xmlGetAttr(regionNode, "xparm")
+              yParam <- xmlGetAttr(regionNode, "yparm")
+              region_type <- xmlGetAttr(regionNode, "type")
+  
+              #parse the coodinates
+              mat <- xpathSApply(regionNode, "points/point", function(pointNode)as.numeric(xmlAttrs(pointNode)))
+              #rescale the gate if it is stored as unscaled value
+              is.x.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_x_parameter_scaled")[[1]]))
+              is.y.scaled <- as.logical(xmlValue(xmlElementsByTagName(gateNode, "is_y_parameter_scaled")[[1]]))
+  
+              x_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "x_parameter_scale_value")[[1]]))
+              y_parameter_scale_value <- as.integer(xmlValue(xmlElementsByTagName(gateNode, "y_parameter_scale_value")[[1]]))
+  
+  
+              x_biexp <- this_biexp[[xParam]][["transform"]]
+              y_biexp <- if(is.null(yParam)) NULL else this_biexp[[yParam]][["transform"]]
+              #the gate may be either stored as simple log or 4096 scale
+              #we need to rescale them to the data scale (i.e. 4.5 )
+              if(is.null(yParam))
+                bound <- matrix(c(-Inf,Inf), byrow = TRUE, nrow = 1, dimnames = list(c(xParam), c("min", "max")))
               else
-                mat[1, ] <- mat[1, ] * 262144
-            }else
-            {
-              if(!is.null(x_biexp))#it was in log scale
+                bound <- matrix(c(-Inf,Inf,-Inf,Inf), byrow = TRUE, nrow = 2, dimnames = list(c(xParam, yParam), c("min", "max")))
+              x.extend <- y.extend <- FALSE
+              if(is.x.scaled)#if the gate is scaled to 4096
               {
-                #restore to raw scale
-                mat[1, ] <- 10 ^ mat[1, ]
-                #set flag to trigger gate extension later
-                x.extend <- TRUE
-              }
-            }
-
-            if(is.y.scaled)#if the gate is scaled to 4096
-            {
-              mat[2, ] <- mat[2, ]/4096
-              if(!is.null(y_biexp))
+                mat[1, ] <- mat[1, ]/4096
+                if(!is.null(x_biexp))
+                {
+                  #when channel is logicle scale
+                  mat[1, ] <- mat[1, ] * 4.5 # restore it to te logicle scale
+                  # rescale gate to data scale by:
+                  # 1) inverting the gate logicle transform (based on the biexp_scale value from the gate node)
+                  #    --This appears to always be a logicle transform: biexp_scale == 0 --> w == 0 in logicle
+                  # 2) applying the tranformation applied to the data (based on the biexp_scale value from the tube node) 
+                  #    --Here if biexp_scale == 0, the data gets scaled log10
+                  trans.gate <- generate_trans(r = x_parameter_scale_value, force_logicle=TRUE)
+                  mat[1, ] <- trans.gate$inverse(mat[1, ])
+                  mat[1, ] <- x_biexp(mat[1, ])
+                }
+                else
+                  mat[1, ] <- mat[1, ] * 262144
+              }else
               {
-                #when channel is logicle scale
-                mat[2, ] <- mat[2, ] * 4.5
-                #rescale gate to data scale -- see note in is.x.scaled block above
-                trans.gate <- generate_trans(r = y_parameter_scale_value, force_logicle=TRUE)
-                mat[2, ] <- trans.gate$inverse(mat[2, ])
-                mat[2, ] <- y_biexp(mat[2, ])
+                if(!is.null(x_biexp))#it was in log scale
+                {
+                  #restore to raw scale
+                  mat[1, ] <- 10 ^ mat[1, ]
+                  #set flag to trigger gate extension later
+                  x.extend <- TRUE
+                }
               }
-              else
-                mat[2, ] <- mat[2, ] * 262144
-            }else
-            {
-              if(!is.null(y_biexp))#it was in log scale
+  
+              if(is.y.scaled)#if the gate is scaled to 4096
               {
-                #restore to raw scale
-                mat[2, ] <- 10 ^ mat[2, ]
-                #set flag to trigger gate extension later
-                y.extend <- TRUE
+                mat[2, ] <- mat[2, ]/4096
+                if(!is.null(y_biexp))
+                {
+                  #when channel is logicle scale
+                  mat[2, ] <- mat[2, ] * 4.5
+                  #rescale gate to data scale -- see note in is.x.scaled block above
+                  trans.gate <- generate_trans(r = y_parameter_scale_value, force_logicle=TRUE)
+                  mat[2, ] <- trans.gate$inverse(mat[2, ])
+                  mat[2, ] <- y_biexp(mat[2, ])
+                }
+                else
+                  mat[2, ] <- mat[2, ] * 262144
+              }else
+              {
+                if(!is.null(y_biexp))#it was in log scale
+                {
+                  #restore to raw scale
+                  mat[2, ] <- 10 ^ mat[2, ]
+                  #set flag to trigger gate extension later
+                  y.extend <- TRUE
+                }
               }
-            }
-
-
-            if(gType == "RECTANGLE_REGION"){
-              x <- unique(mat[1,])
-              y <- unique(mat[2,])
-              if(length(x)!=2||length(y)!=2)
-                stop("invalid RECTANGLE_REGION from ", nodeName)
-              coord <- list(x,y)
-              names(coord) <- c(xParam, yParam)
-              gate <- rectangleGate(.gate = coord)
-            }else if(gType == "POLYGON_REGION"){
-              rownames(mat) <- c(xParam, yParam)
-              gate <- polygonGate(.gate = t(mat))
-            }else if(gType == "INTERVAL_REGION"){
-              # browser()
-              coord <- list(mat[1,])
-              names(coord) <- xParam
-              gate <- rectangleGate(coord)
-            }else
-              stop("unsupported gate type: ", gType)
-
-            #deal with the off threshold data truncation in log10 scale scenario
-            #we do gate extention instead to keep transformation consistent across gates(i.e always use biexp)
-            if(x.extend||y.extend)
+  
+  
+              if(region_type == "RECTANGLE_REGION"){
+                x <- unique(mat[1,])
+                y <- unique(mat[2,])
+                if(length(x)!=2||length(y)!=2)
+                  stop("invalid RECTANGLE_REGION from ", nodeName)
+                coord <- list(x,y)
+                names(coord) <- c(xParam, yParam)
+                gate <- rectangleGate(.gate = coord)
+              }else if(region_type == "POLYGON_REGION"){
+                rownames(mat) <- c(xParam, yParam)
+                gate <- polygonGate(.gate = t(mat))
+              }else if(region_type == "INTERVAL_REGION"){
+                # browser()
+                coord <- list(mat[1,])
+                names(coord) <- xParam
+                gate <- rectangleGate(coord)
+              }else
+                stop("unsupported gate region type: ", region_type)
+  
+              #deal with the off threshold data truncation in log10 scale scenario
+              #we do gate extention instead to keep transformation consistent across gates(i.e always use biexp)
+              if(x.extend||y.extend)
+              {
+                if(x.extend)
+                  bound[xParam, ] <- c(min_val, 262143)
+                if(y.extend)
+                  bound[yParam, ] <- c(min_val, 262143)
+                gate <- extend(gate, bound, t(data.ranges[[sampleName]]))
+                #need transform since extention was performed on the raw-scale gate
+                if(x.extend)
+                  gate <- rescale_gate(gate, x_biexp@.Data, xParam)
+                if(y.extend)
+                  gate <- rescale_gate(gate, y_biexp@.Data, yParam)
+              }
+            }else if(gtype %in% c("AND_Classifier", "OR_Classifier", "NOT_Classifier"))
             {
-              if(x.extend)
-                bound[xParam, ] <- c(min_val, 262143)
-              if(y.extend)
-                bound[yParam, ] <- c(min_val, 262143)
-              gate <- extend(gate, bound, t(data.ranges[[sampleName]]))
-              #need transform since extention was performed on the raw-scale gate
-              if(x.extend)
-                gate <- rescale_gate(gate, x_biexp@.Data, xParam)
-              if(y.extend)
-                gate <- rescale_gate(gate, y_biexp@.Data, yParam)
-            }
+              op <- sub("_Classifier$", "", gtype)
+              gate <- diva_get_bool_gate(gateNode, op)
+                
+            }else
+              stop("Unsupported gate type: ", gtype)
 
 
 
-
-			pop_add(gate, gh, parent = parent, name = nodeName)
+          pop_add(gate, gh, parent = parent, name = nodeName)
             if(parent == "root")
               parent <- ""
             unique.path <- file.path(parent, nodeName)
@@ -701,6 +711,37 @@ diva_to_gatingset<- function(obj, name = NULL
 
 }
 
+diva_get_bool_gate <- function(gateNode, op){
+  if(op == "NOT")
+  {
+    op <- "!"
+  }else if(op == "AND")
+    op <- "&"
+  else 
+    op <- "|"
+  
+  refs <- xmlElementsByTagName(gateNode, "input")
+  refs <- sapply(refs, function(ref){
+                        ref <- xmlValue(ref)
+                        ref <- sub("^All Events", "", ref)
+                        ref <- gsub("\\\\", "/", ref)
+                    })
+  
+  nref <- length(refs)
+  if(op == "!")
+  {
+    if(nref!=1)
+      stop("invalid number of reference nodes for NOT gate")
+    exprs <- paste0("!", refs)
+  }else
+  {
+    if(nref < 2)
+      stop("invalid number of reference nodes for AND, OR gate")
+    exprs <- paste(refs, collapse = op)
+  }
+  call <- substitute(booleanFilter(v), list(v = as.symbol(exprs)))
+  eval(call)
+}
 normalize_gate_path <- function(path){
   path <- gsub("/", "|", path)#escape /
   gsub("\\\\", "/", path)

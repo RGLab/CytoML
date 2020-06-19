@@ -20,15 +20,15 @@ test_that("parse workspace by loading data from cytoset",{
   tmp <- tempfile()
   dir.create(tmp)
   invisible(capture_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp), "No samples", class = "error")))
-  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1])
+  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1], backend = "mem")
   #supply in-memory cs
   expect_equal(cs_get_uri(cs), "")
   expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "not supported", class = "error")
   #supply non-matched cs
-  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1], backend = "h5")
+  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1])
   invisible(capture_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "No samples", class = "error")))
   #supply correct cs
-  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[3:4], backend = "h5")
+  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[3:4])
   #create view
   cf <- get_cytoframe_from_cs(cs, 1)
   # colnames(cf)[5] <- "B710"

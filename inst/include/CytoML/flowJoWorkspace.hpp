@@ -226,15 +226,7 @@ public:
 				//reload to ensure the old view is purged
 				auto cv = i.second->get_cytoframe_view_ref();
 				auto uri = cv.get_uri();
-				CytoFramePtr ptr;
-				if(cv.get_backend_type() == FileFormat::H5)
-				{
-					ptr = CytoFramePtr(new H5CytoFrame(uri));
-				}
-				else
-				{
-					ptr = CytoFramePtr(new TileCytoFrame(uri));
-				}
+				CytoFramePtr ptr = load_cytoframe(uri);
 
 				i.second->set_cytoframe_view(CytoFrameView(ptr));
 			}
@@ -426,23 +418,20 @@ public:
 				if(cf_filename=="")//write to new h5 file when it is loaded from fcs
 				{
 					cf_filename = (cf_dir/uid).string();
-					cf_filename +=  config_const.fmt == FileFormat::H5?".h5":".tile";
+					cf_filename += "." + fmt_to_str(config_const.fmt);
 				}
 
 				CytoFramePtr ptr;
-				if(config_const.fmt == FileFormat::H5)
 				{
+					if(config_const.fmt == FileFormat::H5)
+					{
 
-					GsMutexType::scoped_lock lock(h5Mutex);
-					frptr->write_h5(cf_filename);
-					ptr.reset(new H5CytoFrame(cf_filename, false));
+						GsMutexType::scoped_lock lock(h5Mutex);
+					}
+						frptr->write_to_disk(cf_filename, config_const.fmt);
+						ptr = load_cytoframe(cf_filename, false);
+				}
 
-				}
-				else
-				{
-					frptr->write_tile(cf_filename);
-					ptr.reset(new TileCytoFrame(cf_filename, false));
-				}
 				gh->set_cytoframe_view(CytoFrameView(ptr));
 			}
 			else

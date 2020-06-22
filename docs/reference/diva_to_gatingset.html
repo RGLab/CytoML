@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.99.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.6</span>
       </span>
     </div>
 
@@ -148,7 +148,6 @@
   <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>obj</span>@<span class='kw'>path</span>,
-  <span class='kw'>fast</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>worksheet</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"normal"</span>, <span class='st'>"global"</span>),
   <span class='kw'>swap_cols</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>`FSC-H`</span> <span class='kw'>=</span> <span class='st'>"FSC-W"</span>, <span class='kw'>`SSC-H`</span> <span class='kw'>=</span> <span class='st'>"SSC-W"</span>),
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -161,6 +160,32 @@
     <tr>
       <th>obj</th>
       <td><p>diva_workspace</p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p>sample group to be parsed, either numeric index or the group name</p></td>
+    </tr>
+    <tr>
+      <th>subset</th>
+      <td><p>samples to be imported. either numeric index or the sample name. Default is NULL, which imports all samples.</p></td>
+    </tr>
+    <tr>
+      <th>path</th>
+      <td><p>the FCS data path</p></td>
+    </tr>
+    <tr>
+      <th>worksheet</th>
+      <td><p>select worksheet to import. either "normal" or "global"</p></td>
+    </tr>
+    <tr>
+      <th>swap_cols</th>
+      <td><p>diva seems to swap some data cols during importing fcs to experiments
+this argument provide a list to tell the parser which cols to be swapped
+default is list(`FSC-H` = 'FSC-W',`SSC-H` = 'SSC-W')</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>whether print more messages during the parsing</p></td>
     </tr>
     <tr>
       <th>...</th>

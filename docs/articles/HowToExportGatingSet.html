@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.99.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.6</span>
       </span>
     </div>
 
@@ -89,7 +89,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="HowToExportGatingSet_files/header-attrs-2.3/header-attrs.js"></script><script src="HowToExportGatingSet_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>How to export a GatingSet to GatingML</h1>
@@ -163,7 +163,7 @@
 <a href="#export-to-cytobank" class="anchor"></a>Export to Cytobank</h2>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">outFile</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span>(<span class="kw">fileext</span> <span class="kw">=</span> <span class="st">".xml"</span>)
 <span class="fu"><a href="../reference/gatingset_to_cytobank.html">gatingset_to_cytobank</a></span>(<span class="no">gs</span>, <span class="no">outFile</span>)</pre></body></html></div>
-<pre><code>## [1] "/tmp/Rtmp0eXA2s/file5ff2359d7601.xml"</code></pre>
+<pre><code>## [1] "/tmp/Rtmp4J3aR5/file2995d9ad07.xml"</code></pre>
 <p>Note that the resulted <code>xml</code> file is a standard <code>GatingML2.0</code> file with some additional <code>custom_info</code> added so that it can be recognized by <code>Cytobank</code>. Here is the example gate plot from <code>Cytobank</code> after the gatingML is imported. <img src="cytobank.png" alt="Gates in Cytobank"></p>
 </div>
 <div id="export-to-flowjo" class="section level2">

@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.99.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.6</span>
       </span>
     </div>
 
@@ -150,12 +150,7 @@
     
  
 <dl'>
-  <dt><code>version</code>:</dt><dd><p>Object of class <code>"character"</code>. The version of the XML workspace.</p></dd>
-  <dt><code>file</code>:</dt><dd><p>Object of class <code>"character"</code>. The file name.</p></dd>
-  <dt><code>.cache</code>:</dt><dd><p>Object of class <code>"environment"</code>. An environment for internal use.</p></dd>
-	<dt><code>path</code>:</dt><dd><p>Object of class <code>"character"</code>. The path to the file.</p></dd>
-  <dt><code>doc</code>:</dt><dd><p>Object of class <code>"XMLInternalDocument"</code>. The XML document object.</p></dd>
-  <dt><code>options</code>:</dt><dd><p>Object of class <code>"integer"</code>. The XML parsing options passed to <code>xmlTreeParse</code>.</p></dd>
+  <dt><code>doc</code>:</dt><dd><p>Object of class <code>"externalptr"</code>.</p></dd>
   
 </dl>
 
@@ -165,7 +160,7 @@
   <code>GatingHierarchy</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>flowWorkspaceData</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: flowWorkspaceData</span></div><div class='input'>  <span class='no'>d</span><span class='kw'>&lt;-</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>,<span class='kw'>package</span><span class='kw'>=</span><span class='st'>"flowWorkspaceData"</span>)
+    <pre class="examples"><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>flowWorkspaceData</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: flowWorkspaceData</span></div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘flowWorkspaceData’ was built under R version 4.1.0</span></div><div class='input'>  <span class='no'>d</span><span class='kw'>&lt;-</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata"</span>,<span class='kw'>package</span><span class='kw'>=</span><span class='st'>"flowWorkspaceData"</span>)
   <span class='no'>wsfile</span><span class='kw'>&lt;-</span><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span>(<span class='no'>d</span>,<span class='kw'>pattern</span><span class='kw'>=</span><span class='st'>"A2004Analysis.xml"</span>,<span class='kw'>full</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
   <span class='no'>ws</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='open_flowjo_xml.html'>open_flowjo_xml</a></span>(<span class='no'>wsfile</span>);
   <span class='no'>ws</span></div><div class='output co'>#&gt; File location:  /usr/local/lib/R/cytoset/flowWorkspaceData/extdata/A2004Analysis.xml 

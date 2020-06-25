@@ -48,7 +48,7 @@
 
 <meta property="og:title" content="Convert a GatingSet to flowJo workspace — gatingset_to_flowjo" />
 <meta property="og:description" content="It is a R wrapper for the docker app
-(https://hub.docker.com/r/wjiang2/gs-to-flowjo)" />
+(https://hub.docker.com/r/rglab/gs-to-flowjo)" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -81,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.99.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.6</span>
       </span>
     </div>
 
@@ -142,16 +142,10 @@
 
     <div class="ref-description">
     <p>It is a R wrapper for the docker app
-(https://hub.docker.com/r/wjiang2/gs-to-flowjo)</p>
+(https://hub.docker.com/r/rglab/gs-to-flowjo)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>gatingset_to_flowjo</span>(
-  <span class='no'>gs</span>,
-  <span class='no'>outFile</span>,
-  <span class='kw'>showHidden</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>docker_img</span> <span class='kw'>=</span> <span class='st'>"wjiang2/gs-to-flowjo"</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>gatingset_to_flowjo</span>(<span class='no'>gs</span>, <span class='no'>outFile</span>, <span class='kw'>showHidden</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>docker_img</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -163,6 +157,10 @@
     <tr>
       <th>outFile</th>
       <td><p>the workspace file path to write</p></td>
+    </tr>
+    <tr>
+      <th>showHidden</th>
+      <td><p>whether to export hidden gates. Default is FALSE</p></td>
     </tr>
     <tr>
       <th>docker_img</th>
@@ -177,6 +175,18 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>nothing</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Docker images for <code>gatingset_to_flowjo</code> will be maintained at https://hub.docker.com/r/rglab/gs-to-flowjo for the <code>cytolib</code> 
+package version accompanying each Bioconductor release, as well as a "devel" tagged image for use with the current GitHub development 
+braches of the RGLab cytometry packages.</p>
+<p>If you are using CytoML from a Bioconductor release, please pull docker image corresponding to the major and minor version returned from
+<code><a href='https://rdrr.io/r/utils/packageDescription.html'>packageVersion("cytolib")</a></code>, For example, if <code><a href='https://rdrr.io/r/utils/packageDescription.html'>packageVersion("cytolib")</a></code> returns <code>2.0.2</code>, you should use:</p>
+<p><code>docker pull rglab/gs-to-flowjo:2.0</code></p>
+<p>If you are using CytoML from the current GitHub development branch ("master" branch), please pull the "devel" tagged image. For example:</p>
+<p><code>docker pull rglab/gs-to-flowjo:devel</code></p>
+<p>You may also specify a particular docker image and tag via the <code>docker_img</code> argument. If not provided, <code>gatingset_to_flowjo</code> will
+search for the correct default image corresponding to your <code>cytolib</code> version.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

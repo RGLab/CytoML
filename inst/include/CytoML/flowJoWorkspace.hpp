@@ -371,7 +371,76 @@ public:
 					gh->set_compensation(comp, false);
 				}
 
+				// At this point we have comp and can use comp.prefix to scan param names in gh gates
+				// for uncompensated channel.
+				set<string> keep_uncomp;
+				// These do not carry the comp prefix, so can be used to scan gates
+				vector<string> channels = fr.get_channels();
+
+				// Loop through gates and see if any match un-prefixed channel names
+				for(auto & vertex_id : gh->getVertices()){
+					nodeProperties & node = gh->getNodeProperty(vertex_id);
+					if(vertex_id != 0)
+					{
+						gatePtr g=node.getGate();
+						if(g==NULL)
+							throw(domain_error("no gate available for this node"));
+			 			int gtype = g->getType();
+			 			if(gtype!=LOGICALGATE&&gtype!=BOOLGATE&&gtype!=CLUSTERGATE){
+							vector<string> pnames = g->getParamNames();
+							for(auto & name : pnames){
+								if(std::find(channels.begin(), channels.end(), name) != channels.end())
+									keep_uncomp.insert(name);
+							}
+						}
+					}
+				}
+
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL){
+					for(auto & channel : keep_uncomp)
+						PRINT("Found necessary uncompensated channel: " + channel + "\n");
+				}
+
+
+				EVENT_DATA_VEC uncomp_cols;
+				if(!keep_uncomp.empty()){
+					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+						PRINT("Extracting necessary uncompensated columns...\n");
+					uncomp_cols = fr.get_data(fr.get_col_idx(vector<string>(keep_uncomp.begin(), keep_uncomp.end()), ColType::channel));
+				}
+
 				gh->compensate(fr);
+
+				if(!keep_uncomp.empty()){
+					// Update the channel names by appending the extra uncompensated channels to the compensated channels
+					vector<string> comp_channels_vec = fr.get_channels();
+					set<string> comp_channels(comp_channels_vec.begin(), comp_channels_vec.end());
+					// Determine which channels changed during compensation, but need to have uncompensated added back
+					vector<string> readd_uncomp;
+					std::set_difference(keep_uncomp.begin(), keep_uncomp.end(), comp_channels.begin(), comp_channels.end(), std::inserter(readd_uncomp, readd_uncomp.begin()));
+
+					if(!readd_uncomp.empty()){
+						if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+							PRINT("Re-appending necessary uncompensated channels lost in compensation...\n");
+						// filter down to the columns that need to be re-added
+						vector<uword> keep_idx;
+						std::set<string>::iterator iter;
+						for(auto & readd_channel: readd_uncomp){
+							if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+								PRINT("Re-appending uncompensated channel: " + readd_channel + "\n");
+							iter = std::find(keep_uncomp.begin(), keep_uncomp.end(), readd_channel);
+							if(iter != keep_uncomp.end())
+								keep_idx.push_back(std::distance(keep_uncomp.begin(), iter));
+						}
+						arma::uvec keep_idx_uvec = arma::uvec(keep_idx);
+						uncomp_cols = uncomp_cols.cols(keep_idx_uvec);
+						fr.append_columns(readd_uncomp, uncomp_cols);
+					}
+
+				}
+
+
+
 				gh->transform_gate();
 				// add the scaleTrans for the implicit time transformation based on $TIMESTEP in FCS
 				// This reproduces some of the logic of cytolib::CytoFrame::scale_time_channel

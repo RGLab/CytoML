@@ -406,7 +406,7 @@ public:
 				if(!keep_uncomp.empty()){
 					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 						PRINT("Extracting necessary uncompensated columns...\n");
-					uncomp_cols = fr.get_data(fr.get_col_idx(vector<string>(keep_uncomp.begin(), keep_uncomp.end()), ColType::channel));
+					uncomp_cols = fr.get_data(fr.get_col_idx(vector<string>(keep_uncomp.begin(), keep_uncomp.end()), ColType::channel), true);
 				}
 
 				gh->compensate(fr);

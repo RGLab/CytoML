@@ -2,6 +2,18 @@ context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
 
+test_that("verify the extend logic no longer needed for the gate defined in biexp scale from latest flowjo wsp output",{
+  wsFile <- file.path(path, "gate_negative_area.wsp")
+  ws <- open_flowjo_xml(wsFile)
+  thispath <- system.file("extdata", package = "flowWorkspaceData")
+  gs <- flowjo_to_gatingset(ws, name=1, path = thispath, extend_val = -Inf)
+  
+  res <- gh_pop_compare_stats(gs[[1]])
+  
+  expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.0003)
+  
+  
+})
 test_that("bypass faulty node",{
   
   wsFile <- file.path(path, "bypassfaultynode.xml")

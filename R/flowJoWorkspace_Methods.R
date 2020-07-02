@@ -175,13 +175,14 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @importFrom utils menu
 #' @importFrom RcppParallel RcppParallelLibs
 #' @importFrom dplyr enquo
-#' @importFrom flowWorkspace cytoset
+#' @importFrom flowWorkspace cytoset get_default_backend
 flowjo_to_gatingset <- function(ws, name = NULL
     , subset = list()
     , execute = TRUE
     , path = ""
     , cytoset = NULL
-    , h5_dir = tempdir()
+    , backend_dir = tempdir()
+	, backend = get_default_backend()
     , includeGates = TRUE
     , additional.keys = "$TOT"
     , additional.sampleID = FALSE
@@ -203,6 +204,8 @@ flowjo_to_gatingset <- function(ws, name = NULL
 {
   if(is.null(cytoset))
     cytoset <- cytoset()
+backend <- match.arg(backend, c("h5", "tile"))
+
   # determine the group
   g <- fj_ws_get_sample_groups(ws)
   groups <- g[!duplicated(g$groupName),]
@@ -283,7 +286,8 @@ flowjo_to_gatingset <- function(ws, name = NULL
                  , execute = execute
                  , path = suppressWarnings(normalizePath(path))
                   , cytoset = cytoset@pointer
-                 , h5_dir = suppressWarnings(normalizePath(h5_dir))
+                 , backend_dir = suppressWarnings(normalizePath(backend_dir))
+		 		 , backend = backend
                  , includeGates = includeGates
                  , additional_keys = additional.keys
                  , additional_sampleID = additional.sampleID

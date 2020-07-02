@@ -17,7 +17,8 @@ flowjo_to_gatingset(
   execute = TRUE,
   path = "",
   cytoset = NULL,
-  h5_dir = tempdir(),
+  backend_dir = tempdir(),
+  backend = get_default_backend(),
   includeGates = TRUE,
   additional.keys = "$TOT",
   additional.sampleID = FALSE,
@@ -60,8 +61,6 @@ When it is a \code{data.frame}, it is expected to contain two columns:'sampleID'
 (e.g. standardize channels using \code{cytoqc} package) and then directly use them for flowJo parsing.
 when cytoset is provided, \code{path} argument is ignored.}
 
-\item{h5_dir}{the path to write h5 data}
-
 \item{includeGates}{\code{logical} Should gates be imported, or just the data with compensation and transformation?}
 
 \item{additional.keys}{\code{character} vector:  The keywords (parsed from FCS header) to be combined(concatenated with "_") with FCS filename
@@ -102,6 +101,8 @@ When some of the samples don't have the external compensations matched, it will 
 If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.}
 
 \item{mc.cores}{\code{numeric} the number of threads to pass to the C++ parser to run in parallel}
+
+\item{h5_dir}{the path to write h5 data}
 }
 \value{
 a \code{GatingSet}, which is a wrapper around a list of \code{GatingHierarchy} objects, each representing a single sample in the workspace. The \code{GatingHierarchy} objects contain \code{graphNEL} trees that  represent the gating hierarchy of each sample. Each node in the \code{GatingHierarchy} has associated data, including the population counts from flowJo, the parent population counts, the \code{flowCore} gates generated from the flowJo workspace gate definitions. Data are not yet loaded or acted upon at this stage. To execute the gating of each data file, a call to \code{execute()} must be made on each \code{GatingHierarchy} object in the \code{GatingSet}. This is done automatically by default, and there is no more reason to set this argument to FALSE.

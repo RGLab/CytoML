@@ -217,8 +217,14 @@ void parser_test(testCase & myTest){
 	}
 	else
 	{
+		//read all
+
 		unique_ptr<flowJoWorkspace> ws = openWorkspace(myTest.filename, myTest.sample_name_location,myTest.xmlParserOption);
+		double start = gettime();
 		gs = ws->to_GatingSet(myTest.group_id, myTest.config, myTest.cytoset);
+
+		double runtime = (gettime() - start);
+		cout << "ws->to_GatingSet: " << runtime << endl;
 	}
 
 
@@ -248,7 +254,7 @@ void parser_test(testCase & myTest){
 	gh_counts(gh, myTest.isEqual, myTest.tolerance, myTest.skipPops);
 
 	if(isSaveArchive){
-		gs->serialize_pb(archiveName, H5Option::copy);
+		gs->serialize_pb(archiveName, CytoFileOption::copy);
 
 	}
 

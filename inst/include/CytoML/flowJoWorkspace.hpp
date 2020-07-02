@@ -33,7 +33,6 @@ using namespace tbb;
 namespace CytoML
 {
 
-
 typedef tbb::spin_mutex GsMutexType;
 
 class flowJoWorkspace:public workspace{
@@ -175,19 +174,19 @@ public:
 		 }
 		 if(cytoset.size()>0)
 		 {
-			 if(cytoset.begin()->second->get_cytoframe_view_ref().get_h5_file_path()=="")
+			 if(cytoset.begin()->second->get_cytoframe_view_ref().get_uri()=="")
 				throw(domain_error("In-memory cytoset is not supported!"));
 		 }
 
 		 string data_dir = config.data_dir;
-		 fs::path h5_dir = fs::path(config.h5_dir);
+		 fs::path cf_dir = fs::path(config.cf_dir);
 		 if(config.is_gating)
 		 {
-			 if(!config.is_h5)
+			 if(config.fmt == FileFormat::MEM)
 			 {
 				 if(cytoset.size()>0)
 				 {
-					 config.is_h5 = true;
+					 config.fmt = FileFormat::H5;
 					 PRINT("GatingSet is set to disk-based backend because cytoset is supplied as data input! \n");
 				 }
 			 }
@@ -199,7 +198,7 @@ public:
 				data_dir = path_dir_name(xml_filepath);
 				data_dir = data_dir.empty() ? "." : data_dir; 
 			}
-			h5_dir = fs::path(gsPtr->generate_h5_folder(h5_dir.string()));
+			cf_dir = fs::path(gsPtr->generate_cytoframe_folder(cf_dir.string()));
 		 }
 
 		/*
@@ -211,11 +210,11 @@ public:
 
 		if(config.num_threads <=1)
 			tbb::serial::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-				this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs, cytoset);
+				this->parse_sample(sample_infos[i], config, data_dir, cf_dir, gTrans, gs, cytoset);
 			});
 		else
 			tbb::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-							this->parse_sample(sample_infos[i], config, data_dir, h5_dir, gTrans, gs, cytoset);
+							this->parse_sample(sample_infos[i], config, data_dir, cf_dir, gTrans, gs, cytoset);
 						});
 		if(gsPtr->size() == 0)
 			throw(domain_error("No samples in this workspace to parse!"));
@@ -225,8 +224,11 @@ public:
 			for(auto i : cytoset)
 			{
 				//reload to ensure the old view is purged
-				auto uri = i.second->get_cytoframe_view_ref().get_h5_file_path();
-				i.second->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(uri))));
+				auto cv = i.second->get_cytoframe_view_ref();
+				auto uri = cv.get_uri();
+				CytoFramePtr ptr = load_cytoframe(uri);
+
+				i.second->set_cytoframe_view(CytoFrameView(ptr));
 			}
 
 		}
@@ -235,7 +237,8 @@ public:
 	}
 	void parse_sample(const SampleInfo &sample_info
 			, const ParseWorkspaceParameters & config_const
-			, const string &data_dir, const fs::path &h5_dir
+			, const string &data_dir
+			, const fs::path &cf_dir
 			, const trans_global_vec&gTrans_const
 			, GatingSet &gs
 			, GatingSet & cytoset)
@@ -249,7 +252,7 @@ public:
 				, config_const.keywords_for_uid, config_const.keywords_for_uid_sampleID, sample_info.sample_id);
 		string uid = sample_info.sample_name + ws_key_seq;
 		shared_ptr<MemCytoFrame> frptr;
-		string h5_filename;
+		string cf_filename;
 
 		if(config_const.is_gating)
 		{
@@ -267,14 +270,14 @@ public:
 			if(cytoset.size() > 0)//search cytoset
 				frptr = fjsearch.search_for_data<GatingSet, GS_Item>(cytoset
 						,sample_info.sample_id, sample_info.sample_name, total_event_count, ws_key_seq
-						, cfg, h5_filename);
+						, cfg, cf_filename);
 			else
 			{//search fcs directory
 				vector<string> all_file_paths = list_files(data_dir, config_const.fcs_file_extension);
 
 				frptr = fjsearch.search_for_data<vector<string>, string>(all_file_paths
 						,sample_info.sample_id, sample_info.sample_name, total_event_count, ws_key_seq
-						, cfg, h5_filename);
+						, cfg, cf_filename);
 
 			}
 			if(!frptr){
@@ -340,7 +343,7 @@ public:
 			{
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					cout<<endl<<"Gating ..."<<endl;
-				if(h5_filename=="")
+				if(cf_filename=="")
 				{
 					//load the data into the header-only version of cytoframe
 					frptr->read_fcs_data();
@@ -403,7 +406,7 @@ public:
 				if(!keep_uncomp.empty()){
 					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 						PRINT("Extracting necessary uncompensated columns...\n");
-					uncomp_cols = fr.get_data(fr.get_col_idx(vector<string>(keep_uncomp.begin(), keep_uncomp.end()), ColType::channel));
+					uncomp_cols = fr.get_data(fr.get_col_idx(vector<string>(keep_uncomp.begin(), keep_uncomp.end()), ColType::channel), true);
 				}
 
 				gh->compensate(fr);
@@ -479,19 +482,26 @@ public:
 			}
 
 
-			if(config_const.is_gating&&config_const.is_h5)
+			if(config_const.is_gating&&config_const.fmt != FileFormat::MEM)
 			{
-
+				if(cf_filename=="")//write to new h5 file when it is loaded from fcs
 				{
-					GsMutexType::scoped_lock lock(h5Mutex);
-					if(h5_filename=="")//write to new h5 file when it is loaded from fcs
-					{
-						h5_filename = (h5_dir/uid).string() + ".h5";
-					}
-
-					frptr->write_h5(h5_filename);
-					gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename, false))));
+					cf_filename = (cf_dir/uid).string();
+					cf_filename += "." + fmt_to_str(config_const.fmt);
 				}
+
+				CytoFramePtr ptr;
+				{
+					if(config_const.fmt == FileFormat::H5)
+					{
+
+						GsMutexType::scoped_lock lock(h5Mutex);
+					}
+						frptr->write_to_disk(cf_filename, config_const.fmt);
+						ptr = load_cytoframe(cf_filename, false);
+				}
+
+				gh->set_cytoframe_view(CytoFrameView(ptr));
 			}
 			else
 			  gh->set_cytoframe_view(CytoFrameView(frptr));

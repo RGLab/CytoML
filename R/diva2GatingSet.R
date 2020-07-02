@@ -289,7 +289,7 @@ diva_to_gatingset<- function(obj, name = NULL
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace gh_pop_set_xml_count save_gs load_gs gs_split_by_tree fix_channel_slash compute_timestep gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe_from_h5 cf_write_h5 merge_list_to_gs
+#' @importFrom flowWorkspace gh_pop_set_xml_count save_gs load_gs gs_split_by_tree gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe cf_write_disk merge_list_to_gs
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd
@@ -431,7 +431,7 @@ diva_to_gatingset<- function(obj, name = NULL
 
         message("loading data: ",file);
         #load single sample into cs so that gs can be constructed from it
-        cs <- load_cytoset_from_fcs(file, ...)#has to load data regardless of execute flag because data range is needed for gate extension
+        cs <- load_cytoset_from_fcs(file, backend = "mem", ...)#has to load data regardless of execute flag because data range is needed for gate extension
         cols <- swap_data_cols(colnames(cs), swap_cols)
         if(!all(cols==colnames(cs)))
           for(c1 in names(swap_cols))
@@ -665,8 +665,11 @@ diva_to_gatingset<- function(obj, name = NULL
         {
           #convert to on disk cs to prevent mem issue
           tmp <- tempfile()
-          cf_write_h5(cf, tmp)
-          cs_set_cytoframe(cs, sampleName, load_cytoframe_from_h5(tmp))
+		  backend <- list(...)[["backend"]]
+		  if(is.null(backend))
+			  backend <- get_default_backend()
+		  cf_write_disk(cf, tmp, backend = backend)
+          cs_set_cytoframe(cs, sampleName, load_cytoframe(tmp))
         }
         gslist[[sampleName]] <- gs
       }

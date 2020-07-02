@@ -71,8 +71,8 @@ struct parseWorkspaceFixture{
 		}
 		map<string, string>::iterator it;
 
-		it = arg_map.find("archiveType");
-		myTest.archiveType = it==arg_map.end()?true:it->second == "PB";
+//		it = arg_map.find("archiveType");
+//		myTest.archiveType = it==arg_map.end()?true:it->second == "PB";
 
 		it = arg_map.find("isLoadArchive");
 
@@ -83,6 +83,18 @@ struct parseWorkspaceFixture{
 
 		it = arg_map.find("g_loglevel");
 		g_loglevel = it==arg_map.end()?false:boost::lexical_cast<unsigned>(it->second);
+
+		it = arg_map.find("backend");
+		if(it==arg_map.end()||it->second=="tile")
+		{
+			myTest.config.fmt = FileFormat::TILE;
+		}
+		else
+			myTest.config.fmt = FileFormat::H5;
+
+		it = arg_map.find("num_threads");
+		myTest.config.num_threads = it==arg_map.end()?1:boost::lexical_cast<unsigned>(it->second);
+
 
 	};
 
@@ -222,7 +234,7 @@ BOOST_AUTO_TEST_CASE(PBMC_HIPC_trial)
 	myTest.filename="../wsTestSuite/PBMC/HIPC_trial/data/HIPC_trial.xml";
 	myTest.config.sample_filters["name"]={"004_A1_A01.fcs","004_B1_B01.fcs"};
 	myTest.config.keywords_for_uid = {};
-	myTest.config.num_threads = 2;
+//	myTest.config.num_threads = 2;
 	myTest.archive="../output/HIPC_trial/gs";
 //	g_loglevel = GATE_LEVEL;
 	parser_test(myTest);
@@ -445,7 +457,7 @@ BOOST_AUTO_TEST_CASE(treg)
 	myTest.filename="../wsTestSuite/McGill/Treg/20131206_Treg.1.ellipseidGate.wsp";
 	myTest.archive="../output/McGill/Treg/gs";
 	myTest.group_id = 3;
-	myTest.config.h5_dir = "../output/McGill/Treg";
+	myTest.config.cf_dir = "../output/McGill/Treg";
 	parser_test(myTest);
 
 	vector<bool> isTrue(myTest.isEqual.size(), true);

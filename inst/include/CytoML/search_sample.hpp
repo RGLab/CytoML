@@ -38,11 +38,11 @@ namespace CytoML
 		 float gate_extend_to = -4000;// the value that gate coordinates are extended to. Default is -4000. Usually this value will be automatically detected according to the real data range.
 		 unordered_map<string, vector<string>> sample_filters;
 		 string data_dir = ""; //path for FCS directory
-		 bool is_h5 = true;;
+		 FileFormat fmt = FileFormat::H5;
 		 bool compute_leaf_bool_node = true;
 		 bool include_empty_tree = false;
 		 bool skip_faulty_node = false;
-		 string h5_dir = fs::temp_directory_path().string();// output path for generating the h5 files
+		 string cf_dir = fs::temp_directory_path().string();// output path for generating the h5 files
 		 FCS_READ_PARAM fcs_read_param;
 		 unordered_map<string, compensation> compensation_map;//optional customized sample-specific compensations
 		 compensation global_comp;
@@ -244,7 +244,7 @@ namespace CytoML
 				}
 				if(isfound)
 				{
-					backend_uri = cv.get_h5_file_path();
+					backend_uri = cv.get_uri();
 					if(backend_uri=="")
 					{//return the pointer loaded from fcs as it is
 						return dynamic_pointer_cast<MemCytoFrame>(cv.get_cytoframe_ptr());
@@ -285,7 +285,7 @@ namespace CytoML
 												, const FCS_READ_PARAM & fcs_read_param
 												, string & backend_uri){
 				auto cv = it.second->get_cytoframe_view();
-				backend_uri = cv.get_h5_file_path();
+				backend_uri = cv.get_uri();
 				if(backend_uri=="")
 					throw(domain_error("In-memory cytoset is not supported!"));
 

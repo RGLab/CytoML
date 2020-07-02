@@ -43,7 +43,8 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , bool execute
                                   , string path
 								  , XPtr<GatingSet> cytoset
-                                  , string h5_dir
+                                  , string backend_dir
+								  , string backend
                                   , bool includeGates
                                   , vector<string> additional_keys
                                   , bool additional_sampleID
@@ -67,7 +68,8 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   ParseWorkspaceParameters config;
   //ws parser config
   config.data_dir = path;
-  config.h5_dir = h5_dir;
+  config.cf_dir = backend_dir;
+  config.fmt = backend=="h5"?FileFormat::H5:FileFormat::TILE;
   config.is_gating = execute;
   config.is_parse_gate = includeGates;
   config.is_pheno_data_from_FCS = is_pheno_data_from_FCS;

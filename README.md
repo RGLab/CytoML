@@ -60,8 +60,8 @@ BiocManager::install("openCyto")
 install.packages("devtools") 
 library(devtools) #load it
 
-install_github("RGLab/flowWorkspace", ref="trunk")
-install_github("RGLab/openCyto", ref="trunk")
+install_github("RGLab/flowWorkspace")
+install_github("RGLab/openCyto")
 ```
 
 ### Installing from [BioConductor](https://www.bioconductor.org).
@@ -96,7 +96,7 @@ BiocManager::install("CytoML", version = "devel")
 
 ``` r
 install.packges("devtools")
-devtools::install_github("RGLab/CytoML", ref = "trunk")
+devtools::install_github("RGLab/CytoML")
 ```
 
   - [Latest GitHub Release](https://github.com/RGLab/CytoML/releases)

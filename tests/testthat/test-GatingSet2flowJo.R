@@ -68,7 +68,16 @@ test_that("autogating--tcell", {
 })
 test_that("gatingset_to_flowjo: manual gates with calibration table parsed and stored as biexp ",{
   dataDir <- system.file("extdata",package="flowWorkspaceData")
-  gs <- load_gs(list.files(dataDir, pattern = "gs_manual",full = TRUE))
+  gs_dir <- list.files(dataDir, pattern = "gs_manual",full = TRUE)
+  if(get_default_backend()=="tile")
+  {
+    tmp <- tempfile()
+    convert_backend(gs_dir, tmp)
+    gs_dir <- tmp
+  }
+  gs <- load_gs(gs_dir)
+  
+  
   stats.orig <- gh_pop_compare_stats(gs[[1]])
   #output to flowJo
   outFile <- tempfile(fileext = ".wsp")
@@ -82,6 +91,13 @@ test_that("gatingset_to_flowjo: manual gates with calibration table parsed and s
   gs1 <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
   stats.new <- gh_pop_compare_stats(gs1[[1]])
   expect_equal(stats.orig, stats.new, tol = 5e-3)
+  
+  if(get_default_backend()=="tile")
+  {
+    message("clean up ", gs_dir)
+    unlink(gs_dir)
+  }
+  
 })
 
 test_that("gatingset_to_flowjo: export clustering results as derived parameters ",{

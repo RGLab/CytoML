@@ -244,8 +244,11 @@ gs <- flowjo_to_gatingset(ws, name = 4, mc.cores = 4)
 However, be careful to avoid setting too many cores, which may end up slowing down the process caused by disk IO because FCS files need to be read from disk and the type of file system also contributes to the performance. e.g. parallel file system provided by HPC usually performs better than the regular personal computer. 
 
 ## Skip leaf boolean gates
-
 ```{r echo=FALSE}
+is_local <- dir.exists("~/rglab/workspace/CytoML/wsTestSuite")
+```
+
+```{r echo=FALSE, eval=is_local}
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
 thisPath <- file.path(path, "searchRefNode")
 wsFile <- file.path(thisPath, "2583-Y-MAL067-FJ.xml")
@@ -253,7 +256,7 @@ ws <- open_flowjo_xml(wsFile)
 ```
 
 Sometime the gating tree could be big and could be slow to import all the gates, e.g.
-```{r}
+```{r, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name="Samples", subset = "1379326.fcs", execute = FALSE)
 nodes <- gs_get_pop_paths(gs)
 length(nodes)
@@ -262,12 +265,12 @@ plot(gs, "3+")
 
 it contains a lot of boolean gates at the bottom level of the tree, e.g.
 
-```{r}
+```{r, eval=is_local}
 tail(nodes, 10)
 ```
 
 If these boolean gates are not important for the analysis, user can choose to skip computing them
-```{r}
+```{r, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name="Samples", subset = "1379326.fcs", leaf.bool = F)
 gs_pop_get_stats(gs)
 ```
@@ -275,32 +278,32 @@ gs_pop_get_stats(gs)
 As shown, these boolean leaf gates are still imported, but not gated or computed (which is why stats are NA for these gates). This will speed up the parsing by avoid calculating significant portion of the tree.
 And it can be computed later if user decides to do so
 
-```{r}
+```{r, eval=is_local}
 recompute(gs)
 gs_pop_get_stats(gs)
 ```
 
 ## Skip faulty gates
 
-```{r echo=FALSE}
+```{r echo=FALSE, eval=is_local}
 wsFile <- file.path(path, "bypassfaultynode.xml")
 ws <- open_flowjo_xml(wsFile)
 dataDir <- file.path(path,"Cytotrol/NHLBI/Tcell/")
 ```
 
-```{r error=TRUE}
+```{r error=TRUE, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name = 4, path = dataDir, subset = 1)
 ```
 
 This parsing error is due to the incorrect channel name is used by `CD4` gate that is defined in flowJo and FCS files don't have that channel
-```{r}
+```{r, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name = 4, path = dataDir, execute = FALSE)
 plot(gs)
 gs_pop_get_gate(gs, "CD4")[[1]]
 ```
 
 The parser can be told to skip `CD4` and all its descendants so that the rest of gates can still be parsed
-```{r}
+```{r, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name = 4, path = dataDir, subset = 1, skip_faulty_gate = TRUE)
 head(gs_pop_get_stats(gs))
 ```
@@ -309,45 +312,46 @@ Similar to skipping leaf boolean gates, faulty gates are still imported, but the
 
 ## Import the empty gating tree
 
-```{r echo=FALSE}
+```{r echo=FALSE, eval=is_local}
  wsFile <- file.path(path, "no-gate.wsp")
 ws <- open_flowjo_xml(wsFile, sample_names_from = 'sampleNode')
 ```
 
-```{r error=TRUE}
+```{r error=TRUE, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
 ```
 
 This parsing error is actually due to the fact that the flowJo workspace doesn't have any gates defined.
 We can see that through
-```{r}
+```{r, eval=is_local}
 fj_ws_get_samples(ws)
 ```
 
 By default, parser will ignore and skip any sample that has zero `population`s (consider them as invalid entries in xml). This is why it gives the message of no samples to parse.
 
 User can choose to import it anyway (so that he can get FCS files to be compensated and transformed by flowJo xml), 
-```{r}
+```{r, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir, include_empty_tree = TRUE)
 range(gs_cyto_data(gs)[[1]])
 ```
 
-## Customized fc file extension
+## Customized fcs file extension
 
-```{r echo=FALSE}
+```{r echo=FALSE, eval=is_local}
 wsFile <- file.path(path, "logicle.wsp")
 ws <- open_flowjo_xml(wsFile)
 dataDir <- system.file("extdata", package = "flowCore")
 ```
 
-```{r error=TRUE}
+This will fail to find the samples.
+```{r error=TRUE, eval=is_local}
 gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir, additional.keys = NULL)
 ```
 
 As the error message indicates, FCS file has the non-conventional extention `.B08` other than `.fcs`.
 Parser can be configured to search for the customized fcs files.
 
-```{r}
+```{r eval=is_local}
 gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir, additional.keys = NULL, fcs_file_extension = ".B08")
 sampleNames(gs)
 ```

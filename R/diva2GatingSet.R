@@ -289,7 +289,7 @@ diva_to_gatingset<- function(obj, name = NULL
 }
 #' @importFrom XML xpathSApply
 #' @importFrom flowCore read.FCS transformList spillover logicleTransform
-#' @importFrom flowWorkspace gh_pop_set_xml_count save_gs load_gs gs_split_by_tree gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe cf_write_disk merge_list_to_gs
+#' @importFrom flowWorkspace gh_pop_set_xml_count save_gs load_gs gs_split_by_tree gh_pop_is_hidden gh_pop_is_negated swap_data_cols cs_swap_colnames get_cytoframe_from_cs load_cytoframe cf_write_disk merge_list_to_gs cs_set_cytoframe
 #' @importFrom ggcyto rescale_gate
 #' @param scale_level indicates whether the gate is scaled by tube-level or gate-level biexp_scale_value (for debug purpose, May not be needed.)
 #' @noRd

@@ -279,7 +279,7 @@ diva_to_gatingset<- function(obj, name = NULL
       else
         suppressMessages(gs <- eval(thisCall))
       #cp gates to the all files
-      gs <- gh_apply_to_new_fcs(gs[[1]], sn, path = path , swap_cols = swap_cols, ...)
+      gs <- gh_apply_to_new_fcs(gs[[1]], sn, path = path , swap_cols = swap_cols, compensation_source = "template", ...)
     }else
       gs <- eval(thisCall)
     

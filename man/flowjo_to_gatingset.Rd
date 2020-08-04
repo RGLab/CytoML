@@ -93,7 +93,7 @@ If needed, they can be calculated by calling \code{recompute} method at later st
 When it is a list, its names is supposed to be matched to sample guids (Default is the fcs filename suffixed by $TOT. See "additional.keys" arguments for details of guids)
 When some of the samples don't have the external compensations matched, it will fall back to the flowJo xml or FCS looking for the compensation matrix.}
 
-\item{transform}{\code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.}
+\item{transform}{\code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.), and only valid when execute is FALSE.}
 
 \item{fcs_file_extension}{default is ".fcs"}
 

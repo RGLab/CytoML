@@ -131,7 +131,7 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @param  greedy_match \code{logical}: By default, if flowjo_to_gatingset finds multiple FCS files matching a sample by total event count as well as sampleID and/or keywords specified by additional.keys and additional.sampleID, it will return an error listing the duplicate files.
 #'                                            If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.
 #' @param  mc.cores \code{numeric} the number of threads to pass to the C++ parser to run in parallel
-#' @param  transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
+#' @param  transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.), and only valid when execute is FALSE.
 #' @param  fcs_file_extension default is ".fcs"
 #' @param  ... Additional arguments to be passed to FCS parser
 #' @details

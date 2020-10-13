@@ -65,15 +65,21 @@ open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...
   
 }
 
+#' @importFrom dplyr group_by count arrange select
 setMethod("show",c("flowjo_workspace"),function(object){
 #	cat("FlowJo Workspace Version ",get_version(object),"\n");
       cat("File location: ",get_xml_file_path(object@doc),"\n");
       cat("\nGroups in Workspace\n");
       
       sg <- fj_ws_get_sample_groups(object)
-      tbl<-table(Name=sg$groupName,GroupID=sg$groupID)
-      print(data.frame(Name=rownames(tbl),"Num.Samples"=diag(tbl)))
       
+      sg <- sg %>% 
+            group_by(groupName, groupID) %>% 
+            count(name ="Num.Samples") %>%
+            rename(Name = groupName) %>%
+            arrange(groupID) 
+    
+      print(data.frame(sg[, -2]))
     })
 #' @export
 #' @param obj flowjo_workspace

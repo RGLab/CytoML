@@ -7,6 +7,16 @@
 
 using namespace Rcpp;
 
+// setLogLevel
+void setLogLevel(unsigned short loglevel);
+RcppExport SEXP _CytoML_setLogLevel(SEXP loglevelSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< unsigned short >::type loglevel(loglevelSEXP);
+    setLogLevel(loglevel);
+    return R_NilValue;
+END_RCPP
+}
 // open_workspace
 XPtr<flowJoWorkspace> open_workspace(string filename, int sample_name_location, int xmlParserOption);
 RcppExport SEXP _CytoML_open_workspace(SEXP filenameSEXP, SEXP sample_name_locationSEXP, SEXP xmlParserOptionSEXP) {
@@ -115,6 +125,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_CytoML_setLogLevel", (DL_FUNC) &_CytoML_setLogLevel, 1},
     {"_CytoML_open_workspace", (DL_FUNC) &_CytoML_open_workspace, 3},
     {"_CytoML_parse_workspace", (DL_FUNC) &_CytoML_parse_workspace, 26},
     {"_CytoML_get_keywords_by_id", (DL_FUNC) &_CytoML_get_keywords_by_id, 2},

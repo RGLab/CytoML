@@ -13,6 +13,13 @@ using namespace cytolib;
 using namespace CytoML;
 WS_INIT()
 
+//only needed for win
+//[[Rcpp::export]]
+void setLogLevel(unsigned short loglevel) {
+  
+  g_loglevel = loglevel;
+  
+}
 GatingSet * getGsPtr(SEXP _gsPtr){
 
 	if(R_ExternalPtrAddr(_gsPtr)==0)

@@ -176,6 +176,6 @@ test_that("autogating to cytobank--tcell", {
   #parse it back in
   suppressWarnings(gs1 <- cytobank_to_gatingset(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs")))
   stats.new <- gh_pop_compare_stats(gs1[[1]])[order(node), list(openCyto.count, node)]
-  expect_equal(stats.orig, stats.new, tol = 6e-4)
+  expect_equal(stats.orig, stats.new, tol = 6e-3)
 
 })

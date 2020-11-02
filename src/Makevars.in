@@ -6,7 +6,7 @@ ifneq (,)
 This makefile requires GNU Make.
 endif
 	
-CXX_STD = CXX17
+CXX_STD = CXX11
 #somehow the implicit $CC isn't available/accurate, so we have to re-fetch it
 compilerinfo = ${shell R CMD config CXX}
 compiler = $(findstring clang++, $(compilerinfo))

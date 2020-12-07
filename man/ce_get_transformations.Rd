@@ -4,10 +4,12 @@
 \alias{ce_get_transformations}
 \title{Obtain the transformations associated with each channel in a Cytobank experiment}
 \usage{
-ce_get_transformations(x)
+ce_get_transformations(x, panel_name = NULL)
 }
 \arguments{
 \item{x}{A \code{cytobank_experiment} object}
+
+\item{panel_name}{select panel to process}
 }
 \value{
 A \code{transformerList} object containing \code{transformation} objects for each

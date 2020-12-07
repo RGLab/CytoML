@@ -82,7 +82,7 @@ cytobank_to_gatingset <- function(x, ...)UseMethod("cytobank_to_gatingset")
 
 
 #' @name cytobank_to_gatingset
-#' @param panel_id select panel to parse
+#' @param panel_id select panel to process
 #' @param ... other arguments
 #' @method cytobank_to_gatingset cytobank_experiment
 #' @importFrom dplyr filter
@@ -95,12 +95,12 @@ cytobank_to_gatingset.cytobank_experiment <- function(x, panel_id = 1, ...){
   pname <- panel[panel_id,][["panel"]]
   samples <- ce_get_samples(ce) %>% filter(panel == pname)
   samples <- samples[["sample"]]
-  trans <- ce_get_transformations(ce)
+  trans <- ce_get_transformations(ce, pname)
   gs <- cytobank_to_gatingset(ce$gatingML, file.path(ce$fcsdir, samples), trans, ...)
   pData(gs) <- pData(ce)[samples, , drop = FALSE]
   #update markers 
-  markers.ce <- markernames(ce)[samples]
-  cols.ce <- colnames(ce)
+  markers.ce <- ce_get_markers(ce, pname)[samples]
+  cols.ce <- ce_get_channels(ce, pname)
   
   for(sn in names(markers.ce))
   {
@@ -186,18 +186,25 @@ setMethod("markernames",
           signature=signature(object="cytobank_experiment"),
           definition=function(object){
             
-            panels <- get_panel_per_file(object)
-            res <- lapply(panels, `[[`, "markers")
-            res <- Filter(Negate(is.null), res)
-            
-            if(length(unique(res)) > 1)
-            {
-              warning("markers are not consistent across samples!")
-            }
-            res
+            .Defunct("ce_get_markers")
             
           })
 
+#' Extract markers from cytobank_experiment
+#' @inheritParams ce_get_channels
+#' @export
+ce_get_markers <- function(x, panel_name = NULL){
+  panels <- get_panel_per_file(x, panel_name)
+  res <- lapply(panels, `[[`, "markers")
+  res <- Filter(Negate(is.null), res)
+  
+  if(length(unique(res)) > 1)
+  {
+    warning("markers are not consistent across samples!")
+  }
+  res
+  
+}
 #' @rdname cytobank_experiment-methods
 #' @param do.NULL,prefix not used
 #' @param x cytobank_experiment
@@ -205,36 +212,49 @@ setMethod("markernames",
 setMethod("colnames",
           signature=signature(x="cytobank_experiment"),
           definition=function(x, do.NULL="missing", prefix="missing"){
-            panels <- get_panel_per_file(x)
-            res <- lapply(panels, `[[`, "channels")
-            res <- Filter(Negate(is.null), res)
-            if(length(unique(res)) > 1)
-              stop("colnames are not consistent across samples!")
-            res[[1]]
-          })
+       .Defunct("ce_get_channels")
+               })
 
-get_panel_per_file <- function(ce){
+#' Extract channels from cytobank_experiment
+#' @param x A \code{cytobank_experiment} object
+#' @param panel_name select panel to process
+#' @export
+ce_get_channels <- function(x, panel_name = NULL){
+  panels <- get_panel_per_file(x, panel_name)
+  res <- lapply(panels, `[[`, "channels")
+  res <- Filter(Negate(is.null), res)
+  if(length(unique(res)) > 1)
+    stop("colnames are not consistent across samples!")
+  res[[1]]
+  
+}
+get_panel_per_file <- function(ce, panel_name = NULL){
   res <- lapply(ce$experiment$fcsFiles, function(sample){
                 pairs <- sample[["panel"]][["channels"]]
-                list( panel = sample[["panel"]][["name"]]
+                sp <- sample[["panel"]][["name"]]
+                if(is.null(panel_name)||panel_name == sp)
+                {
+                  list( panel = sp
                     , channels = unlist(lapply(pairs, `[[`, "shortName"))
                      , markers = unlist(lapply(pairs, `[[`, "longName"))
                     )
+                }else
+                  NULL
       
   })
   names(res) <- sampleNames(ce)
-  res
+  Filter(Negate(is.null), res)
 }
 
 #' Obtain the transformations associated with each channel in a Cytobank experiment
 #' 
 #' @name ce_get_transformations
-#' @param x A \code{cytobank_experiment} object
+#' @inheritParams ce_get_channels
 #' @return A \code{transformerList} object containing \code{transformation} objects for each
 #' transformed channel
 #' @export
-ce_get_transformations <- function(x){
-  chnls <- colnames(x)
+ce_get_transformations <- function(x, panel_name = NULL){
+  chnls <- ce_get_channels(x, panel_name)
   low.chnls <- tolower(chnls)
   scales <- x$experiment$scales
   res <- list()

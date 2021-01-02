@@ -2,32 +2,22 @@
 CXX_STD = CXX11
 #libxml is an odd ball with extra nested path(libxml2/libxml/xxx) that doesn't conform to the include path as the rest 
 #so can't use the default libs shipped with Rtools4
-PKG_CPPFLAGS =-DROUT -I../inst/include/ -I$(LIB_XML2)/$(R_ARCH)/include/libxml2 -DLIBXML_STATIC -fpermissive -DRCPP_PARALLEL_USE_TBB=1
+VERSION=2.9.8
+RWINLIB=../windows/libxml2-$(VERSION)
+PKG_CPPFLAGS =-DROUT -I../inst/include/ -I$(RWINLIB)/include/libxml2 -DLIBXML_STATIC -fpermissive -DRCPP_PARALLEL_USE_TBB=1
 
 #needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
 RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e "Rhdf5lib::pkgconfig('PKG_CXX_LIBS')")
+libxmllibs=-L$(RWINLIB)/lib${R_ARCH} -lxml2 -llzma -liconv -lz
 
-PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(LIB_XML2)/$(R_ARCH)/lib/libxml2.a `${R_HOME}/bin/Rscript -e "cytolib:::cytolib_LdFlags();cat(' ');RProtoBufLib:::LdFlags();cat(' ');RcppParallel::RcppParallelLibs()"` ${RHDF5_LIBS} -lws2_32
+PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(libxmllibs) `${R_HOME}/bin/Rscript -e "cytolib:::cytolib_LdFlags();cat(' ');RProtoBufLib:::LdFlags();cat(' ');RcppParallel::RcppParallelLibs()"` ${RHDF5_LIBS} -lws2_32
 
-USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
-PKGLIB = ${USERDIR}/libflowWorkspace.a
-
-
-all:  $(SHLIB)
- 
-$(SHLIB): $(PKGLIB)
-
-
-#expose static lib for other package to link to 
-$(PKGLIB): $(OBJECTS)
-	mkdir -p "${USERDIR}"
-	$(AR) rs "${PKGLIB}" $(OBJECTS)
-
-
-.PHONY: 	all clean 
+all: clean winlibs
 
 clean:
-		rm -f $(OBJECTS) $(SHLIB)
- 
+	rm -f $(OBJECTS) $(SHLIB)
 
+winlibs:
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R" $(VERSION)
 
+.PHONY: all winlibs clean

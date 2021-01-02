@@ -33,14 +33,18 @@ ce
 **cytobank_experiment** is a wrapper around the `ACS` file, which can be inspected by various accessors.
 ```{r}
 sampleNames(ce)
-colnames(ce)
-markernames(ce)
+ce_get_panels(ce)
+ce_get_compensations(ce)
+ce_get_samples(ce)
+ce_get_channels(ce)
+ce_get_markers(ce)
 pData(ce)
 ```
 Then import `cytobank_experiment` into **GatingSet**
 ```{r}
 gs <- cytobank_to_gatingset(ce)
 ```
+By default, the first `panel` (i.e. `panel_id = 1`) will be imported. Change `panel_id` argument to select different panel (if there are more than one , which can be inspected by `ce_get_panels`   )
 
 Alternatively, the import can be done by `gatingML` and `fcs` files that are downloaded separately form Cytobank without `ACS`.
 ```{r, eval=FALSE}

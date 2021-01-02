@@ -327,7 +327,19 @@ backend <- match.arg(backend, c("h5", "tile"))
   #    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed                
   gslist <- suppressMessages(gs_split_by_tree(gs))
   if(length(gslist) > 1)
-	  warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
+  {
+    msg <- "GatingSet contains different gating tree structures and must be cleaned before using it!\n "
+    if(grepl("all samples", groups[groupInd], ignore.case = TRUE))
+    {
+      msg <- c(msg
+              , "It seems that you selected the 'All Samples' group,"
+              ," which is a generic group and typically contains samples with different gating schemes attached."
+              , "Please choose a different sample group and try again.")
+    }
+    warning(msg)
+    
+  }
+	  
   gs
 }
 

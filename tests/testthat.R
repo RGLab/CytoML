@@ -1,8 +1,9 @@
 library(testthat)
 library(CytoML)
 
-
-test_check("CytoML")
+win32_flag = .Platform$OS.type == "windows" && .Machine$sizeof.pointer != 8
+if(!win32_flag)
+  test_check("CytoML")
 
 #devtools::test()
 

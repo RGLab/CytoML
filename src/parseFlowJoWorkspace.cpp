@@ -76,7 +76,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   //ws parser config
   config.data_dir = path;
   config.cf_dir = backend_dir;
-  config.fmt = backend=="h5"?FileFormat::H5:FileFormat::TILE;
+  config.fmt = FileFormat::H5;
   config.is_gating = execute;
   config.is_parse_gate = includeGates;
   config.is_pheno_data_from_FCS = is_pheno_data_from_FCS;

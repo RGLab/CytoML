@@ -9,16 +9,20 @@
 \alias{pData,cytobank_experiment-method}
 \title{Methods for interacting with cytobank_experiment objects}
 \usage{
-markernames(object)
+\S4method{markernames}{cytobank_experiment}(object)
 
-colnames(object)
+\S4method{colnames}{cytobank_experiment}(x, do.NULL = "missing", prefix = "missing")
 
-sampleNames(object)
+\S4method{sampleNames}{cytobank_experiment}(object)
 
-pData(object)
+\S4method{pData}{cytobank_experiment}(object)
 }
 \arguments{
 \item{object}{A \code{cytobank_experiment} object}
+
+\item{x}{cytobank_experiment}
+
+\item{do.NULL, prefix}{not used}
 }
 \description{
 These methods mirror similar accessor methods for the \code{GatingSet}

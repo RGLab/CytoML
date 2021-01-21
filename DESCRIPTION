@@ -1,9 +1,9 @@
 Package: CytoML
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
-Version: 1.99.13
+Version: 2.3.2
 Date: 2016-04-15
-Author: Mike Jiang, J. Spidlen., N. Gopalakrishnan, F. Hahne, B. Ellis, R. Gentleman, M. Dalphin, N. Le Meur, B. Purcell
+Author: Mike Jiang, Jake Wagner
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
 Description: Uses platform-specific implemenations of the GatingML2.0 standard 
     to exchange gated cytometry data with other software platforms.
@@ -11,15 +11,14 @@ License: file LICENSE
 License_restricts_use: yes
 LazyData: TRUE
 Imports:
-    cytolib(>= 1.99.28),
+    cytolib(>= 2.1.18),
     flowCore (>= 1.99.10),
-    flowWorkspace (>= 3.99.15),
+    flowWorkspace (>= 4.1.8),
     openCyto (>= 1.99.2),
     XML,
     data.table,
     jsonlite,
     RBGL,
-    ncdfFlow,
     Rgraphviz,
     Biobase,
     methods,
@@ -38,7 +37,8 @@ Imports:
     corpcor,
     RUnit,
     tibble,
-    RcppParallel
+    RcppParallel,
+    xml2
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib, cytolib ( >= 1.99.26),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1), flowWorkspace
 Suggests:
@@ -47,7 +47,7 @@ Suggests:
     knitr,
     parallel
 VignetteBuilder: knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 BugReports: https://github.com/RGLab/CytoML/issues
 URL: https://github.com/RGLab/CytoML
 Collate: 
@@ -68,7 +68,6 @@ Collate:
     'graphGML_methods.R'
     'helperFunctions.R'
     'parameter-methods.R'
-    'parseDivaWorkspace_old.R'
     'transforms.R'
     'utils.R'
     'writeGatingML.R'

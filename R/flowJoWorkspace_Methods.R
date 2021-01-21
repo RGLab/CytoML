@@ -7,12 +7,7 @@ NULL
 #'
 #' @section Slots: 
 #' \describe{
-#'   \item{\code{version}:}{Object of class \code{"character"}. The version of the XML workspace. }
-#'   \item{\code{file}:}{Object of class \code{"character"}. The file name. }
-#'   \item{\code{.cache}:}{Object of class \code{"environment"}. An environment for internal use.  }
-#' 	\item{\code{path}:}{Object of class \code{"character"}. The path to the file. }
-#'   \item{\code{doc}:}{Object of class \code{"XMLInternalDocument"}. The XML document object. }
-#'   \item{\code{options}:}{Object of class \code{"integer"}. The XML parsing options passed to \code{\link{xmlTreeParse}}. }
+#'   \item{\code{doc}:}{Object of class \code{"externalptr"}. }
 #'   }
 #' 
 #' @seealso 
@@ -44,7 +39,7 @@ setClass("flowjo_workspace",representation(doc="externalptr"))
 #' @param options xml parsing options passed to \code{\link{xmlTreeParse}}. See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption for details.
 #' @param sample_names_from character specifying where in the XML workspace file to obtain the sample names, either
 #' "keyword" for the included $FIL keyword for each sample, or "sampleNode" for the name of the sample node
-#' @param workspace A \code{flowjo_workspace}
+#' @param ... not used
 #' @details
 #' 	Open an XML flowJo workspace file and return a \code{flowjo_workspace} object. The workspace is represented using a \code{XMLInternalDocument} object.
 #' 	Close a flowJoWorkpsace after finishing with it. This is necessary to explicitly clean up the C-based representation of the XML tree. (See the XML package).
@@ -57,7 +52,6 @@ setClass("flowjo_workspace",representation(doc="externalptr"))
 #' }
 #'
 #' @importFrom XML xmlTreeParse xmlAttrs xmlGetAttr xmlTreeParse xmlRoot xmlValue xpathApply
-#' @import flowCore ncdfFlow
 #' @export 
 open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...){
   if("sampNloc" %in% names(list(...))){
@@ -71,17 +65,34 @@ open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...
   
 }
 
+set_log_level <- function(level = "none"){
+  if(.Platform$OS.type != "windows")
+    stop("Please call 'flowWorkspace::set_log_level' for non-windows platforms!")
+  valid_levels <- c("none", "GatingSet", "GatingHierarchy", "Population", "Gate")
+  level <- match.arg(level, valid_levels)
+  setLogLevel( as.integer(match(level, valid_levels) - 1))
+  level
+}
+
+#' @importFrom dplyr group_by count arrange select
 setMethod("show",c("flowjo_workspace"),function(object){
 #	cat("FlowJo Workspace Version ",get_version(object),"\n");
       cat("File location: ",get_xml_file_path(object@doc),"\n");
       cat("\nGroups in Workspace\n");
       
       sg <- fj_ws_get_sample_groups(object)
-      tbl<-table(Name=sg$groupName,GroupID=sg$groupID)
-      print(data.frame(Name=rownames(tbl),"Num.Samples"=diag(tbl)))
       
+      sg <- sg %>% 
+            group_by(groupName, groupID) %>% 
+            count(name ="Num.Samples") %>%
+            rename(Name = groupName) %>%
+            arrange(groupID) 
+    
+      print(data.frame(sg[, -2]))
     })
 #' @export
+#' @param obj flowjo_workspace
+#' @rdname flowjo_to_gatingset
 setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 
 #' @templateVar old parseWorkspace
@@ -90,6 +101,7 @@ setGeneric("parseWorkspace",function(obj,...)standardGeneric("parseWorkspace"))
 NULL
 
 #' @importFrom flowWorkspace openWorkspace
+#' @rdname flowjo_to_gatingset
 setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 			.Deprecated("flowjo_to_gatingset")
 			flowjo_to_gatingset(obj, ...)
@@ -99,44 +111,44 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' Parse a flowJo Workspace
 #' 
 #' Function to parse a flowJo Workspace, generate a \code{GatingHierarchy} or \code{GatingSet} object, and associated flowCore gates. The data are not loaded or acted upon until an explicit call to \code{recompute()} is made on the \code{GatingHierarchy} objects in the \code{GatingSet}.
-#' @param obj A \code{flowjo_workspace} to be parsed.
-#' @param ...
-#'      \itemize{
-#'      	\item name \code{numeric} or \code{character}. The name or index of the group of samples to be imported. If \code{NULL}, the groups are printed to the screen and one can be selected interactively. Usually, multiple groups are defined in the flowJo workspace file.
-#'      	\item execute \code{TRUE|FALSE} a logical specifying if the gates, transformations, and compensation should be immediately calculated after the flowJo workspace have been imported. TRUE by default. 
-#'      	\item subset \code{numeric} vector specifying the subset of samples in a group to import.
+#' @param ws A \code{flowjo_workspace} to be parsed.
+#' @param name \code{numeric} or \code{character}. The name or index of the group of samples to be imported. If \code{NULL}, the groups are printed to the screen and one can be selected interactively. Usually, multiple groups are defined in the flowJo workspace file.
+#' @param  execute \code{TRUE|FALSE} a logical specifying if the gates, transformations, and compensation should be immediately calculated after the flowJo workspace have been imported. TRUE by default. 
+#' @param  subset \code{numeric} vector specifying the subset of samples in a group to import.
 #'                        Or a \code{character} specifying the FCS filenames to be imported.
 #'                        Or an \code{expression} to be passed to 'subset' function to filter samples by 'pData' (Note that the columns referred by the expression must also be explicitly specified in 'keywords' argument)  
-#'      	\item requiregates \code{logical} Should samples that have no gates be included?
-#'      	\item includeGates \code{logical} Should gates be imported, or just the data with compensation and transformation?
-#'      	\item path either a \code{character} scalar or \code{data.frame}. When \code{character}, it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
+#' @param  includeGates \code{logical} Should gates be imported, or just the data with compensation and transformation?
+#' @param  path either a \code{character} scalar or \code{data.frame}. When \code{character}, it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
 #'                                                          When it is a \code{data.frame}, it is expected to contain two columns:'sampleID' and 'file', which is used as the mapping between 'sampleID' and FCS file (absolute) path. When such mapping is provided, the file system searching is avoided.
-#'      	\item sampNloc a \code{character} scalar indicating where to get sampleName(or FCS filename) within xml workspace. It is either from "keyword" or "sampleNode". 
-
-#'      	\item compensation=NULL: a \code{compensation} object, matrix or data.frame or a list of these objects that allow the customized compensation () to be used instead of the one specified in flowJo workspace or FCS file.    
+#' @param cytoset a \code{cytoset} object that provides the alternative data source other than FCS files. It is useful sometime to preprocess the raw fcs files
+#'                                   (e.g. standardize channels using \code{cytoqc} package) and then directly use them for flowJo parsing.
+#'                                   when cytoset is provided, \code{path} argument is ignored.
+#' @param h5_dir the path to write h5 data
+#' @param  compensation a \code{compensation} object, matrix or data.frame or a list of these objects that allow the customized compensation () to be used instead of the one specified in flowJo workspace or FCS file.    
 #'                                 When it is a list, its names is supposed to be matched to sample guids (Default is the fcs filename suffixed by $TOT. See "additional.keys" arguments for details of guids)
 #'                                 When some of the samples don't have the external compensations matched, it will fall back to the flowJo xml or FCS looking for the compensation matrix.
-#'      	\item options=0: a \code{integer} option passed to \code{\link{xmlTreeParse}}
-#'          \item channel.ignore.case a \code{logical} flag indicates whether the colnames(channel names) matching needs to be case sensitive (e.g. compensation, gating..)
-#'          \item extend_val \code{numeric} the threshold that determine wether the gates need to be extended. default is 0. It is triggered when gate coordinates are below this value.
-#'          \item extend_to \code{numeric} the value that gate coordinates are extended to. Default is -4000. Usually this value will be automatically detected according to the real data range.
+#' @param  channel.ignore.case a \code{logical} flag indicates whether the colnames(channel names) matching needs to be case sensitive (e.g. compensation, gating..)
+#' @param  extend_val \code{numeric} the threshold that determine wether the gates need to be extended. default is 0. It is triggered when gate coordinates are below this value.
+#' @param  extend_to \code{numeric} the value that gate coordinates are extended to. Default is -4000. Usually this value will be automatically detected according to the real data range.
 #'                                  But when the gates needs to be extended without loading the raw data (i.e. \code{execute} is set to FALSE), then this hard-coded value is used.
-#'          \item leaf.bool a \code{logical} whether to compute the leaf boolean gates. Default is TRUE. It helps to speed up parsing by turning it off when the statistics of these leaf boolean gates are not important for analysis. (e.g. COMPASS package will calculate them by itself.)
+#' @param  leaf.bool a \code{logical} whether to compute the leaf boolean gates. Default is TRUE. It helps to speed up parsing by turning it off when the statistics of these leaf boolean gates are not important for analysis. (e.g. COMPASS package will calculate them by itself.)
 #'                                           If needed, they can be calculated by calling \code{recompute} method at later stage.
-#'          \item additional.keys \code{character} vector:  The keywords (parsed from FCS header) to be combined(concatenated with "_") with FCS filename
+#' @param  additional.keys \code{character} vector:  The keywords (parsed from FCS header) to be combined(concatenated with "_") with FCS filename
 #'                                                          to uniquely identify samples. Default is '$TOT' (total number of cells) and more keywords can be added to make this GUID.
-#'          \item additional.sampleID \code{boolean}: A boolean specifying whether to include the flowJo sample ID in a GUID to uniquely identify samples. This can be helpful when the
+#' @param  additional.sampleID \code{boolean}: A boolean specifying whether to include the flowJo sample ID in a GUID to uniquely identify samples. This can be helpful when the
 #'                                                    filename or other keywords are not enough to differentiate between samples. Default is FALSE.                                                
-#'          \item keywords \code{character} vector specifying the keywords to be extracted as pData of GatingSet
-#'          \item keywords.source \code{character} the place where the keywords are extracted from, can be either "XML" or "FCS"
-#'          \item keyword.ignore.case a \code{logical} flag indicates whether the keywords matching needs to be case sensitive.    
-#'          \item include_empty_tree a \code{logical} whether to include samples that don't have gates.
-#'          \item greedy_match \code{logical}: By default, if flowjo_to_gatingset finds multiple FCS files matching a sample by total event count as well as sampleID and/or keywords specified by additional.keys and additional.sampleID, it will return an error listing the duplicate files.
+#' @param  keywords \code{character} vector specifying the keywords to be extracted as pData of GatingSet
+#' @param  keywords.source \code{character} the place where the keywords are extracted from, can be either "XML" or "FCS"
+#' @param  keyword.ignore.case a \code{logical} flag indicates whether the keywords matching needs to be case sensitive.    
+#' @param  include_empty_tree a \code{logical} whether to include samples that don't have gates.
+#' @param  skip_faulty_gate a \code{logical} whether to skip the faulty gates so that the parser can still process the rest of gating tree.
+#' 
+#' @param  greedy_match \code{logical}: By default, if flowjo_to_gatingset finds multiple FCS files matching a sample by total event count as well as sampleID and/or keywords specified by additional.keys and additional.sampleID, it will return an error listing the duplicate files.
 #'                                            If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.
-#'          \item mc.cores \code{numeric} the number of threads to pass to the C++ parser to run in parallel
-#' 			\item transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.
-#'      	\item ...: Additional arguments to be passed to \link{read.ncdfFlowSet} or \link{read.flowSet}.
-#'      	}
+#' @param  mc.cores \code{numeric} the number of threads to pass to the C++ parser to run in parallel
+#' @param  transform \code{logical} to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.), and only valid when execute is FALSE.
+#' @param  fcs_file_extension default is ".fcs"
+#' @param  ... Additional arguments to be passed to FCS parser
 #' @details
 #' A flowjo_workspace is generated with a call to \code{open_flowjo_xml()}, passing the name of the xml workspace file. This returns a \code{flowjo_workspace}, which can be parsed using the \code{flowjo_to_gatingset()} method. The function can be called non-interactively by passing the index or name of the group of samples to be imported via \code{flowjo_to_gatingset(obj,name=x)}, where \code{x} is either the numeric index, or the name. 
 #' The \code{subset} argument allows one to select a set of files from the chosen sample group. The routine will take the intersection of the files in the sample group, the files specified in \code{subset} and the files available on disk, and import them. 
@@ -177,11 +189,15 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @export 
 #' @importFrom utils menu
 #' @importFrom RcppParallel RcppParallelLibs
+#' @importFrom dplyr enquo
+#' @importFrom flowWorkspace cytoset get_default_backend
 flowjo_to_gatingset <- function(ws, name = NULL
     , subset = list()
     , execute = TRUE
     , path = ""
-    , h5_dir = tempdir()
+    , cytoset = NULL
+    , backend_dir = tempdir()
+	, backend = get_default_backend()
     , includeGates = TRUE
     , additional.keys = "$TOT"
     , additional.sampleID = FALSE
@@ -193,6 +209,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
     , channel.ignore.case = FALSE
     , leaf.bool = TRUE
     , include_empty_tree = FALSE
+    , skip_faulty_gate = FALSE
     , compensation = NULL
     , transform = TRUE
 	, fcs_file_extension = ".fcs"
@@ -200,7 +217,10 @@ flowjo_to_gatingset <- function(ws, name = NULL
 	, mc.cores = 1
     , ...)
 {
-  
+  if(is.null(cytoset))
+    cytoset <- cytoset()
+backend <- match.arg(backend, c("h5", "tile"))
+
   # determine the group
   g <- fj_ws_get_sample_groups(ws)
   groups <- g[!duplicated(g$groupName),]
@@ -219,9 +239,26 @@ flowjo_to_gatingset <- function(ws, name = NULL
   }
   
   #parse the filter
-  subset <- try(eval(substitute(subset)), silent = TRUE)
-  if(class(subset) == "try-error")
+  subset_parsed <- try(eval(substitute(subset)), silent = TRUE)
+  if(class(subset_parsed) == "try-error"){
+    # Try evaluating the subset arg as an expression for filtering
+    # based on keywords
+    samples_in_group <- fj_ws_get_samples(ws, groupInd)
+    subset_parsed <- try({
+      keys <- lapply(samples_in_group$sampleID, function(sid){
+        unlist(fj_ws_get_keywords(ws, sid)[keywords])
+      })
+      keys <- data.frame(do.call(rbind, keys), check.names = FALSE)
+      keys <- cbind(samples_in_group[,c("sampleID", "name")], keys)
+      # Pull the sample names that pass the filter
+      filter(keys, !!enquo(subset))$name
+      })
+  }
+  if(class(subset_parsed) == "try-error")
     stop("invalid 'subset' argument!")
+  
+  subset <- subset_parsed
+
   if(is(subset, "numeric"))#convert numeric index to sample names
   {
     subset <- as.character(fj_ws_get_samples(ws, groupInd)[subset, "name"])
@@ -263,7 +300,9 @@ flowjo_to_gatingset <- function(ws, name = NULL
                  , subset = subset
                  , execute = execute
                  , path = suppressWarnings(normalizePath(path))
-                 , h5_dir = suppressWarnings(normalizePath(h5_dir))
+                  , cytoset = cytoset@pointer
+                 , backend_dir = suppressWarnings(normalizePath(backend_dir))
+		 		 , backend = backend
                  , includeGates = includeGates
                  , additional_keys = additional.keys
                  , additional_sampleID = additional.sampleID
@@ -275,6 +314,7 @@ flowjo_to_gatingset <- function(ws, name = NULL
                  , channel_ignore_case = channel.ignore.case
                  , leaf_bool = leaf.bool
                 , include_empty_tree = include_empty_tree
+               , skip_faulty_gate = skip_faulty_gate
                  , comps = compensation
                 , transform = transform
 		 		 , fcs_file_extension = fcs_file_extension
@@ -287,7 +327,19 @@ flowjo_to_gatingset <- function(ws, name = NULL
   #    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed                
   gslist <- suppressMessages(gs_split_by_tree(gs))
   if(length(gslist) > 1)
-	  warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
+  {
+    msg <- "GatingSet contains different gating tree structures and must be cleaned before using it!\n "
+    if(grepl("all samples", groups[groupInd], ignore.case = TRUE))
+    {
+      msg <- c(msg
+              , "It seems that you selected the 'All Samples' group,"
+              ," which is a generic group and typically contains samples with different gating schemes attached."
+              , "Please choose a different sample group and try again.")
+    }
+    warning(msg)
+    
+  }
+	  
   gs
 }
 

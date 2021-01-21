@@ -1,19 +1,13 @@
 # CytoML 1.0.0
 
------------------------------------
-
 * First submission
 
 # CytoML 1.1.2
-
------------------------------------
 
 * support diva workspace parsing
 
 
 # CytoML 1.11.11 (Bioconductor 3.10)
-
------------------------------------
 
 ## API Changes
 
@@ -49,8 +43,6 @@
 * Add some flexibility to `getSpilloverMat` used in `gatingset_to_flowjo`
 
 # CytoML 1.13.x (Bioconductor 3.11)
-
------------------------------------
 
 ## API Changes
 

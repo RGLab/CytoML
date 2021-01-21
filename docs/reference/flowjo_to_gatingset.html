@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parse a flowJo Workspace — flowjo_to_gatingset • CytoML</title>
+<title>Parse a flowJo Workspace — parseWorkspace • CytoML</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,10 +46,9 @@
 
 
 
-<meta property="og:title" content="Parse a flowJo Workspace — flowjo_to_gatingset" />
+<meta property="og:title" content="Parse a flowJo Workspace — parseWorkspace" />
 <meta property="og:description" content="Function to parse a flowJo Workspace, generate a GatingHierarchy or GatingSet object, and associated flowCore gates. The data are not loaded or acted upon until an explicit call to recompute() is made on the GatingHierarchy objects in the GatingSet." />
 <meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -63,7 +66,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -77,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CytoML</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.13.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.6</span>
       </span>
     </div>
 
@@ -107,10 +110,13 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/RGLab/CytoML">
+  <a href="https://github.com/RGLab/CytoML/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -137,12 +143,18 @@
     <p>Function to parse a flowJo Workspace, generate a <code>GatingHierarchy</code> or <code>GatingSet</code> object, and associated flowCore gates. The data are not loaded or acted upon until an explicit call to <code>recompute()</code> is made on the <code>GatingHierarchy</code> objects in the <code>GatingSet</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>flowjo_to_gatingset</span>(
+    <pre class="usage"><span class='fu'>parseWorkspace</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+
+<span class='co'># S4 method for flowjo_workspace</span>
+<span class='fu'>parseWorkspace</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+
+<span class='fu'>flowjo_to_gatingset</span>(
   <span class='no'>ws</span>,
   <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   <span class='kw'>execute</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>cytoset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>h5_dir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(),
   <span class='kw'>includeGates</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>additional.keys</span> <span class='kw'>=</span> <span class='st'>"$TOT"</span>,
@@ -155,9 +167,11 @@
   <span class='kw'>channel.ignore.case</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>leaf.bool</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>include_empty_tree</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>skip_faulty_gate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>compensation</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>transform</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>fcs_file_extension</span> <span class='kw'>=</span> <span class='st'>".fcs"</span>,
+  <span class='kw'>greedy_match</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>mc.cores</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='no'>...</span>
 )</pre>
@@ -166,43 +180,120 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><ul>
-<li><p>name <code>numeric</code> or <code>character</code>. The name or index of the group of samples to be imported. If <code>NULL</code>, the groups are printed to the screen and one can be selected interactively. Usually, multiple groups are defined in the flowJo workspace file.</p></li>
-<li><p>execute <code>TRUE|FALSE</code> a logical specifying if the gates, transformations, and compensation should be immediately calculated after the flowJo workspace have been imported. TRUE by default.</p></li>
-<li><p>subset <code>numeric</code> vector specifying the subset of samples in a group to import.
-              Or a <code>character</code> specifying the FCS filenames to be imported.
-              Or an <code>expression</code> to be passed to 'subset' function to filter samples by 'pData' (Note that the columns referred by the expression must also be explicitly specified in 'keywords' argument)</p></li>
-<li><p>requiregates <code>logical</code> Should samples that have no gates be included?</p></li>
-<li><p>includeGates <code>logical</code> Should gates be imported, or just the data with compensation and transformation?</p></li>
-<li><p>path either a <code>character</code> scalar or <code>data.frame</code>. When <code>character</code>, it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
-                                                When it is a <code>data.frame</code>, it is expected to contain two columns:'sampleID' and 'file', which is used as the mapping between 'sampleID' and FCS file (absolute) path. When such mapping is provided, the file system searching is avoided.</p></li>
-<li><p>sampNloc a <code>character</code> scalar indicating where to get sampleName(or FCS filename) within xml workspace. It is either from "keyword" or "sampleNode".</p></li>
-<li><p>compensation=NULL: a <code>compensation</code> object, matrix or data.frame or a list of these objects that allow the customized compensation () to be used instead of the one specified in flowJo workspace or FCS file.    
-                       When it is a list, its names is supposed to be matched to sample guids (Default is the fcs filename suffixed by $TOT. See "additional.keys" arguments for details of guids)
-                       When some of the samples don't have the external compensations matched, it will fall back to the flowJo xml or FCS looking for the compensation matrix.</p></li>
-<li><p>options=0: a <code>integer</code> option passed to <code>xmlTreeParse</code></p></li>
-<li><p>channel.ignore.case a <code>logical</code> flag indicates whether the colnames(channel names) matching needs to be case sensitive (e.g. compensation, gating..)</p></li>
-<li><p>extend_val <code>numeric</code> the threshold that determine wether the gates need to be extended. default is 0. It is triggered when gate coordinates are below this value.</p></li>
-<li><p>extend_to <code>numeric</code> the value that gate coordinates are extended to. Default is -4000. Usually this value will be automatically detected according to the real data range.
-                        But when the gates needs to be extended without loading the raw data (i.e. <code>execute</code> is set to FALSE), then this hard-coded value is used.</p></li>
-<li><p>leaf.bool a <code>logical</code> whether to compute the leaf boolean gates. Default is TRUE. It helps to speed up parsing by turning it off when the statistics of these leaf boolean gates are not important for analysis. (e.g. COMPASS package will calculate them by itself.)
-                                 If needed, they can be calculated by calling <code>recompute</code> method at later stage.</p></li>
-<li><p>additional.keys <code>character</code> vector:  The keywords (parsed from FCS header) to be combined(concatenated with "_") with FCS filename
-                                                to uniquely identify samples. Default is '$TOT' (total number of cells) and more keywords can be added to make this GUID.</p></li>
-<li><p>additional.sampleID <code>boolean</code>: A boolean specifying whether to include the flowJo sample ID in a GUID to uniquely identify samples. This can be helpful when the
-                                          filename or other keywords are not enough to differentiate between samples. Default is FALSE.</p></li>
-<li><p>keywords <code>character</code> vector specifying the keywords to be extracted as pData of GatingSet</p></li>
-<li><p>keywords.source <code>character</code> the place where the keywords are extracted from, can be either "XML" or "FCS"</p></li>
-<li><p>keyword.ignore.case a <code>logical</code> flag indicates whether the keywords matching needs to be case sensitive.</p></li>
-<li><p>include_empty_tree a <code>logical</code> whether to include samples that don't have gates.</p></li>
-<li><p>transform <code>logical</code> to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.</p></li>
-<li><p>...: Additional arguments to be passed to read.ncdfFlowSet or read.flowSet.</p></li>
-</ul></td>
+      <th>obj</th>
+      <td><p>flowjo_workspace</p></td>
     </tr>
     <tr>
-      <th>obj</th>
+      <th>...</th>
+      <td><p>Additional arguments to be passed to FCS parser</p></td>
+    </tr>
+    <tr>
+      <th>ws</th>
       <td><p>A <code>flowjo_workspace</code> to be parsed.</p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p><code>numeric</code> or <code>character</code>. The name or index of the group of samples to be imported. If <code>NULL</code>, the groups are printed to the screen and one can be selected interactively. Usually, multiple groups are defined in the flowJo workspace file.</p></td>
+    </tr>
+    <tr>
+      <th>subset</th>
+      <td><p><code>numeric</code> vector specifying the subset of samples in a group to import.
+Or a <code>character</code> specifying the FCS filenames to be imported.
+Or an <code>expression</code> to be passed to 'subset' function to filter samples by 'pData' (Note that the columns referred by the expression must also be explicitly specified in 'keywords' argument)</p></td>
+    </tr>
+    <tr>
+      <th>execute</th>
+      <td><p><code>TRUE|FALSE</code> a logical specifying if the gates, transformations, and compensation should be immediately calculated after the flowJo workspace have been imported. TRUE by default.</p></td>
+    </tr>
+    <tr>
+      <th>path</th>
+      <td><p>either a <code>character</code> scalar or <code>data.frame</code>. When <code>character</code>, it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
+When it is a <code>data.frame</code>, it is expected to contain two columns:'sampleID' and 'file', which is used as the mapping between 'sampleID' and FCS file (absolute) path. When such mapping is provided, the file system searching is avoided.</p></td>
+    </tr>
+    <tr>
+      <th>cytoset</th>
+      <td><p>a <code>cytoset</code> object that provides the alternative data source other than FCS files. It is useful sometime to preprocess the raw fcs files
+(e.g. standardize channels using <code>cytoqc</code> package) and then directly use them for flowJo parsing.
+when cytoset is provided, <code>path</code> argument is ignored.</p></td>
+    </tr>
+    <tr>
+      <th>h5_dir</th>
+      <td><p>the path to write h5 data</p></td>
+    </tr>
+    <tr>
+      <th>includeGates</th>
+      <td><p><code>logical</code> Should gates be imported, or just the data with compensation and transformation?</p></td>
+    </tr>
+    <tr>
+      <th>additional.keys</th>
+      <td><p><code>character</code> vector:  The keywords (parsed from FCS header) to be combined(concatenated with "_") with FCS filename
+to uniquely identify samples. Default is '$TOT' (total number of cells) and more keywords can be added to make this GUID.</p></td>
+    </tr>
+    <tr>
+      <th>additional.sampleID</th>
+      <td><p><code>boolean</code>: A boolean specifying whether to include the flowJo sample ID in a GUID to uniquely identify samples. This can be helpful when the
+filename or other keywords are not enough to differentiate between samples. Default is FALSE.</p></td>
+    </tr>
+    <tr>
+      <th>keywords</th>
+      <td><p><code>character</code> vector specifying the keywords to be extracted as pData of GatingSet</p></td>
+    </tr>
+    <tr>
+      <th>keywords.source</th>
+      <td><p><code>character</code> the place where the keywords are extracted from, can be either "XML" or "FCS"</p></td>
+    </tr>
+    <tr>
+      <th>keyword.ignore.case</th>
+      <td><p>a <code>logical</code> flag indicates whether the keywords matching needs to be case sensitive.</p></td>
+    </tr>
+    <tr>
+      <th>extend_val</th>
+      <td><p><code>numeric</code> the threshold that determine wether the gates need to be extended. default is 0. It is triggered when gate coordinates are below this value.</p></td>
+    </tr>
+    <tr>
+      <th>extend_to</th>
+      <td><p><code>numeric</code> the value that gate coordinates are extended to. Default is -4000. Usually this value will be automatically detected according to the real data range.
+But when the gates needs to be extended without loading the raw data (i.e. <code>execute</code> is set to FALSE), then this hard-coded value is used.</p></td>
+    </tr>
+    <tr>
+      <th>channel.ignore.case</th>
+      <td><p>a <code>logical</code> flag indicates whether the colnames(channel names) matching needs to be case sensitive (e.g. compensation, gating..)</p></td>
+    </tr>
+    <tr>
+      <th>leaf.bool</th>
+      <td><p>a <code>logical</code> whether to compute the leaf boolean gates. Default is TRUE. It helps to speed up parsing by turning it off when the statistics of these leaf boolean gates are not important for analysis. (e.g. COMPASS package will calculate them by itself.)
+If needed, they can be calculated by calling <code>recompute</code> method at later stage.</p></td>
+    </tr>
+    <tr>
+      <th>include_empty_tree</th>
+      <td><p>a <code>logical</code> whether to include samples that don't have gates.</p></td>
+    </tr>
+    <tr>
+      <th>skip_faulty_gate</th>
+      <td><p>a <code>logical</code> whether to skip the faulty gates so that the parser can still process the rest of gating tree.</p></td>
+    </tr>
+    <tr>
+      <th>compensation</th>
+      <td><p>a <code>compensation</code> object, matrix or data.frame or a list of these objects that allow the customized compensation () to be used instead of the one specified in flowJo workspace or FCS file.
+When it is a list, its names is supposed to be matched to sample guids (Default is the fcs filename suffixed by $TOT. See "additional.keys" arguments for details of guids)
+When some of the samples don't have the external compensations matched, it will fall back to the flowJo xml or FCS looking for the compensation matrix.</p></td>
+    </tr>
+    <tr>
+      <th>transform</th>
+      <td><p><code>logical</code> to enable/disable transformation of gates and data. Default is TRUE. It is mainly for debug purpose (when the raw gates need to be parsed.</p></td>
+    </tr>
+    <tr>
+      <th>fcs_file_extension</th>
+      <td><p>default is ".fcs"</p></td>
+    </tr>
+    <tr>
+      <th>greedy_match</th>
+      <td><p><code>logical</code>: By default, if flowjo_to_gatingset finds multiple FCS files matching a sample by total event count as well as sampleID and/or keywords specified by additional.keys and additional.sampleID, it will return an error listing the duplicate files.
+If greedy_match is TRUE, the method will simply take the first file with either filename or $FIL keyword matching the sample name and having the correct number of events.</p></td>
+    </tr>
+    <tr>
+      <th>mc.cores</th>
+      <td><p><code>numeric</code> the number of threads to pass to the C++ parser to run in parallel</p></td>
     </tr>
     </table>
 
@@ -248,15 +339,9 @@ The <code>subset</code> argument allows one to select a set of files from the ch
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -267,7 +352,7 @@ The <code>subset</code> argument allows one to select a set of files from the ch
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

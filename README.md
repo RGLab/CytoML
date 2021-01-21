@@ -31,6 +31,17 @@ CytoML allows you to:
   - Share computational flow analyses with users on other platforms.
   - Perform comparative analyses between computational and manual gating
     approaches.
+    
+### Reporting Bugs or Issues
+- Use the issue template in github when creating a new issue. 
+- Follow the instructions in the template (do your background reading).
+- Search and verify that the issue hasn't already been addressed.
+- Check the Bioconductor support site. 
+- Make sure your flow packages are up to date.
+- THEN if your issue persists, file a bug report.
+
+Otherwise, we may close your issue without responding.
+
 
 ## INSTALLATION
 
@@ -49,8 +60,8 @@ BiocManager::install("openCyto")
 install.packages("devtools") 
 library(devtools) #load it
 
-install_github("RGLab/flowWorkspace", ref="trunk")
-install_github("RGLab/openCyto", ref="trunk")
+install_github("RGLab/flowWorkspace")
+install_github("RGLab/openCyto")
 ```
 
 ### Installing from [BioConductor](https://www.bioconductor.org).
@@ -85,7 +96,7 @@ BiocManager::install("CytoML", version = "devel")
 
 ``` r
 install.packges("devtools")
-devtools::install_github("RGLab/CytoML", ref = "trunk")
+devtools::install_github("RGLab/CytoML")
 ```
 
   - [Latest GitHub Release](https://github.com/RGLab/CytoML/releases)

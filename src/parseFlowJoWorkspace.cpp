@@ -13,6 +13,13 @@ using namespace cytolib;
 using namespace CytoML;
 WS_INIT()
 
+//only needed for win
+//[[Rcpp::export]]
+void setLogLevel(unsigned short loglevel) {
+  
+  g_loglevel = loglevel;
+  
+}
 GatingSet * getGsPtr(SEXP _gsPtr){
 
 	if(R_ExternalPtrAddr(_gsPtr)==0)
@@ -42,7 +49,9 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , List subset
                                   , bool execute
                                   , string path
-                                  , string h5_dir
+								  , XPtr<GatingSet> cytoset
+                                  , string backend_dir
+								  , string backend
                                   , bool includeGates
                                   , vector<string> additional_keys
                                   , bool additional_sampleID
@@ -54,6 +63,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , bool channel_ignore_case
                                   , bool leaf_bool
 								  , bool include_empty_tree
+								  , bool skip_faulty_gate
 								  , List comps
 								  , bool transform
 								  , string fcs_file_extension
@@ -65,7 +75,8 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   ParseWorkspaceParameters config;
   //ws parser config
   config.data_dir = path;
-  config.h5_dir = h5_dir;
+  config.cf_dir = backend_dir;
+  config.fmt = FileFormat::H5;
   config.is_gating = execute;
   config.is_parse_gate = includeGates;
   config.is_pheno_data_from_FCS = is_pheno_data_from_FCS;
@@ -78,6 +89,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   config.channel_ignore_case = channel_ignore_case;
   config.compute_leaf_bool_node = leaf_bool;
   config.include_empty_tree = include_empty_tree;
+  config.skip_faulty_node = skip_faulty_gate;
   config.fcs_file_extension = fcs_file_extension;
   config.greedy_match = greedy_match;
   config.transform = transform;
@@ -107,7 +119,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   else
 	  config.compensation_map = list_to_comps(comps);
 
-  unique_ptr<GatingSet> gs = ws->to_GatingSet(group_id, config);
+  unique_ptr<GatingSet> gs = ws->to_GatingSet(group_id, config, *cytoset);
   return XPtr<GatingSet>(gs.release());
 }
 

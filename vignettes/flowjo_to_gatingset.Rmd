@@ -1,0 +1,358 @@
+---
+title: "Import FlowJo workspace to R"
+author: "Mike Jiang"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    collapsed: false
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{flowJo parser}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set()
+```
+
+# Basics
+
+`CytoML` provides `flowjo_to_gatingset` function to parse `FlowJo` workspace (`xml` or `wsp` file) and FCS files into a self-contained `GatingSet` object, which captures the entire analysis recorded in flowJo, include `compensation`, `transformation` and `gating`.
+
+## open the workspace
+
+```{r}
+library(CytoML)
+dataDir <- system.file("extdata",package="flowWorkspaceData")
+wsfile <- list.files(dataDir, pattern="manual.xml",full=TRUE)
+ws <- open_flowjo_xml(wsfile)
+ws
+```
+
+### Extract groups from xml
+
+Once opened, sample group information can be retrieved
+
+```{r}
+tail(fj_ws_get_sample_groups(ws))
+```
+
+### Extract Samples from xml 
+
+And sample information for a given group
+
+```{r}
+fj_ws_get_samples(ws, group_id = 5)
+```
+
+### Extract keywords from xml
+
+keywords recorded in xml for a given sample
+
+```{r}
+fj_ws_get_keywords(ws, 28)[1:5]
+```
+
+## Parse with default settings
+In majority use cases, only two parameters are required to complete the parsing, i.e.
+
+- `name`: the group to import
+- `path`: the data path of FCS files. 
+
+### select group
+
+`name` parameter can be set to the group name displayed above through `flowJo_workspace` APIs.
+
+```{r eval=FALSE}
+gs <- flowjo_to_gatingset(ws, name = "T-cell")
+```
+
+`name` can also be the numeric index
+```{r eval=FALSE}
+gs <- flowjo_to_gatingset(ws, name = 4)
+```
+
+### FCS path
+
+As shown above, the `path` be omitted if fcs files are located at the same folder as xml file.
+
+#### string
+Otherwise, `path` is set the actual folder where FCS files are located. The folder can contain sub-folders and the parser will recursively look up the directory for FCS files (by matching the file names, keywords, etc)
+
+
+```{r eval=FALSE}
+gs <- flowjo_to_gatingset(ws, name = 4, path = dataDir)
+```
+
+#### data.frame
+
+`path` can alternatively be a \code{data.frame}, which should contain two columns:'sampleID' and 'file'. It essentially provides hardcoded mapping between 'sampleID' and FCS file (absolute) path to avoid the file system searching or sample matching process (between the flowJo sample reference and the FCS files). 
+
+However this is rarely needed since auto-searching does pretty accurate and robust matching.
+
+# Advanced
+
+Due to the varieties of FlowJo workspace or FCS file issues, sometime the default setting won't be sufficient to handle some edge cases, e.g. when the error occurs at specific gate due to the incorrect gate parameters defined in xml , but we want to be able to import the upstream gates that are still useful. Or there is letter case inconsistency for channels used in xml, which will trigger an error by default.
+
+Also there are other features provided by the parser that allow users to speed up the parsing or extract more meta data from either xml or FCS files.
+
+`flowjo_to_gatingset` provides more parameters that can be configured to solve different problems during the parsing. In document aims to go through these parameters and explore them one by one.
+
+## Parsing xml without loading FCS
+
+It is possible to only import the gating structure without reading the FCS data by setting `execute` flag to `FALSE`.
+```{r}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE)
+gs
+```
+
+Gating hierarchy is immediately available
+```{r}
+suppressMessages(library(flowWorkspace))
+plot(gs)
+```
+
+So are the gates
+```{r}
+gs_pop_get_gate(gs, "CD3+")
+```
+
+compensations
+```{r}
+gs_get_compensations(gs)[1]
+```
+
+transformations
+```{r}
+gh_get_transformations(gs[[1]], channel = "B710-A")
+```
+
+
+and `stats`
+```{r}
+head(gs_pop_get_stats(gs, xml = TRUE))
+```
+Note that `xml` flag needs to be set in order to tell it to return the stats from xml file. Otherwise it will display the value computed from FCS file, which will be `NA` in this case since we didn't load FCS files.
+
+Apparently, it is very fast to only import xml, but data won't be available for retrieving.
+```{r error=TRUE}
+gs_pop_get_data(gs)
+```
+
+## Additional keys to tag samples
+
+As shown above, the sample names appear to be the FCS filename appended with some numbers by default
+```{r}
+sampleNames(gs)
+```
+
+These numbers are actually the value of `$TOT` keyword, which is the total number of events for each sample. This value is typically unique for each file thus is used to tag the sample on top of the existing sample name. 
+This default behavior is recommended so that samples can be uniquely identified even when duplication of file names occur, which is not uncommon. e.g. We often see the multiple files are named as `Specimen_XXX` that are located under different sub-folders.
+
+### additional.keys
+However, if users decide it is unnecessary in their case and prefer to the shorter names. It can be removed through `additional.keys` parameter
+```{r}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE, additional.keys = NULL)
+sampleNames(gs)
+```
+
+Or it can be tagged by some extra keywords value if `$TOT` turns out to be not sufficient for the unique ID, which rarely happens.
+```{r}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE, additional.keys = c("$TOT", "EXPERIMENT NAME"))
+sampleNames(gs)
+
+```
+
+### additional.sampleID
+And we can even include the `sample ID` used by flowJo xml when the filename and other keywords can't be differentiated between samples. This can be turned on by `additional.sampleID` flag
+
+```{r}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE, additional.sampleID = TRUE)
+sampleNames(gs)
+```
+
+## Annotate sample with keywords
+
+Be default, the pheno data of samples (returned by `pData()`) only contains single column of file name.
+```{r}
+pData(gs)
+```
+
+### keywords
+
+`keywords` can be specified to ask the parser to exact the keywords and attach them to the pdata.
+```{r}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE, additional.keys = NULL, keywords = c("EXPERIMENT NAME", "TUBE NAME"))
+pData(gs)
+```
+
+### keywords.source
+
+By default, `keywords` are parsed from xml file. Alternatively it can be read from FCS files by setting `keywords.source = "FCS"`.
+Obviously, `execute` needs to be set to `TRUE` in order for this to succeed.
+
+### keyword.ignore.case
+
+Occasionally, keyword names may not be case consistent across samples, e.g. `tube name` vs `TUBE NAME`, which will prevent the parser from
+constructing the `pData` data structure properly. 
+
+`keyword.ignore.case` can be optionally set to `TRUE` in order to relax the rule to make the parser succeed. 
+But it is recommended to keep it as default (especially when `keywords.source = "FCS"`) and use the dedicated tool `cytoqc` package to standardize `FCS` files before running the parser.
+
+## Import a subset
+
+Sometime it is useful to only select a small subset of samples to import to quickly test or review the content of gating tree instead of waiting for the entire data set to be completed, which could take longer time if the total number of samples is big.
+
+`subset` argument takes numeric indies, e.g.
+
+```{r}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE, additional.keys = NULL, subset = 1:2)
+sampleNames(gs)
+```
+
+or the vector of sample (FCS) names, e.g.
+```{r eval=FALSE}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE, additional.keys = NULL, subset = c("CytoTrol_CytoTrol_3.fcs"))
+sampleNames(gs)
+```
+
+or an \code{expression} that is similar to the one passed to 'base::subset' function to filter a data.frame.
+Note that the columns referred by the expression must also be explicitly specified in 'keywords' argument, which we will cover in the later sections.
+
+e.g.
+```{r}
+gs <- flowjo_to_gatingset(ws, name = 4, execute = FALSE, additional.keys = NULL
+                                                        , subset = `EXPERIMENT NAME` == "C2_Tcell"
+                                                        , keywords = c("EXPERIMENT NAME")
+                                                        )
+
+pData(gs)
+```
+
+## Parallel parsing
+
+It is possible to utilize multiple cpus (cores) to speed up the parsing where each sample is parsed and gated concurrently.
+Parallel parsing is enabled when `mc.cores` is set to the value > 1.
+```{r eval=FALSE}
+gs <- flowjo_to_gatingset(ws, name = 4, mc.cores = 4)
+```
+
+However, be careful to avoid setting too many cores, which may end up slowing down the process caused by disk IO because FCS files need to be read from disk and the type of file system also contributes to the performance. e.g. parallel file system provided by HPC usually performs better than the regular personal computer. 
+
+## Skip leaf boolean gates
+```{r echo=FALSE}
+is_local <- dir.exists("~/rglab/workspace/CytoML/wsTestSuite")
+```
+
+```{r echo=FALSE, eval=is_local}
+path <- "~/rglab/workspace/CytoML/wsTestSuite"
+thisPath <- file.path(path, "searchRefNode")
+wsFile <- file.path(thisPath, "2583-Y-MAL067-FJ.xml")
+ws <- open_flowjo_xml(wsFile)
+```
+
+Sometime the gating tree could be big and could be slow to import all the gates, e.g.
+```{r, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name="Samples", subset = "1379326.fcs", execute = FALSE)
+nodes <- gs_get_pop_paths(gs)
+length(nodes)
+plot(gs, "3+")
+```
+
+it contains a lot of boolean gates at the bottom level of the tree, e.g.
+
+```{r, eval=is_local}
+tail(nodes, 10)
+```
+
+If these boolean gates are not important for the analysis, user can choose to skip computing them
+```{r, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name="Samples", subset = "1379326.fcs", leaf.bool = F)
+gs_pop_get_stats(gs)
+```
+
+As shown, these boolean leaf gates are still imported, but not gated or computed (which is why stats are NA for these gates). This will speed up the parsing by avoid calculating significant portion of the tree.
+And it can be computed later if user decides to do so
+
+```{r, eval=is_local}
+recompute(gs)
+gs_pop_get_stats(gs)
+```
+
+## Skip faulty gates
+
+```{r echo=FALSE, eval=is_local}
+wsFile <- file.path(path, "bypassfaultynode.xml")
+ws <- open_flowjo_xml(wsFile)
+dataDir <- file.path(path,"Cytotrol/NHLBI/Tcell/")
+```
+
+```{r error=TRUE, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name = 4, path = dataDir, subset = 1)
+```
+
+This parsing error is due to the incorrect channel name is used by `CD4` gate that is defined in flowJo and FCS files don't have that channel
+```{r, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name = 4, path = dataDir, execute = FALSE)
+plot(gs)
+gs_pop_get_gate(gs, "CD4")[[1]]
+```
+
+The parser can be told to skip `CD4` and all its descendants so that the rest of gates can still be parsed
+```{r, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name = 4, path = dataDir, subset = 1, skip_faulty_gate = TRUE)
+head(gs_pop_get_stats(gs))
+```
+
+Similar to skipping leaf boolean gates, faulty gates are still imported, but they are not computed.
+
+## Import the empty gating tree
+
+```{r echo=FALSE, eval=is_local}
+ wsFile <- file.path(path, "no-gate.wsp")
+ws <- open_flowjo_xml(wsFile, sample_names_from = 'sampleNode')
+```
+
+```{r error=TRUE, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir)
+```
+
+This parsing error is actually due to the fact that the flowJo workspace doesn't have any gates defined.
+We can see that through
+```{r, eval=is_local}
+fj_ws_get_samples(ws)
+```
+
+By default, parser will ignore and skip any sample that has zero `population`s (consider them as invalid entries in xml). This is why it gives the message of no samples to parse.
+
+User can choose to import it anyway (so that he can get FCS files to be compensated and transformed by flowJo xml), 
+```{r, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir, include_empty_tree = TRUE)
+range(gs_cyto_data(gs)[[1]])
+```
+
+## Customized fcs file extension
+
+```{r echo=FALSE, eval=is_local}
+wsFile <- file.path(path, "logicle.wsp")
+ws <- open_flowjo_xml(wsFile)
+dataDir <- system.file("extdata", package = "flowCore")
+```
+
+This will fail to find the samples.
+```{r error=TRUE, eval=is_local}
+gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir, additional.keys = NULL)
+```
+
+As the error message indicates, FCS file has the non-conventional extention `.B08` other than `.fcs`.
+Parser can be configured to search for the customized fcs files.
+
+```{r eval=is_local}
+gs <- flowjo_to_gatingset(ws, name = 1, path = dataDir, additional.keys = NULL, fcs_file_extension = ".B08")
+sampleNames(gs)
+```
+

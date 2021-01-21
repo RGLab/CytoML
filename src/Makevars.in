@@ -6,12 +6,13 @@ ifneq (,)
 This makefile requires GNU Make.
 endif
 	
-CXX_STD = CXX14
-PKG_CPPFLAGS =-DROUT -I../inst/include/ @PKG_CPPFLAGS@ -DBOOST_NO_AUTO_PTR -Wno-unknown-pragmas -Wno-comment 
+CXX_STD = CXX11
+
+PKG_CPPFLAGS =-DROUT -I../inst/include/ @PKG_CPPFLAGS@ -DBOOST_NO_AUTO_PTR 
 
 RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
     "${R_HOME}/bin/R" --vanilla --slave)
 
-PKG_LIBS = `${R_HOME}/bin/Rscript -e "cytolib:::cytolib_LdFlags();cat(' ');RProtoBufLib::LdFlags()"` $(RHDF5_LIBS) $(LAPACK_LIBS) $(BLAS_LIBS) @PKG_LIBS@   
+PKG_LIBS = `${R_HOME}/bin/Rscript -e "cytolib:::cytolib_LdFlags()"` $(RHDF5_LIBS) $(LAPACK_LIBS) $(BLAS_LIBS) @PKG_LIBS@   
 
   

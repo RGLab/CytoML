@@ -1,6 +1,43 @@
 context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
+
+test_that("verify the extend logic no longer needed for the gate defined in biexp scale from latest flowjo wsp output",{
+  wsFile <- file.path(path, "gate_negative_area.wsp")
+  ws <- open_flowjo_xml(wsFile)
+  thispath <- system.file("extdata", package = "flowWorkspaceData")
+  gs <- flowjo_to_gatingset(ws, name=1, path = thispath, extend_val = -Inf)
+  
+  res <- gh_pop_compare_stats(gs[[1]])
+  
+  expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.0003)
+  
+  
+})
+test_that("bypass faulty node",{
+  
+  wsFile <- file.path(path, "bypassfaultynode.xml")
+  
+  ws <- open_flowjo_xml(wsFile)
+  
+  expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = file.path(path,"Cytotrol/NHLBI/Tcell/"), subset = 1), "colname not", class = "error")
+  gs <- flowjo_to_gatingset(ws, name = 4, path = file.path(path,"Cytotrol/NHLBI/Tcell/"), subset = 1, skip_faulty_gate = TRUE)
+  
+  expect_equal(length(gs_get_pop_paths(gs)), 24)
+  expect_is(gh_pop_get_count(gs[[1]], "CD3+"), "numeric")
+  expect_true(is.na(gh_pop_get_count(gs[[1]], "CD4")))
+  
+  
+})
+test_that("Attribute redefined",{
+			skip("only run interactively due to its lengthy output that can't be suppressed")
+			wsFile <- file.path(path, "attr_redefined_err.xml")
+			expect_error(ws <- open_flowjo_xml(wsFile), "not parsed", class = "error")
+			suppressMessages(ws <- open_flowjo_xml(wsFile, options = 1))
+			expect_is(ws, "flowjo_workspace")
+			
+		})
+
 test_that("no gate",{
   
   wsFile <- file.path(path, "no-gate.wsp")
@@ -817,3 +854,15 @@ test_that("magnetic gates", {
   expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
 })
 
+test_that("keep uncompensated channels", {
+  wsfile <- file.path(path, "comp_uncomp.wsp")
+  datapath <- system.file("extdata",package="flowWorkspaceData")
+  cf <- load_cytoframe_from_fcs(list.files(datapath, "CytoTrol_CytoTrol_1.fcs", full.names = TRUE))
+  ws <- open_flowjo_xml(wsfile);
+  gs1 <- flowjo_to_gatingset(ws, name = 1, path = datapath);
+  expect_equal(colnames(gs1),
+               c("FSC-A","FSC-H","FSC-W","SSC-A","Comp-B710-A","Comp-R660-A","Comp-R780-A","Comp-V450-A","Comp-V545-A","Comp-G560-A","Comp-G780-A","Time","B710-A"))
+  expected_dims <- dim(cf)
+  expected_dims["parameters"] <- expected_dims["parameters"] + 1
+  expect_equal(expected_dims, dim(gh_pop_get_data(gs1[[1]])))
+})

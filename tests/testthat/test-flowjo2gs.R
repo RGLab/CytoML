@@ -14,6 +14,41 @@ source("flowJoWorkspace-testSuite.R", local = TRUE)
 
 gs <- NULL
 
+test_that("parse workspace by loading data from cytoset",{
+  #default search fcs 
+  tmp <- tempfile()
+  dir.create(tmp)
+  invisible(capture_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp), "No samples", class = "error")))
+  cs <- load_cytoset_from_fcs(list.files(dataDir, ".fcs", full.names = TRUE)[1], backend = "mem")
+  #supply in-memory cs
+  expect_equal(cs_get_uri(cs), "")
+  expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "not supported", class = "error")
+  #supply non-matched cs
+  cs <- load_cytoset_from_fcs(list.files(dataDir, "a2004", full.names = TRUE)[1], is_h5 = TRUE)
+  invisible(capture_output(expect_error(gs <- flowjo_to_gatingset(ws, name = 4, path = tmp, cytoset = cs), "No samples", class = "error")))
+  #supply correct cs
+  cs <- load_cytoset_from_fcs(list.files(dataDir, "CytoTrol_CytoTrol_", full.names = TRUE), is_h5 = TRUE)
+  #create view
+  cf <- get_cytoframe_from_cs(cs, 1)
+  # colnames(cf)[5] <- "B710"
+  newcol <- matrix(0, nrow = nrow(cf), ncol = 1)
+  colnames(newcol) <- "redundant"
+  cf <- cf_append_cols(cf, newcol)
+  cf <- cf[, -13]
+  cflist <- list(cf, cs[[2, return = "cytoframe"]])
+  names(cflist) <- c("a","b")
+  cs <- cytoset(cflist)
+  invisible(capture_output(gs <- flowjo_to_gatingset(ws, name = 4, path = tempdir(), cytoset = cs)))
+  expect_that(gs, is_a("GatingSet"))
+  stats <- gh_pop_compare_stats(gs[[1]])  
+  expect_equal(stats[, openCyto.freq], stats[, xml.freq], tol = 3e-3)
+  #cs is shared with gs
+  expect_equal(cs_get_uri(cs), cs_get_uri(gs_cyto_data(gs)))
+  #cs meta is also modified in place
+  expect_equal(colnames(cs), colnames(gs_cyto_data(gs)))
+  
+  })
+
 test_that("Can parse workspace in current working dir without path",{
   wd <- getwd()
   setwd(dataDir)
@@ -161,11 +196,10 @@ test_that("parse pData from keyword", {
 
 
 test_that("subset", {
-
-    #TODO:subset by keyword  
-    expect_error(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4
-                                                                , subset = `TUBE NAME` %in% c("CytoTrol_1", "CytoTrol_2")
-                                                                , keywords = "TUBE NAME", execute = F), "invalid")
+  
+    dd <- capture.output(suppressMessages(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4
+                                          , subset = `TUBE NAME` %in% c("CytoTrol_1", "CytoTrol_2")
+                                          , keywords = "TUBE NAME", execute = F)))
     #subset by sample names
     dd <- capture.output(suppressMessages(gs2 <- flowjo_to_gatingset(ws, path = dataDir, name = 4
                                                                 , subset = c("CytoTrol_CytoTrol_1.fcs", "CytoTrol_CytoTrol_2.fcs")
@@ -178,6 +212,7 @@ test_that("subset", {
                                                                  , subset = 1:2
                                                                  , keywords = "TUBE NAME"
                                                                  , execute = F))))
+    expect_equivalent(pData(gs1), pData(gs2))
     expect_equivalent(pData(gs2), pData(gs3))
     
     expect_error(gs4 <- flowjo_to_gatingset(ws, path = dataDir, name = 4

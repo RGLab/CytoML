@@ -21,7 +21,7 @@ it is typically used by 'cytobank_experiment' parser(i.e. 'cytobank_to_gatingset
 
 \item{...}{other arguments}
 
-\item{panel_id}{select panel to parse}
+\item{panel_id}{select panel to process}
 }
 \value{
 a GatingSet

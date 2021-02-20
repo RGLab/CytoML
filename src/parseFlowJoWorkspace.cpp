@@ -13,6 +13,13 @@ using namespace cytolib;
 using namespace CytoML;
 WS_INIT()
 
+//only needed for win
+//[[Rcpp::export]]
+void setLogLevel(unsigned short loglevel) {
+  
+  g_loglevel = loglevel;
+  
+}
 GatingSet * getGsPtr(SEXP _gsPtr){
 
 	if(R_ExternalPtrAddr(_gsPtr)==0)
@@ -69,7 +76,7 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   //ws parser config
   config.data_dir = path;
   config.cf_dir = backend_dir;
-  config.fmt = backend=="h5"?FileFormat::H5:FileFormat::TILE;
+  config.fmt = FileFormat::H5;
   config.is_gating = execute;
   config.is_parse_gate = includeGates;
   config.is_pheno_data_from_FCS = is_pheno_data_from_FCS;

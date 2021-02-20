@@ -547,7 +547,7 @@ public:
 					wsNode curMarkerNode_Y(resY->nodesetval->nodeTab[j]);
 	  				// On first pass through, add the detector names as well
   					if(i == 0)
-  						comp.detector.push_back(curMarkerNode_Y.getProperty("name"));
+  						comp.detector.push_back(curMarkerNode_Y.getProperty(nodePath.compMatChName));
 					string sValue=curMarkerNode_Y.getProperty(nodePath.compMatVal);
 					comp.spillOver.push_back(atof(sValue.c_str()));
 				}

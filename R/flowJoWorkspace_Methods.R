@@ -65,15 +65,30 @@ open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...
   
 }
 
+set_log_level <- function(level = "none"){
+  if(.Platform$OS.type != "windows")
+    stop("Please call 'flowWorkspace::set_log_level' for non-windows platforms!")
+  valid_levels <- c("none", "GatingSet", "GatingHierarchy", "Population", "Gate")
+  level <- match.arg(level, valid_levels)
+  setLogLevel( as.integer(match(level, valid_levels) - 1))
+  level
+}
+
+#' @importFrom dplyr group_by count arrange select
 setMethod("show",c("flowjo_workspace"),function(object){
 #	cat("FlowJo Workspace Version ",get_version(object),"\n");
       cat("File location: ",get_xml_file_path(object@doc),"\n");
       cat("\nGroups in Workspace\n");
       
       sg <- fj_ws_get_sample_groups(object)
-      tbl<-table(Name=sg$groupName,GroupID=sg$groupID)
-      print(data.frame(Name=rownames(tbl),"Num.Samples"=diag(tbl)))
       
+      sg <- sg %>% 
+            group_by(groupName, groupID) %>% 
+            count(name ="Num.Samples") %>%
+            rename(Name = groupName) %>%
+            arrange(groupID) 
+    
+      print(data.frame(sg[, -2]))
     })
 #' @export
 #' @param obj flowjo_workspace
@@ -312,7 +327,19 @@ backend <- match.arg(backend, c("h5", "tile"))
   #    # try to post process the GatingSet to split the GatingSets(based on different the gating trees) if needed                
   gslist <- suppressMessages(gs_split_by_tree(gs))
   if(length(gslist) > 1)
-	  warning("GatingSet contains different gating tree structures and must be cleaned before using it! ")
+  {
+    msg <- "GatingSet contains different gating tree structures and must be cleaned before using it!\n "
+    if(grepl("all samples", groups[groupInd], ignore.case = TRUE))
+    {
+      msg <- c(msg
+              , "It seems that you selected the 'All Samples' group,"
+              ," which is a generic group and typically contains samples with different gating schemes attached."
+              , "Please choose a different sample group and try again.")
+    }
+    warning(msg)
+    
+  }
+	  
   gs
 }
 

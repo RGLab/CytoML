@@ -1,5 +1,28 @@
 context("gatingset_to_cytobank ..")
 
+
+test_that("multipanel",{
+  acsfile <- "~/rglab/workspace/CytoML/wsTestSuite/gatingML/multipanel/experiment_36089_Dec-05-2020_08-49-PM.acs"
+  skip_if_not(file.exists(acsfile))
+  ce <- open_cytobank_experiment(acsfile)
+  pn <- "Panel 2"
+  expect_equal(length(get_panel_per_file(ce)), 3)
+  expect_equal(length(get_panel_per_file(ce, pn)), 1)
+  
+  expect_error(ce_get_channels(ce), "not consistent")
+  expect_equal(length(ce_get_channels(ce, pn)), 16)
+  
+  expect_warning(length(ce_get_markers(ce)), "not consistent")
+  expect_equal(length(ce_get_markers(ce, pn)), 1)
+  
+  expect_error(length(ce_get_transformations(ce)), "not consistent")
+  expect_equal(length(ce_get_transformations(ce, pn)), 7)
+  
+  gs <- cytobank_to_gatingset(ce, panel_id = 2)
+  
+  expect_is(gs, "GatingSet")
+})
+
 test_that("transform ungated channel",{
   acsfile <- "~/rglab/workspace/CytoML/wsTestSuite/gatingML/experiment_34218_Feb-16-2020_08-33-PM.acs"
   skip_if_not(file.exists(acsfile))
@@ -176,6 +199,6 @@ test_that("autogating to cytobank--tcell", {
   #parse it back in
   suppressWarnings(gs1 <- cytobank_to_gatingset(outFile, file.path(dataDir, "CytoTrol_CytoTrol_1.fcs")))
   stats.new <- gh_pop_compare_stats(gs1[[1]])[order(node), list(openCyto.count, node)]
-  expect_equal(stats.orig, stats.new, tol = 6e-4)
+  expect_equal(stats.orig, stats.new, tol = 6e-3)
 
 })

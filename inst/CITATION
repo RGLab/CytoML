@@ -1,0 +1,18 @@
+citHeader("To cite package ‘CytoML’ in publications use:")
+
+citEntry(entry = "Article",
+author = personList(as.person("Greg Finak"),
+	as.person("Wenxin Jiang"),
+	as.person("Raphael Gottardo")),
+title = "CytoML for cross-platform cytometry data sharing",
+journal = "Cytometry Part A",
+year = 2018,
+volume = 93,
+pages = 1189-1196,
+url ="https://doi.org/10.1002/cyto.a.23663",
+textVersion = paste("Finak, G. Jiang, M., Gottardo, R. (2018)",
+"CytoML for cross-platform cytometry data sharing.",
+"Cytometry A. 93:1189-1196"))
+
+citFooter("As CytoML is evolving, you may want to cite the package version. see packageVersion('CytoML')")
+

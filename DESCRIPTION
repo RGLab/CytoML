@@ -1,7 +1,7 @@
 Package: CytoML
 Type: Package
 Title: A GatingML Interface for Cross Platform Cytometry Data Sharing
-Version: 2.3.2
+Version: 2.3.3
 Date: 2016-04-15
 Author: Mike Jiang, Jake Wagner
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -11,7 +11,7 @@ License: file LICENSE
 License_restricts_use: yes
 LazyData: TRUE
 Imports:
-    cytolib(>= 2.3.4),
+    cytolib(>= 2.3.7),
     flowCore (>= 1.99.10),
     flowWorkspace (>= 4.1.8),
     openCyto (>= 1.99.2),

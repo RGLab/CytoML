@@ -322,18 +322,14 @@ public:
 	  				comp.marker.push_back(curMarkerNode_X.getProperty("parameter"));
 	  				xmlXPathObjectPtr resY=curMarkerNode_X.xpathInNode("*[local-name()='coefficient']");
 	  				unsigned nY=resY->nodesetval->nodeNr;
-	  				if(nX!=nY)
-	  				{
-	  					xmlXPathFreeObject(resX);
-	  					xmlXPathFreeObject(resY);
-	  					throw(domain_error("not the same x,y dimensions in spillover matrix!"));
-	  				}
-
 	  				for(unsigned j=0;j<nY;j++)
 	  				{
-	  					wsNode curMarkerNode_Y(resY->nodesetval->nodeTab[j]);
-	  					string sValue=curMarkerNode_Y.getProperty("value");
-	  					comp.spillOver.push_back(atof(sValue.c_str()));
+		  				wsNode curMarkerNode_Y(resY->nodesetval->nodeTab[j]);
+		  				// On first pass through, add the detector names as well
+	  					if(i == 0)
+	  						comp.detector.push_back(curMarkerNode_Y.getProperty("parameter"));
+		  				string sValue=curMarkerNode_Y.getProperty("value");
+		  				comp.spillOver.push_back(atof(sValue.c_str()));
 	  				}
 	  				xmlXPathFreeObject(resY);
 	  			}

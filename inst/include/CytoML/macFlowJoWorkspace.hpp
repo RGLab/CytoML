@@ -541,16 +541,13 @@ public:
 				comp.marker.push_back(curMarkerNode_X.getProperty("name"));
 				xmlXPathObjectPtr resY=curMarkerNode_X.xpathInNode("ChannelValue");
 				unsigned nY=resY->nodesetval->nodeNr;
-				if(nX!=nY)
-				{
-					xmlXPathFreeObject(resX);
-					xmlXPathFreeObject(resY);
-					throw(domain_error("not the same x,y dimensions in spillover matrix!"));
-				}
 
 				for(unsigned j=0;j<nY;j++)
 				{
 					wsNode curMarkerNode_Y(resY->nodesetval->nodeTab[j]);
+	  				// On first pass through, add the detector names as well
+  					if(i == 0)
+  						comp.detector.push_back(curMarkerNode_Y.getProperty(nodePath.compMatChName));
 					string sValue=curMarkerNode_Y.getProperty(nodePath.compMatVal);
 					comp.spillOver.push_back(atof(sValue.c_str()));
 				}

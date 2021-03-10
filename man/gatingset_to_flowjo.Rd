@@ -26,21 +26,10 @@ It is a R wrapper for the docker app
 (https://hub.docker.com/r/rglab/gs-to-flowjo)
 }
 \details{
-Docker images for \code{gatingset_to_flowjo} will be maintained at https://hub.docker.com/r/rglab/gs-to-flowjo for the \code{cytolib} 
-package version accompanying each Bioconductor release, as well as a "devel" tagged image for use with the current GitHub development 
-braches of the RGLab cytometry packages.
+Docker images for \code{gatingset_to_flowjo} will be maintained at https://gallery.ecr.aws/x4k5d9i7/cytoverse/gs-to-wsp
 
-If you are using CytoML from a Bioconductor release, please pull docker image corresponding to the major and minor version returned from
-\code{packageVersion("cytolib")}, For example, if \code{packageVersion("cytolib")} returns \code{2.0.2}, you should use:
 
-\code{docker pull rglab/gs-to-flowjo:2.0}
-
-If you are using CytoML from the current GitHub development branch ("master" branch), please pull the "devel" tagged image. For example:
-
-\code{docker pull rglab/gs-to-flowjo:devel}
-
-You may also specify a particular docker image and tag via the \code{docker_img} argument. If not provided, \code{gatingset_to_flowjo} will
-search for the correct default image corresponding to your \code{cytolib} version.
+\code{docker pull public.ecr.aws/x4k5d9i7/cytoverse/gs-to-wsp:latest}
 }
 \examples{
 \dontrun{

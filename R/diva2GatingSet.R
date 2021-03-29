@@ -298,6 +298,7 @@ diva_to_gatingset<- function(obj, name = NULL
                                 , template_sheet = "Global Sheet1"
                                 , swap_cols
                                 ,path,xmlParserOption, ws, groupName, scale_level = "tube", verbose = FALSE, num_threads = 1
+                                , xml_compensation_enabled = NULL
                                 ,  ...){
 
   scale_level <- match.arg(scale_level, c("gate", "tube"))
@@ -395,7 +396,8 @@ diva_to_gatingset<- function(obj, name = NULL
         #global worksheet doesn't seem to have the valid default scale parameters sometime
         #so we parse it from the sample/tube-specific settings
         use_auto_biexp_scale <- as.logical(xmlValue(sampleNode.tube[["instrument_settings"]][["use_auto_biexp_scale"]]))
-        xml_compensation_enabled <- as.logical(xmlValue(sampleNode.tube[["instrument_settings"]][["compensation_enabled"]]))
+        if(is.null(xml_compensation_enabled))
+          xml_compensation_enabled <- as.logical(xmlValue(sampleNode.tube[["instrument_settings"]][["compensation_enabled"]]))
         biexp_scale_node <- ifelse(use_auto_biexp_scale, "comp_biexp_scale", "manual_biexp_scale")
         comp <- xpathApply(sampleNode.tube, "instrument_settings/parameter", function(paramNode, biexp_para){
 

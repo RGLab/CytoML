@@ -340,7 +340,7 @@ gatingset_to_flowjo(gs, outFile)
 ## Next Steps
 
 See the [flowWorskspace](http://www.github.com/RGLab/flowWorkspace) and
-\[openCyto\](<http://www.github.com/RGLab/openCyto>) packages to learn
+[openCyto](<http://www.github.com/RGLab/openCyto>) packages to learn
 more about what can be done with `GatingSet` objects.
 
 ## Code of conduct

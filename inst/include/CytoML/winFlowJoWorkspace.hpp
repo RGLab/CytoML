@@ -849,18 +849,40 @@ public:
 				//only meaningful for scaling ellipsoidGate from 256 back to raw
 				if(g_loglevel>=GATING_SET_LEVEL)
 					COUT<<"flin func:"<<pname<<endl;
-//				double minRange=atof(transNode.getProperty("minRange").c_str());
-				double maxRange=atof(transNode.getProperty("maxRange").c_str());
-				if(maxRange==0)
-					maxRange = 1;
-
-				shared_ptr<scaleTrans> curTran(new scaleTrans(maxRange,maxRange));
-
-				curTran->setName("");
-				curTran->setChannel(pname);
-
-				curTp[curTran->getChannel()]=curTran;
-
+				auto gain = transNode.getProperty("gain");
+				
+				if (boost::to_lower_copy(pname) == "time") {
+				  if (gain !=
+          "1") {  // cytolib::EVENT_DATA_TYPEmust skip adding it when gain == 1 since $TIMESTEP should
+				    // be used for scaling time channel in that case
+				    
+				    auto scale_factor = stof(gain);
+				    
+				    std::shared_ptr<cytolib::scaleTrans> curTran(
+				        new cytolib::scaleTrans(scale_factor));
+				    curTran->setName("");
+				    curTran->setChannel(pname);
+				    curTran->setGateOnlyFlag(false);
+				    curTran->setDataOnlyFlag(true);
+				    curTp[pname] = curTran;
+				  }
+				} else {  // need it for ellipsoid gate rescaling
+				  // and only meaningful for scaling cytolib::ellipsoidGate from 256 back
+				  // minRange=atof(transNode.getProperty("minRange").c_str());to raw
+				  cytolib::EVENT_DATA_TYPE maxRange =
+				    atof(transNode.getProperty("transforms:maxRange").c_str());
+				  if (maxRange == 0) maxRange = 1;
+				  
+				  std::shared_ptr<cytolib::scaleTrans> curTran(
+				      new cytolib::scaleTrans(maxRange, maxRange));
+				  
+				  curTran->setName("");
+				  curTran->setChannel(pname);
+				  curTran->setGateOnlyFlag(true);
+				  curTran->setDataOnlyFlag(false);
+				  curTp[pname] = curTran;
+				}
+				
 			}else if(transType.compare("log")==0){
 				if(g_loglevel>=GATING_SET_LEVEL)
 					COUT<<"flog func:"<<pname<<endl;

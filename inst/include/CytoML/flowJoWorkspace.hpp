@@ -15,7 +15,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include "search_sample.hpp"
-#define TBB_PREVIEW_SERIAL_SUBSET 1
 
 //solve windows build issues
 #ifdef Free
@@ -26,19 +25,13 @@
 #endif
 
 
-#include <tbb/tbb.h>
-#include "tbb/task_scheduler_init.h"
-#include <tbb/spin_mutex.h>
-using namespace tbb;
 namespace CytoML
 {
 
-typedef tbb::spin_mutex GsMutexType;
 
 class flowJoWorkspace:public workspace{
 private:
 	string versionList;//used for legacy mac ws
-	GsMutexType GsMutex, TransMutex, h5Mutex;
 
 public:
 
@@ -92,7 +85,6 @@ public:
 
 	 		trans_local trans, trans_raw;
 	 		{
-				GsMutexType::scoped_lock lock1(TransMutex);//biexp interpolation could be performed on the shared global trans object
 
 				//prefixed version
 				trans = getTransformation(root,comp,transFlag,_gTrans, true);
@@ -205,17 +197,10 @@ public:
 		 * try to parse each sample
 		 */
 		GatingSet & gs = *gsPtr;
-		tbb::task_scheduler_init init(config.num_threads);
 
+		for (int i = 0; i < sample_infos.size(); i++)
+			this->parse_sample(sample_infos[i], config, data_dir, cf_dir, gTrans, gs, cytoset);
 
-		if(config.num_threads <=1)
-			tbb::serial::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-				this->parse_sample(sample_infos[i], config, data_dir, cf_dir, gTrans, gs, cytoset);
-			});
-		else
-			tbb::parallel_for<int>(0, sample_infos.size(), 1, [&, this](int i){
-							this->parse_sample(sample_infos[i], config, data_dir, cf_dir, gTrans, gs, cytoset);
-						});
 		if(gsPtr->size() == 0)
 			throw(domain_error("No samples in this workspace to parse!"));
 		//keep the cs in sync with backend file
@@ -499,11 +484,7 @@ public:
 
 				CytoFramePtr ptr;
 				{
-					if(config_const.fmt == FileFormat::H5)
-					{
-
-						GsMutexType::scoped_lock lock(h5Mutex);
-					}
+				
 						frptr->write_to_disk(cf_filename, config_const.fmt);
 						ptr = load_cytoframe(cf_filename, false);
 				}
@@ -514,7 +495,6 @@ public:
 			  gh->set_cytoframe_view(CytoFrameView(frptr));
 
 			{
-			  GsMutexType::scoped_lock lock(GsMutex);
 			  if(gs.find(uid) != gs.end()){
 			    throw(domain_error("Duplicated GUIDs detected within group: " + uid
                             + "\n Consider adding additional keywords to the GUID with argument \"additional.keys\""

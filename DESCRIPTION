@@ -37,10 +37,9 @@ Imports:
     corpcor,
     RUnit,
     tibble,
-    RcppParallel,
     xml2
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
-LinkingTo: cpp11, BH(>= 1.62.0-1), RProtoBufLib, cytolib, Rhdf5lib, flowWorkspace, RcppParallel
+LinkingTo: cpp11, BH(>= 1.62.0-1), RProtoBufLib, cytolib, Rhdf5lib, flowWorkspace
 Suggests:
     testthat,
     flowWorkspaceData ,
@@ -55,9 +54,9 @@ Collate:
     'AllClasses.R'
     'GatingSet2cytobank.R'
     'GatingSet2flowJo.R'
-    'cpp11.R'
     'gate-methods.R'
     'compensation.R'
+    'cpp11.R'
     'cytobank2GatingSet.R'
     'cytobankExperiment.R'
     'cytolibml_bin_path.R'

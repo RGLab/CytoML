@@ -188,7 +188,6 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @rdname flowjo_to_gatingset
 #' @export 
 #' @importFrom utils menu
-#' @importFrom RcppParallel RcppParallelLibs
 #' @importFrom dplyr enquo
 #' @importFrom flowWorkspace cytoset get_default_backend
 flowjo_to_gatingset <- function(ws, name = NULL

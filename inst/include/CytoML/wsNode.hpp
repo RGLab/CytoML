@@ -13,15 +13,7 @@
 #include "cytolib/nodeProperties.hpp"
 using namespace std;
 
-#ifdef ROUT
-#include <RcppArmadillo.h>
-#define COUT Rcpp::Rcout //flowWorkspace is still using Rcpp, so we don't bother replace COUT with PRINT yet
-#endif
-
-
-#ifndef ROUT
 #define COUT cout
-#endif
 
 
 namespace CytoML

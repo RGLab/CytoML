@@ -11,5 +11,8 @@ using namespace cytolib;
 #ifdef FALSE
   #undef FALSE
 #endif
+#ifdef TRUE
+  #undef TRUE
+#endif
 
 #endif // __flowWorkspace_h__

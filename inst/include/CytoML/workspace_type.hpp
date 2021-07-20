@@ -21,6 +21,8 @@ extern WS_VERSION_TYPE_MAP ws_ver_type_map; //declare global var
 												{"1.8", WS_TYPE::WS_VX},\
 												{"20.0", WS_TYPE::WS_VX}\
 												};\
+		CytoML::CytoStream  cytocout;
+
 
 namespace CytoML
 {

@@ -66,8 +66,8 @@ open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...
 }
 
 set_log_level <- function(level = "none"){
-  if(.Platform$OS.type != "windows")
-    stop("Please call 'flowWorkspace::set_log_level' for non-windows platforms!")
+  # if(.Platform$OS.type != "windows")
+    # stop("Please call 'flowWorkspace::set_log_level' for non-windows platforms!")
   valid_levels <- c("none", "GatingSet", "GatingHierarchy", "Population", "Gate")
   level <- match.arg(level, valid_levels)
   setLogLevel( as.integer(match(level, valid_levels) - 1))

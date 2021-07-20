@@ -13,7 +13,54 @@
 #include "cytolib/nodeProperties.hpp"
 using namespace std;
 
+#include <cstdio>
+#include <streambuf>
+
+namespace CytoML {
+
+    class Cytostreambuf : public std::streambuf {
+    public:
+        Cytostreambuf(){}
+
+    protected:
+        std::streamsize xsputn(const char *s, std::streamsize n) {
+        Rprintf("%.*s", n, s);
+        return n;
+    }
+
+        int overflow(int c = traits_type::eof()) {
+        if (c != traits_type::eof()) {
+            char_type ch = traits_type::to_char_type(c);
+            return xsputn(&ch, 1) == 1 ? c : traits_type::eof();
+        }
+        return c;
+    }
+
+
+       
+    };
+
+    class CytoStream : public std::ostream {
+        Cytostreambuf  cytobuf;
+    public:
+        CytoStream() : std::ostream(&cytobuf){}
+    };
+    
+
+}
+
+
+    
+extern CytoML::CytoStream  cytocout;
+
+#ifdef ROUT
+#define COUT cytocout
+#endif
+
+
+#ifndef ROUT
 #define COUT cout
+#endif
 
 
 namespace CytoML

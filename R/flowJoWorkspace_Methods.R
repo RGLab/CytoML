@@ -291,8 +291,10 @@ backend <- match.arg(backend, c("h5", "tile"))
     {
       compensation <- sapply(compensation, check_comp, simplify = FALSE)
     }else
+    {
       compensation <- check_comp(compensation)
-      
+      compensation <- list(compensation)
+    } 
   }
   args <- list(ws = ws@doc
                  , group_id = groupInd - 1

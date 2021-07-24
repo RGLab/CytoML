@@ -294,7 +294,7 @@ setMethod("pData","cytobank_experiment",function(object){
 })
 
 get_pd <- function(ce){
-  res <- do.call(rbind, lapply(ce$experiment$fcsFiles, function(sample){
+  res <- bind_rows(lapply(ce$experiment$fcsFiles, function(sample){
                                 data.frame(as.list(
                                   c(name = sample[["filename"]]
                                       , unlist(sample[["tags"]])

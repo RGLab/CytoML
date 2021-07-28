@@ -81,7 +81,7 @@ gs_compare_cytobank_counts <- function(gs, file, id.vars = c("FCS Filename", "po
 
   # extract the counts from our gating sets
   #load openCyto stats
-  opencyto_counts <- gs_pop_get_count_fast(gs, statType = "count", path = "auto")
+  opencyto_counts <- gs_pop_get_count_fast(gs, statType = "count", path = "full")
 
   setnames(opencyto_counts, names(opencyto_counts), c("fcs_filename", "population", "parent", "count", "parent_count"))
   #add root entry
@@ -93,7 +93,7 @@ gs_compare_cytobank_counts <- function(gs, file, id.vars = c("FCS Filename", "po
   opencyto_counts <- opencyto_counts[,.(fcs_filename, population, count)]
   #Remove spaces in population names as cytobank removes them here
   opencyto_counts <- opencyto_counts[, population := gsub(" ", "", population)]
-
+  opencyto_counts <- opencyto_counts[, population := basename(population)]
 
 
   # merge the two data.tables

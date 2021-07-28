@@ -59,7 +59,7 @@ jobs:
         
       - name: Install macOS system dependencies
         if: runner.os == 'macOS'
-        run: brew install libgit2
+        run: brew install libgit2 xquartz
 
       - name: Get bioc ver
         run: echo "bioc_ver=$(Rscript -e 'writeLines(as.character(remotes::bioc_version()))')" >> $GITHUB_ENV

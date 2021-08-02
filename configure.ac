@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([CytoML], [1.9.4], [wjiang2@fhcrc.org])
+AC_INIT([CytoML], [1.9.4], [mike@ozette.ai])
 AC_CONFIG_SRCDIR([src/parseFlowJoWorkspace.cpp])
 #AC_CONFIG_HEADERS([config.h])
 AC_ARG_WITH(xml2,

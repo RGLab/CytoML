@@ -25,18 +25,14 @@ Imports:
     graph,
     graphics,
     utils,
-    base64enc,
+    jsonlite,
     dplyr,
     grDevices,
     methods,
     ggcyto (>= 1.11.4),
     yaml,
-    lattice,
     stats,
-    corpcor,
-    RUnit,
-    tibble,
-    xml2
+    tibble
 biocViews: ImmunoOncology, FlowCytometry, DataImport, DataRepresentation
 LinkingTo: cpp11, BH(>= 1.62.0-1), RProtoBufLib, cytolib, Rhdf5lib, flowWorkspace
 Suggests:
@@ -70,6 +66,5 @@ Collate:
     'transforms.R'
     'utils.R'
     'writeGatingML.R'
-    'zzz.R'
 SystemRequirements: xml2, GNU make, C++11    
 Encoding: UTF-8

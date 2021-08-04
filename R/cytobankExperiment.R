@@ -293,6 +293,7 @@ setMethod("pData","cytobank_experiment",function(object){
   get_pd(object)
 })
 
+#' @importFrom dplyr bind_rows
 get_pd <- function(ce){
   res <- bind_rows(lapply(ce$experiment$fcsFiles, function(sample){
                                 data.frame(as.list(

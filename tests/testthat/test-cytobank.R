@@ -162,6 +162,7 @@ test_that("gatingML-cytobank exporting: cytotrol tcell",{
 
   close(con)
 })
+register_plugins(flowStats:::.tailgate, "tailgate")
 
 test_that("autogating to cytobank--tcell", {
   set.seed(1)

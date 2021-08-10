@@ -1,5 +1,6 @@
 context("gatingset_to_flowjo ..")
 skip_if_not((check_docker_status()[1]=="docker_ok" || check_binary_status()=="binary_ok"))
+register_plugins(flowStats:::.tailgate, "tailgate")
 test_that("autogating--tcell", {
   
   dataDir <- system.file("extdata",package="flowWorkspaceData")

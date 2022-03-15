@@ -2,15 +2,15 @@
 CXX_STD = CXX11
 #libxml is an odd ball with extra nested path(libxml2/libxml/xxx) that doesn't conform to the include path as the rest 
 #so can't use the default libs shipped with Rtools4
-VERSION=2.9.8
+VERSION=2.9.10
 RWINLIB=../windows/libxml2-$(VERSION)
 PKG_CPPFLAGS =-DROUT -I../inst/include/ -I$(RWINLIB)/include/libxml2 -DLIBXML_STATIC -fpermissive
 
 #needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
 RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e "Rhdf5lib::pkgconfig('PKG_CXX_LIBS')")
-libxmllibs=-L$(RWINLIB)/lib${R_ARCH} -lxml2 -llzma -liconv -lz
+libxmllibs=-L$(RWINLIB)/lib${R_ARCH}-ucrt -lxml2 -llzma -liconv -lz
 
-PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(libxmllibs) `${R_HOME}/bin/Rscript -e "cytolib:::cytolib_LdFlags();cat(' ');RProtoBufLib:::LdFlags()"` ${RHDF5_LIBS} -lws2_32  -lbcrypt
+PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(libxmllibs) `${R_HOME}/bin/Rscript -e "cytolib:::cytolib_LdFlags();cat(' ');RProtoBufLib:::LdFlags();cat(' ');RcppParallel::RcppParallelLibs()"` ${RHDF5_LIBS} -lws2_32  -lbcrypt
 
 all: clean winlibs
 

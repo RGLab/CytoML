@@ -107,7 +107,7 @@ test_that("set T value properly through PnE instead of PnR for flog transform wh
 
 test_that("handle the linear transform with maxRange = 0",{
   
-  wsFile <- file.path(path, "faultylinearTransform/FlowJo Test.wsp")
+  wsFile <- file.path(path, "faultylinearTransform/FlowJo_Test.wsp")
   
   ws <- open_flowjo_xml(wsFile)
   gs <- flowjo_to_gatingset(ws, name = 1)
@@ -197,7 +197,7 @@ test_that("skip gains from FCS for vX ",{
 #somehow the latest Rstudio crashes on this particular test case (but not in R console command)
 test_that("gate extension ",{
       thisPath <- file.path(path, "gate_extension")
-      wsFile <- file.path(thisPath, "02-15-2013 ICS.xml")
+      wsFile <- file.path(thisPath, "02-15-2013_ICS.xml")
       ws <- open_flowjo_xml(wsFile)
       set.seed(1)
       capture.output(gs <- flowjo_to_gatingset(ws, name=3, which.lines = 5e4))
@@ -210,7 +210,7 @@ test_that("gate extension ",{
 
 test_that("curlyQuad gate1 ",{
       thisPath <- file.path(path, "gate_extension")
-      wsFile <- file.path(thisPath, "VSVG OGH 14OCT15.wsp")
+      wsFile <- file.path(thisPath, "VSVG_OGH_14OCT15.wsp")
       ws <- open_flowjo_xml(wsFile)
       capture.output(gs <- flowjo_to_gatingset(ws, name=3))
       
@@ -280,7 +280,7 @@ test_that("Time gate ",{
 })
 test_that("Time gate2--when computed timestep is very different from $TIMESTEP ",{
       thisPath <- file.path(path, "timegate")
-      wsFile <- file.path(thisPath, "MX1 Analysis VISC.xml")
+      wsFile <- file.path(thisPath, "MX1_Analysis_VISC.xml")
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws,name="Group 1",subset=1)
       res <- gh_pop_compare_stats(gs[[1]])[xml.count!=-1,]
@@ -347,7 +347,7 @@ test_that("v 10.0.6 - vX 1.8",{
 test_that("v 10.0.7 - vX 20.0 (ellipsoidGate)",{
       
       thisPath <- file.path(path, "bioaster_ellipsoidGate")
-      wsFile <- file.path(thisPath, "Matrice 1.wsp")
+      wsFile <- file.path(thisPath, "Matrice_1.wsp")
       
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = "Matrice", subset = 1, execute = FALSE)
@@ -432,7 +432,7 @@ test_that("v 10.0.7 - vX 20.0 (McGill/treg) ellipseidGate (biexponential)",{
 test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
       
       thisPath <- file.path(path, "PROVIDE")
-      wsFile <- file.path(thisPath, "batch1 local and week 53.wsp")
+      wsFile <- file.path(thisPath, "batch1_local_and_week_53.wsp")
       
       ws <- open_flowjo_xml(wsFile, sample_names_from = "sampleNode")
       gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, execute = FALSE)
@@ -550,7 +550,7 @@ test_that("v 10.0.8 - vX 20.0 (slash_issue_vX)",{
 
 test_that("v 10.2 - vX 20.0 (EllipsoidGate)",{
       thisPath <- file.path(path, "EllipsoidGate_10.2")
-      wsFile <- file.path(thisPath, "mA J21 for HT.wsp")
+      wsFile <- file.path(thisPath, "mA_J21_for_HT.wsp")
       
       ws <- open_flowjo_xml(wsFile)
       set.seed(1)
@@ -568,7 +568,7 @@ test_that("v 10.2 - vX 20.0 (EllipsoidGate)",{
 test_that("v 7.6.1- win 1.6 (use default biexp trans when channel-specific trans not found within its respective trans group )",{
       
       thisPath <- file.path(path, "GYO")
-      wsFile <- file.path(thisPath, "whole blood GYO-0109 050214.wsp")
+      wsFile <- file.path(thisPath, "whole_blood_GYO-0109_050214.wsp")
       ws <- open_flowjo_xml(wsFile)
       
       gs <- flowjo_to_gatingset(ws, name = 2, subset = 1, path = thisPath,  execute = FALSE)
@@ -636,7 +636,7 @@ test_that("v 7.6.5 - win 1.61 (sample_names_from = 'sampleNode')",{
 test_that("v 9.0.1 - mac 2.0 (HVTN 080-0880)",{
       
       thisPath <- file.path(path, "HVTN/080")
-      wsFile <- file.path(thisPath, "080 batch 0880.xml")
+      wsFile <- file.path(thisPath, "080_batch_0880.xml")
 
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = 4, subset = 1, execute = FALSE)
@@ -752,13 +752,13 @@ test_that("v 9.6.3 - mac 2.0 (ignore highValue for FSC/SSC)",{
 
 test_that("v 9.7.4 - mac 3.0",{
       thisPath <- file.path(path, "v9.7.4")
-      wsFile <- file.path(thisPath, "T1 CHI-002v974.xml")
+      wsFile <- file.path(thisPath, "T1_CHI-002v974.xml")
 
       ws <- open_flowjo_xml(wsFile)
-      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002 PBMC control_101211.fcs", execute = FALSE)
+      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002_PBMC_control_101211.fcs", execute = FALSE)
       expect_is(gs, "GatingSet")
       set.seed(1)
-      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002 PBMC control_101211.fcs")
+      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002_PBMC_control_101211.fcs")
       gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       thisCounts <- gh_pop_compare_stats(gh, path = "full")[, list(xml.count,openCyto.count, node)]
@@ -768,7 +768,7 @@ test_that("v 9.7.4 - mac 3.0",{
 
 test_that("v 9.7.5 - mac 3.0 (no compensation and using calibrationIndex)",{
       thisPath <- file.path(path, "Ragon")
-      wsFile <- file.path(thisPath, "neut v non neut v9.xml")
+      wsFile <- file.path(thisPath, "neut_v_non_neut_v9.xml")
       
       ws <- open_flowjo_xml(wsFile)
       gs <- flowjo_to_gatingset(ws, name = 5, subset = "477889_env_cct_norm_concatenated.txt", execute = FALSE)
@@ -847,7 +847,7 @@ test_that("search_for_fcs logic", {
 
 test_that("magnetic gates", {
   thisPath <- file.path(path, "magnetic")
-  ws <- open_flowjo_xml(file.path(thisPath, "2020-03-11 CyTOF gating strategy_dummy.wsp"))
+  ws <- open_flowjo_xml(file.path(thisPath, "2020-03-11_CyTOF_gating_strategy_dummy.wsp"))
   gs <- flowjo_to_gatingset(ws, name = 1)
   thisCounts <- gh_pop_compare_stats(gs[[1]])
   # Give a little cushion to frequency tolerance due to small subsample

@@ -42,7 +42,7 @@ test_that("no gate",{
   
   wsFile <- file.path(path, "no-gate.wsp")
   
-  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  ws <- open_flowjo_xml(wsFile, sample_names_from = 'sampleNode')
   expect_equal(nrow(fj_ws_get_samples(ws)), 1)
   gs <- flowjo_to_gatingset(ws, name = 1, path = file.path(path,"Cytotrol/NHLBI/Tcell/"), include_empty_tree = TRUE)
   expect_equal(range(gh_pop_get_data(gs[[1]]))[,5], c(50.70029, 256.91464), tol = 1e-6)
@@ -55,7 +55,7 @@ test_that("flog-- offset and decades that expose the previous logGml2-based flog
   
   wsFile <- file.path(path, "flog/log.wsp")
   
-  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  ws <- open_flowjo_xml(wsFile, sample_names_from = 'sampleNode')
   gs <- flowjo_to_gatingset(ws, name = 1, path = file.path(path,"Cytotrol/NHLBI/Tcell/"))
   res <- gh_pop_compare_stats(gs[[1]])
   expect_equal(res[, xml.freq], res[, openCyto.freq], tol = 0.01)
@@ -66,7 +66,7 @@ test_that("which.lines",{
   
   wsFile <- file.path(path, "flog_PnE/Liver.wsp")
   
-  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  ws <- open_flowjo_xml(wsFile, sample_names_from = 'sampleNode')
   set.seed(1)
   gs <- flowjo_to_gatingset(ws, name = 2, which.lines = 5e4)
   expect_equal(nrow(gh_pop_get_data(gs[[1]])), 5e4)
@@ -95,7 +95,7 @@ test_that("set T value properly through PnE instead of PnR for flog transform wh
   
   wsFile <- file.path(path, "flog_PnE/Liver.wsp")
   
-  ws <- open_flowjo_xml(wsFile, sampNloc = 'sampleNode')
+  ws <- open_flowjo_xml(wsFile, sample_names_from = 'sampleNode')
   gs <- flowjo_to_gatingset(ws, name = 2)
  
   res <- gh_pop_compare_stats(gs[[1]])
@@ -241,7 +241,7 @@ test_that("curlyQuad gate ",{
 test_that("EllipsoidGate defined on log-transformed channels ",{
       thisPath <- file.path(path, "ellipsoid_log")
       wsFile <- file.path(thisPath, "xml_spillover2.xml")
-      ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
+      ws <- open_flowjo_xml(wsFile, sample_names_from = "sampleNode")
       capture.output(gs <- flowjo_to_gatingset(ws, name=1, execute = T, subset = "spillover_B2.fcs"))
        
       res <- gh_pop_compare_stats(gs[[1]])
@@ -434,7 +434,7 @@ test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
       thisPath <- file.path(path, "PROVIDE")
       wsFile <- file.path(thisPath, "batch1 local and week 53.wsp")
       
-      ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
+      ws <- open_flowjo_xml(wsFile, sample_names_from = "sampleNode")
       gs <- flowjo_to_gatingset(ws, name = 1, subset = 3, execute = FALSE)
       expect_is(gs, "GatingSet")
       
@@ -449,7 +449,7 @@ test_that("v 10.0.7 - vX 20.0 (PROVIDE/CyTOF) ellipseidGate (fasinh)",{
       #switch to the corrected wsp
       wsFile <- file.path(thisPath, "count_corrected.wsp")
       
-      ws <- open_flowjo_xml(wsFile, sampNloc = "sampleNode")
+      ws <- open_flowjo_xml(wsFile, sample_names_from = "sampleNode")
       capture.output(gs <- flowjo_to_gatingset(ws, name = 1, subset = 3))
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)[, list(xml.count,openCyto.count, node)]
@@ -587,9 +587,9 @@ test_that("v 7.6.5 - win 1.61 (PBMC)",{
       wsFile <- file.path(thisPath, "Exp2_Tcell.wsp")
 
       ws <- open_flowjo_xml(wsFile)
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, sampNloc = "sampleNode", execute = FALSE)
+      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, sample_names_from = "sampleNode", execute = FALSE)
       expect_is(gs, "GatingSet")
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, sampNloc = "sampleNode")
+      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, sample_names_from = "sampleNode")
       gh <- gs[[1]]
             
       thisCounts <- gh_pop_compare_stats(gh)
@@ -597,17 +597,17 @@ test_that("v 7.6.5 - win 1.61 (PBMC)",{
             
     })
 
-test_that("v 7.6.5 - win 1.61 (sampNloc = 'sampleNode')",{
+test_that("v 7.6.5 - win 1.61 (sample_names_from = 'sampleNode')",{
       
       thisPath <- file.path(path, "Cytotrol/Miami")
       wsFile <- file.path(thisPath, "flowJo/Cytotrol_061112_Tcell.wsp")
 
       ws <- open_flowjo_xml(wsFile)
       
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sampNloc = "sampleNode", execute = FALSE)
+      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sample_names_from = "sampleNode", execute = FALSE)
       expect_is(gs, "GatingSet")
       
-      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sampNloc = "sampleNode")
+      gs <- flowjo_to_gatingset(ws, name = 1, subset = 1, path = file.path(thisPath,"Tcell"), sample_names_from = "sampleNode")
       gh <- gs[[1]]
       thisCounts <- gh_pop_compare_stats(gh)
       expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-4)

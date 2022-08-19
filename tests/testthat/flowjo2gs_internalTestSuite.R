@@ -2,6 +2,21 @@ context("parse workspaces of various flowJo versions ")
 library(data.table)
 path <- "~/rglab/workspace/CytoML/wsTestSuite"
 
+test_that("ellipsoidGate bug",{
+  # ellipse defined on fsc and ssc wasn't properly scaled
+  thisPath <- file.path(path, "Cytotrol/NHLBI/")
+  wsFile <- file.path(thisPath, "ellipse_bug.wsp")
+  
+  ws <- open_flowjo_xml(wsFile)
+  
+  gs <- flowjo_to_gatingset(ws, name = 1, subset = 1)
+  
+  gh <- gs[[1]]
+  
+  thisCounts <- gh_pop_compare_stats(gh)
+  expect_equal(thisCounts[, xml.freq], thisCounts[, openCyto.freq], tol = 2e-2)
+})
+
 test_that("verify the extend logic no longer needed for the gate defined in biexp scale from latest flowjo wsp output",{
   wsFile <- file.path(path, "gate_negative_area.wsp")
   ws <- open_flowjo_xml(wsFile)

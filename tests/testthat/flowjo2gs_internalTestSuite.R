@@ -770,10 +770,10 @@ test_that("v 9.7.4 - mac 3.0",{
       wsFile <- file.path(thisPath, "T1_CHI-002v974.xml")
 
       ws <- open_flowjo_xml(wsFile)
-      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002_PBMC_control_101211.fcs", execute = FALSE)
+      gs <- flowjo_to_gatingset(ws, name = "CHI-002_PBMC_control", subset = "CHI-002_PBMC_control_101211.fcs", execute = FALSE)
       expect_is(gs, "GatingSet")
       set.seed(1)
-      gs <- flowjo_to_gatingset(ws, name = "CHI-002 PBMC control", subset = "CHI-002_PBMC_control_101211.fcs")
+      gs <- flowjo_to_gatingset(ws, name = "CHI-002_PBMC_control", subset = "CHI-002_PBMC_control_101211.fcs")
       gh <- gs[[1]]
       expectCounts <- fread(file.path(thisPath, "expectCounts.csv"))      
       thisCounts <- gh_pop_compare_stats(gh, path = "full")[, list(xml.count,openCyto.count, node)]

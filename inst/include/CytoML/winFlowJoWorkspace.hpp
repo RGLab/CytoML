@@ -870,7 +870,7 @@ public:
 				  // and only meaningful for scaling cytolib::ellipsoidGate from 256 back
 				  // minRange=atof(transNode.getProperty("minRange").c_str());to raw
 				  cytolib::EVENT_DATA_TYPE maxRange =
-				    atof(transNode.getProperty("transforms:maxRange").c_str());
+				    atof(transNode.getProperty("maxRange").c_str());
 				  if (maxRange == 0) maxRange = 1;
 				  
 				  std::shared_ptr<cytolib::scaleTrans> curTran(

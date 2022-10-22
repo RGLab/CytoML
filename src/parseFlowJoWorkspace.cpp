@@ -113,9 +113,9 @@ cpp11::external_pointer<GatingSet> parse_workspace(cpp11::external_pointer<flowJ
   if(comps.size()==1&&Rf_isNull(comps.names()))
   {
 	  if(!Rf_isMatrix(comps[0]))
-		cpp11::stop("compensation must be of the type of cpp11::doubles_matrix, ");
+		cpp11::stop("compensation must be of the type of cpp11::doubles_matrix<>, ");
 
-	  config.global_comp = mat_to_comp(cpp11::as_cpp<cpp11::doubles_matrix>(comps[0]));
+	  config.global_comp = mat_to_comp(cpp11::as_cpp<cpp11::doubles_matrix<>>(comps[0]));
   }
   else
 	  config.compensation_map = list_to_comps(comps);

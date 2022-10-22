@@ -174,9 +174,9 @@ export_gates_cytobank <- function(gs, flowEnv, trans.Gm2objs, trans, compId, sho
 }
 
 
-#' @importFrom base64enc base64encode base64decode
+#' @importFrom jsonlite base64_enc base64_dec
 base64encode_cytobank <- function(x){
-  x <- base64encode(charToRaw(x))
+  x <- base64_enc(charToRaw(x))
   x <- gsub("=", ".", x)
   x <- gsub("\\+", "_", x)
   x <- gsub("/", "-", x)
@@ -186,7 +186,7 @@ base64decode_cytobank <- function(x){
   x <- gsub("\\.", "=", x)
   x <- gsub("_", "\\+", x)
   x <- gsub("-", "/", x)
-  base64decode(x)
+  base64_dec(x)
 }
 
 

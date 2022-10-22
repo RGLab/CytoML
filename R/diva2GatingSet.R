@@ -94,7 +94,7 @@ open_diva_xml <- function(file,options = 0,...){
 
 #' @export
 diva_get_sample_groups <- function(x){
-    ldply(
+  do.call(rbind, 
         xpathApply(x@doc, "/bdfacs/experiment/specimen",function(specimen){
               samples <- xpathApply(specimen, "tube",function(tube){
                                             c(tube = xmlGetAttr(tube,"name")
@@ -102,7 +102,7 @@ diva_get_sample_groups <- function(x){
                                             )
                                   })
 
-              samples <- ldply(samples)
+              samples <- do.call(rbind, lapply(samples, function(i)data.frame(t(i))))
               samples[["specimen"]] <- xmlGetAttr(specimen, "name")
               samples
             })
@@ -122,7 +122,6 @@ diva_get_sample_groups <- function(x){
 #' @return
 #' A \code{data.frame} with columns \code{tub}, \code{name}, and \code{specimen}
 #' @importFrom methods selectMethod
-#' @importFrom plyr ldply
 #' @export
 diva_get_samples <- diva_get_sample_groups
 

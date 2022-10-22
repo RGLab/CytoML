@@ -66,8 +66,8 @@ open_flowjo_xml <- function(file,options = 0, sample_names_from = "keyword", ...
 }
 
 set_log_level <- function(level = "none"){
-  if(.Platform$OS.type != "windows")
-    stop("Please call 'flowWorkspace::set_log_level' for non-windows platforms!")
+  # if(.Platform$OS.type != "windows")
+    # stop("Please call 'flowWorkspace::set_log_level' for non-windows platforms!")
   valid_levels <- c("none", "GatingSet", "GatingHierarchy", "Population", "Gate")
   level <- match.arg(level, valid_levels)
   setLogLevel( as.integer(match(level, valid_levels) - 1))
@@ -188,7 +188,6 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #' @rdname flowjo_to_gatingset
 #' @export 
 #' @importFrom utils menu
-#' @importFrom RcppParallel RcppParallelLibs
 #' @importFrom dplyr enquo
 #' @importFrom flowWorkspace cytoset get_default_backend
 flowjo_to_gatingset <- function(ws, name = NULL
@@ -292,8 +291,10 @@ backend <- match.arg(backend, c("h5", "tile"))
     {
       compensation <- sapply(compensation, check_comp, simplify = FALSE)
     }else
+    {
       compensation <- check_comp(compensation)
-      
+      compensation <- list(compensation)
+    } 
   }
   args <- list(ws = ws@doc
                  , group_id = groupInd - 1

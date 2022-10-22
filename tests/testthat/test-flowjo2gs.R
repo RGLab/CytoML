@@ -168,7 +168,9 @@ test_that("parse pData from keyword", {
     #parse pData from xml
     expect_error(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4, keywords = keys, execute = F, keywords.source="FCS")
                  , "Can't parse phenodata", class = "error")
-    dd <- capture.output(suppressMessages(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4, keywords = keys, execute = F)))
+    dd <- capture.output(suppressMessages(gs1 <- flowjo_to_gatingset(ws, path = dataDir, name = 4
+                                                                     , keywords = keys
+                                                                     , execute = F)))
     pd1 <- pData(gs1)
     expect_equal(nrow(pd1), 4)
     

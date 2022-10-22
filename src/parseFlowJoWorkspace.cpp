@@ -6,16 +6,16 @@
  *  Created on: Mar 30, 2012
  *      Author: wjiang2
  */
+#include <cpp11.hpp>
 #include "CytoML/openWorkspace.hpp"
 #include "flowWorkspace.h"
-using namespace Rcpp;
 using namespace cytolib;
 using namespace CytoML;
 WS_INIT()
 
 //only needed for win
-//[[Rcpp::export]]
-void setLogLevel(unsigned short loglevel) {
+[[cpp11::register]]
+void setLogLevel(int short loglevel) {
   
   g_loglevel = loglevel;
   
@@ -24,38 +24,39 @@ GatingSet * getGsPtr(SEXP _gsPtr){
 
 	if(R_ExternalPtrAddr(_gsPtr)==0)
 			throw(domain_error("Null GatingSet pointer!"));
-	XPtr<GatingSet>gs(_gsPtr);
+	cpp11::external_pointer<GatingSet>gs(_gsPtr);
 
-	return gs;
+        return gs.get();
+
 }
 /*
  * can't use module for exposing overloaded methods
  */
 
 
-//[[Rcpp::export]]
-XPtr<flowJoWorkspace> open_workspace(string filename, int sample_name_location, int xmlParserOption)
+[[cpp11::register]]
+cpp11::external_pointer<flowJoWorkspace> open_workspace(std::string filename, int sample_name_location, int xmlParserOption)
 {
 
   unique_ptr<flowJoWorkspace> ws = openWorkspace(filename, static_cast<SAMPLE_NAME_LOCATION>(sample_name_location),xmlParserOption);
 
-  return XPtr<flowJoWorkspace>(ws.release());
+  return cpp11::external_pointer<flowJoWorkspace>(ws.release());
 }
 
 
-//[[Rcpp::export]]
-XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
+[[cpp11::register]]
+cpp11::external_pointer<GatingSet> parse_workspace(cpp11::external_pointer<flowJoWorkspace> ws
                                   , int group_id
-                                  , List subset
+                                  , cpp11::list subset
                                   , bool execute
-                                  , string path
-								  , XPtr<GatingSet> cytoset
-                                  , string backend_dir
-								  , string backend
+                                  , std::string path
+								  , cpp11::external_pointer<GatingSet> cytoset
+                                  , std::string backend_dir
+								  , std::string backend
                                   , bool includeGates
-                                  , vector<string> additional_keys
+                                  , vector<std::string> additional_keys
                                   , bool additional_sampleID
-                                  , vector<string> keywords
+                                  , vector<std::string> keywords
                                   , bool is_pheno_data_from_FCS
                                   , bool keyword_ignore_case
                                   , float extend_val
@@ -64,11 +65,11 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
                                   , bool leaf_bool
 								  , bool include_empty_tree
 								  , bool skip_faulty_gate
-								  , List comps
+								  , cpp11::list comps
 								  , bool transform
-								  , string fcs_file_extension
+								  , std::string fcs_file_extension
 								  , bool greedy_match
-								 , FCS_READ_PARAM fcs_parse_arg
+								 , SEXP fcs_parse_arg
                                  , int num_threads = 1
 )
 {
@@ -97,94 +98,94 @@ XPtr<GatingSet> parse_workspace(XPtr<flowJoWorkspace> ws
   SEXP nm = subset.names();
   if(!Rf_isNull(nm))//without NULL checking, the following line will fail
   {
-	  vector<string> filter_names = as<vector<string> >(nm);
+	  vector<std::string> filter_names = cpp11::as_cpp<vector<std::string> >(nm);
 
-	  for(unsigned i = 0; i < filter_names.size(); i++)
+	  for(int i = 0; i < filter_names.size(); i++)
 	  {
-		string filter_name = filter_names[i];
-		config.sample_filters[filter_name] = as<vector<string>>(subset[filter_name]);
+		std::string filter_name = filter_names[i];
+		config.sample_filters[filter_name] = cpp11::as_cpp<vector<std::string>>(subset[filter_name]);
 	  }
   }
   //fcs parser config
-  config.fcs_read_param = fcs_parse_arg;
+  config.fcs_read_param = sexp_to_fcs_read_param(fcs_parse_arg);
 //  config.fcs_read_param.data.num_threads = num_threads;
   config.num_threads = num_threads;
   if(comps.size()==1&&Rf_isNull(comps.names()))
   {
 	  if(!Rf_isMatrix(comps[0]))
-		stop("compensation must be of the type of NumericMatrix, ");
+		cpp11::stop("compensation must be of the type of cpp11::doubles_matrix, ");
 
-	  config.global_comp = mat_to_comp(as<NumericMatrix>(comps[0]));
+	  config.global_comp = mat_to_comp(cpp11::as_cpp<cpp11::doubles_matrix>(comps[0]));
   }
   else
 	  config.compensation_map = list_to_comps(comps);
 
   unique_ptr<GatingSet> gs = ws->to_GatingSet(group_id, config, *cytoset);
-  return XPtr<GatingSet>(gs.release());
+  return cpp11::external_pointer<GatingSet>(gs.release());
 }
 
-//[[Rcpp::export]]
-KW_PAIR get_keywords_by_id(XPtr<flowJoWorkspace> ws, int sample_id)
+[[cpp11::register]]
+SEXP get_keywords_by_id(cpp11::external_pointer<flowJoWorkspace> ws, int sample_id)
 {
-  return ws->get_keywords(sample_id).getPairs();
+  return kw_to_sexp(ws->get_keywords(sample_id).getPairs());
 }
 
-//[[Rcpp::export]]
-KW_PAIR get_keywords_by_name(XPtr<flowJoWorkspace> ws, string sample_name)
+[[cpp11::register]]
+SEXP get_keywords_by_name(cpp11::external_pointer<flowJoWorkspace> ws, std::string sample_name)
 {
   wsSampleNode node = ws->get_sample_node(sample_name);
-  return ws->get_keywords(node).getPairs();
+  return kw_to_sexp(ws->get_keywords(node).getPairs());
 }
 
-//[[Rcpp::export]]
-List get_sample_groups(XPtr<flowJoWorkspace> ws)
+[[cpp11::register]]
+cpp11::list get_sample_groups(cpp11::external_pointer<flowJoWorkspace> ws)
 {
 
   vector<SampleGroup> groups = ws->get_sample_groups();
-  unsigned nGroup = groups.size();
-  IntegerVector group_ids(nGroup);
-  StringVector group_names(nGroup);
-  List sample_ids(nGroup);
-  for(unsigned i = 0; i < nGroup; i++)
+  int nGroup = groups.size();
+  cpp11::writable::integers group_ids(nGroup);
+  cpp11::writable::strings group_names(nGroup);
+  cpp11::writable::list sample_ids(nGroup);
+  for(int i = 0; i < nGroup; i++)
   {
     group_ids[i] = i;
     group_names[i] = groups[i].group_name;
-    unsigned nSample = groups[i].sample_ids.size();
-    IntegerVector sample_id_vec(nSample);
-    for(unsigned j = 0; j < nSample; j++)
+    int nSample = groups[i].sample_ids.size();
+    cpp11::writable::integers sample_id_vec(nSample);
+    for(int j = 0; j < nSample; j++)
       sample_id_vec[j] = groups[i].sample_ids[j];
     sample_ids[i] = sample_id_vec;
   }
 
-  return List::create(Named("groupID") = group_ids
-                    , Named("groupName") = group_names
-                     , Named("sampleID") = sample_ids
-                    );
+  return cpp11::list({cpp11::named_arg("groupID") = group_ids
+                    , cpp11::named_arg("groupName") = group_names
+                     , cpp11::named_arg("sampleID") = sample_ids
+  });
 }
 
-//[[Rcpp::export]]
-List get_samples(XPtr<flowJoWorkspace> ws)
+[[cpp11::register]]
+cpp11::list get_samples(cpp11::external_pointer<flowJoWorkspace> ws)
 {
 
   vector<SampleGroup> groups = ws->get_sample_groups();
-  unsigned nGroup = groups.size();
-  List grouplist(nGroup);
+  int nGroup = groups.size();
+  cpp11::writable::list grouplist(nGroup);
   ParseWorkspaceParameters config;
   config.include_empty_tree = true;
-  for(unsigned i = 0; i < nGroup; i++)
+  for(int i = 0; i < nGroup; i++)
   {
     const vector<SampleInfo> & sample_info_vec = ws->get_sample_info(groups[i].sample_ids, config);
-    unsigned nSample = sample_info_vec.size();
-    List samples(nSample);
+    int nSample = sample_info_vec.size();
+    cpp11::writable::list samples(nSample);
 
-    for(unsigned j = 0; j < nSample; j++)
+    for(int j = 0; j < nSample; j++)
     {
       const SampleInfo & sample_info = sample_info_vec[j];
-      samples[j] = List::create(Named("sampleID") = sample_info.sample_id
-                                  , Named("name") = sample_info.sample_name
-                                  , Named("count") = sample_info.total_event_count
-                                  , Named("pop.counts") = sample_info.population_count
-                                  );
+      samples[j] = cpp11::list({cpp11::named_arg("sampleID") = sample_info.sample_id
+                                  , cpp11::named_arg("name") = sample_info.sample_name
+                                  , cpp11::named_arg("count") = sample_info.total_event_count
+                                  , cpp11::named_arg("pop.counts") = sample_info.population_count
+      });
 
     }
 
@@ -195,14 +196,9 @@ List get_samples(XPtr<flowJoWorkspace> ws)
 }
 
 
-// //[[Rcpp::export]]
-// string get_version(XPtr<flowJoWorkspace> ws)
-// {
-//   return ws->parseVersionList();
-// }
 
-//[[Rcpp::export]]
-string get_xml_file_path(XPtr<flowJoWorkspace> ws)
+[[cpp11::register]]
+std::string get_xml_file_path(cpp11::external_pointer<flowJoWorkspace> ws)
 {
   return ws->get_xml_file_path();
 }

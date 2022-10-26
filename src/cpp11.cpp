@@ -3,6 +3,7 @@
 
 #include "CytoML_types.h"
 #include "cpp11/declarations.hpp"
+#include <R_ext/Visibility.h>
 
 // parseFlowJoWorkspace.cpp
 void setLogLevel(int short loglevel);
@@ -63,16 +64,6 @@ extern "C" SEXP _CytoML_get_xml_file_path(SEXP ws) {
 }
 
 extern "C" {
-/* .Call calls */
-extern SEXP _CytoML_get_keywords_by_id(SEXP, SEXP);
-extern SEXP _CytoML_get_keywords_by_name(SEXP, SEXP);
-extern SEXP _CytoML_get_sample_groups(SEXP);
-extern SEXP _CytoML_get_samples(SEXP);
-extern SEXP _CytoML_get_xml_file_path(SEXP);
-extern SEXP _CytoML_open_workspace(SEXP, SEXP, SEXP);
-extern SEXP _CytoML_parse_workspace(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _CytoML_setLogLevel(SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_CytoML_get_keywords_by_id",   (DL_FUNC) &_CytoML_get_keywords_by_id,    2},
     {"_CytoML_get_keywords_by_name", (DL_FUNC) &_CytoML_get_keywords_by_name,  2},
@@ -86,7 +77,7 @@ static const R_CallMethodDef CallEntries[] = {
 };
 }
 
-extern "C" void R_init_CytoML(DllInfo* dll){
+extern "C" attribute_visible void R_init_CytoML(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);

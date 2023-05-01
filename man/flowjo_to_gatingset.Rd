@@ -54,8 +54,7 @@ Or an \code{expression} to be passed to 'subset' function to filter samples by '
 
 \item{execute}{\code{TRUE|FALSE} a logical specifying if the gates, transformations, and compensation should be immediately calculated after the flowJo workspace have been imported. TRUE by default.}
 
-\item{path}{either a \code{character} scalar or \code{data.frame}. When \code{character}, it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
-When it is a \code{data.frame}, it is expected to contain two columns:'sampleID' and 'file', which is used as the mapping between 'sampleID' and FCS file (absolute) path. When such mapping is provided, the file system searching is avoided.}
+\item{path}{either a \code{character} scalar . it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files.}
 
 \item{cytoset}{a \code{cytoset} object that provides the alternative data source other than FCS files. It is useful sometime to preprocess the raw fcs files
 (e.g. standardize channels using \code{cytoqc} package) and then directly use them for flowJo parsing.

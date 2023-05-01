@@ -118,8 +118,7 @@ setMethod("parseWorkspace",signature("flowjo_workspace"),function(obj, ...){
 #'                        Or a \code{character} specifying the FCS filenames to be imported.
 #'                        Or an \code{expression} to be passed to 'subset' function to filter samples by 'pData' (Note that the columns referred by the expression must also be explicitly specified in 'keywords' argument)  
 #' @param  includeGates \code{logical} Should gates be imported, or just the data with compensation and transformation?
-#' @param  path either a \code{character} scalar or \code{data.frame}. When \code{character}, it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
-#'                                                          When it is a \code{data.frame}, it is expected to contain two columns:'sampleID' and 'file', which is used as the mapping between 'sampleID' and FCS file (absolute) path. When such mapping is provided, the file system searching is avoided.
+#' @param  path either a \code{character} scalar . it is a path to the fcs files that are to be imported. The code will search recursively, so you can point it to a location above the files. 
 #' @param cytoset a \code{cytoset} object that provides the alternative data source other than FCS files. It is useful sometime to preprocess the raw fcs files
 #'                                   (e.g. standardize channels using \code{cytoqc} package) and then directly use them for flowJo parsing.
 #'                                   when cytoset is provided, \code{path} argument is ignored.

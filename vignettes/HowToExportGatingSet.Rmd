@@ -60,7 +60,7 @@ tbl[c(8,11), gating_args:= "gate_range = c(2e3, 3e3)"]
 gtFile <- tempfile()
 write.csv(tbl, file = gtFile)
 ##reload the new template
-gt <- gatingTemplate(gtFile, autostart = 1L)
+gt <- gatingTemplate(gtFile)
 #run the gating
 gating(gt, gs)
 #hide the gates that are not of interest

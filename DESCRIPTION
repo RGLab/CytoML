@@ -66,5 +66,5 @@ Collate:
     'transforms.R'
     'utils.R'
     'writeGatingML.R'
-SystemRequirements: xml2, GNU make, C++11    
+SystemRequirements: xml2, GNU make, C++17    
 Encoding: UTF-8
